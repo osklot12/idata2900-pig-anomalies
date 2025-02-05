@@ -3,144 +3,110 @@ import json
 import requests
 import tensorflow as tf
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from io import BytesIO
 
 # 🔹 CONFIGURE YOUR BUCKET
 BUCKET_NAME = "norsvin-g2b-behavior-prediction"
-script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the script
-CREDENTIALS_FILE = os.path.join(script_dir, "user_oauth_credentials.json")  # Absolute path
 ANNOTATIONS_PATH = "g2b_behaviour/releases/g2b-prediction/annotations"
 SEED = 42  # Ensures deterministic shuffling
-
+CREDENTIALS_FILE = r"C:\Users\chris\Documents\Skole2025\IDATA2900\idata2900-pig-anomalies\.secrets\norsvin-research-3706-gn2bhv-06eecdfeb6aa.json"
 SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
 
-def get_access_token():
-    """Authenticate using stored OAuth token instead of client_secret.json."""
-    creds = None
+class GCPStorageHandler:
+    """Handles authentication and interactions with Google Cloud Storage."""
 
-    if os.path.exists(CREDENTIALS_FILE):
-        creds = Credentials.from_authorized_user_file(CREDENTIALS_FILE, SCOPES)
+    def __init__(self, bucket_name=BUCKET_NAME, credentials_path=CREDENTIALS_FILE):
+        self.bucket_name = bucket_name
+        self.credentials_path = credentials_path
+        self.token = None
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            raise FileNotFoundError("❌ OAuth token expired or missing. Ensure 'user_oauth_credentials.json' exists.")
+    def authenticate(self):
+        """Authenticate using the service account and refresh the token."""
+        if not os.path.exists(self.credentials_path):
+            raise FileNotFoundError(f"❌ Service account file not found: {self.credentials_path}")
 
-    return creds.token
+        creds = service_account.Credentials.from_service_account_file(
+            self.credentials_path, scopes=SCOPES
+        )
 
+        creds.refresh(Request())  # Ensure token is fresh
+        self.token = creds.token
 
-def list_files_in_bucket():
-    """List all video files in the GCS bucket."""
-    access_token = get_access_token()
-    headers = {"Authorization": f"Bearer {access_token}"}
-    url = f"https://www.googleapis.com/storage/v1/b/{BUCKET_NAME}/o"
+    def get_access_token(self):
+        """Returns a valid access token (refreshes if needed)."""
+        if not self.token:
+            self.authenticate()
+        return self.token
 
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print(f"❌ Error listing files: {response.text}")
-        return []
+    def list_files(self, prefix="", file_extension=""):
+        """List all files in the GCS bucket, optionally filtering by prefix and extension."""
+        self.authenticate()
+        headers = {"Authorization": f"Bearer {self.get_access_token()}"}
+        url = f"https://www.googleapis.com/storage/v1/b/{self.bucket_name}/o?prefix={prefix}"
 
-    files = [file["name"] for file in response.json().get("items", []) if file["name"].endswith(".mp4")]
-    print(f"🔍 Found {len(files)} videos in the bucket")
-    print(f"📝 Sample filenames: {files[:3]}")
-    files.sort()
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            print(f"❌ Error listing files: {response.text}")
+            return []
 
-    tf.random.set_seed(SEED)
-    shuffled_files = tf.random.shuffle(files).numpy().tolist()
-    return shuffled_files
+        files = [file["name"] for file in response.json().get("items", []) if file["name"].endswith(file_extension)]
+        return files
 
+    def stream_video(self, blob_name):
+        """Stream a video file from GCS into memory."""
+        self.authenticate()
+        headers = {"Authorization": f"Bearer {self.get_access_token()}"}
+        file_url = f"https://storage.googleapis.com/{self.bucket_name}/{blob_name}"
 
-def stream_video_from_gcs(blob_name):
-    """Stream a video file from Google Cloud Storage into memory."""
-    access_token = get_access_token()
-    headers = {"Authorization": f"Bearer {access_token}"}
-    file_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{blob_name}"
+        response = requests.get(file_url, headers=headers, stream=True, timeout=10)
 
-    response = requests.get(file_url, headers=headers, stream=True, timeout=10)
-    print(f"📥 Streaming {blob_name} | Status Code: {response.status_code}")
-    if response.status_code != 200:
-        print(f"❌ Failed to stream {blob_name}. Error: {response.status_code} | {response.text}")
-    if response.status_code != 200:
-        print(f"❌ Failed to stream {blob_name}. Error: {response.status_code} | {response.text}")
-        return None
+        if response.status_code != 200:
+            print(f"❌ Failed to stream {blob_name}. Error: {response.status_code} | {response.text}")
+            return None
 
-    return BytesIO(response.content)
+        return BytesIO(response.content)
 
+    def download_json(self, blob_name):
+        """Download a JSON file from GCS and return the parsed content."""
+        self.authenticate()
+        headers = {"Authorization": f"Bearer {self.get_access_token()}"}
+        file_url = f"https://storage.googleapis.com/{self.bucket_name}/{blob_name}"
 
-def list_annotations():
-    """List all annotation files in the annotations directory."""
-    access_token = get_access_token()
-    headers = {"Authorization": f"Bearer {access_token}"}
-    url = f"https://www.googleapis.com/storage/v1/b/{BUCKET_NAME}/o?prefix={ANNOTATIONS_PATH}"
+        response = requests.get(file_url, headers=headers)
+        if response.status_code != 200:
+            print(f"❌ Failed to download {blob_name}. Error: {response.status_code} | {response.text}")
+            return None
 
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print(f"❌ Error listing annotation files: {response.text}")
-        return []
-
-    annotation_files = [file["name"] for file in response.json().get("items", []) if file["name"].endswith(".json")]
-
-    print(f"📜 Retrieved {len(annotation_files)} annotations")
-    print(f"📝 Sample annotations: {annotation_files[:5]}")  # Show first 5
-    annotation_files.sort()
-    return annotation_files
+        return response.json()
 
 
+class VideoAnnotationLoader:
+    """Handles loading videos and matching them with annotations."""
 
-def download_json(blob_name):
-    """Download an annotation JSON file from GCS and load it into memory."""
-    access_token = get_access_token()
-    headers = {"Authorization": f"Bearer {access_token}"}
-    file_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{blob_name}"
+    def __init__(self, storage_handler):
+        self.storage_handler = storage_handler
 
-    response = requests.get(file_url, headers=headers)
-    if response.status_code != 200:
-        print(f"❌ Failed to download {blob_name}. Error: {response.status_code} | {response.text}")
-        return None
+    def load_videos_with_annotations(self):
+        """Loads videos from GCS into memory and pairs them with annotations."""
+        video_files = self.storage_handler.list_files(file_extension=".mp4")
+        annotation_files = self.storage_handler.list_files(prefix=ANNOTATIONS_PATH, file_extension=".json")
+        combined_data = {}
 
-    return response.json()
+        for video in map(lambda v: v.decode('utf-8') if isinstance(v, bytes) else v, video_files):
+            video_name = os.path.basename(video).replace(".mp4", "")
 
+            matching_annotation = next(
+                (ann for ann in annotation_files if os.path.basename(ann).replace(".json", "") == video_name), None
+            )
 
-def load_videos_with_annotations():
-    """Load videos from GCS into memory and pair them with corresponding annotations."""
-    video_files = list_files_in_bucket()
-    annotation_files = list_annotations()
-    combined_data = {}
+            video_stream = self.storage_handler.stream_video(video)
+            annotation_data = self.storage_handler.download_json(matching_annotation) if matching_annotation else None
 
-    for video in map(lambda v: v.decode('utf-8') if isinstance(v, bytes) else v, video_files):
-        video_name = os.path.basename(video).replace(".mp4", "") if isinstance(video, str) else os.path.basename(
-            video.decode('utf-8')).replace(".mp4", "")
-
-        print(f"🧐 Extracted video filename: {video_name}")
-        print(
-            f"📂 Available annotation filenames: {[os.path.basename(a) for a in annotation_files][:5]}")  # Print first 5
-
-        matching_annotation = next(
-            (ann for ann in annotation_files if os.path.basename(ann).replace(".json", "") == video_name), None)
-
-        print(f"🔎 Checking annotation for {video_name}")
-        print(f"📄 Matching Annotation: {matching_annotation if matching_annotation else '❌ No match found'}")
-
-        video_stream = stream_video_from_gcs(video)
-        annotation_data = download_json(matching_annotation) if matching_annotation else None
-
-        if video_stream and annotation_data:
-            combined_data[video] = {
-                "video_stream": video_stream,
-                "annotation": annotation_data
-            }
-
-    print(f"✅ Total Videos Processed: {len(combined_data)}")
-    for key, value in combined_data.items():
-        print(f"🎥 Video: {key}")
-        print(f"📝 Annotation Sample: {json.dumps(value['annotation'])[:300]}...")
-    return combined_data
-
-
-# Example usage
-print("🚀 Streaming videos and loading annotations into memory...")
-data = load_videos_with_annotations()
-print("🎯 Videos and annotations loaded into memory!")
+            if video_stream and annotation_data:
+                combined_data[video] = {
+                    "video_stream": video_stream,
+                    "annotation": annotation_data
+                }
+        return combined_data
