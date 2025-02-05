@@ -30,7 +30,20 @@ def storage_handler():
 @pytest.fixture
 def video_loader(storage_handler):
     """Fixture to create an instance of VideoAnnotationLoader for tests."""
-    return VideoAnnotationLoader(storage_handler)
+    loader = VideoAnnotationLoader(storage_handler)
+
+    # Mock API calls before calling load_videos_with_annotations()
+    loader.storage_handler.list_files = MagicMock(
+        side_effect=[
+            ["test_video.mp4"],  # Mock video file list
+            ["g2b_behaviour/releases/g2b-prediction/test_video.json"],  # Mock annotation file
+        ]
+    )
+    loader.storage_handler.stream_video = MagicMock(return_value=BytesIO(b"\x00\x01\x02\x03\x04\x05"))
+    loader.storage_handler.download_json = MagicMock(return_value={"mock_annotation": True})
+
+    return loader
+
 
 
 # 🔹 Test Authentication
@@ -108,3 +121,21 @@ def test_video_annotation_matching(video_loader):
     assert len(combined_data) == 1
     assert "video1.mp4" in combined_data
     assert combined_data["video1.mp4"]["annotation"] == {"mock_annotation": True}
+
+# 🔹 Test Video Loading as 1D Byte Array
+@patch("requests.get")
+def test_video_as_1d_array(mock_get, video_loader):
+    """Test if videos are correctly stored as 1D byte arrays."""
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.content = b"\x00\x01\x02\x03\x04\x05"  # Mock binary video data
+
+    # Call load_videos_with_annotations after mocking
+    video_loader.load_videos_with_annotations()
+
+    # Fetch video as a 1D array
+    video_1d_array = video_loader.get_video_as_1d_array("test_video.mp4")
+
+    assert isinstance(video_1d_array, list)  # Should be a list
+    assert all(isinstance(byte, int) for byte in video_1d_array)  # Each element should be an int
+    assert video_1d_array == [0, 1, 2, 3, 4, 5]  # Expected byte sequence
+
