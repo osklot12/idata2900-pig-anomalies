@@ -85,16 +85,23 @@ class GCPStorageHandler:
 class VideoAnnotationLoader:
     """Handles loading videos and matching them with annotations."""
 
-    def __init__(self, storage_handler):
+    def __init__(self, storage_handler, max_loaded_videos=20):
         self.storage_handler = storage_handler
+        self.max_loaded_videos = max_loaded_videos
+        self.loaded_videos = {}  # Stores video_name -> 1D byte array
+
+    def _convert_to_1d_array(self, video_stream):
+        """Convert video stream to a 1D unsigned byte array (0-255)."""
+        return [b & 0xFF for b in video_stream.read()]  # Ensures all values remain in 0-255 range
 
     def load_videos_with_annotations(self):
-        """Loads videos from GCS into memory and pairs them with annotations."""
-        video_files = self.storage_handler.list_files(file_extension=".mp4")
+        """Loads up to max_loaded_videos into memory and pairs them with annotations."""
+        video_files = self.storage_handler.list_files(file_extension=".mp4")[:self.max_loaded_videos]
         annotation_files = self.storage_handler.list_files(prefix=ANNOTATIONS_PATH, file_extension=".json")
+
         combined_data = {}
 
-        for video in map(lambda v: v.decode('utf-8') if isinstance(v, bytes) else v, video_files):
+        for video in video_files:
             video_name = os.path.basename(video).replace(".mp4", "")
 
             matching_annotation = next(
@@ -105,8 +112,17 @@ class VideoAnnotationLoader:
             annotation_data = self.storage_handler.download_json(matching_annotation) if matching_annotation else None
 
             if video_stream and annotation_data:
+                video_1d_array = self._convert_to_1d_array(video_stream)
                 combined_data[video] = {
-                    "video_stream": video_stream,
+                    "video_bytes": video_1d_array,  # Store as a 1D array
                     "annotation": annotation_data
                 }
+                self.loaded_videos[video] = video_1d_array  # Store in class memory
+
         return combined_data
+
+    def get_video_as_1d_array(self, video_name):
+        """Retrieve a video as a single-dimensional byte array."""
+        return self.loaded_videos.get(video_name, None)
+
+
