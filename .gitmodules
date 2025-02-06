@@ -1,3 +1,0 @@
-[submodule "extern/cpp"]
-	path = extern/cpp
-	url = git@github.com:osklot12/idata2900-pig-anomalies-cpp.git
