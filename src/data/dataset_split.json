@@ -1,0 +1,11 @@
+{
+    "train": [
+        "g2b_behaviour/images/avd13_cam6_20220305142704_20220305142903_fps2.0.mp4"
+    ],
+    "val": [
+        "g2b_behaviour/images/avd13_cam3_20231002110218_20231002110252_fps2.0.mp4"
+    ],
+    "test": [
+        "g2b_behaviour/images/avd1_cam2_20210904165413_20210904165612_fps2.0.mp4"
+    ]
+}
