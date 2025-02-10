@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3f0df77-ed35-4dc7-9331-7226982dfc53" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/idata2900-pig-anomalies.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/idata2900-pig-anomalies.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/unit/data/data_loader_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/unit/data/test_dataloader.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +44,7 @@
     "Python tests.pytest for test_dataloader.test_video_as_1d_array.executor": "Run",
     "Python tests.pytest for test_framestream.test_framestream_initialization.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "ext",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/osklot12/code/idata2900-pig-anomalies/data/test",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
