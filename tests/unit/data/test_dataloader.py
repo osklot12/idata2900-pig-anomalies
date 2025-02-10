@@ -26,7 +26,6 @@ def storage_handler():
         yield handler
 
 
-
 @pytest.fixture
 def video_loader(storage_handler):
     """Fixture to create an instance of VideoAnnotationLoader for tests."""
@@ -45,7 +44,6 @@ def video_loader(storage_handler):
     return loader
 
 
-
 # 🔹 Test Authentication
 @patch("src.data.data_loader.service_account.Credentials.from_service_account_file")
 @patch("os.path.exists", return_value=True)  # 🔹 Pretend the file always exists
@@ -58,7 +56,6 @@ def test_authentication(mock_open, mock_exists, mock_creds, storage_handler):
     storage_handler.authenticate()
 
     assert storage_handler.token == "mock_access_token"
-
 
 
 
@@ -121,6 +118,7 @@ def test_video_annotation_matching(video_loader):
     assert len(combined_data) == 1
     assert "video1.mp4" in combined_data
     assert combined_data["video1.mp4"]["annotation"] == {"mock_annotation": True}
+
 
 # 🔹 Test Video Loading as 1D Byte Array
 @patch("requests.get")

@@ -5,10 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3f0df77-ed35-4dc7-9331-7226982dfc53" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/data/data/sample-5s.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/idata2900-pig-anomalies.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/idata2900-pig-anomalies.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ext/cpp" beforeDir="false" afterPath="$PROJECT_DIR$/ext/cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/data/test_framestream.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/data/test_framestream.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/unit/data/data_loader_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/unit/data/test_dataloader.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,10 +26,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2sfvDhGGDfsDW5ruhh1Y2XvrWXq" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,6 +39,13 @@
   "keyToString": {
     "Python tests.Python tests for test_framestream.test_framestream_initialization.executor": "Run",
     "Python tests.Python tests for test_framestream.test_framestream_read.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_authentication.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_download_json.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_list_files.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_stream_video.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_video_annotation_matching.executor": "Run",
+    "Python tests.pytest for test_dataloader.test_video_as_1d_array.executor": "Run",
+    "Python tests.pytest for test_framestream.test_framestream_initialization.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "ext",
     "last_opened_file_path": "/home/osklot12/code/idata2900-pig-anomalies/data/test",
@@ -53,12 +61,14 @@
       <recent name="$PROJECT_DIR$/data/test" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
+      <recent name="$PROJECT_DIR$/tests/unit" />
       <recent name="$PROJECT_DIR$/tests/data/data" />
       <recent name="$PROJECT_DIR$/tests/data" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="Python tests for tests.unit.data.test_framestream.test_framestream_initialization" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python tests.pytest for test_dataloader.test_video_as_1d_array">
+    <configuration name="pytest for test_dataloader.test_download_json" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="idata2900-pig-anomalies" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,12 +79,14 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;tests.unit.data.test_framestream.test_framestream_initialization&quot;" />
+      <option name="_new_target" value="&quot;test_dataloader.test_download_json&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for tests.unit.data.test_framestream.test_framestream_read" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for test_dataloader.test_list_files" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="idata2900-pig-anomalies" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -85,15 +97,74 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;tests.unit.data.test_framestream.test_framestream_read&quot;" />
+      <option name="_new_target" value="&quot;test_dataloader.test_list_files&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_dataloader.test_stream_video" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="idata2900-pig-anomalies" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit/data" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_dataloader.test_stream_video&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_dataloader.test_video_annotation_matching" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="idata2900-pig-anomalies" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit/data" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_dataloader.test_video_annotation_matching&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_dataloader.test_video_as_1d_array" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="idata2900-pig-anomalies" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit/data" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_dataloader.test_video_as_1d_array&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for tests.unit.data.test_framestream.test_framestream_read" />
-        <item itemvalue="Python tests.Python tests for tests.unit.data.test_framestream.test_framestream_initialization" />
+        <item itemvalue="Python tests.pytest for test_dataloader.test_video_as_1d_array" />
+        <item itemvalue="Python tests.pytest for test_dataloader.test_video_annotation_matching" />
+        <item itemvalue="Python tests.pytest for test_dataloader.test_download_json" />
+        <item itemvalue="Python tests.pytest for test_dataloader.test_stream_video" />
+        <item itemvalue="Python tests.pytest for test_dataloader.test_list_files" />
       </list>
     </recent_temporary>
   </component>
@@ -113,14 +184,32 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738859328356</updated>
-      <workItem from="1738859328885" duration="4293000" />
+      <workItem from="1738859328885" duration="5048000" />
+      <workItem from="1739212334897" duration="415000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/unit/data/test_dataloader.py</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$.coverage" NAME=" Coverage Results" MODIFIED="1738864472430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_stream_video.coverage" NAME="pytest for test_dataloader.test_stream_video Coverage Results" MODIFIED="1739212708469" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_video_as_1d_array.coverage" NAME="pytest for test_dataloader.test_video_as_1d_array Coverage Results" MODIFIED="1739212720674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_framestream_test_framestream_initialization.coverage" NAME="pytest for test_framestream.test_framestream_initialization Coverage Results" MODIFIED="1739212347429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_download_json.coverage" NAME="pytest for test_dataloader.test_download_json Coverage Results" MODIFIED="1739212713065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_authentication.coverage" NAME="pytest for test_dataloader.test_authentication Coverage Results" MODIFIED="1739212685708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_video_annotation_matching.coverage" NAME="pytest for test_dataloader.test_video_annotation_matching Coverage Results" MODIFIED="1739212716776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$.coverage" NAME=" Coverage Results" MODIFIED="1739212350995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
+    <SUITE FILE_PATH="coverage/idata2900_pig_anomalies$pytest_for_test_dataloader_test_list_files.coverage" NAME="pytest for test_dataloader.test_list_files Coverage Results" MODIFIED="1739212703768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/unit/data" />
   </component>
 </project>
