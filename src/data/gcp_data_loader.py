@@ -63,7 +63,7 @@ class GCPDataLoader:
         all_files = self.fetch_all_files()
         return [file for file in all_files if file.startswith(prefix) and file.endswith(file_extension)]
 
-    def stream_video(self, blob_name: str, chunk_size: int = 8192) -> BytesIO:
+    def stream_video(self, blob_name: str, chunk_size: int = 1920 * 1080) -> BytesIO:
         """
         Streams a video file from GCS in chunks to avoid loading large files into memory.
 
