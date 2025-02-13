@@ -63,6 +63,28 @@ class GCPDataLoader:
         all_files = self.fetch_all_files()
         return [file for file in all_files if file.startswith(prefix) and file.endswith(file_extension)]
 
+    def download_video(self, blob_name: str) -> BytesIO:
+        """
+        Downloads a full video file from GCS into memory.
+
+        :param blob_name: The name of the video file in GCS.
+        :return BytesIO object containing the raw video data.
+        """
+        headers = {"Authorization": f"Bearer {self.get_access_token()}"}
+        file_url = f"https://storage.googleapis.com/{self.bucket_name}/{blob_name}"
+
+        response = requests.get(file_url, headers=headers, stream=True, timeout=60)
+        if response.status_code != 200:
+            raise RuntimeError(f"Failed to download {blob_name}. Error: {response.status_code} | {response.text}")
+
+        video_data = BytesIO()
+        for chunk in response.iter_content(chunk_size=8192):
+            video_data.write(chunk)
+
+        video_data.seek(0)
+
+        return video_data
+
     def stream_video(self, blob_name: str, chunk_size: int = 1920 * 1080) -> BytesIO:
         """
         Streams a video file from GCS in chunks to avoid loading large files into memory.
