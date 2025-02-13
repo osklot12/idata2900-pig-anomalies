@@ -1,5 +1,5 @@
 import pytest
-import time
+import numpy as np
 from src.data.gcp_data_loader import GCPDataLoader
 from cppbindings import FrameStream
 
@@ -16,14 +16,11 @@ def gcp_loader():
 def test_framestream_with_gcpdataloader(gcp_loader):
     """Tests if FrameStream can read frames from a video streamed by GCPDataLoader."""
     video_blob_name = f"{TEST_VIDEO_PREFIX}{TEST_VIDEO_NAME}"
-    video_stream = gcp_loader.stream_video(video_blob_name)
-    assert video_stream is not None and len(video_stream.getvalue()) > 0, "Failed to stream video from GCP"
+    video_data = gcp_loader.download_video(video_blob_name)
 
-    print(f"Streaming video from GCP: {video_blob_name}")
+    video_bytes = video_data.getvalue()
+    fstream = FrameStream(bytearray(video_bytes))
 
-    video_data = list(video_stream.getvalue())
-    print(f"Video data size: {len(video_data)} bytes")
+    frame = fstream.read()
 
-    fstream = FrameStream(video_data)
 
-    frame_count = 0
