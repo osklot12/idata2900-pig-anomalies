@@ -1,7 +1,5 @@
 import os
-import json
 import requests
-import tensorflow as tf
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from io import BytesIO
