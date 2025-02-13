@@ -17,7 +17,6 @@ class GCPDataLoader:
     def __init__(self, bucket_name: str, credentials_path: str, seed: int = 42, shuffle_buffer_size: int = 1000):
         """
         Initializes the GCPDataLoader.
-
         :param bucket_name: The name of the GCS bucket.
         :param credentials_path: The path to the service account JSON credentials file.
         :param seed: The seed for deterministic shuffling.
