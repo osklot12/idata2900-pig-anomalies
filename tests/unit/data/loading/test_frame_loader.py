@@ -1,6 +1,7 @@
 import pytest
 import tensorflow as tf
 from src.data.loading.frame_loader import FrameLoader
+from tests.utils.dummies.dummy_frame_stream import DummyFrameStream
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
@@ -18,6 +19,13 @@ def frame_callback(received_frames):
 
 def test_load_frames(received_frames, frame_callback):
     """Test loading frames using dummy classes"""
-
-    # use the dummy implementations
+    # arrange
     dummy_gcp_loader = DummyGCPDataLoader(bucket_name="mock-bucket", credentials_path="mock-credentials.json")
+    dummy_frame_stream = DummyFrameStream(video_bytes=b"fake_video_data")
+
+    frame_loader = FrameLoader(
+        bucket_name="mock-bucket",
+        credentials_path="mock-credentials.json",
+        callback=frame_callback
+    )
+    frame_loader.data_loader = dummy_gcp_loader

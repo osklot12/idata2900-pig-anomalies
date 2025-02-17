@@ -12,7 +12,7 @@ class GCPDataLoader:
     Now includes deterministic seeding and per-frame shuffling for training.
     """
 
-    def __init__(self, bucket_name: str, credentials_path: str):
+    def __init__(self, bucket_name: str = None, credentials_path: str = None):
         """
         Initializes the GCPDataLoader.
         :param bucket_name: The name of the GCS bucket.
