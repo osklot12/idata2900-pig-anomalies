@@ -9,7 +9,9 @@ class FrameLoader:
     """
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
-    def __init__(self, bucket_name: str, credentials_path: str, callback: Callable[[str, int, tf.Tensor, bool], None]):
+
+    def __init__(self, bucket_name: str, credentials_path: str,
+                 callback: Callable[[str, int, tf.Tensor, bool], None], data_loader):
         self.data_loader = GCPDataLoader(bucket_name, credentials_path)
         self.callback = callback
 
