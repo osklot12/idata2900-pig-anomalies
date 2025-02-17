@@ -1,12 +1,10 @@
 import os
-import json
 import requests
 import random
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from functools import lru_cache
 from io import BytesIO
-import tensorflow as tf
 
 class GCPDataLoader:
     """
@@ -14,22 +12,17 @@ class GCPDataLoader:
     Now includes deterministic seeding and per-frame shuffling for training.
     """
 
-    def __init__(self, bucket_name: str, credentials_path: str, seed: int = 42, shuffle_buffer_size: int = 1000):
+    def __init__(self, bucket_name: str, credentials_path: str):
         """
         Initializes the GCPDataLoader.
         :param bucket_name: The name of the GCS bucket.
         :param credentials_path: The path to the service account JSON credentials file.
-        :param seed: The seed for deterministic shuffling.
-        :param shuffle_buffer_size: The number of frames to hold in the shuffle buffer (for breaking sequence).
         """
         self.bucket_name = bucket_name
         self.credentials_path = credentials_path
         self.token = None
         self.creds = None
-        self.seed = seed
-        self.shuffle_buffer_size = shuffle_buffer_size
         self.authenticate()
-        self.set_seed(self.seed)  # Apply deterministic behavior
 
     def set_seed(self, seed: int):
         """Sets the random seed for deterministic behavior across runs."""
@@ -67,9 +60,7 @@ class GCPDataLoader:
         if response.status_code != 200:
             raise RuntimeError(f"Failed to fetch files: {response.text}")
 
-        file_list = [file["name"] for file in response.json().get("items", [])]
-        random.shuffle(file_list)  # Apply deterministic shuffling
-        return file_list
+        return [file["name"] for file in response.json().get("items", [])]
 
     def list_files(self, prefix="", file_extension=""):
         """Lists files in the bucket with optional prefix and extension filtering."""
@@ -131,33 +122,3 @@ class GCPDataLoader:
             raise RuntimeError(f"Failed to download {blob_name}. Error: {response.status_code} | {response.text}")
 
         return response.json()
-
-    def load_frames_for_training(self, frame_list):
-        """
-        Loads frames into a TensorFlow dataset and applies shuffling to break temporal order.
-
-        :param frame_list: List of frame file names.
-        :return: Shuffled TensorFlow dataset.
-        """
-        random.shuffle(frame_list)  # Initial shuffle for varied frame order
-
-        def load_and_decode_frame(frame_name):
-            """Loads and decodes an image frame from GCS."""
-            headers = {"Authorization": f"Bearer {self.get_access_token()}"}
-            file_url = f"https://storage.googleapis.com/{self.bucket_name}/{frame_name}"
-
-            response = requests.get(file_url, headers=headers)
-            if response.status_code != 200:
-                raise RuntimeError(f"Failed to load frame {frame_name}. Error: {response.status_code}")
-
-            image_bytes = response.content
-            image_tensor = tf.image.decode_jpeg(image_bytes, channels=3)
-            image_tensor = tf.image.resize(image_tensor, (224, 224))  # Resize for model input
-            image_tensor = image_tensor / 255.0  # Normalize to [0, 1]
-            return image_tensor
-
-        dataset = tf.data.Dataset.from_tensor_slices(frame_list)
-        dataset = dataset.map(lambda x: tf.py_function(load_and_decode_frame, [x], tf.float32))
-        dataset = dataset.shuffle(buffer_size=self.shuffle_buffer_size, seed=self.seed, reshuffle_each_iteration=True)
-
-        return dataset

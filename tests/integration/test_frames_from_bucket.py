@@ -1,6 +1,5 @@
 import pytest
-import numpy as np
-from src.data.gcp_data_loader import GCPDataLoader
+from src.data.loading.gcp_data_loader import GCPDataLoader
 from cppbindings import FrameStream
 
 TEST_BUCKET = "norsvin-g2b-behavior-prediction"
@@ -21,6 +20,5 @@ def test_framestream_with_gcpdataloader(gcp_loader):
     video_bytes = video_data.getvalue()
     fstream = FrameStream(bytearray(video_bytes))
 
-    frame = fstream.read()
-
-
+    while fstream.read():
+        print("Frame read")
