@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from io import BytesIO
-from src.data.gcp_data_loader import GCPDataLoader
+from src.data.loading.gcp_data_loader import GCPDataLoader
 
 # Constants for testing
 TEST_BUCKET = "test-bucket"
