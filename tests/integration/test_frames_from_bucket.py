@@ -1,4 +1,6 @@
 import pytest
+
+from src.auth.gcp_auth_service import GCPAuthService
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from cppbindings import FrameStream
 
@@ -10,7 +12,8 @@ TEST_VIDEO_NAME = "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"
 @pytest.fixture
 def gcp_loader():
     """Create a real GCPDataLoader instance with actual credentials."""
-    return GCPDataLoader(bucket_name=TEST_BUCKET, credentials_path=TEST_CREDENTIALS_PATH)
+    auth_service = GCPAuthService(credentials_path=TEST_CREDENTIALS_PATH)
+    return GCPDataLoader(bucket_name=TEST_BUCKET, auth_service=auth_service)
 
 def test_framestream_with_gcpdataloader(gcp_loader):
     """Tests if FrameStream can read frames from a video streamed by GCPDataLoader."""
