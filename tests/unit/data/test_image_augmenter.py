@@ -1,82 +1,61 @@
+import pytest
 import tensorflow as tf
-import random
-from src.data.pipeline_component import PipelineComponent
+import numpy as np
+from src.data.image_augmentor import ImageAugmentor
 
 
-class ImageAugmentor(PipelineComponent):
-    """
-    Image augmentation class that applies various transformations
-    such as flipping, rotation (random angles), brightness, contrast, zoom, cropping, and noise.
-    """
+@pytest.fixture
+def image_augmentor():
+    """Creates an instance of ImageAugmentor."""
+    return ImageAugmentor(target_size=(224, 224), seed=42)
 
-    def __init__(self, target_size=(224, 224), seed=None):
-        super().__init__()
-        self.target_size = target_size
-        self.seed = seed  # Optional seed for reproducibility
-        if self.seed:
-            random.seed(self.seed)
-            tf.random.set_seed(self.seed)
-        self.to_tf_function()
 
-    def process(self, image: tf.Tensor) -> tf.Tensor:
-        """Applies diverse augmentations to the image."""
-        self._validate_input(image)
-        return self._augment(image)
+@pytest.fixture
+def mock_image():
+    """Generates a mock image tensor (224x224 RGB)."""
+    return tf.random.uniform(shape=(224, 224, 3), minval=0, maxval=1, dtype=tf.float32)
 
-    def _augment(self, image: tf.Tensor) -> tf.Tensor:
-        """Applies a series of random augmentations to an image tensor."""
 
-        # Randomly flip the image (left-right / up-down)
-        if random.random() > 0.5:
-            image = tf.image.flip_left_right(image)
-        if random.random() > 0.5:
-            image = tf.image.flip_up_down(image)
+@pytest.fixture
+def mock_annotation():
+    """Creates a mock annotation dictionary with a bounding box."""
+    return {
+        "bounding_box": {"x": 50, "y": 40, "w": 100, "h": 80},
+        "label": "pig"
+    }
 
-        # Random rotation (any angle, not just 90-degree multiples)
-        image = self._random_rotation(image)
 
-        # Random brightness & contrast adjustment
-        image = tf.image.random_brightness(image, max_delta=0.2)
-        image = tf.image.random_contrast(image, lower=0.7, upper=1.3)
+def test_augmentor_does_not_modify_original_annotation(image_augmentor, mock_image, mock_annotation):
+    """Ensures process() does not modify input annotation in-place."""
+    annotation_copy = mock_annotation.copy()
+    _ = image_augmentor.process(mock_image, mock_annotation, rotation_angle=5)
 
-        # Random zoom (cropping)
-        image = self._random_zoom(image)
+    # Verify the original annotation remains unchanged
+    assert mock_annotation == annotation_copy, "❌ process() modified input annotation in-place!"
 
-        # Random translation (shifting)
-        image = self._random_translate(image)
 
-        # Random noise
-        image = self._add_random_noise(image)
+def test_augmentor_rotates_image(image_augmentor, mock_image, mock_annotation):
+    """Tests that the augmentor applies rotation and keeps image shape valid."""
+    rotated_image, updated_annotation = image_augmentor.process(mock_image, mock_annotation, rotation_angle=5)
 
-        return image
+    assert rotated_image.shape == mock_image.shape, "❌ Image shape changed after rotation!"
+    assert "bounding_box" in updated_annotation, "❌ Bounding box missing in updated annotation!"
 
-    def _random_rotation(self, image: tf.Tensor) -> tf.Tensor:
-        """Rotates image by a small random angle (-30 to 30 degrees)."""
-        angle = random.uniform(-30, 30)  # Random angle in degrees
-        radians = angle * (3.1415926535 / 180)  # Convert to radians
-        return tfa.image.rotate(image, radians)  # Requires TensorFlow Addons
 
-    def _random_zoom(self, image: tf.Tensor) -> tf.Tensor:
-        """Applies random zoom by cropping and resizing."""
-        crop_fraction = random.uniform(0.7, 1.0)  # Keep 70-100% of the original image
-        crop_size = [int(self.target_size[0] * crop_fraction), int(self.target_size[1] * crop_fraction), 3]
-        image = tf.image.resize_with_crop_or_pad(image, crop_size[0], crop_size[1])
-        return tf.image.resize(image, self.target_size)
+def test_augmentor_adjusts_bbox(image_augmentor, mock_image, mock_annotation):
+    """Tests that the bounding box is properly adjusted after augmentation."""
+    _, adjusted_annotation = image_augmentor.process(mock_image, mock_annotation, rotation_angle=5)
 
-    def _random_translate(self, image: tf.Tensor) -> tf.Tensor:
-        """Applies random translation (shifting)."""
-        translations = [random.randint(-20, 20), random.randint(-20, 20)]  # Shift by up to 20 pixels
-        return tfa.image.translate(image, translations)
+    bbox = adjusted_annotation["bounding_box"]
 
-    def _add_random_noise(self, image: tf.Tensor) -> tf.Tensor:
-        """Adds random Gaussian noise to the image."""
-        noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=0.05, dtype=tf.float32)
-        return tf.clip_by_value(image + noise, 0.0, 1.0)  # Keep within valid pixel range
+    assert isinstance(bbox, dict), "❌ Bounding box is not a dictionary!"
+    assert all(k in bbox for k in ["x", "y", "w", "h"]), "❌ Bounding box keys are missing!"
+    assert bbox["w"] > 0 and bbox["h"] > 0, "❌ Bounding box dimensions are invalid!"
 
-    def _validate_input(self, image):
-        """Ensures the input is a valid TensorFlow image tensor."""
-        if not isinstance(image, tf.Tensor):
-            raise TypeError(f"❌ Expected TensorFlow tensor, but got {type(image)} instead.")
 
-        if image.shape.ndims is None or image.shape.ndims != 3:
-            raise ValueError(f"❌ Expected 3D image tensor [H, W, C], but got shape {image.shape}.")
+def test_image_noise_and_flipping(image_augmentor, mock_image, mock_annotation):
+    """Tests that brightness, contrast, and flipping apply correctly."""
+    augmented_image, updated_annotation = image_augmentor.process(mock_image, mock_annotation)
+
+    assert augmented_image.shape == mock_image.shape, "❌ Image shape changed unexpectedly!"
+    assert "bounding_box" in updated_annotation, "❌ Bounding box missing in updated annotation!"
