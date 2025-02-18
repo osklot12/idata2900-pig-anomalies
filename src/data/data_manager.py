@@ -1,152 +1,77 @@
 import tensorflow as tf
-import random
-import threading
 import json
-from src.data.gcp_data_loader import GCPDataLoader
+import os
+import random
 from src.data.image_augmentor import ImageAugmentor
 
 class DataManager:
     """
-    Manages dataset loading, seeding, shuffling, and ensures annotation consistency during augmentation.
+    Manages dataset loading, augmentation, and ensures annotation consistency.
     """
 
-    def __init__(self, bucket_name, credentials_path, seed=42, shuffle_buffer_size=1000, num_threads=4):
+    def __init__(self, output_dir, num_augmented_versions=10):
         """
         Initializes the DataManager.
 
-        :param bucket_name: Name of the GCP bucket.
-        :param credentials_path: Path to GCP credentials.
-        :param seed: Random seed for consistent dataset order.
-        :param shuffle_buffer_size: Size of shuffle buffer to break temporal dependency.
-        :param num_threads: Number of parallel threads for data loading.
+        :param output_dir: Directory to store processed frames and JSON annotations.
+        :param num_augmented_versions: Number of augmented versions to generate per frame.
         """
-        self.gcp_loader = GCPDataLoader(bucket_name, credentials_path)
         self.augmentor = ImageAugmentor(target_size=(224, 224))
-        self.seed = seed
-        self.shuffle_buffer_size = shuffle_buffer_size
-        self.num_threads = num_threads
-        self.loaded_videos = set()  # Tracks already loaded videos to avoid duplicates
-        self.lock = threading.Lock()  # Prevents race conditions in multithreading
-        random.seed(self.seed)
+        self.output_dir = output_dir
+        self.num_augmented_versions = num_augmented_versions
 
-    def load_frames_from_video(self, video_name):
+    def process_video_frames(self, video_name, frame_data, annotation_data):
         """
-        Loads frames from a specific video.
-
-        :param video_name: The name of the video file.
-        :return: List of frame tensors and corresponding annotations.
+        Handles the full data processing pipeline for a single video based on its extracted JPG frames.
         """
-        frame_list = self.gcp_loader.list_files(prefix=f"frames/{video_name}/", file_extension=".jpg")
-        annotation_file = f"annotations/{video_name}.json"
-        annotation_data = self.gcp_loader.download_json(annotation_file) if annotation_file else None
+        assert frame_data, f"❌ No frame data provided for {video_name}"
+        assert annotation_data, f"❌ No annotation data provided for {video_name}"
 
-        frames = []
-        for frame_name in frame_list:
-            frame = self.gcp_loader.stream_video(frame_name)
-            frame_tensor = tf.image.decode_jpeg(frame.read(), channels=3)
-            frame_tensor = tf.image.resize(frame_tensor, (224, 224)) / 255.0  # Normalize
-            frames.append((frame_name, frame_tensor))
+        # Organize augmented sequences
+        augmented_sequences = {i: [] for i in range(self.num_augmented_versions)}
+        annotation_sequences = {i: {} for i in range(self.num_augmented_versions)}
 
-        return frames, annotation_data
+        for frame_name, frame_tensor in frame_data.items():
+            frame_idx = int(frame_name.split("_")[1])  # Extract frame index from name
+            original_annotation = annotation_data["annotations"][0]["frames"].get(str(frame_idx), {})
 
-    def process_video(self, video_name):
+            for aug_version in range(self.num_augmented_versions):
+                # Pass both image and annotation to ImageAugmentor
+                augmented_frame, augmented_annotation = self.augmentor.process(frame_tensor, original_annotation)
+
+                augmented_sequences[aug_version].append(augmented_frame)
+                annotation_sequences[aug_version][frame_idx] = augmented_annotation
+
+        self.save_augmented_data(video_name, augmented_sequences, annotation_sequences)
+
+    def save_augmented_data(self, video_name, augmented_sequences, annotation_sequences):
         """
-        Loads, augments, and processes a video.
-
-        :param video_name: The video to process.
-        :return: Processed frames and updated annotations.
+        Saves augmented frames and corresponding annotations.
         """
-        frames, annotations = self.load_frames_from_video(video_name)
+        for version in range(self.num_augmented_versions):
+            version_dir = os.path.join(self.output_dir, f"{video_name}_version{version}")
+            os.makedirs(version_dir, exist_ok=True)
 
-        if not frames:
-            print(f"❌ No frames found for {video_name}")
-            return [], None
+            # Save frames
+            for frame_idx, frame in enumerate(augmented_sequences[version]):
+                frame_path = os.path.join(version_dir, f"frame_{frame_idx}.jpg")
+                tf.keras.utils.save_img(frame_path, frame.numpy())
 
-        processed_frames = []
-        updated_annotations = {}
+            # Convert EagerTensors in annotations to regular Python floats
+            def convert_annotations(obj):
+                if isinstance(obj, tf.Tensor):
+                    return float(obj.numpy())  # Convert Tensor to float
+                elif isinstance(obj, dict):
+                    return {key: convert_annotations(value) for key, value in obj.items()}  # Recursively convert dicts
+                elif isinstance(obj, list):
+                    return [convert_annotations(item) for item in obj]  # Convert lists
+                else:
+                    return obj  # Return original if no conversion needed
 
-        for frame_name, frame in frames:
-            augmented_frame, new_annotations = self.augment_frame_and_annotations(frame, frame_name, annotations)
-            processed_frames.append((frame_name, augmented_frame))
-            updated_annotations[frame_name] = new_annotations
+            # Apply conversion to annotation JSON
+            json_annotations = convert_annotations(annotation_sequences[version])
 
-        return processed_frames, updated_annotations
-
-    def augment_frame_and_annotations(self, frame, frame_name, annotations):
-        """
-        Augments the frame and updates its corresponding annotations.
-
-        :param frame: TensorFlow image tensor.
-        :param frame_name: The filename of the frame.
-        :param annotations: The annotation dictionary.
-        :return: Augmented frame and updated annotations.
-        """
-        original_height, original_width, _ = frame.shape
-
-        # Select random transformations (flip, rotate)
-        flip_horizontal = random.choice([True, False])
-        flip_vertical = random.choice([True, False])
-        rotation_angle = random.choice([0, 90, 180, 270])
-
-        augmented_frame = frame
-        if flip_horizontal:
-            augmented_frame = tf.image.flip_left_right(augmented_frame)
-        if flip_vertical:
-            augmented_frame = tf.image.flip_up_down(augmented_frame)
-        if rotation_angle == 90:
-            augmented_frame = tf.image.rot90(augmented_frame, k=1)
-        elif rotation_angle == 180:
-            augmented_frame = tf.image.rot90(augmented_frame, k=2)
-        elif rotation_angle == 270:
-            augmented_frame = tf.image.rot90(augmented_frame, k=3)
-
-        # Get bounding box for this frame (if exists)
-        frame_index = int(frame_name.split("_")[-1].split(".")[0])  # Extract frame index from name
-        bbox_data = annotations["annotations"][0]["frames"].get(str(frame_index), {}).get("bounding_box", None)
-
-        if bbox_data:
-            bbox_data = self.adjust_bbox(bbox_data, original_width, original_height, flip_horizontal, flip_vertical, rotation_angle)
-
-        return augmented_frame, bbox_data
-
-    def adjust_bbox(self, bbox, orig_width, orig_height, flip_horizontal, flip_vertical, rotation_angle):
-        """
-        Adjusts bounding box coordinates based on the augmentation applied.
-
-        :param bbox: Original bounding box data.
-        :param orig_width: Original image width.
-        :param orig_height: Original image height.
-        :param flip_horizontal: Whether the image was flipped horizontally.
-        :param flip_vertical: Whether the image was flipped vertically.
-        :param rotation_angle: Rotation applied (0, 90, 180, 270).
-        :return: Adjusted bounding box.
-        """
-        x, y, w, h = bbox["x"], bbox["y"], bbox["w"], bbox["h"]
-
-        # Flip Adjustments
-        if flip_horizontal:
-            x = orig_width - (x + w)
-        if flip_vertical:
-            y = orig_height - (y + h)
-
-        # Rotation Adjustments
-        if rotation_angle == 90:
-            x_new = y
-            y_new = orig_width - (x + w)
-            w_new = h
-            h_new = w
-        elif rotation_angle == 180:
-            x_new = orig_width - (x + w)
-            y_new = orig_height - (y + h)
-            w_new = w
-            h_new = h
-        elif rotation_angle == 270:
-            x_new = orig_height - (y + h)
-            y_new = x
-            w_new = h
-            h_new = w
-        else:  # No rotation
-            x_new, y_new, w_new, h_new = x, y, w, h
-
-        return {"x": x_new, "y": y_new, "w": w_new, "h": h_new}
-
+            # Save annotations
+            annotation_path = os.path.join(version_dir, "annotations.json")
+            with open(annotation_path, "w") as f:
+                json.dump(json_annotations, f)

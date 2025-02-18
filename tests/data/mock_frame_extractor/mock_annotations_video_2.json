@@ -1,0 +1,28 @@
+{
+    "version": "2.0",
+    "schema_ref": "https://darwin-public.s3.eu-west-1.amazonaws.com/darwin_json/2.0/schema.json",
+    "item": {
+        "name": "video_2.mp4",
+        "path": "/",
+        "source_info": {
+            "item_id": "mock-video-2",
+            "dataset": {"name": "mock_dataset", "slug": "mock_dataset"},
+            "team": {"name": "MockTeam", "slug": "mockteam"}
+        },
+        "slots": [{"type": "video", "slot_name": "0", "width": 1920, "height": 1080, "fps": 2}]
+    },
+    "annotations": [
+        {
+            "frames": {
+                "1": {"bounding_box": {"x": 520, "y": 300, "w": 90, "h": 110}, "keyframe": true},
+                "2": {"bounding_box": {"x": 400, "y": 620, "w": 110, "h": 140}, "keyframe": false},
+                "3": {"bounding_box": {"x": 315, "y": 530, "w": 100, "h": 120}, "keyframe": false},
+                "4": {"bounding_box": {"x": 230, "y": 340, "w": 85, "h": 100}, "keyframe": false},
+                "5": {"bounding_box": {"x": 690, "y": 500, "w": 115, "h": 135}, "keyframe": false}
+            },
+            "id": "mock-annotation-2",
+            "name": "mock_label_2",
+            "slot_names": ["0"]
+        }
+    ]
+}
