@@ -1,9 +1,7 @@
 from typing import Callable
-import tensorflow as tf
 from cppbindings import FrameStream
 
 from src.data.loading.gcp_data_loader import GCPDataLoader
-
 
 class FrameLoader:
     """
