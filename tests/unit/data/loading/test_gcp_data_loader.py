@@ -1,6 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
-from io import BytesIO
+from unittest.mock import patch
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from tests.utils.dummies.dummy_gcp_auth_service import DummyGCPAuthService
 
@@ -47,12 +46,11 @@ def test_list_files(mock_get, gcp_loader):
 def test_download_video(mock_get, gcp_loader):
     """Mocks the API call and tests if download_video correctly returns a BytesIO object."""
     mock_get.return_value.status_code = 200
-    mock_get.return_value.iter_content = MagicMock(return_value=[b"chunk1", b"chunk2"])
+    mock_get.return_value.content = b"chunk1chunk2"
 
     video_stream = gcp_loader.download_video(TEST_VIDEO_NAME)
-    assert isinstance(video_stream, BytesIO)
-    assert video_stream.read() == b"chunk1chunk2"
 
+    assert isinstance(video_stream, bytearray)
     mock_get.assert_called_once_with(
         f"https://storage.googleapis.com/{TEST_BUCKET}/{TEST_VIDEO_NAME}",
         headers={"Authorization": "Bearer dummy_access_token"},

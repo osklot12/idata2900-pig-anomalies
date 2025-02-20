@@ -1,31 +1,46 @@
 import pytest
 import tensorflow as tf
+from unittest.mock import Mock
+
 from src.data.loading.frame_loader import FrameLoader
-from tests.utils.dummies.dummy_frame_stream import DummyFrameStream
+from src.data.loading.gcp_data_loader import GCPDataLoader
+from cppbindings import FrameStream
+
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
 @pytest.fixture
-def received_frames():
-    """Fixture to store received frames."""
-    return []
+def dummy_data_loader():
+    """Fixture to provide a dummy GCPDataLoader."""
+    return DummyGCPDataLoader(bucket_name="test-bucket", credentials_path="fake-path")
+
 
 @pytest.fixture
-def frame_callback(received_frames):
-    """Callback function that captures frames received from FrameLoader."""
-    def callback(video_name, frame_index, frame, is_last_frame):
-        received_frames.append((video_name, frame_index, frame))
-    return callback
+def mock_callback():
+    """Fixture to provide a mock callback."""
+    return Mock()
 
-def test_load_frames(received_frames, frame_callback):
-    """Test loading frames using dummy classes"""
-    # arrange
-    dummy_gcp_loader = DummyGCPDataLoader(bucket_name="mock-bucket", credentials_path="mock-credentials.json")
-    dummy_frame_stream = DummyFrameStream(video_bytes=b"fake_video_data")
+
+def test_frame_loader(dummy_data_loader, mock_callback):
+    """Test that FrameLoader correctly loads and processes video frames."""
+    video_blob_name = "test-video.mp4"
 
     frame_loader = FrameLoader(
-        bucket_name="mock-bucket",
-        credentials_path="mock-credentials.json",
-        callback=frame_callback
+        bucket_name="test-bucket",
+        credentials_path="fake-path",
+        callback=mock_callback,
+        data_loader=dummy_data_loader
     )
-    frame_loader.data_loader = dummy_gcp_loader
+
+    frame_loader.load_frames(video_blob_name)
+
+    # ensure the callback was called at least once (check frame loading happened)
+    assert mock_callback.call_count > 1
+
+    # extract the last callback call arguments (last call should have `None` as frame)
+    last_call = mock_callback.call_args_list[-1]
+    _, last_frame_index, last_frame, is_complete = last_call[0]
+
+    # the last call should indicate completion
+    assert last_frame is None
+    assert is_complete is True
