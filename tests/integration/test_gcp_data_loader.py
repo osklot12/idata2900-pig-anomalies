@@ -22,8 +22,6 @@ def gcp_loader():
 def test_fetch_all_files(gcp_loader):
     """Integration test: Checks if we can fetch real files from GCS."""
     files = gcp_loader.fetch_all_files()
-    for file in files:
-        print(file)
     assert isinstance(files, list)
 
 @pytest.mark.integration
@@ -45,9 +43,8 @@ def test_list_annotation_files(gcp_loader):
 @pytest.mark.integration
 def test_download_video(gcp_loader):
     """Integration test: Downloads a real video file from GCS."""
-    video_stream = gcp_loader.download_video(f"{TEST_VIDEO_PREFIX}{TEST_VIDEO_NAME}")
-    assert isinstance(video_stream, BytesIO)
-    video_data = video_stream.read()
+    video_data = gcp_loader.download_video(f"{TEST_VIDEO_PREFIX}{TEST_VIDEO_NAME}")
+    assert isinstance(video_data, bytearray)
     assert len(video_data) > 0
 
 def test_download_json(gcp_loader):
