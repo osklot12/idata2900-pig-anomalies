@@ -10,8 +10,7 @@ class FrameLoader:
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
 
-    def __init__(self, bucket_name: str, credentials_path: str,
-                 callback: Callable[[str, int, bytearray, bool], None], data_loader):
+    def __init__(self, data_loader, callback: Callable[[str, int, bytearray, bool], None]):
         self.data_loader = data_loader
         self.callback = callback
 
