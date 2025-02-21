@@ -1,7 +1,9 @@
 import pytest
 import cppbindings
 
-TEST_VIDEO_PATH = "../../data/sample-5s.mp4"
+from tests.conftest import get_test_path
+
+TEST_VIDEO_PATH = get_test_path("tests/data/sample-5s.mp4")
 
 @pytest.fixture
 def video_data():
