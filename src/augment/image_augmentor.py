@@ -1,9 +1,9 @@
 import tensorflow as tf
 import random
 from math import radians, cos, sin
-import numpy as np
+from src.augment.augmentor_interface import AugmentorBase
 
-class ImageAugmentor:
+class ImageAugmentor(AugmentorBase):
     """Applies image augmentations like flipping, rotation, brightness, and contrast."""
 
     def __init__(self, seed=None):
@@ -11,21 +11,15 @@ class ImageAugmentor:
             random.seed(seed)
             tf.random.set_seed(seed)
 
-    def augment(self, image: tf.Tensor) -> tf.Tensor:
-        """Applies random image augmentations."""
-        image = self._random_flip(image)
-        image = self._random_rotation(image)
+    def augment(self, image: tf.Tensor, annotation=None, rotation: float = 0, flip: bool = False) -> tf.Tensor:
+        """Applies augmentations with specified rotation and flip."""
+        if flip:
+            image = tf.image.flip_left_right(image)
+        if rotation != 0:
+            image = self._rotate(image, rotation)
+
         image = self._random_brightness_contrast(image)
         return image
-
-    def _random_flip(self, image):
-        """Randomly flips the image horizontally."""
-        return tf.image.flip_left_right(image) if random.random() > 0.5 else image
-
-    def _random_rotation(self, image):
-        """Applies a small random rotation (-15° to +15°)."""
-        angle = random.uniform(-15, 15)
-        return self._rotate(image, angle)
 
     def _random_brightness_contrast(self, image):
         """Applies random brightness and contrast adjustments."""

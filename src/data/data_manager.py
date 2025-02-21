@@ -34,13 +34,12 @@ class DataManager:
                 # 🔹 Ensure annotations are JSON-compatible
                 safe_annotation = self._convert_annotations(augmented_annotation)
 
-                # 🔹 Store in memory (FIXED: Keep `tf.Tensor`)
+                # 🔹 Store in memory
                 self.memory_store.append({
-                    "frame": tf.convert_to_tensor(augmented_frame),  # ✅ Ensure it stays as `tf.Tensor`
-                    "annotation": json.dumps(safe_annotation)  # ✅ Now safely JSON serializable
+                    "frame": tf.convert_to_tensor(augmented_frame),
+                    "annotation": json.dumps(safe_annotation)
                 })
 
-        print(f"✅ {len(self.memory_store)} frames processed and stored in memory.")
 
     def _convert_annotations(self, obj):
         """
@@ -49,7 +48,7 @@ class DataManager:
         """
         if isinstance(obj, tf.Tensor):
             if obj.dtype == tf.string:
-                return obj.numpy().decode('utf-8')  # Convert bytes to string ✅ FIXED!
+                return obj.numpy().decode('utf-8')
             else:
                 return obj.numpy().tolist()  # Convert Tensor to Python type
         elif isinstance(obj, dict):
@@ -57,6 +56,6 @@ class DataManager:
         elif isinstance(obj, list):
             return [self._convert_annotations(item) for item in obj]  # Convert lists
         elif isinstance(obj, bytes):
-            return obj.decode('utf-8')  # ✅ Convert bytes to string
+            return obj.decode('utf-8')
         else:
             return obj  # Return original if no conversion needed
