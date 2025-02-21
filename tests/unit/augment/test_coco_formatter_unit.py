@@ -1,7 +1,7 @@
 import pytest
 import json
 import tensorflow as tf
-from src.augment.coco_formatter import COCOFormatter
+from src.data.augment.coco_formatter import COCOFormatter
 from tests.conftest import get_test_path
 
 

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from src.augment.augmentor_interface import ProcessorBase
+from src.data.augment.augmentor_interface import ProcessorBase
 
 class ImageResizer(ProcessorBase):
     """Handles image resizing to a target dimension."""
