@@ -17,6 +17,7 @@ def mock_callback():
     """Fixture to provide a mock callback."""
     return Mock()
 
+
 def test_load_frames(dummy_data_loader, mock_callback):
     """Test that FrameLoader correctly loads and processes video frames."""
 

@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, call, patch
 from src.data.loading.parallel_frame_loader import ParallelFrameLoader
-from src.data.loading.frame_loader import FrameLoader
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
