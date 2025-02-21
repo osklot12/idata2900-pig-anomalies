@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-from src.augment.combined_augmentor import AugmentationPipeline
+from src.data.augment.combined_augmentor import AugmentationPipeline
 
 @pytest.fixture
 def test_image():

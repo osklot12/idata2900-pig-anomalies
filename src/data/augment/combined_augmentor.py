@@ -1,6 +1,6 @@
-from src.augment.image_augmentor import ImageAugmentor
-from src.augment.json_augmentor import JsonAugmentor
-from src.augment.augmentor_interface import AugmentorBase
+from src.data.augment.image_augmentor import ImageAugmentor
+from src.data.augment.json_augmentor import JsonAugmentor
+from src.data.augment.augmentor_interface import AugmentorBase
 import tensorflow as tf
 import random
 
