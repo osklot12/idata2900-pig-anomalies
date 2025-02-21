@@ -1,11 +1,11 @@
 import os
 import requests
 from functools import lru_cache
-from io import BytesIO
 from src.auth.gcp_auth_service import GCPAuthService
+from src.data.dataset_source import DatasetSource
 
 
-class GCPDataLoader:
+class GCPDataLoader(DatasetSource):
     """
     Handles authentication and efficient data loading from Google Cloud Storage (GCS).
     Now includes deterministic seeding and per-frame shuffling for training.

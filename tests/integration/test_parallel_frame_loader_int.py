@@ -3,9 +3,10 @@ import pytest
 from src.auth.gcp_auth_service import GCPAuthService
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.data.loading.parallel_frame_loader import ParallelFrameLoader
+from tests.conftest import get_test_path
 
+TEST_CREDENTIALS_PATH = get_test_path(".secrets/service-account.json")
 TEST_BUCKET = "norsvin-g2b-behavior-prediction"
-TEST_CREDENTIALS_PATH = "../../.secrets/service-account.json"
 TEST_VIDEO_PREFIX = "g2b_behaviour/images/"
 
 @pytest.fixture

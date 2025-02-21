@@ -3,10 +3,11 @@ import os
 from io import BytesIO
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.auth.gcp_auth_service import GCPAuthService
+from tests.conftest import get_test_path
 
 # constants
+TEST_CREDENTIALS_PATH = get_test_path(".secrets/service-account.json")
 TEST_BUCKET = "norsvin-g2b-behavior-prediction"
-TEST_CREDENTIALS_PATH = "../../.secrets/service-account.json"
 TEST_VIDEO_PREFIX = "g2b_behaviour/images/"
 TEST_VIDEO_NAME = "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"
 TEST_JSON_PREFIX = "g2b_behaviour/releases/g2b-prediction/annotations/"

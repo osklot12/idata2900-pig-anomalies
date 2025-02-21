@@ -1,8 +1,9 @@
 import pytest
 import os
 from src.auth.gcp_auth_service import GCPAuthService
+from tests.conftest import get_test_path
 
-TEST_CREDENTIALS_PATH = "../../.secrets/service-account.json"
+TEST_CREDENTIALS_PATH = get_test_path(".secrets/service-account.json")
 
 @pytest.fixture(scope="module")
 def gcp_auth_service():
