@@ -35,6 +35,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
 
     # act
     frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
 
     # assert
     assert mock_callback.call_count == SAMPLE_N_FRAMES + 1, \
@@ -58,6 +59,7 @@ def test_no_resizing_when_resize_none(dummy_data_loader, mock_callback):
 
     # act
     frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
     processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
 
     # assert
@@ -78,6 +80,7 @@ def test_resizing_works_correctly(dummy_data_loader, mock_callback):
 
     # act
     frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
     processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
 
     # assert
@@ -97,6 +100,7 @@ def test_correct_number_of_frames_loaded(dummy_data_loader, mock_callback):
 
     # act
     frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
     processed_frame_count = len(mock_callback.call_args_list) - 1
 
     # assert
