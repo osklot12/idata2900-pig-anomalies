@@ -1,9 +1,11 @@
 from typing import Callable
 from cppbindings import FrameStream
 
-from src.data.loading.gcp_data_loader import GCPDataLoader
+from src.data.dataset_source import DatasetSource
+from src.data.loading.frame_loader_interface import FrameLoaderInterface
 
-class FrameLoader:
+
+class FrameLoader(FrameLoaderInterface):
     """
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
@@ -25,3 +27,6 @@ class FrameLoader:
 
         # notify that the video processing is complete
         self.callback(video_blob_name, frame_index, None, True)
+
+    def get_data_source(self) -> "DatasetSource":
+        return self.data_loader

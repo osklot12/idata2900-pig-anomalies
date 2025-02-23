@@ -3,7 +3,7 @@ from typing import List
 
 class DatasetSource(ABC):
     """
-    A source of dataset instances.
+    An interface for a source of dataset instances.
     """
 
     @abstractmethod

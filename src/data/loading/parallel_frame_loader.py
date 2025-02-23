@@ -2,9 +2,12 @@ from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Callable, List
 
+from src.data.dataset_source import DatasetSource
 from src.data.loading.frame_loader import FrameLoader
+from src.data.loading.frame_loader_interface import FrameLoaderInterface
 
-class ParallelFrameLoader:
+
+class ParallelFrameLoader(FrameLoaderInterface):
     """
     Loads frames from multiple videos in parallel using multiple FrameLoaders.
     """
@@ -29,3 +32,5 @@ class ParallelFrameLoader:
                 except Exception as e:
                     print(f"Error processing video {video_name}: {e}")
 
+    def get_data_source(self) -> "DatasetSource":
+        return self.data_loader
