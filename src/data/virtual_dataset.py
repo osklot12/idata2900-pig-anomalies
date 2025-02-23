@@ -2,6 +2,8 @@ import random
 from collections import deque
 from typing import List, Deque
 
+import numpy as np
+
 from src.data.loading.frame_loader_interface import FrameLoaderInterface
 
 
@@ -11,8 +13,8 @@ class VirtualDataset:
     mimicking a traditional dataset stored on disk.
     """
 
-    def __init__(self, loader: "FrameLoaderInterface",
-                 train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, seed=42, buffer_size=20):
+    def __init__(self, loader: "FrameLoaderInterface", max_buffer_bytes: int,
+                 train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, seed=42):
         if train_ratio + val_ratio + test_ratio != 1:
             raise ValueError("Train, validation, and test ratios must sum to 1.")
 
@@ -22,17 +24,17 @@ class VirtualDataset:
         self.test_ratio = test_ratio
         self.seed = seed
 
-        self.train_data: List[str] = []
-        self.val_data: List[str] = []
-        self.test_data: List[str] = []
+        self.train_ids: List[str] = []
+        self.val_ids: List[str] = []
+        self.test_ids: List[str] = []
 
         self._shuffle_and_split()
 
-        self.buffer_size = buffer_size
-        self.video_buffer : Deque = deque(maxlen=self.buffer_size)
+        self.max_buffer_bytes = max_buffer_bytes
 
-    def feed_frame(self, video_name: str, frame_index: int, frame: bytearray, is_last_frame: bool):
-        """Receives a frame and assigns it to the appropriate dataset split."""
+
+    def feed(self, source: str, frame_index: int, frame: np.ndarray, end_of_stream: bool):
+        """"""
         
 
     def _shuffle_and_split(self):
@@ -45,9 +47,9 @@ class VirtualDataset:
         # getting train and val split end indexes, test split follows implicitly
         train_end, val_end = self._get_split_indices(all_files)
 
-        self.train_data = all_files[:train_end]
-        self.val_data = all_files[train_end:val_end]
-        self.test_data = all_files[val_end:]
+        self.train_ids = all_files[:train_end]
+        self.val_ids = all_files[train_end:val_end]
+        self.test_ids = all_files[val_end:]
 
     def _get_split_indices(self, all_files):
         """Computes the indices for the end of train and validation splits."""

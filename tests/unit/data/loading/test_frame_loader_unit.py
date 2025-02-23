@@ -1,3 +1,7 @@
+import os
+import cv2
+import numpy as np
+
 import pytest
 from unittest.mock import Mock
 
@@ -9,6 +13,8 @@ from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 SAMPLE_N_FRAMES = 171
 SAMPLE_WIDTH = 1920
 SAMPLE_HEIGHT = 1080
+
+OUTPUT_DIR = "test_frames_output"
 
 
 @pytest.fixture
@@ -29,7 +35,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
         callback=mock_callback,
-        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH, 3),
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=(224, 224)
     )
 
@@ -53,7 +59,7 @@ def test_no_resizing_when_resize_none(dummy_data_loader, mock_callback):
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
         callback=mock_callback,
-        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH, 3),
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=None
     )
 
@@ -74,7 +80,7 @@ def test_resizing_works_correctly(dummy_data_loader, mock_callback):
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
         callback=mock_callback,
-        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH, 3),
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=resized_shape
     )
 
@@ -94,7 +100,7 @@ def test_correct_number_of_frames_loaded(dummy_data_loader, mock_callback):
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
         callback=mock_callback,
-        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH, 3),
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=(224, 224)
     )
 
