@@ -1,4 +1,3 @@
-import os
 import requests
 from functools import lru_cache
 from src.auth.gcp_auth_service import GCPAuthService
