@@ -17,7 +17,8 @@ class FrameLoader(FrameLoaderInterface):
                  frame_shape, resize_shape=None):
         self.data_loader = data_loader
         self.callback = callback
-        self.frame_shape = frame_shape
+        # assumes rgb
+        self.frame_shape = (frame_shape[0], frame_shape[1], 3)
         self.resize_shape = resize_shape
         self._thread = None
 
