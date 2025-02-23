@@ -1,3 +1,4 @@
+import threading
 from typing import Callable
 
 import numpy as np
@@ -18,9 +19,20 @@ class FrameLoader(FrameLoaderInterface):
         self.callback = callback
         self.frame_shape = frame_shape
         self.resize_shape = resize_shape
+        self._thread = None
 
     def load_frames(self, video_blob_name: str):
         """Loads frames from a video, feeding them to the callback function."""
+        self._thread = threading.Thread(target=self._process_frames, args=(video_blob_name,))
+        self._thread.start()
+
+    def wait_for_completion(self):
+        """Waits for the frame processing thread to finish."""
+        if self._thread:
+            self._thread.join()
+
+    def _process_frames(self, video_blob_name: str):
+        """Processes frames and feeds them to the callback function."""
         video_data = self.data_loader.download_video(video_blob_name)
         fstream = FrameStream(video_data)
 
