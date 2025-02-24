@@ -80,3 +80,21 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
             continue
 
         assert annotation in expected_annotations[frame_index], f"Unexpected annotation at frame {frame_index}"
+
+def test_empty_annotations(dummy_data_loader, mock_callback):
+    """Tests that the callback is only called once when there are no annotations."""
+    # arrange
+    dummy_data_loader.set_dummy_json("""{"item": {"name": "empty_video"}, "annotations": {}}""")
+    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
+
+    # act
+    annotation_loader.load_annotations("test_annotations.json")
+    annotation_loader.wait_for_completion()
+
+    # assert
+    assert mock_callback.call_count == 1, f"Expected 1 call, got {mock_callback.call_count}"
+    _, frame_index, annotation, is_complete = mock_callback.call_args_list[0][0]
+
+    assert frame_index is None, "Frame index should be None for empty annotations!"
+    assert annotation is None, "Annotation should be None for empty annotations!"
+    assert is_complete is True, "Completion flag should be True for empty annotations!"

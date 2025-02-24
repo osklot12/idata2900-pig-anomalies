@@ -26,13 +26,16 @@ class AnnotationLoader:
 
     def _process_annotations(self, video_blob_name: str):
         """Processes annotations and feeds them to the callback function."""
-        annotations_json = self.data_loader.download_json(video_blob_name)
+        try:
+            annotations_json = self.data_loader.download_json(video_blob_name)
 
-        video_name = annotations_json.get("item", {}).get("name", "unknown_video")
-        annotations: Dict[int, list] = DarwinDecoder.decode(annotations_json)
+            video_name = annotations_json.get("item", {}).get("name", "unknown_video")
+            annotations: Dict[int, list] = DarwinDecoder.decode(annotations_json)
 
-        for frame_index, frame_annotations in annotations.items():
-            for annotation in frame_annotations:
-                self.callback(video_name, frame_index, annotation, False)
+            for frame_index, frame_annotations in annotations.items():
+                for annotation in frame_annotations:
+                    self.callback(video_name, frame_index, annotation, False)
 
-        self.callback(video_name, None, None, True)
+            self.callback(video_name, None, None, True)
+        except Exception as e:
+            print(f"Error in _process_annotations: {e}")

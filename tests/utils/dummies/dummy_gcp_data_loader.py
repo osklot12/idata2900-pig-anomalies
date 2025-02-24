@@ -1,7 +1,9 @@
 import json
 import os
+from enum import Enum
 from io import BytesIO
 
+# directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_VIDEO_PATH = os.path.join(BASE_DIR, "../../data/sample-5s.mp4")
 
@@ -10,6 +12,7 @@ class DummyGCPDataLoader:
     def __init__(self, bucket_name, credentials_path):
         self.bucket_name = bucket_name
         self.credentials_path = credentials_path
+        self.dummy_json = self._get_test_json_data()
 
     def download_video(self, blob_name):
         """Returns test video data."""
@@ -17,7 +20,11 @@ class DummyGCPDataLoader:
 
     def download_json(self, blob_name):
         """Returns test JSON data."""
-        return self._get_test_json_data()
+        return self.dummy_json
+
+    def set_dummy_json(self, json_data):
+        """Sets the dummy JSON data."""
+        self.dummy_json = json.loads(json_data)
 
     @staticmethod
     def _get_test_video_data():
