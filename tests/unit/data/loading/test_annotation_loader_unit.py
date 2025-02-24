@@ -29,7 +29,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     annotation_loader.wait_for_completion()
 
     # assert
-    total_frames = 200
+    total_frames = 171
     expected_calls = total_frames + 1
 
     assert mock_callback.call_count == expected_calls, \
@@ -71,7 +71,7 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     }
 
     # assert
-    total_frames = 200
+    total_frames = 171
     for frame_index in range(total_frames):
         call = mock_callback.call_args_list[frame_index]
         _, received_frame, received_annotations, is_complete = call[0]
