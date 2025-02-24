@@ -6,6 +6,7 @@ import cv2
 from cppbindings import FrameStream
 
 from src.data.dataset_source import DatasetSource
+from src.data.loading.feed_status import FeedStatus
 from src.data.loading.frame_loader_interface import FrameLoaderInterface
 
 class FrameLoader(FrameLoaderInterface):
@@ -13,7 +14,7 @@ class FrameLoader(FrameLoaderInterface):
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
 
-    def __init__(self, data_loader, callback: Callable[[str, int, np.ndarray, bool], None],
+    def __init__(self, data_loader, callback: Callable[[str, int, np.ndarray, bool], FeedStatus],
                  frame_shape, resize_shape=None):
         self.data_loader = data_loader
         self.callback = callback
