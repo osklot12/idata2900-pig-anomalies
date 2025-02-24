@@ -1,8 +1,6 @@
 import pytest
 import json
 from src.data.darwin_decoder import DarwinDecoder
-from tests.conftest import get_test_path
-
 
 @pytest.fixture
 def sample_json():

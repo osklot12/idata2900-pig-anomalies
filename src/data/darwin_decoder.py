@@ -25,13 +25,7 @@ class DarwinDecoder:
             for frame_index, frame_data in annotation.get("frames", {}).items():
                 frame_index = int(frame_index)
 
-                bbox = frame_data.get("bounding_box", {})
-                x, y, w, h = (
-                    bbox.get("x", 0),
-                    bbox.get("y", 0),
-                    bbox.get("w", 0),
-                    bbox.get("h", 0)
-                )
+                h, w, x, y = DarwinDecoder._get_bounding_box_values(frame_data)
 
                 if frame_index not in frame_annotations:
                     frame_annotations[frame_index] = []
@@ -41,6 +35,18 @@ class DarwinDecoder:
                 )
 
         return frame_annotations
+
+    @staticmethod
+    def _get_bounding_box_values(frame_data):
+        """Parses and retrieves bounding box values from a Darwin JSON annotation."""
+        bbox = frame_data.get("bounding_box", {})
+        x, y, w, h = (
+            bbox.get("x", 0),
+            bbox.get("y", 0),
+            bbox.get("w", 0),
+            bbox.get("h", 0)
+        )
+        return h, w, x, y
 
     @staticmethod
     def get_frame_count(json_data) -> int:
