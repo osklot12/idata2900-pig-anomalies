@@ -58,7 +58,7 @@ def sample_json():
 
 def test_decode(sample_json):
     """Tests DarwinDecoder with a sample JSON structure."""
-    decoded_annotations = DarwinDecoder.decode(sample_json)
+    decoded_annotations = DarwinDecoder.get_annotations(sample_json)
 
     expected_output = {
         56: [("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824)],

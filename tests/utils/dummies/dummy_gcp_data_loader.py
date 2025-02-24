@@ -1,14 +1,14 @@
 import json
 import os
-from enum import Enum
-from io import BytesIO
 
 # directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_VIDEO_PATH = os.path.join(BASE_DIR, "../../data/sample-5s.mp4")
 
+
 class DummyGCPDataLoader:
     """A fake GCPDataLoader that returns dummy video data."""
+
     def __init__(self, bucket_name, credentials_path):
         self.bucket_name = bucket_name
         self.credentials_path = credentials_path
@@ -39,6 +39,14 @@ class DummyGCPDataLoader:
         """Generates test JSON data."""
         json_data = """
             {
+                "item": {
+                    "name": "test_video.mp4",
+                    "slots": [
+                        {
+                            "frame_count": 200
+                        }
+                    ]
+                },
                 "annotations": [
                     {
                         "name": "g2b_bellynosing",

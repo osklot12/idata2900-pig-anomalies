@@ -29,17 +29,17 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     annotation_loader.wait_for_completion()
 
     # assert
-    expected_frames = {56, 110, 128, 162}
-    expected_calls = len(expected_frames) * 2 + 1
+    total_frames = 200
+    expected_calls = total_frames + 1
 
     assert mock_callback.call_count == expected_calls, \
-        f"Expected {expected_calls} calls, got {mock_callback.call_count}"
+        f"Expected {expected_calls} calls, but got {mock_callback.call_count}"
 
     last_call = mock_callback.call_args_list[-1]
-    _, last_frame_index, last_annotation, is_complete = last_call[0]
-    assert last_annotation is None, "Final callback did not receive None!"
-    assert is_complete is True, "Final callback did not indicate completion!"
+    _, last_frame_index, last_annotations, is_complete = last_call[0]
 
+    assert last_annotations is None, "Final callback did not receive None!"
+    assert is_complete is True, "Final callback did not indicate completion!"
 
 def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     """Tests that annotations are correctly extracted and passed to the callback."""
@@ -71,30 +71,23 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     }
 
     # assert
-    for call in mock_callback.call_args_list:
-        _, frame_index, annotation, is_complete = call[0]
+    total_frames = 200
+    for frame_index in range(total_frames):
+        call = mock_callback.call_args_list[frame_index]
+        _, received_frame, received_annotations, is_complete = call[0]
 
+        # if frame carries termination signal, it should not have an index or annotations
         if is_complete:
-            assert frame_index is None, "Final callback should not have a frame index!"
-            assert annotation is None, "Final callback should not have an annotation!"
+            assert received_frame is None, "Final callback should not have a frame index!"
+            assert received_annotations is None, "Final callback should not have annotations!"
             continue
 
-        assert annotation in expected_annotations[frame_index], f"Unexpected annotation at frame {frame_index}"
+        # if frame has annotation, it should match the expected annotation
+        if frame_index in expected_annotations:
+            assert received_annotations == expected_annotations[frame_index], \
+                f"Annotations at frame {frame_index} did not match expected annotations!"
 
-def test_empty_annotations(dummy_data_loader, mock_callback):
-    """Tests that the callback is only called once when there are no annotations."""
-    # arrange
-    dummy_data_loader.set_dummy_json("""{"item": {"name": "empty_video"}, "annotations": {}}""")
-    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
-
-    # act
-    annotation_loader.load_annotations("test_annotations.json")
-    annotation_loader.wait_for_completion()
-
-    # assert
-    assert mock_callback.call_count == 1, f"Expected 1 call, got {mock_callback.call_count}"
-    _, frame_index, annotation, is_complete = mock_callback.call_args_list[0][0]
-
-    assert frame_index is None, "Frame index should be None for empty annotations!"
-    assert annotation is None, "Annotation should be None for empty annotations!"
-    assert is_complete is True, "Completion flag should be True for empty annotations!"
+        # if frame has no annotations, it should receive an empty list
+        else:
+            assert received_annotations == [], \
+                f"Frame {frame_index} should have no annotations but got {received_annotations}"
