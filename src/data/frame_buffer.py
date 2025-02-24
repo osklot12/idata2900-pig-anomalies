@@ -1,4 +1,5 @@
 from collections import deque
+from threading import Lock
 from typing import Deque, Tuple
 
 import numpy as np
@@ -6,7 +7,7 @@ import numpy as np
 
 class FrameBuffer:
     """
-    A buffer that stores frames while enforcing a maximum memory limit.
+    A thread-safe buffer that stores frames while enforcing a maximum memory limit.
     """
 
     def __init__(self, max_bytes: int):
@@ -16,6 +17,7 @@ class FrameBuffer:
         self.max_bytes = max_bytes
         self.buffer: Deque[Tuple[str, int, np.ndarray]] = deque()
         self.current_mem_usage = 0
+        self.lock = Lock()
 
     def add_frame(self, video_name: str, frame_index: int, frame: np.ndarray):
         """Adds a new frame to the buffer, removing old frames if necessary."""
@@ -27,9 +29,10 @@ class FrameBuffer:
                 f" ({self.max_bytes} bytes) and will be dropped."
             )
         else:
-            self._make_space_for_frame(frame_size)
-            self.buffer.append((video_name, frame_index, frame))
-            self.current_mem_usage += frame_size
+            with self.lock:
+                self._make_space_for_frame(frame_size)
+                self.buffer.append((video_name, frame_index, frame))
+                self.current_mem_usage += frame_size
 
     def _make_space_for_frame(self, frame_size):
         """Removes old frames from the buffer until there is enough space for the new frame."""
@@ -39,7 +42,8 @@ class FrameBuffer:
 
     def get_frames(self):
         """Returns all frames currently in the buffer."""
-        return list(self.buffer)
+        with self.lock:
+            return list(self.buffer)
 
     def __len__(self):
         """Returns the number of frames currently in the buffer."""
