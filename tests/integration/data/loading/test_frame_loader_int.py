@@ -32,10 +32,12 @@ def test_load_frames(gcp_data_loader, mock_callback):
     frame_loader = FrameLoader(
         data_loader=gcp_data_loader,
         callback=mock_callback,
+        frame_shape=(1520, 2688)
     )
 
     # act
     frame_loader.load_frames(video_blob_name)
+    frame_loader.wait_for_completion()
 
     # assert
     assert mock_callback.call_count > 1
