@@ -3,7 +3,7 @@ from typing import Callable, Dict, Tuple, Optional, List
 
 from src.data.darwin_decoder import DarwinDecoder
 from src.data.loading.feed_status import FeedStatus
-from src.utils.norsvin_annotations import NorsvinBehaviorClass
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 
 class AnnotationLoader:
