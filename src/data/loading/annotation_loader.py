@@ -2,6 +2,7 @@ import threading
 from typing import Callable, Dict, Tuple
 
 from src.data.darwin_decoder import DarwinDecoder
+from src.data.loading.feed_status import FeedStatus
 
 
 class AnnotationLoader:
@@ -9,7 +10,7 @@ class AnnotationLoader:
     Loads annotations for videos and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, callback: Callable[[str, int, Tuple[str, float, float, float, float], bool], None]):
+    def __init__(self, data_loader, callback: Callable[[str, int, Tuple[str, float, float, float, float], bool], FeedStatus]):
         self.data_loader = data_loader
         self.callback = callback
         self._thread = None
