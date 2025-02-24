@@ -43,7 +43,7 @@ class DummyGCPDataLoader:
                     "name": "test_video.mp4",
                     "slots": [
                         {
-                            "frame_count": 200
+                            "frame_count": 171
                         }
                     ]
                 },

@@ -28,6 +28,9 @@ class FrameAnnotationLoader:
         """Feeds a frame."""
         result = FeedStatus.DROP
 
+        if end_of_stream:
+            index = -1
+
         if self.annotation_buffer.has(index):
             # match found
             annotations, annotation_end = self.annotation_buffer.pop(index)[1:]
@@ -46,6 +49,9 @@ class FrameAnnotationLoader:
                         end_of_stream: bool) -> FeedStatus:
         """Feeds an annotation and checks if a frame exists for this index."""
         result = FeedStatus.DROP
+
+        if end_of_stream:
+            index = -1
 
         if self.frame_buffer.has(index):
             # match found
