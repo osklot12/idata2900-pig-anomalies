@@ -133,8 +133,6 @@ class VirtualDataset:
                 frame_index, (frame, annotation)
             )
 
-            print(f"Current stored frame indices: {list(source_buffer.keys())}")
-
     def _get_source_buffer(self, source_key, split_buffer):
         """
         Returns the appropriate source buffer for the specified source key.
