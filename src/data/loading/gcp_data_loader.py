@@ -1,3 +1,5 @@
+import os
+
 import requests
 from functools import lru_cache
 from src.auth.gcp_auth_service import GCPAuthService
@@ -19,6 +21,11 @@ class GCPDataLoader(DatasetSource):
         self.bucket_name = bucket_name
         self.auth_service = auth_service
 
+    @staticmethod
+    def _strip_extension(filename: str) -> str:
+        """Removes the file extension from a given filename."""
+        return os.path.splitext(filename)[0]
+
     @lru_cache(maxsize=1)
     def fetch_all_files(self):
         """Retrieves all file names in the bucket (caches results to reduce API calls)."""
@@ -32,10 +39,25 @@ class GCPDataLoader(DatasetSource):
         return [file["name"] for file in response.json().get("items", [])]
 
     @lru_cache(maxsize=10)
-    def list_files(self, prefix="", file_extension=""):
-        """Lists files in the bucket with optional prefix and extension filtering."""
+    def list_files(self, prefix="", file_extension="", strip_extension=False):
+        """
+        Lists files in the bucket with optional prefix, extension filtering, and filename stripping.
+
+        :param prefix: Optional prefix filter.
+        :param file_extension: Optional file extension filter.
+        :param strip_extension: If True, removes the file extension.
+        :return: List of matching file names.
+        """
         all_files = self.fetch_all_files()
-        filtered_files = [file for file in all_files if file.startswith(prefix) and file.endswith(file_extension)]
+
+        filtered_files = [
+            file for file in all_files
+            if file.startswith(prefix) and file.endswith(file_extension)
+        ]
+
+        if strip_extension:
+            return [self._strip_extension(f) for f in filtered_files]
+
         return filtered_files
 
     def download_video(self, blob_name: str) -> bytes:

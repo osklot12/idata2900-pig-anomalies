@@ -1,26 +1,26 @@
 import math
 import random
-from collections import deque
-from typing import List, Deque
+from typing import List, Tuple, Optional
 
 import numpy as np
 
+from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataset_source import DatasetSource
-from src.data.frame_buffer import FrameBuffer
+from src.data.dataset_split import DatasetSplit
 
 
 class VirtualDataset:
     """
-    Organizes frames into train, validation, and test sets while
+    Organizes streamed frames with annotations into train, validation, and test sets while
     mimicking a traditional dataset stored on disk.
     """
 
-    def __init__(self, loader: "DatasetSource", max_buffer_bytes: int,
+    def __init__(self, dataset_ids: List[str], max_sources: int, max_frames_per_source: int,
                  train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, seed=42):
         if train_ratio + val_ratio + test_ratio != 1:
             raise ValueError("Train, validation, and test ratios must sum to 1.")
 
-        self.dataset_source = loader
+        self.dataset_ids = dataset_ids
         self.train_ratio = train_ratio
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
@@ -33,54 +33,115 @@ class VirtualDataset:
         self._shuffle_and_split()
 
         # floor each max buffer size to never exceed the total max buffer size
-        self.train_max_bytes = math.floor(train_ratio * max_buffer_bytes)
-        self.val_max_bytes = math.floor(val_ratio * max_buffer_bytes)
-        self.test_max_bytes = math.floor(test_ratio * max_buffer_bytes)
+        self.train_max_sources = math.floor(train_ratio * max_sources)
+        self.val_max_sources = math.floor(val_ratio * max_sources)
+        self.test_max_sources = math.floor(test_ratio * max_sources)
 
-        self.train_buffer = FrameBuffer(max_bytes=self.train_max_bytes)
-        self.val_buffer = FrameBuffer(max_bytes=self.val_max_bytes)
-        self.test_buffer = FrameBuffer(max_bytes=self.test_max_bytes)
+        # train split buffer
+        self.train_buffer = HashBuffer[
+            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
+        ](max_size=self.train_max_sources)
 
-    def feed(self, source: str, frame_index: int, frame: np.ndarray, end_of_stream: bool):
+        # val split buffer
+        self.val_buffer = HashBuffer[
+            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
+        ](max_size=self.val_max_sources)
+
+        # test split buffer
+        self.test_buffer = HashBuffer[
+            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
+        ](max_size=self.test_max_sources)
+
+        self.max_frames_per_source = max_frames_per_source
+
+    def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> List[
+        Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]:
+        """
+        Samples a randomized batch of frame-annotation pairs from the specified dataset split.
+
+        :param split: The dataset split.
+        :param batch_size: The number of samples to retrieve.
+        :return: A list of (frame, annotation) pairs.
+        """
+        buffer = self._get_buffer_for_split(split)
+        keys = list(buffer.keys())
+
+        sampled_batch = []
+        attempts = 0
+
+        while len(sampled_batch) < batch_size:
+            if attempts > batch_size * 2:
+                raise RuntimeError("Too many attempts to retrieve batch.")
+
+            # randomly pick source from split
+            source_key = random.choice(keys)
+            source_buffer = buffer.at(source_key)
+
+            # ensure source has data
+            if not source_buffer is None and not source_buffer.size() == 0:
+                frame_indices = list(source_buffer.keys())
+                random_index = random.choice(frame_indices)
+                sampled_batch.append(source_buffer.at(random_index))
+
+            attempts += 1
+
+        return sampled_batch
+
+    def get_frame_count(self, split: DatasetSplit) -> int:
+        """
+        Returns the total number of stored frames in the specified dataset split.
+
+        :param split: The dataset split (TRAIN, VAL, TEST).
+        :return: The total number of frames stored in the split.
+        """
+
+    def feed(self, source: str, frame_index: int, frame: np.ndarray,
+             annotation: Optional[List[Tuple[str, float, float, float, float]]], end_of_stream: bool):
         """
         Feeds a frame into the appropriate buffer.
 
         :param source: The ID of the source of the frame.
         :param frame_index: The index of the frame within the source.
         :param frame: The frame data.
+        :param annotation: The annotation data.
         :param end_of_stream: Boolean indicating whether the frame is the last in the source.
         """
-        if source in self.train_ids:
-            self.train_buffer.add_frame(source, frame_index, frame)
-            split = "train"
-        elif source in self.val_ids:
-            self.val_buffer.add_frame(source, frame_index, frame)
-            split = "val"
-        elif source in self.test_ids:
-            self.test_buffer.add_frame(source, frame_index, frame)
-            split = "test"
-        else:
-            raise ValueError(f"Source {source} not found in dataset.")
+        # get correct split
+        split_buffer = self._get_buffer_for_source(source)
 
-        # Print info for debugging
-        print(f"Frame {frame_index} from {source} added to {split} buffer.")
+        # allocates buffer for source if new
+        source_buffer = self._allocate_source_buffer(source, split_buffer)
 
-        if end_of_stream:
-            print(f"End of stream for {source}.")
+        # add instance to source buffer
+        source_buffer.at(source).add(
+            frame_index, (frame, annotation)
+        )
+
+    def _allocate_source_buffer(self, source_key, parent_buffer):
+        """
+        Allocates a new buffer for the source, inside the parent buffer.
+        Raises an exception if the such buffer already exists.
+        """
+        if not parent_buffer.has(source_key):
+            parent_buffer.add(
+                source_key,
+                HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]](
+                    max_size=self.max_frames_per_source,
+                )
+            )
+        return parent_buffer.at(source_key)
 
     def _shuffle_and_split(self):
         """Shuffles and splits the dataset into train, validation, and test sets."""
-        all_files = self.dataset_source.list_files()
-
         random.seed(self.seed)
-        random.shuffle(all_files)
+        random.shuffle(self.dataset_ids)
 
         # getting train and val split end indexes, test split follows implicitly
-        train_end, val_end = self._get_split_indices(all_files)
+        train_end, val_end = self._get_split_indices(self.dataset_ids)
 
-        self.train_ids = all_files[:train_end]
-        self.val_ids = all_files[train_end:val_end]
-        self.test_ids = all_files[val_end:]
+        self.train_ids = self.dataset_ids[:train_end]
+        self.val_ids = self.dataset_ids[train_end:val_end]
+        self.test_ids = self.dataset_ids[val_end:]
 
     def _get_split_indices(self, all_files):
         """Computes the indices for the end of train and validation splits."""
@@ -89,3 +150,29 @@ class VirtualDataset:
         val_end = train_end + int(self.val_ratio * num_files)
 
         return train_end, val_end
+
+    def _get_buffer_for_source(self, source):
+        """Returns the buffer (split) the source belongs to."""
+        if source in self.train_ids:
+            buffer = self.train_buffer
+        elif source in self.val_ids:
+            buffer = self.val_buffer
+        elif source in self.test_ids:
+            buffer = self.test_buffer
+        else:
+            raise ValueError(f"Source {source} not found in dataset.")
+
+        return buffer
+
+    def _get_buffer_for_split(self, split: DatasetSplit):
+        """Returns the buffer (split) for the given DatasetSplit."""
+        if split == DatasetSplit.TRAIN:
+            buffer = self.train_buffer
+        elif split == DatasetSplit.VAL:
+            buffer = self.val_buffer
+        elif split == DatasetSplit.TEST:
+            buffer = self.test_buffer
+        else:
+            raise ValueError(f"Split {split} not found in dataset.")
+
+        return buffer

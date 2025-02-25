@@ -1,7 +1,7 @@
 from typing import Callable, Tuple, Optional, List
 import numpy as np
 
-from src.data.data_structures.indexed_buffer import IndexedBuffer
+from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.loading.feed_status import FeedStatus
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -15,12 +15,12 @@ class FrameAnnotationLoader:
         self.callback = callback
 
         # frame buffer
-        self.frame_buffer = IndexedBuffer[
+        self.frame_buffer = HashBuffer[
             Tuple[str, np.ndarray, bool]
         ](max_size=buffer_size)
 
         # annotation buffer
-        self.annotation_buffer = IndexedBuffer[
+        self.annotation_buffer = HashBuffer[
             Tuple[str, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool]
         ](max_size=buffer_size)
 
