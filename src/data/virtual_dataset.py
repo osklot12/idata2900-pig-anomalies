@@ -1,11 +1,11 @@
 import math
 import random
+import threading
 from typing import List, Tuple, Optional
 
 import numpy as np
 
 from src.data.data_structures.hash_buffer import HashBuffer
-from src.data.dataset_source import DatasetSource
 from src.data.dataset_split import DatasetSplit
 
 
@@ -25,6 +25,8 @@ class VirtualDataset:
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
+
+        self.lock = threading.Lock()
 
         self.train_ids: List[str] = []
         self.val_ids: List[str] = []
@@ -63,27 +65,31 @@ class VirtualDataset:
         :param batch_size: The number of samples to retrieve.
         :return: A list of (frame, annotation) pairs.
         """
-        buffer = self._get_buffer_for_split(split)
-        keys = list(buffer.keys())
-
         sampled_batch = []
         attempts = 0
 
-        while len(sampled_batch) < batch_size:
-            if attempts > batch_size * 2:
-                raise RuntimeError("Too many attempts to retrieve batch.")
+        with self.lock:
+            if self.get_frame_count(split) < batch_size:
+                raise ValueError(f"Not enough available data in split {split.name} for batch size {batch_size}.")
 
-            # randomly pick source from split
-            source_key = random.choice(keys)
-            source_buffer = buffer.at(source_key)
+            buffer = self._get_buffer_for_split(split)
+            keys = list(buffer.keys())
 
-            # ensure source has data
-            if not source_buffer is None and not source_buffer.size() == 0:
-                frame_indices = list(source_buffer.keys())
-                random_index = random.choice(frame_indices)
-                sampled_batch.append(source_buffer.at(random_index))
+            while len(sampled_batch) < batch_size:
+                if attempts > batch_size * 2:
+                    raise RuntimeError(f"Too many attempts to retrieve batch.")
 
-            attempts += 1
+                # randomly pick source from split
+                source_key = random.choice(keys)
+                source_buffer = buffer.at(source_key)
+
+                # ensure source has data
+                if not source_buffer is None and not source_buffer.size() == 0:
+                    frame_indices = list(source_buffer.keys())
+                    random_index = random.choice(frame_indices)
+                    sampled_batch.append(source_buffer.at(random_index))
+
+                attempts += 1
 
         return sampled_batch
 
@@ -94,6 +100,15 @@ class VirtualDataset:
         :param split: The dataset split (TRAIN, VAL, TEST).
         :return: The total number of frames stored in the split.
         """
+        buffer = self._get_buffer_for_split(split)
+        total_frames = 0
+
+        for source_key in buffer.keys():
+            source_buffer = buffer.at(source_key)
+            if source_buffer:
+                total_frames += source_buffer.size()
+
+        return total_frames
 
     def feed(self, source: str, frame_index: int, frame: np.ndarray,
              annotation: Optional[List[Tuple[str, float, float, float, float]]], end_of_stream: bool):
@@ -106,30 +121,34 @@ class VirtualDataset:
         :param annotation: The annotation data.
         :param end_of_stream: Boolean indicating whether the frame is the last in the source.
         """
-        # get correct split
-        split_buffer = self._get_buffer_for_source(source)
+        with self.lock:
+            # get correct split
+            split_buffer = self._get_buffer_for_source(source)
 
-        # allocates buffer for source if new
-        source_buffer = self._allocate_source_buffer(source, split_buffer)
+            # allocates buffer for source if new
+            source_buffer = self._get_source_buffer(source, split_buffer)
 
-        # add instance to source buffer
-        source_buffer.at(source).add(
-            frame_index, (frame, annotation)
-        )
-
-    def _allocate_source_buffer(self, source_key, parent_buffer):
-        """
-        Allocates a new buffer for the source, inside the parent buffer.
-        Raises an exception if the such buffer already exists.
-        """
-        if not parent_buffer.has(source_key):
-            parent_buffer.add(
-                source_key,
-                HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]](
-                    max_size=self.max_frames_per_source,
-                )
+            # add instance to source buffer
+            source_buffer.add(
+                frame_index, (frame, annotation)
             )
-        return parent_buffer.at(source_key)
+
+            print(f"Current stored frame indices: {list(source_buffer.keys())}")
+
+    def _get_source_buffer(self, source_key, split_buffer):
+        """
+        Returns the appropriate source buffer for the specified source key.
+        Creates a new source buffer if it does not exist.
+
+        :param source_key: The key of the source data.
+        :param split_buffer: The split buffer.
+        """
+        if not split_buffer.has(source_key):
+            new_buffer = HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]](
+                max_size=self.max_frames_per_source,
+            )
+            split_buffer.add(source_key, new_buffer)
+        return split_buffer.at(source_key)
 
     def _shuffle_and_split(self):
         """Shuffles and splits the dataset into train, validation, and test sets."""

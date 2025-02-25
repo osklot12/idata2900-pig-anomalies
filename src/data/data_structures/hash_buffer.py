@@ -1,6 +1,6 @@
 import threading
 from collections import deque
-from typing import Dict, Generic, TypeVar, Optional, Hashable, KeysView
+from typing import Dict, Generic, TypeVar, Optional, Hashable, KeysView, List
 
 # generic type for stored data
 T = TypeVar('T')
@@ -47,10 +47,10 @@ class HashBuffer(Generic[T]):
         with self.lock:
             return self.data.get(key, None)
 
-    def keys(self) -> KeysView[Hashable]:
+    def keys(self) -> List[Hashable]:
         """Thread-safe retrieval of all keys."""
         with self.lock:
-            return self.data.keys()
+            return list(self.data.keys())
 
     def size(self) -> int:
         """Returns the current number of stored items."""
