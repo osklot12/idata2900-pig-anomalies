@@ -1,12 +1,12 @@
 import pytest
 import numpy as np
-from src.data.data_structures.indexed_buffer import IndexedBuffer
+from src.data.data_structures.hash_buffer import HashBuffer
 
 
-def test_indexed_buffer_add():
+def test_hash_buffer_add():
    """Tests adding elements to the buffer."""
    # arrange
-   buffer = IndexedBuffer[int](max_size=3)
+   buffer = HashBuffer[int](max_size=3)
 
    # act
    buffer.add(1, 100)
@@ -19,10 +19,10 @@ def test_indexed_buffer_add():
    assert buffer.has(2)
    assert buffer.has(3)
 
-def test_indexed_buffer_pop():
+def test_hash_buffer_pop():
    """Tests popping elements from the buffer."""
    # arrange
-   buffer = IndexedBuffer[int](max_size=3)
+   buffer = HashBuffer[int](max_size=3)
    first_added_element = 100
    second_added_element = 200
    third_added_element = 300
@@ -43,10 +43,10 @@ def test_indexed_buffer_pop():
    assert buffer.size() == 0
    assert buffer.pop(0) is None
 
-def test_indexed_buffer_eviction():
+def test_hash_buffer_eviction():
    """Tests that the buffer evicts old entries when full."""
    # arrange
-   buffer = IndexedBuffer[int](max_size=3)
+   buffer = HashBuffer[int](max_size=3)
    buffer.add(1, 100)
    buffer.add(2, 200)
    buffer.add(3, 300)
@@ -60,11 +60,11 @@ def test_indexed_buffer_eviction():
    assert buffer.has(3)
    assert buffer.has(4)
 
-def test_indexed_buffer_thread_safety():
+def test_hash_buffer_thread_safety():
    """Tests concurrent access to the buffer."""
    # arrange
    import threading
-   buffer = IndexedBuffer[int](max_size=5)
+   buffer = HashBuffer[int](max_size=5)
 
    def add_item():
       for i_ in range(10):
@@ -83,10 +83,10 @@ def test_indexed_buffer_thread_safety():
    for i in range(5, 10):
       assert buffer.has(i)
 
-def test_indexed_buffer_remove_nonexistent():
+def test_hash_buffer_remove_nonexistent():
    """Tests that popping a non-existent index returns None."""
    # arrange
-   buffer = IndexedBuffer[int](max_size=2)
+   buffer = HashBuffer[int](max_size=2)
 
    # act
    popped_element = buffer.pop(17)
