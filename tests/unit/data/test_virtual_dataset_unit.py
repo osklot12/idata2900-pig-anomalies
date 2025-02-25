@@ -42,16 +42,14 @@ def test_dataset_initialization(virtual_dataset):
         virtual_dataset.dataset_ids)
 
 
-def test_feed_and_retrieve_frames(virtual_dataset):
+def test_feed_and_retrieve_frames(virtual_dataset, sample_frame, sample_annotation):
     """Tests feeding frames into the dataset and retrieving them."""
     # arrange
     source = "video1"
-    frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
-    annotation = [("label", 100, 100, 50, 50)]
 
     # act
     for i in range(10):
-        virtual_dataset.feed(source, i, frame, annotation, end_of_stream=False)
+        virtual_dataset.feed(source, i, sample_frame, sample_annotation, end_of_stream=False)
 
     # assert
     buffer = virtual_dataset._get_buffer_for_source(source)
@@ -62,24 +60,21 @@ def test_feed_and_retrieve_frames(virtual_dataset):
     assert source_buffer.size() == 10, "Should contain 10 frames."
 
     retrieved_frame, retrieved_annotation = source_buffer.at(5)
-    assert np.array_equal(retrieved_frame, frame), "Frame data should match."
-    assert retrieved_annotation == annotation, "Annotations should match."
+    assert np.array_equal(retrieved_frame, sample_frame), "Frame data should match."
+    assert retrieved_annotation == sample_annotation, "Annotations should match."
 
 
-def test_get_frame_count(virtual_dataset):
+def test_get_frame_count(virtual_dataset, sample_frame, sample_annotation):
     """Tests counting the number of stored frames in each split."""
     # arrange
     source_train = virtual_dataset.train_ids[0]
     source_val = virtual_dataset.val_ids[0]
 
-    frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
-    annotation = [("label", 100, 100, 50, 50)]
-
     for i in range(10):
-        virtual_dataset.feed(source_train, i, frame, annotation, end_of_stream=False)
+        virtual_dataset.feed(source_train, i, sample_frame, sample_annotation, end_of_stream=False)
 
     for i in range(5):
-        virtual_dataset.feed(source_val, i, frame, annotation, end_of_stream=False)
+        virtual_dataset.feed(source_val, i, sample_frame, sample_annotation, end_of_stream=False)
 
     # act
     count_train = virtual_dataset.get_frame_count(DatasetSplit.TRAIN)
@@ -92,15 +87,13 @@ def test_get_frame_count(virtual_dataset):
     assert count_test == 0, "Test split should contain 10 frames."
 
 
-def test_get_shuffled_batch(virtual_dataset):
+def test_get_shuffled_batch(virtual_dataset, sample_frame, sample_annotation):
     """Tests the randomized batch sampling method."""
     # arrange
     source = virtual_dataset.train_ids[0]
-    frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
-    annotation = [("label", 100, 100, 50, 50)]
 
     for i in range(30):
-        virtual_dataset.feed(source, i, frame, annotation, end_of_stream=False)
+        virtual_dataset.feed(source, i, sample_frame, sample_annotation, end_of_stream=False)
 
     # act
     batch_size = 10
@@ -118,16 +111,14 @@ def test_get_shuffled_batch_fails_on_empty_split(virtual_dataset):
     with pytest.raises(ValueError, match=f"Not enough available data in split {split.name} for batch size {batch_size}."):
         virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
 
-def test_thread_safety(virtual_dataset):
+def test_thread_safety(virtual_dataset, sample_frame, sample_annotation):
     """Tests that feeding and batch retrieval can run safely in multiple threads."""
     # arrange
     source = virtual_dataset.train_ids[0]
-    frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
-    annotation = [("label", 100, 100, 50, 50)]
 
     def feed_data():
         for i in range(15):
-            virtual_dataset.feed(source, i, frame, annotation, end_of_stream=False)
+            virtual_dataset.feed(source, i, sample_frame, sample_annotation, end_of_stream=False)
 
     def retrieve_batches():
         for _ in range(3):
