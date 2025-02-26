@@ -1,22 +1,26 @@
-from src.data.augment.image_augmentor import ImageAugmentor
-from src.data.augment.json_augmentor import JsonAugmentor
-from src.data.augment.augmentor_interface import AugmentorBase
-import tensorflow as tf
 import random
+import numpy as np
+from src.data.augment.image_augmentor import ImageAugmentor
+from src.data.augment.annotation_augmentor import AnnotationAugmentor
 
-class AugmentationPipeline(AugmentorBase):
-    """Combines image and JSON augmentation into one unified process."""
+class CombinedAugmentation:
+    """Combines image and annotation augmentation into one unified process."""
 
     def __init__(self, seed=None):
         self.image_augmentor = ImageAugmentor(seed)
-        self.json_augmentor = JsonAugmentor()
+        self.annotation_augmentor = AnnotationAugmentor()
 
-    def augment(self, image: tf.Tensor, annotation: dict):
+    def augment(self, image: np.ndarray, annotations: list):
         """Applies both image & annotation augmentation consistently."""
         flip = random.choice([True, False])
         rotation = random.uniform(-15, 15)
 
+        # Apply image augmentation
         aug_image = self.image_augmentor.augment(image, rotation=rotation, flip=flip)
-        aug_annotation = self.json_augmentor.augment(image, annotation, rotation=rotation, flip=flip)
 
-        return aug_image, aug_annotation
+        # Apply annotation augmentation
+        _, _, aug_annotations = self.annotation_augmentor.augment(
+            "source", 0, annotations, image.shape[:2], flip=flip, rotation=rotation
+        )
+
+        return aug_image, aug_annotations
