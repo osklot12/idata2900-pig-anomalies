@@ -3,6 +3,7 @@ from typing import Callable, Dict, Tuple, Optional, List
 
 from src.data.darwin_decoder import DarwinDecoder
 from src.data.loading.feed_status import FeedStatus
+from src.utils.annotation_normalizer import AnnotationNormalizer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
@@ -37,7 +38,7 @@ class AnnotationLoader:
             source = SourceNormalizer.normalize(video_name)
 
             # extract image dimensions (width, height)
-            slots = annotations_json.get("item")
+            original_width, original_height = DarwinDecoder.get_frame_dimensions(annotations_json)
 
             frame_count = DarwinDecoder.get_frame_count(annotations_json)
             if frame_count <= 0:
@@ -45,11 +46,26 @@ class AnnotationLoader:
 
             annotations: Dict[int, list] = DarwinDecoder.get_annotations(annotations_json)
 
+            # normalization range
+            new_range = (0, 1)
+
             # call callback for every frame
             for frame_index in range(frame_count):
-                frame_annotations = annotations.get(frame_index, [])
+                raw_frame_annotations = annotations.get(frame_index, [])
+                normalized_annotations = [
+                    (
+                        NorsvinBehaviorClass.from_json_label(behavior),
+                        *AnnotationNormalizer.normalize_bounding_box(
+                            image_dimensions=(original_width, original_height),
+                            bounding_box=(x, y, w, h),
+                            new_range=new_range,
+                        )
+                    )
+                    for behavior, x, y, w, h in raw_frame_annotations
+                ]
                 print(f"[AnnotationLoader] Processed annotation for frame {frame_index} for source {source}")
-                self.callback(source, frame_index, frame_annotations, False)
+                print(f"[AnnotationLoader] Annotation {frame_index}: {normalized_annotations}")
+                self.callback(source, frame_index, normalized_annotations, False)
 
             # send termination signal
             self.callback(source, None, None, True)
