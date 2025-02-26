@@ -2,25 +2,37 @@ import random
 import numpy as np
 from src.data.augment.image_augmentor import ImageAugmentor
 from src.data.augment.annotation_augmentor import AnnotationAugmentor
+from src.data.augment.augmentor_interface import AugmentorBase
 
-class CombinedAugmentation:
-    """Combines image and annotation augmentation into one unified process."""
+class CombinedAugmentation(AugmentorBase):
+    """Applies multiple augmentation passes per frame based on config."""
 
-    def __init__(self, seed=None):
-        self.image_augmentor = ImageAugmentor(seed)
+    def __init__(self, rotation_range=None, num_versions=1):
+        self.image_augmentor = ImageAugmentor()
         self.annotation_augmentor = AnnotationAugmentor()
 
-    def augment(self, image: np.ndarray, annotations: list):
-        """Applies both image & annotation augmentation consistently."""
-        flip = random.choice([True, False])
-        rotation = random.uniform(-15, 15)
+        # Default rotation range if not provided
+        self.rotation_range = rotation_range if rotation_range else [-15, 15]
 
-        # Apply image augmentation
-        aug_image = self.image_augmentor.augment(image, rotation=rotation, flip=flip)
+        # Number of augmented versions per frame (default 1)
+        self.num_versions = max(1, num_versions)
 
-        # Apply annotation augmentation
-        _, _, aug_annotations = self.annotation_augmentor.augment(
-            "source", 0, annotations, image.shape[:2], flip=flip, rotation=rotation
-        )
+    def augment(self, image: np.ndarray, annotation_list: list, rotation: float = 0, flip: bool = False):
+        """Applies augmentation multiple times based on num_versions."""
+        augmented_data = []
 
-        return aug_image, aug_annotations
+        for _ in range(self.num_versions):
+            flip = random.choice([True, False])
+            rotation = random.uniform(self.rotation_range[0], self.rotation_range[1])
+
+            # Apply image augmentation
+            aug_image = self.image_augmentor.augment(image, rotation=rotation, flip=flip)
+
+            # Apply annotation augmentation separately
+            _, _, aug_annotations = self.annotation_augmentor.augment(
+                "source", 0, annotation_list, image.shape[:2], flip=flip, rotation=rotation
+            )
+
+            augmented_data.append((aug_image, aug_annotations))
+
+        return augmented_data  # List of (image, annotations) pairs

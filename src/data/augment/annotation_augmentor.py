@@ -1,21 +1,22 @@
 import numpy as np
 from math import radians, cos, sin
+from src.data.augment.augmentor_interface import AugmentorBase
 
-class AnnotationAugmentor:
+class AnnotationAugmentor(AugmentorBase):
     """
     Adjusts bounding box annotations for flipping and rotation.
     """
-    def augment(self, source: str, frame_index: int, annotations: list, image_shape: tuple, flip: bool = False, rotation: float = 0):
+    def augment(self, source: str, frame_index: int, annotation_list: list, image_shape: tuple, flip: bool = False, rotation: float = 0):
         """
         Modifies annotations based on applied transformations.
         """
         if flip:
-            annotations = self._flip_annotations(annotations, image_shape)
+            annotation_list = self._flip_annotations(annotation_list, image_shape)
 
         if rotation != 0:
-            annotations = self._rotate_annotations(annotations, image_shape, rotation)
+            annotation_list = self._rotate_annotations(annotation_list, image_shape, rotation)
 
-        return source, frame_index, annotations
+        return source, frame_index, annotation_list
 
     def _flip_annotations(self, annotations, image_shape):
         """Flips bounding boxes horizontally."""
