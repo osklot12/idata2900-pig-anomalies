@@ -1,0 +1,32 @@
+bucket:
+  credentials_path: "secrets/service_account.json"  # Path to the GCP service account JSON file
+  bucket_name: "your-gcs-bucket-name"
+  video_prefix: "datasets/videos/"  # Path to videos in the bucket
+  annotation_prefix: "datasets/annotations/"  # Path to annotation files in the bucket
+
+server:
+  gRPC_path: "" # Path to the local gRPC server
+
+memory_management:
+  max_sources_in_memory: 2  # Maximum number of video sources/streams loaded at a time
+  max_frames_per_source: 500  # Maximum frames per video source loaded in memory at a time
+  split_ratio: [0.7, 0.2, 0.1]  # Training, validation, testing split (sum must be 1.0)
+  max_loading_threads: 4  # Maximum number of threads handling video/frame loading
+
+formatting:
+  output_format: "COCO"  # Options: COCO, Kinetics, etc.
+  image_size: [224, 224]  # Image dimensions for resizing
+
+augmentation:
+  enable_augmentation: true
+  amount_augmented_frames: 10 # Amount of augmented frames from original frame
+  flip_probability: 0.5  # Probability of flipping images horizontally
+  rotation_range: [-15, 15]  # Rotation range in degrees
+
+logging:
+  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  enable_debug_mode: false
+
+coco_format:
+  enable_coco_format: true
+  coco_output_path: "data/coco_annotations.json"
