@@ -1,68 +1,67 @@
 import pytest
-import json
 from src.data.darwin_decoder import DarwinDecoder
+from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 @pytest.fixture
-def sample_json():
-    """Provides a sample Darwin JSON annotation."""
-    json_data = """
-    {
-        "annotations": [
-            {
-                "name": "g2b_bellynosing",
-                "frames": {
-                    "56": {
-                        "bounding_box": {
-                            "x": 1925.0824,
-                            "y": 1178.3059,
-                            "w": 108.3765,
-                            "h": 110.6824
-                        },
-                        "keyframe": true
-                    },
-                    "110": {
-                        "bounding_box": {
-                            "x": 1925.0824,
-                            "y": 1178.3059,
-                            "w": 108.3765,
-                            "h": 110.6824
-                        },
-                        "keyframe": true
-                    },
-                    "128": {
-                        "bounding_box": {
-                            "x": 1920.4706,
-                            "y": 1194.4471,
-                            "w": 126.8235,
-                            "h": 112.9882
-                        },
-                        "keyframe": true
-                    },
-                    "162": {
-                        "bounding_box": {
-                            "x": 1920.4706,
-                            "y": 1194.4471,
-                            "w": 126.8235,
-                            "h": 112.9882
-                        },
-                        "keyframe": true
-                    }
-                }
-            }
-        ]
-    }
-    """
-    return json.loads(json_data)
+def data_loader():
+    """Returns a DummyGCPDataLoader instance."""
+    return DummyGCPDataLoader()
 
-def test_decode(sample_json):
-    """Tests DarwinDecoder with a sample JSON structure."""
+def _get_expected_annotations():
+    """Returns the expected annotations for the DummyGCPDataLoader."""
+    expected_annotations = {}
+
+    for behavior, frames, in DummyGCPDataLoader.ANNOTATIONS:
+        for frame, x, y, w, h in frames:
+            frame_idx = int(frame)
+            if frame_idx not in expected_annotations:
+                expected_annotations[frame_idx] = []
+            expected_annotations[frame_idx].append((behavior, x, y, w, h))
+
+    return expected_annotations
+
+def test_get_annotations(data_loader):
+    """Tests that get_annotations returns the expected annotations."""
+    # arrange
+    sample_json = data_loader.download_json("test_annotations.json")
+
+    # act
     decoded_annotations = DarwinDecoder.get_annotations(sample_json)
 
-    expected_output = {
-        56: [("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824)],
-        110: [("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824)],
-        128: [("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882)],
-        162: [("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882)],
-    }
+    # assert
+    expected_annotations = _get_expected_annotations()
 
-    assert decoded_annotations == expected_output, "Decoded annotations do not match expected output"
+    assert len(expected_annotations) == len(decoded_annotations)
+
+    for frame_idx, expected_list in expected_annotations.items():
+        assert len(decoded_annotations[frame_idx]) == len(expected_list)
+        for (expected_behavior, expected_x, expected_y, expected_w, expected_h), (
+        actual_behavior, actual_x, actual_y, actual_w, actual_h) in zip(expected_list, decoded_annotations[frame_idx]):
+            assert expected_behavior == actual_behavior
+            assert expected_x == pytest.approx(actual_x, rel=1e-6)
+            assert expected_y == pytest.approx(actual_y, rel=1e-6)
+            assert expected_w == pytest.approx(actual_w, rel=1e-6)
+            assert expected_h == pytest.approx(actual_h, rel=1e-6)
+
+def test_get_frame_count(data_loader):
+    """Tests that get_frame_count returns the expected frame count."""
+    # arrange
+    sample_json = data_loader.download_json("test_annotations.json")
+
+    # act
+    frame_count = DarwinDecoder.get_frame_count(sample_json)
+
+    # assert
+    assert frame_count == DummyGCPDataLoader.FRAME_COUNT
+
+def test_get_frame_dimensions(data_loader):
+    """Tests that get_frame_dimensions returns the expected frame dimensions."""
+    # arrange
+    sample_json = data_loader.download_json("test_annotations.json")
+
+    # act
+    dim = DarwinDecoder.get_frame_dimensions(sample_json)
+
+    # assert
+    assert dim[0] == DummyGCPDataLoader.FRAME_WIDTH
+    assert dim[1] == DummyGCPDataLoader.FRAME_HEIGHT

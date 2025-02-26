@@ -12,10 +12,27 @@ TEST_VIDEO_PATH = os.path.join(BASE_DIR, "../../data/sample-5s.mp4")
 class DummyGCPDataLoader(DatasetSource):
     """A fake GCPDataLoader that returns dummy video data."""
 
+    # constants
+    FRAME_WIDTH = 1920
+    FRAME_HEIGHT = 1080
+    FRAME_COUNT = 171
+    N_ANNOTATIONS = 4
+    ANNOTATIONS = [
+        ("g2b_bellynosing", [
+            # frame, x, y, w, h
+            ("56", 1925.0824, 1178.3069, 108.3765, 110.6824),
+            ("110", 1846.0824, 1203.3069, 107.3742, 89.4320),
+        ]),
+        ("g2b_bellynosing", [
+            ("87", 1654.0443, 478.1234, 87.3424, 130.4320),
+            ("110", 1324.8329, 804.8342, 101.3482, 102.7300),
+        ])
+    ]
+
     def list_files(self) -> List[str]:
         return self.fetch_all_files()
 
-    def __init__(self, bucket_name, credentials_path):
+    def __init__(self, bucket_name: str = "test-bucket", credentials_path: str = "test_credentials.json"):
         self.bucket_name = bucket_name
         self.credentials_path = credentials_path
         self.dummy_json = self._get_test_json_data()
@@ -52,100 +69,36 @@ class DummyGCPDataLoader(DatasetSource):
     @staticmethod
     def _get_test_json_data():
         """Generates test JSON data."""
-        json_data = """
-            {
-                "item": {
-                    "name": "test_video.mp4",
-                    "slots": [
-                        {
-                            "frame_count": 171
-                        }
-                    ]
-                },
-                "annotations": [
-                    {
-                        "name": "g2b_bellynosing",
-                        "frames": {
-                            "56": {
-                                "bounding_box": {
-                                    "x": 1925.0824,
-                                    "y": 1178.3059,
-                                    "w": 108.3765,
-                                    "h": 110.6824
-                                },
-                                "keyframe": true
-                            },
-                            "110": {
-                                "bounding_box": {
-                                    "x": 1925.0824,
-                                    "y": 1178.3059,
-                                    "w": 108.3765,
-                                    "h": 110.6824
-                                },
-                                "keyframe": true
-                            },
-                            "128": {
-                                "bounding_box": {
-                                    "x": 1920.4706,
-                                    "y": 1194.4471,
-                                    "w": 126.8235,
-                                    "h": 112.9882
-                                },
-                                "keyframe": true
-                            },
-                            "162": {
-                                "bounding_box": {
-                                    "x": 1920.4706,
-                                    "y": 1194.4471,
-                                    "w": 126.8235,
-                                    "h": 112.9882
-                                },
-                                "keyframe": true
-                            }
-                        }
+        # construct the JSON dictionary
+        json_data = {
+            "item": {
+                "name": "test_video.mp4",
+                "slots": [{
+                    "width": DummyGCPDataLoader.FRAME_WIDTH,
+                    "height": DummyGCPDataLoader.FRAME_HEIGHT,
+                    "frame_count": DummyGCPDataLoader.FRAME_COUNT
+                }]
+            },
+            "annotations": []
+        }
+
+        # iterate over all annotations and add them dynamically
+        for behavior, frames in DummyGCPDataLoader.ANNOTATIONS:
+            frames_dict = {
+                frame: {
+                    "bounding_box": {
+                        "x": x,
+                        "y": y,
+                        "w": w,
+                        "h": h
                     },
-                    {
-                        "name": "g2b_tailbiting",
-                        "frames": {
-                            "56": {
-                                "bounding_box": {
-                                    "x": 1925.0824,
-                                    "y": 1178.3059,
-                                    "w": 108.3765,
-                                    "h": 110.6824
-                                },
-                                "keyframe": true
-                            },
-                            "110": {
-                                "bounding_box": {
-                                    "x": 1925.0824,
-                                    "y": 1178.3059,
-                                    "w": 108.3765,
-                                    "h": 110.6824
-                                },
-                                "keyframe": true
-                            },
-                            "128": {
-                                "bounding_box": {
-                                    "x": 1920.4706,
-                                    "y": 1194.4471,
-                                    "w": 126.8235,
-                                    "h": 112.9882
-                                },
-                                "keyframe": true
-                            },
-                            "162": {
-                                "bounding_box": {
-                                    "x": 1920.4706,
-                                    "y": 1194.4471,
-                                    "w": 126.8235,
-                                    "h": 112.9882
-                                },
-                                "keyframe": true
-                            }
-                        }
-                    }
-                ]
+                    "keyframe": True
+                } for frame, x, y, w, h in frames
             }
-            """
-        return json.loads(json_data)
+
+            json_data["annotations"].append({
+                "name": behavior,
+                "frames": frames_dict
+            })
+
+        return json_data

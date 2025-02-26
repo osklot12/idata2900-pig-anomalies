@@ -32,9 +32,13 @@ class AnnotationLoader:
         try:
             annotations_json = self.data_loader.download_json(annotation_blob_name)
 
-            # fetch video name, number of frames and annotations
+            # fetch video name and normalize source id
             video_name = annotations_json.get("item", {}).get("name", "unknown_video")
             source = SourceNormalizer.normalize(video_name)
+
+            # extract image dimensions (width, height)
+            slots = annotations_json.get("item")
+
             frame_count = DarwinDecoder.get_frame_count(annotations_json)
             if frame_count <= 0:
                 raise RuntimeError(f"No frames found in {annotation_blob_name}")
