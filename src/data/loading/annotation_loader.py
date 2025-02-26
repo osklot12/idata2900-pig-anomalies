@@ -4,6 +4,7 @@ from typing import Callable, Dict, Tuple, Optional, List
 from src.data.darwin_decoder import DarwinDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
+from src.utils.source_normalizer import SourceNormalizer
 
 
 class AnnotationLoader:
@@ -33,6 +34,7 @@ class AnnotationLoader:
 
             # fetch video name, number of frames and annotations
             video_name = annotations_json.get("item", {}).get("name", "unknown_video")
+            source = SourceNormalizer.normalize(video_name)
             frame_count = DarwinDecoder.get_frame_count(annotations_json)
             if frame_count <= 0:
                 raise RuntimeError(f"No frames found in {annotation_blob_name}")
@@ -42,9 +44,10 @@ class AnnotationLoader:
             # call callback for every frame
             for frame_index in range(frame_count):
                 frame_annotations = annotations.get(frame_index, [])
-                self.callback(video_name, frame_index, frame_annotations, False)
+                print(f"[AnnotationLoader] Processed annotation for frame {frame_index} for source {source}")
+                self.callback(source, frame_index, frame_annotations, False)
 
             # send termination signal
-            self.callback(video_name, None, None, True)
+            self.callback(source, None, None, True)
         except Exception as e:
             print(f"Error in _process_annotations: {e}")

@@ -125,13 +125,25 @@ class VirtualDataset:
             # get correct split
             split_buffer = self._get_buffer_for_source(source)
 
-            # allocates buffer for source if new
-            source_buffer = self._get_source_buffer(source, split_buffer)
+            if split_buffer and frame_index < 0:
+                print(f"[VirtualDataset] End of stream signal received for source {source}.")
 
-            # add instance to source buffer
-            source_buffer.add(
-                frame_index, (frame, annotation)
-            )
+            elif split_buffer:
+                # allocates buffer for source if new
+                source_buffer = self._get_source_buffer(source, split_buffer)
+
+                # add instance to source buffer
+                source_buffer.add(
+                    frame_index, (frame, annotation)
+                )
+
+                print(f"[VirtualDataset] Instance {frame_index} from source {source} received and stored")
+                print(f"[VirtualDataset] Train split: {self.get_frame_count(DatasetSplit.TRAIN)}")
+                print(f"[VirtualDataset] Val split: {self.get_frame_count(DatasetSplit.VAL)}")
+                print(f"[VirtualDataset] Test split: {self.get_frame_count(DatasetSplit.TEST)}")
+
+            else:
+                print(f"[VirtualDataset] Source {source} not recognized.")
 
     def _get_source_buffer(self, source_key, split_buffer):
         """
@@ -169,7 +181,10 @@ class VirtualDataset:
         return train_end, val_end
 
     def _get_buffer_for_source(self, source):
-        """Returns the buffer (split) the source belongs to."""
+        """
+        Returns the buffer (split) the source belongs to.
+        Returns None if source is not recognized.
+        """
         if source in self.train_ids:
             buffer = self.train_buffer
         elif source in self.val_ids:
@@ -177,7 +192,7 @@ class VirtualDataset:
         elif source in self.test_ids:
             buffer = self.test_buffer
         else:
-            raise ValueError(f"Source {source} not found in dataset.")
+            buffer = None
 
         return buffer
 
