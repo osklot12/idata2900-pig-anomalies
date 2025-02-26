@@ -1,5 +1,6 @@
 from typing import Callable, Tuple, Optional, List
 import numpy as np
+from threading import Lock
 
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.loading.feed_status import FeedStatus
@@ -13,6 +14,7 @@ class FrameAnnotationLoader:
                                            Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus],
                  buffer_size: int = 1000):
         self.callback = callback
+        self.lock = Lock()
 
         # frame buffer
         self.frame_buffer = HashBuffer[
@@ -26,21 +28,23 @@ class FrameAnnotationLoader:
 
     def feed_frame(self, source: str, index: int, frame_data: np.ndarray, end_of_stream: bool) -> FeedStatus:
         """Feeds a frame."""
-        result = FeedStatus.DROP
+        with self.lock:
+            result = FeedStatus.DROP
 
-        if end_of_stream:
-            index = -1
+            if end_of_stream:
+                index = -1
 
-        if self.annotation_buffer.has(index):
-            # match found
-            annotations, annotation_end = self.annotation_buffer.pop(index)[1:]
-            self._feed_pair(source, index, frame_data, annotations, end_of_stream)
-            result = FeedStatus.ACCEPT
 
-        else:
-            # store frame until annotation arrives
-            self.frame_buffer.add(index, (source, frame_data, end_of_stream))
-            result = FeedStatus.ACCEPT
+            if self.annotation_buffer.has(index):
+                # match found
+                annotations, annotation_end = self.annotation_buffer.pop(index)[1:]
+                self._feed_pair(source, index, frame_data, annotations, end_of_stream)
+                result = FeedStatus.ACCEPT
+
+            else:
+                # store frame until annotation arrives
+                self.frame_buffer.add(index, (source, frame_data, end_of_stream))
+                result = FeedStatus.ACCEPT
 
         return result
 
@@ -48,21 +52,22 @@ class FrameAnnotationLoader:
                         annotations: Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]],
                         end_of_stream: bool) -> FeedStatus:
         """Feeds an annotation and checks if a frame exists for this index."""
-        result = FeedStatus.DROP
+        with self.lock:
+            result = FeedStatus.DROP
 
-        if end_of_stream:
-            index = -1
+            if end_of_stream:
+                index = -1
 
-        if self.frame_buffer.has(index):
-            # match found
-            frame_data, frame_end = self.frame_buffer.pop(index)[1:]
-            self._feed_pair(source, index, frame_data, annotations, end_of_stream)
-            result = FeedStatus.ACCEPT
+            if self.frame_buffer.has(index):
+                # match found
+                frame_data, frame_end = self.frame_buffer.pop(index)[1:]
+                self._feed_pair(source, index, frame_data, annotations, end_of_stream)
+                result = FeedStatus.ACCEPT
 
-        else:
-            # store annotation until frame arrives
-            self.annotation_buffer.add(index, (source, annotations, end_of_stream))
-            result = FeedStatus.ACCEPT
+            else:
+                # store annotation until frame arrives
+                self.annotation_buffer.add(index, (source, annotations, end_of_stream))
+                result = FeedStatus.ACCEPT
 
         return result
 
@@ -70,6 +75,7 @@ class FrameAnnotationLoader:
                    annotations: Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]],
                    end_of_stream: bool) -> FeedStatus:
         """Feeds matched frame and annotation pair to the callback function."""
+        print(f"[FrameAnnotationLoader] Matched frame and annotation pair with index {index}, feeding forward")
         feed_result = FeedStatus.RETRY_LATER
 
         keep_feeding = True

@@ -8,6 +8,8 @@ from cppbindings import FrameStream
 from src.data.dataset_source import DatasetSource
 from src.data.loading.feed_status import FeedStatus
 from src.data.loading.frame_loader_interface import FrameLoaderInterface
+from src.utils.source_normalizer import SourceNormalizer
+
 
 class FrameLoader(FrameLoaderInterface):
     """
@@ -36,20 +38,22 @@ class FrameLoader(FrameLoaderInterface):
     def _process_frames(self, video_blob_name: str):
         """Processes frames and feeds them to the callback function."""
         video_data = self.data_loader.download_video(video_blob_name)
+        source = SourceNormalizer.normalize(video_blob_name)
         fstream = FrameStream(video_data)
 
         frame_index = 0
         frame = fstream.read()
         while frame:
+            print(f"[FrameLoader] Processed frame {frame_index} for source {source}")
             processed_frame = self._process_frame(frame)
 
-            self.callback(video_blob_name, frame_index, processed_frame, False)
+            self.callback(source, frame_index, processed_frame, False)
 
             frame = fstream.read()
             frame_index += 1
 
         # notify that the video processing is complete
-        self.callback(video_blob_name, frame_index, None, True)
+        self.callback(source, frame_index, None, True)
 
     def _process_frame(self, frame):
         """Processes a frame by converting it to a np.ndarray and resizing it if necessary."""
