@@ -1,11 +1,11 @@
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Any
 
 
 class DarwinDecoder:
     """Decodes annotations stored in Darwin JSON format."""
 
     @staticmethod
-    def get_annotations(json_data) -> Dict[int, List[Tuple[str, float, float, float, float]]]:
+    def get_annotations(json_data: Dict[str, Any]) -> Dict[int, List[Tuple[str, float, float, float, float]]]:
         """
         Decodes Darwin JSON annotations into a dictionary where:
         - Key: Frame index (int)
@@ -49,7 +49,7 @@ class DarwinDecoder:
         return h, w, x, y
 
     @staticmethod
-    def get_frame_count(json_data) -> int:
+    def get_frame_count(json_data: Dict[str, Any]) -> int:
         """
         Extracts the frame count from the Darwin JSON structure.
 
@@ -61,8 +61,31 @@ class DarwinDecoder:
         """
         result = -1
 
-        slots = json_data.get("item", {}).get("slots", [])
+        slots = DarwinDecoder._get_slots(json_data)
         if slots and "frame_count" in slots[0]:
             result = slots[0]["frame_count"]
 
         return result
+
+    @staticmethod
+    def get_frame_dimensions(json_data: Dict[str, Any]) -> Tuple[int, int]:
+        """
+        Extracts the original image dimensions (width, height) from the Darwin JSON structure.
+
+        Args:
+            json_data (Dict[str, Any]): The annotation loaded from a Darwin JSON file.
+
+        Returns:
+            Tuple[int, int]: (width, height) of the original video frames. Defaults to (0, 0) if not found.
+        """
+        result = (0, 0)
+
+        slots = DarwinDecoder._get_slots(json_data)
+        if slots and "width" in slots[0] and "height" in slots[0]:
+            result = slots[0]["width"], slots[0]["height"]
+        return result
+
+    @staticmethod
+    def _get_slots(json_data):
+        """Extracts the slots for the Darwin JSON structure."""
+        return json_data.get("item", {}).get("slots", [])
