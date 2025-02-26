@@ -1,9 +1,20 @@
+import os
+import cv2
+import numpy as np
+
 import pytest
 from unittest.mock import Mock
 
 from src.data.loading.frame_loader import FrameLoader
 
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
+
+# sample video metadata
+SAMPLE_N_FRAMES = 171
+SAMPLE_WIDTH = 1920
+SAMPLE_HEIGHT = 1080
+
+OUTPUT_DIR = "test_frames_output"
 
 
 @pytest.fixture
@@ -18,26 +29,86 @@ def mock_callback():
     return Mock()
 
 
-def test_load_frames(dummy_data_loader, mock_callback):
-    """Test that FrameLoader correctly loads and processes video frames."""
-
+def test_callback_called_correctly(dummy_data_loader, mock_callback):
+    """Tests that the callback function is called correctly."""
     # arrange
-    video_blob_name = "test-video.mp4"
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
         callback=mock_callback,
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
+        resize_shape=(224, 224)
     )
 
     # act
-    frame_loader.load_frames(video_blob_name)
+    frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
 
     # assert
-    assert mock_callback.call_count > 1
+    assert mock_callback.call_count == SAMPLE_N_FRAMES + 1, \
+        f"Expected {SAMPLE_N_FRAMES + 1} calls, got {mock_callback.call_count}"
 
-    # extract the last callback call arguments (last call should have `None` as frame)
     last_call = mock_callback.call_args_list[-1]
     _, last_frame_index, last_frame, is_complete = last_call[0]
+    assert last_frame is None, "Final callback did not receive None!"
+    assert is_complete is True, "Final callback did not indicate completion!"
 
-    # the last call should indicate completion
-    assert last_frame is None
-    assert is_complete is True
+
+def test_no_resizing_when_resize_none(dummy_data_loader, mock_callback):
+    """Tests that frames retain their original shape when resize_shape=None"""
+    # arrange
+    frame_loader = FrameLoader(
+        data_loader=dummy_data_loader,
+        callback=mock_callback,
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
+        resize_shape=None
+    )
+
+    # act
+    frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
+    processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
+
+    # assert
+    assert all(frame.shape == (SAMPLE_HEIGHT, SAMPLE_WIDTH, 3) for frame in processed_frames), \
+        "Frames were resized when they should not have been!"
+
+
+def test_resizing_works_correctly(dummy_data_loader, mock_callback):
+    """Tests that frames are correctly resize when resize_shape is set."""
+    # arrange
+    resized_shape = (224, 224)
+    frame_loader = FrameLoader(
+        data_loader=dummy_data_loader,
+        callback=mock_callback,
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
+        resize_shape=resized_shape
+    )
+
+    # act
+    frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
+    processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
+
+    # assert
+    assert all(frame.shape == (resized_shape[0], resized_shape[1], 3) for frame in processed_frames), \
+        f"Some frames were not resized correctly to {resized_shape}!"
+
+
+def test_correct_number_of_frames_loaded(dummy_data_loader, mock_callback):
+    """Tests that the expected number of frames are loaded."""
+    # arrange
+    frame_loader = FrameLoader(
+        data_loader=dummy_data_loader,
+        callback=mock_callback,
+        frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
+        resize_shape=(224, 224)
+    )
+
+    # act
+    frame_loader.load_frames("test_video.mp4")
+    frame_loader.wait_for_completion()
+    processed_frame_count = len(mock_callback.call_args_list) - 1
+
+    # assert
+    assert processed_frame_count == SAMPLE_N_FRAMES, \
+        f"Expected {SAMPLE_N_FRAMES} frames, got {processed_frame_count}"
