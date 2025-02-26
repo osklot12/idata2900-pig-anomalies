@@ -1,17 +1,15 @@
+import numpy as np
 import pytest
-import tensorflow as tf
 from src.data.augment.image_normalizer import ImageNormalizer
 
-@pytest.fixture
-def test_image():
-    """Creates a test image tensor (random 224x224 RGB image)."""
-    return tf.random.uniform((224, 224, 3), dtype=tf.float32)
-
 @pytest.mark.parametrize("norm_range", [(0, 1), (-1, 1)])
-def test_image_normalizer(test_image, norm_range):
-    """Tests if image normalization works within the expected range."""
-    normalizer = ImageNormalizer(norm_range)
-    normalized_image = normalizer.process(test_image)
+def test_normalization(norm_range):
+    """Test if the image normalization falls within the correct range."""
+    normalizer = ImageNormalizer(norm_range=norm_range)
+    sample_image = np.random.randint(0, 256, (224, 224, 3), dtype=np.uint8)
 
-    assert tf.reduce_min(normalized_image).numpy() >= norm_range[0], "Min normalization value incorrect"
-    assert tf.reduce_max(normalized_image).numpy() <= norm_range[1], "Max normalization value incorrect"
+    normalized_image = normalizer.process(sample_image)
+    min_val, max_val = norm_range
+
+    assert np.min(normalized_image) >= min_val, "Normalization min value incorrect"
+    assert np.max(normalized_image) <= max_val, "Normalization max value incorrect"
