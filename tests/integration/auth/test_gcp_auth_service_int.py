@@ -1,9 +1,9 @@
 import pytest
-import os
 from src.auth.gcp_auth_service import GCPAuthService
-from tests.conftest import get_test_path
+from src.utils.norsvin_bucket_parser import NorsvinBucketParser
+from src.utils.path_finder import PathFinder
 
-TEST_CREDENTIALS_PATH = get_test_path(".secrets/service-account.json")
+TEST_CREDENTIALS_PATH = PathFinder.get_abs_path(NorsvinBucketParser.CREDENTIALS_PATH)
 
 @pytest.fixture(scope="module")
 def gcp_auth_service():
