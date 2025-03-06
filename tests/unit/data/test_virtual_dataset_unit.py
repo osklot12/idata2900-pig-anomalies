@@ -111,6 +111,37 @@ def test_get_shuffled_batch_fails_on_empty_split(virtual_dataset):
     with pytest.raises(ValueError, match=f"Not enough available data in split {split.name} for batch size {batch_size}."):
         virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
 
+def test_get_shuffled_batch_is_non_deterministic(virtual_dataset, sample_annotation):
+    """
+    Ensures that batch retrieval is not always returning the same frames in the same order.
+    Due to the randomness involved, this test may give a false negative, so run it a couple of times if needed.
+    """
+    # arrange
+    source = virtual_dataset.train_ids[0]
+
+    n_frames = 1000
+    batch_size = 10
+    n_batches = 5
+    retrieved_batches = []
+
+    for i in range(n_frames):
+        unique_frame = np.full((1080, 1920, 3), i % 256, dtype=np.uint8)
+        virtual_dataset.feed(source, i, unique_frame, sample_annotation, end_of_stream=False)
+
+    # act
+    for _ in range(n_batches):
+        batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
+        retrieved_batches.append(batch)
+
+    # assert
+    batch_sets = [set(np.mean(frame) for frame, _ in batch) for batch in retrieved_batches]
+
+    unique_batches = len(set(tuple(sorted(batch)) for batch in batch_sets))
+
+    assert unique_batches > 1, "Shuffled batches should not all be identical."
+
+
+
 def test_thread_safety(virtual_dataset, sample_frame, sample_annotation):
     """Tests that feeding and batch retrieval can run safely in multiple threads."""
     # arrange
