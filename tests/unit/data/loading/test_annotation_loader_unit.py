@@ -4,7 +4,7 @@ import pytest
 
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
-from src.data.annotation_normalizer import AnnotationNormalizer
+from src.data.bbox_normalizer import BBoxNormalizer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -28,6 +28,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
         decoder_cls=DarwinDecoder,
+        label_parser=NorsvinBehaviorClass,
         callback=mock_callback
     )
 
@@ -72,7 +73,7 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
         normalized_annotations = [
             (
                 NorsvinBehaviorClass.from_json_label(behavior),
-                *AnnotationNormalizer.normalize_bounding_box(
+                *BBoxNormalizer.normalize_bounding_box(
                     image_dimensions=(original_width, original_height),
                     bounding_box=(x, y, w, h),
                     new_range=new_range,

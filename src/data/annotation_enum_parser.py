@@ -5,6 +5,6 @@ class AnnotationEnumParser(ABC):
 
     @staticmethod
     @abstractmethod
-    def enum_from_str(self, label: str):
+    def enum_from_str(label: str):
         """Converts an annotation label string to an enum."""
         raise NotImplementedError
