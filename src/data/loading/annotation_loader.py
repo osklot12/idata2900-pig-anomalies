@@ -1,7 +1,8 @@
 import threading
-from typing import Callable, Dict, Tuple, Optional, List
+from typing import Callable, Dict, Tuple, Optional, List, Type
 
-from src.data.darwin_decoder import DarwinDecoder
+from src.data.decoders.bbox_decoder import BBoxDecoder
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.utils.annotation_normalizer import AnnotationNormalizer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
@@ -13,13 +14,20 @@ class AnnotationLoader:
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus]):
+    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder],
+                 callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus]):
         self.data_loader = data_loader
+        self.decoder_cls = decoder_cls
         self.callback = callback
         self._thread = None
 
     def load_annotations(self, annotation_blob_name: str):
-        """Loads annotations for a video, feeding them to the callback function."""
+        """
+        Loads annotations for a video, feeding them to the callback function.
+
+        Args:
+            annotation_blob_name: blob name of the annotation file.
+        """
         self._thread = threading.Thread(target=self._process_annotations, args=(annotation_blob_name,))
         self._thread.start()
 
@@ -31,20 +39,24 @@ class AnnotationLoader:
     def _process_annotations(self, annotation_blob_name: str):
         """Processes annotations and feeds them to the callback function."""
         try:
+            # download json annotation file
             annotations_json = self.data_loader.download_json(annotation_blob_name)
+
+            # instantiate decoder
+            decoder = self.decoder_cls(annotations_json)
 
             # fetch video name and normalize source id
             video_name = annotations_json.get("item", {}).get("name", "unknown_video")
             source = SourceNormalizer.normalize(video_name)
 
             # extract image dimensions (width, height)
-            original_width, original_height = DarwinDecoder.get_frame_dimensions(annotations_json)
+            original_width, original_height = decoder.get_frame_dimensions()
 
-            frame_count = DarwinDecoder.get_frame_count(annotations_json)
+            frame_count = decoder.get_frame_count()
             if frame_count <= 0:
                 raise RuntimeError(f"No frames found in {annotation_blob_name}")
 
-            annotations: Dict[int, list] = DarwinDecoder.get_annotations(annotations_json)
+            annotations: Dict[int, list] = decoder.get_annotations()
 
             # normalization range
             new_range = (0, 1)
