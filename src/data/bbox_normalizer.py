@@ -24,6 +24,15 @@ class BBoxNormalizer:
         if self.new_range[0] > self.new_range[1]:
             self.new_range = (self.new_range[1], self.new_range[0])
 
+    def set_image_dimensions(self, image_dimensions: Tuple[float, float]):
+        """
+        Sets the image dimensions.
+
+        Args:
+            image_dimensions: Tuple (width, height) representing the original image dimensions.
+        """
+        self.image_width, self.image_height = image_dimensions
+
     def normalize_bounding_box(self, bounding_box: Tuple[float, float, float, float]) -> Tuple[float, float, float, float]:
         """
         Normalizes a bounding box to the configured range.
