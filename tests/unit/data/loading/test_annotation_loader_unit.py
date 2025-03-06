@@ -5,6 +5,7 @@ import pytest
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
 from src.data.bbox_normalizer import BBoxNormalizer
+from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -24,11 +25,12 @@ def mock_callback():
 
 def test_callback_called_correctly(dummy_data_loader, mock_callback):
     """Tests that the callback function is called correctly."""
-    # Arrange
+    # arrange
+    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
         decoder_cls=DarwinDecoder,
-        label_parser=NorsvinBehaviorClass,
+        normalizer=normalizer,
         callback=mock_callback
     )
 
@@ -53,9 +55,11 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
 def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     """Tests that annotations are correctly extracted and passed to the callback."""
     # arrange
+    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
         decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
         callback=mock_callback
     )
 
@@ -63,28 +67,11 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     annotation_loader.load_annotations("test_annotations.json")
     annotation_loader.wait_for_completion()
 
-    raw_expected_annotations = dummy_data_loader.get_annotations()
+    # assert
+    total_frames = dummy_data_loader.frame_count
+    expected_annotations = dummy_data_loader.get_annotations()
 
-    expected_annotations = {}
-    original_width, original_height = dummy_data_loader.get_video_properties()[:2]
-    new_range = (0, 1)  # The expected normalization range
-
-    for frame, annotations in raw_expected_annotations.items():
-        normalized_annotations = [
-            (
-                NorsvinBehaviorClass.from_json_label(behavior),
-                *BBoxNormalizer.normalize_bounding_box(
-                    image_dimensions=(original_width, original_height),
-                    bounding_box=(x, y, w, h),
-                    new_range=new_range,
-                )
-            )
-            for behavior, x, y, w, h in annotations
-        ]
-        expected_annotations[frame] = normalized_annotations
-
-    # Assert
-    total_frames = dummy_data_loader.frame_count  # Use stored frame count
+    normalized_expected_annotations = _normalize_annotation_dict(dummy_data_loader)
 
     for frame_index in range(total_frames):
         call = mock_callback.call_args_list[frame_index]
@@ -97,11 +84,28 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
             continue
 
         # If the frame is expected to have annotations, check if they match
-        if frame_index in expected_annotations:
-            assert received_annotations == expected_annotations[frame_index], \
+        if frame_index in normalized_expected_annotations:
+            assert received_annotations == normalized_expected_annotations[frame_index], \
                 f"Annotations at frame {frame_index} did not match expected annotations!"
 
         # If the frame is not expected to have annotations, it should be an empty list
         else:
             assert received_annotations == [], \
                 f"Frame {frame_index} should have no annotations but got {received_annotations}"
+
+
+def _normalize_annotation_dict(dummy_data_loader):
+    normalized_expected_annotations = {
+        frame_index: [
+            (
+                NorsvinAnnotationParser.enum_from_str(behavior),  # Convert string to enum
+                x / 1920,  # Normalize X
+                y / 1080,  # Normalize Y
+                w / 1920,  # Normalize Width
+                h / 1080  # Normalize Height
+            )
+            for behavior, x, y, w, h in annotations
+        ]
+        for frame_index, annotations in dummy_data_loader.get_annotations().items()
+    }
+    return normalized_expected_annotations

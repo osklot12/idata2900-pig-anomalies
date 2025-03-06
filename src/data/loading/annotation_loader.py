@@ -14,11 +14,12 @@ class AnnotationLoader:
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder], label_parser: Type[AnnotationEnumParser],
-                 callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus]):
+    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder], normalizer: BBoxNormalizer,
+                 callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]],
+                                     bool], FeedStatus]):
         self.data_loader = data_loader
         self.decoder_cls = decoder_cls
-        self.label_parser = label_parser
+        self.normalizer = normalizer
         self.callback = callback
         self._thread = None
 
@@ -41,37 +42,21 @@ class AnnotationLoader:
         """Processes annotations and feeds them to the callback function."""
         try:
             # download json annotation file
-            annotations_json = self.data_loader.download_json(annotation_blob_name)
+            json = self.data_loader.download_json(annotation_blob_name)
 
             # instantiate decoder
-            decoder = self.decoder_cls(annotations_json)
+            decoder = self.decoder_cls(json)
 
-            # fetch video name and normalize source id
-            video_name = annotations_json.get("item", {}).get("name", "unknown_video")
-            source = SourceNormalizer.normalize(video_name)
+            # extract and set image dimensions (width, height) for normalizer
+            self.normalizer.set_image_dimensions(decoder.get_frame_dimensions())
 
-            # extract image dimensions (width, height)
-            original_width, original_height = decoder.get_frame_dimensions()
+            # extract metadata
+            source = self._get_source_id(json)
+            frame_count = self._get_frame_count(annotation_blob_name, decoder)
 
-            frame_count = decoder.get_frame_count()
-            if frame_count <= 0:
-                raise RuntimeError(f"No frames found in {annotation_blob_name}")
-
+            # normalize annotations
             raw_annotations: Dict[int, list] = decoder.get_annotations()
-
-            # normalization range
-            new_range = (0, 1)
-
-           # normalize annotations
-            normalized_annotations = {
-                frame_index: BBoxNormalizer.normalize_annotations(
-                    image_dimensions=(original_width, original_height),
-                    annotations=annotations,
-                    new_range=new_range,
-                    annotation_parser=self.label_parser,
-                )
-                for frame_index, annotations in raw_annotations.items()
-            }
+            normalized_annotations = self._get_normalized_annotations(raw_annotations)
 
             # calls callback for every frame
             for frame_index in range(frame_count):
@@ -84,3 +69,21 @@ class AnnotationLoader:
             self.callback(source, None, None, True)
         except Exception as e:
             print(f"Error in _process_annotations: {e}")
+
+    def _get_normalized_annotations(self, raw_annotations):
+        return {
+            frame_index: self.normalizer.normalize_annotations(annotations)
+            for frame_index, annotations in raw_annotations.items()
+        }
+
+    @staticmethod
+    def _get_source_id(json):
+        video_name = json.get("item", {}).get("name", "unknown_video")
+        return SourceNormalizer.normalize(video_name)
+
+    @staticmethod
+    def _get_frame_count(annotation_blob_name, decoder):
+        frame_count = decoder.get_frame_count()
+        if frame_count <= 0:
+            raise RuntimeError(f"No frames found in {annotation_blob_name}")
+        return frame_count
