@@ -2,9 +2,8 @@ import threading
 from typing import Callable, Dict, Tuple, Optional, List, Type
 
 from src.data.decoders.bbox_decoder import BBoxDecoder
-from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.feed_status import FeedStatus
-from src.utils.annotation_normalizer import AnnotationNormalizer
+from src.data.annotation_normalizer import AnnotationNormalizer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
