@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -22,7 +23,11 @@ def mock_callback():
 def test_callback_called_correctly(dummy_data_loader, mock_callback):
     """Tests that the callback function is called correctly."""
     # arrange
-    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
+    annotation_loader = AnnotationLoader(
+        data_loader=dummy_data_loader,
+        decoder_cls=DarwinDecoder,
+        callback=mock_callback
+    )
 
     # act
     annotation_loader.load_annotations("test_annotations.json")
@@ -41,34 +46,24 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     assert last_annotations is None, "Final callback did not receive None!"
     assert is_complete is True, "Final callback did not indicate completion!"
 
+
 def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     """Tests that annotations are correctly extracted and passed to the callback."""
     # arrange
-    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
+    annotation_loader = AnnotationLoader(
+        data_loader=dummy_data_loader,
+        decoder_cls=DarwinDecoder,
+        callback=mock_callback
+    )
 
     # act
     annotation_loader.load_annotations("test_annotations.json")
     annotation_loader.wait_for_completion()
 
     # assert
-    expected_annotations = {
-        56: [
-            ("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824),
-            ("g2b_tailbiting", 1925.0824, 1178.3059, 108.3765, 110.6824),
-        ],
-        110: [
-            ("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824),
-            ("g2b_tailbiting", 1925.0824, 1178.3059, 108.3765, 110.6824),
-        ],
-        128: [
-            ("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882),
-            ("g2b_tailbiting", 1920.4706, 1194.4471, 126.8235, 112.9882),
-        ],
-        162: [
-            ("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882),
-            ("g2b_tailbiting", 1920.4706, 1194.4471, 126.8235, 112.9882),
-        ],
-    }
+    expected_annotations = {}
+    for behavior, frames in dummy_data_loader.ANNOTATIONS:
+        for frame, x, y, w, h in frames
 
     # assert
     total_frames = 171

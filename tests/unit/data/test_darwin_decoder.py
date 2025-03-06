@@ -1,5 +1,5 @@
 import pytest
-from src.data.darwin_decoder import DarwinDecoder
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 @pytest.fixture
@@ -24,9 +24,10 @@ def test_get_annotations(data_loader):
     """Tests that get_annotations returns the expected annotations."""
     # arrange
     sample_json = data_loader.download_json("test_annotations.json")
+    decoder = DarwinDecoder(sample_json)
 
     # act
-    decoded_annotations = DarwinDecoder.get_annotations(sample_json)
+    decoded_annotations = decoder.get_annotations()
 
     # assert
     expected_annotations = _get_expected_annotations()
@@ -47,21 +48,23 @@ def test_get_frame_count(data_loader):
     """Tests that get_frame_count returns the expected frame count."""
     # arrange
     sample_json = data_loader.download_json("test_annotations.json")
+    decoder = DarwinDecoder(sample_json)
 
     # act
-    frame_count = DarwinDecoder.get_frame_count(sample_json)
+    frame_count = decoder.get_frame_count()
 
     # assert
-    assert frame_count == DummyGCPDataLoader.FRAME_COUNT
+    assert frame_count == DummyGCPDataLoader.DEFAULT_FRAME_COUNT
 
 def test_get_frame_dimensions(data_loader):
     """Tests that get_frame_dimensions returns the expected frame dimensions."""
     # arrange
     sample_json = data_loader.download_json("test_annotations.json")
+    decoder = DarwinDecoder(sample_json)
 
     # act
-    dim = DarwinDecoder.get_frame_dimensions(sample_json)
+    dim = decoder.get_frame_dimensions()
 
     # assert
-    assert dim[0] == DummyGCPDataLoader.FRAME_WIDTH
-    assert dim[1] == DummyGCPDataLoader.FRAME_HEIGHT
+    assert dim[0] == DummyGCPDataLoader.DEFAULT_FRAME_WIDTH
+    assert dim[1] == DummyGCPDataLoader.DEFAULT_FRAME_HEIGHT
