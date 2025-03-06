@@ -1,9 +1,10 @@
 import threading
 from typing import Callable, Dict, Tuple, Optional, List, Type
 
+from src.data.annotation_enum_parser import AnnotationEnumParser
 from src.data.decoders.bbox_decoder import BBoxDecoder
 from src.data.loading.feed_status import FeedStatus
-from src.data.annotation_normalizer import AnnotationNormalizer
+from src.data.bbox_normalizer import BBoxNormalizer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
@@ -13,10 +14,11 @@ class AnnotationLoader:
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder],
+    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder], label_parser: Type[AnnotationEnumParser],
                  callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus]):
         self.data_loader = data_loader
         self.decoder_cls = decoder_cls
+        self.label_parser = label_parser
         self.callback = callback
         self._thread = None
 
@@ -55,30 +57,28 @@ class AnnotationLoader:
             if frame_count <= 0:
                 raise RuntimeError(f"No frames found in {annotation_blob_name}")
 
-            annotations: Dict[int, list] = decoder.get_annotations()
+            raw_annotations: Dict[int, list] = decoder.get_annotations()
 
             # normalization range
             new_range = (0, 1)
 
+           # normalize annotations
+            normalized_annotations = {
+                frame_index: BBoxNormalizer.normalize_annotations(
+                    image_dimensions=(original_width, original_height),
+                    annotations=annotations,
+                    new_range=new_range,
+                    annotation_parser=self.label_parser,
+                )
+                for frame_index, annotations in raw_annotations.items()
+            }
+
             # calls callback for every frame
             for frame_index in range(frame_count):
-                raw_frame_annotations = annotations.get(frame_index, [])
-
-                # normalize annotations
-                normalized_annotations = [
-                    (
-                        NorsvinBehaviorClass.from_json_label(behavior),
-                        *AnnotationNormalizer.normalize_bounding_box(
-                            image_dimensions=(original_width, original_height),
-                            bounding_box=(x, y, w, h),
-                            new_range=new_range,
-                        )
-                    )
-                    for behavior, x, y, w, h in raw_frame_annotations
-                ]
+                frame_annotations = normalized_annotations.get(frame_index, [])
                 print(f"[AnnotationLoader] Processed annotation for frame {frame_index} for source {source}")
-                print(f"[AnnotationLoader] Annotation {frame_index}: {normalized_annotations}")
-                self.callback(source, frame_index, normalized_annotations, False)
+                print(f"[AnnotationLoader] Annotation {frame_index}: {frame_annotations}")
+                self.callback(source, frame_index, frame_annotations, False)
 
             # send termination signal
             self.callback(source, None, None, True)
