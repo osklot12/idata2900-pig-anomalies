@@ -5,7 +5,7 @@ import pytest
 
 from src.data.loading.annotation_loader import AnnotationLoader
 from src.data.loading.feed_status import FeedStatus
-from src.data.loading.frame_annotation_loader import FrameAnnotationLoader
+from src.data.loading.instance_loader import InstanceLoader
 from src.data.loading.frame_loader import FrameLoader
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -23,7 +23,7 @@ def mock_callback():
 @pytest.fixture
 def integration_setup(dummy_data_loader, mock_callback):
     """Creates a full integration setup with loaders and a FrameAnnotationLoader."""
-    frame_annotation_loader = FrameAnnotationLoader(callback=mock_callback, buffer_size=1000)
+    frame_annotation_loader = InstanceLoader(callback=mock_callback, buffer_size=1000)
 
     frame_loader = FrameLoader(dummy_data_loader, frame_annotation_loader.feed_frame,
                                frame_shape=(1080, 1920))
