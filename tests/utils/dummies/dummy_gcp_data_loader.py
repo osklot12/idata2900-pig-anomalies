@@ -1,6 +1,7 @@
 from typing import List, Dict, Tuple
 
 from src.data.dataset_source import DatasetSource
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 
 class DummyGCPDataLoader(DatasetSource):
@@ -82,7 +83,7 @@ class DummyGCPDataLoader(DatasetSource):
         """Returns the annotations."""
         return self.annotations
 
-    def set_annotations(self, annotations: Dict[int, List[Tuple[str, float, float, float, float]]]):
+    def set_annotations(self, annotations: Dict[int, List[Tuple[NorsvinBehaviorClass, float, float, float, float]]]):
         """Sets custom annotations."""
         self.annotations = annotations.copy()
 

@@ -1,6 +1,9 @@
 from enum import Enum, auto
 
-class NorsvinBehaviorClass(Enum):
+from src.data.annotation_enum_parser import AnnotationEnumParser
+
+
+class NorsvinBehaviorClass(Enum, AnnotationEnumParser):
     """An enumeration of Norsvin's behavioral classes."""
 
     TAIL_BITING = auto()
@@ -16,8 +19,7 @@ class NorsvinBehaviorClass(Enum):
     """Behavior where pigs puts their tail down."""
 
     @staticmethod
-    def from_json_label(label: str) -> "NorsvinBehaviorClass":
-        """Converts JSON behavior labels to enum values."""
+    def enum_from_str(self, label: str):
         mapping = {
             "g2b_tailbiting": NorsvinBehaviorClass.TAIL_BITING,
             "g2b_earbiting": NorsvinBehaviorClass.EAR_BITING,
