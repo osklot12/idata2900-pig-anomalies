@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.dataset_split import DatasetSplit
 from src.data.loading.annotation_loader import AnnotationLoader
 from src.data.loading.instance_loader import InstanceLoader
 from src.data.loading.frame_loader import FrameLoader
