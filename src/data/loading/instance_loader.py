@@ -7,7 +7,7 @@ from src.data.loading.feed_status import FeedStatus
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 
-class FrameAnnotationLoader:
+class InstanceLoader:
     """Loads pairs of frames and annotations and feeds them to a callback function."""
 
     def __init__(self, callback: Callable[[str, int, np.ndarray,

@@ -10,7 +10,7 @@ from src.utils.source_normalizer import SourceNormalizer
 
 class AnnotationLoader:
     """
-    Loads annotations for videos and invokes callable, feeding the annotations forward.
+    Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
     def __init__(self, data_loader, callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]], bool], FeedStatus]):
@@ -49,9 +49,11 @@ class AnnotationLoader:
             # normalization range
             new_range = (0, 1)
 
-            # call callback for every frame
+            # calls callback for every frame
             for frame_index in range(frame_count):
                 raw_frame_annotations = annotations.get(frame_index, [])
+
+                # normalize annotations
                 normalized_annotations = [
                     (
                         NorsvinBehaviorClass.from_json_label(behavior),

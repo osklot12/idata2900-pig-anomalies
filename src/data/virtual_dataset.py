@@ -7,6 +7,7 @@ import numpy as np
 
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataset_split import DatasetSplit
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 
 class VirtualDataset:
@@ -57,7 +58,7 @@ class VirtualDataset:
         self.max_frames_per_source = max_frames_per_source
 
     def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> List[
-        Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]:
+        Tuple[np.ndarray, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]]]]:
         """
         Samples a randomized batch of frame-annotation pairs from the specified dataset split.
 
@@ -208,3 +209,24 @@ class VirtualDataset:
             raise ValueError(f"Split {split} not found in dataset.")
 
         return buffer
+
+    def get_split_for_source(self, source: str):
+        """
+        Returns the DatasetSplit for the given source.
+
+        Args:
+            source: The ID of the source data.
+
+        Returns:
+            The DatasetSplit for the given source, None if not recognized.
+        """
+        if source in self.train_ids:
+            split = DatasetSplit.TRAIN
+        elif source in self.val_ids:
+            split = DatasetSplit.VAL
+        elif source in self.test_ids:
+            split = DatasetSplit.TEST
+        else:
+            split = None
+
+        return split
