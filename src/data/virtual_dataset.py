@@ -66,33 +66,24 @@ class VirtualDataset:
         :param batch_size: The number of samples to retrieve.
         :return: A list of (frame, annotation) pairs.
         """
-        sampled_batch = []
-        attempts = 0
-
         with self.lock:
             if self.get_frame_count(split) < batch_size:
                 raise ValueError(f"Not enough available data in split {split.name} for batch size {batch_size}.")
 
             buffer = self._get_buffer_for_split(split)
-            keys = list(buffer.keys())
 
-            while len(sampled_batch) < batch_size:
-                if attempts > batch_size * 2:
-                    raise RuntimeError(f"Too many attempts to retrieve batch.")
+            frame_references = [
+                source_buffer.at(frame_index)
+                for source_key in buffer.keys()
+                for source_buffer in [buffer.at(source_key)]
+                if source_buffer and source_buffer.size() > 0
+                for frame_index in source_buffer.keys()
+            ]
 
-                # randomly pick source from split
-                source_key = random.choice(keys)
-                source_buffer = buffer.at(source_key)
+            # ensure "non-deterministic" behavior
+            random.seed(None)
 
-                # ensure source has data
-                if not source_buffer is None and not source_buffer.size() == 0:
-                    frame_indices = list(source_buffer.keys())
-                    random_index = random.choice(frame_indices)
-                    sampled_batch.append(source_buffer.at(random_index))
-
-                attempts += 1
-
-        return sampled_batch
+            return random.sample(frame_references, batch_size)
 
     def get_frame_count(self, split: DatasetSplit) -> int:
         """
