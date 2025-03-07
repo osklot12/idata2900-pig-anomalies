@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from src.data.loading.frame_loader import FrameLoader
+from src.data.streamers.frame_streamer import FrameStreamer
 
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -28,7 +28,7 @@ def mock_callback():
 def test_callback_called_correctly(dummy_data_loader, mock_callback):
     """Tests that the callback function is called correctly."""
     # arrange
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=dummy_data_loader,
         video_blob_name="test_video.mp4",
         callback=mock_callback,
@@ -53,7 +53,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
 def test_no_resizing_when_resize_none(dummy_data_loader, mock_callback):
     """Tests that frames retain their original shape when resize_shape=None"""
     # arrange
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=dummy_data_loader,
         video_blob_name="test_video.mp4",
         callback=mock_callback,
@@ -75,7 +75,7 @@ def test_resizing_works_correctly(dummy_data_loader, mock_callback):
     """Tests that frames are correctly resize when resize_shape is set."""
     # arrange
     resized_shape = (224, 224)
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=dummy_data_loader,
         video_blob_name="test_video.mp4",
         callback=mock_callback,
@@ -96,7 +96,7 @@ def test_resizing_works_correctly(dummy_data_loader, mock_callback):
 def test_correct_number_of_frames_loaded(dummy_data_loader, mock_callback):
     """Tests that the expected number of frames are loaded."""
     # arrange
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=dummy_data_loader,
         video_blob_name="test_video.mp4",
         callback=mock_callback,

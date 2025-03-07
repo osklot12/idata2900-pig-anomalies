@@ -7,9 +7,9 @@ import pytest
 from src.auth.gcp_auth_service import GCPAuthService
 from src.data.bbox_normalizer import BBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.loading.annotation_loader import AnnotationLoader
+from src.data.streamers.annotation_streamer import AnnotationStreamer
 from src.data.loading.instance_loader import InstanceLoader
-from src.data.loading.frame_loader import FrameLoader
+from src.data.streamers.frame_streamer import FrameStreamer
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.data.virtual_dataset import VirtualDataset
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
@@ -53,7 +53,7 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
     """Sets up and returns loaders for testing."""
     instance_loader = InstanceLoader(virtual_dataset.feed)
 
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=frame_data_loader,
         video_blob_name=NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE),
         callback=instance_loader.feed_frame,
@@ -63,7 +63,7 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
 
     normalizer = BBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
                                 annotation_parser=NorsvinAnnotationParser)
-    annotation_loader = AnnotationLoader(
+    annotation_loader = AnnotationStreamer(
         data_loader=annotation_data_loader,
         annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),
         decoder_cls=DarwinDecoder,

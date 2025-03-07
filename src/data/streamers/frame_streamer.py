@@ -7,11 +7,11 @@ from cppbindings import FrameStream
 
 from src.data.dataset_source import DatasetSource
 from src.data.loading.feed_status import FeedStatus
-from src.data.loading.streamer import Streamer
+from src.data.streamers.streamer import Streamer
 from src.utils.source_normalizer import SourceNormalizer
 
 
-class FrameLoader(Streamer):
+class FrameStreamer(Streamer):
     """
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
@@ -27,17 +27,20 @@ class FrameLoader(Streamer):
         self._thread = None
 
     def stream(self):
-        self._thread = threading.Thread(target=self._process_frames, args=(self.video_blob_name,))
+        self._thread = threading.Thread(target=self._process_frames)
         self._thread.start()
+
+    def stop(self):
+        pass
 
     def wait_for_completion(self):
         if self._thread:
             self._thread.join()
 
-    def _process_frames(self, video_blob_name: str):
+    def _process_frames(self):
         """Processes frames and feeds them to the callback function."""
-        video_data = self.data_loader.download_video(video_blob_name)
-        source = SourceNormalizer.normalize(video_blob_name)
+        video_data = self.data_loader.download_video(self.video_blob_name)
+        source = SourceNormalizer.normalize(self.video_blob_name)
         fstream = FrameStream(video_data)
 
         frame_index = 0

@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.loading.frame_loader import FrameLoader
+from src.data.streamers.frame_streamer import FrameStreamer
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
@@ -26,7 +26,7 @@ def test_load_frames(gcp_data_loader, mock_callback):
 
     # arrange
     video_blob_name = NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE)
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=gcp_data_loader,
         video_blob_name=video_blob_name,
         callback=mock_callback,
