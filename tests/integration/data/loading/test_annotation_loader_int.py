@@ -30,14 +30,14 @@ def test_real_gcp_annotations_processing(gcp_data_loader, mock_callback):
     normalizer = BBoxNormalizer(image_dimensions=(2688, 1502), new_range=(0, 1), annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=gcp_data_loader,
+        annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),
         decoder_cls=DarwinDecoder,
         normalizer=normalizer,
         callback=mock_callback
     )
-    annotation_blob_name = NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE)
 
     # act
-    annotation_loader.load_annotations(annotation_blob_name)
+    annotation_loader.stream()
     annotation_loader.wait_for_completion()
 
     # assert
