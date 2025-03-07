@@ -1,14 +1,18 @@
-import time
 from unittest.mock import Mock
+import cv2
+import matplotlib.pyplot as plt
 
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
+from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
-from src.data.loading.frame_annotation_loader import FrameAnnotationLoader
+from src.data.loading.instance_loader import InstanceLoader
 from src.data.loading.frame_loader import FrameLoader
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.data.virtual_dataset import VirtualDataset
+from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from src.utils.source_normalizer import SourceNormalizer
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
@@ -44,23 +48,34 @@ def mock_callback():
     """Fixture to provide a mock callback."""
     return Mock()
 
-@pytest.mark.integration
-def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_dataset, mock_callback):
-    """Tests that data is successfully streamed from the could and stored in the VirtualDataset."""
-    # arrange
-    frame_annotation_loader = FrameAnnotationLoader(virtual_dataset.feed)
+@pytest.fixture
+def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
+    """Sets up and returns loaders for testing."""
+    instance_loader = InstanceLoader(virtual_dataset.feed)
 
     frame_loader = FrameLoader(
         data_loader=frame_data_loader,
-        callback=frame_annotation_loader.feed_frame,
+        callback=instance_loader.feed_frame,
         frame_shape=(1520, 2688),
         resize_shape=(640, 640)
     )
 
+    normalizer = BBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
+                                annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=annotation_data_loader,
-        callback=frame_annotation_loader.feed_annotation
+        decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
+        callback=instance_loader.feed_annotation
     )
+
+    return instance_loader, frame_loader, annotation_loader
+
+@pytest.mark.integration
+def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_dataset, mock_callback, setup_loaders):
+    """Tests that data is successfully streamed from the could and stored in the VirtualDataset."""
+    # arrange
+    instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
     frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))
@@ -75,3 +90,53 @@ def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_datas
 
     assert split_buffer.has(sample_source)
     assert split_buffer.at(sample_source).size() == 208
+
+
+@pytest.mark.integration
+def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtual_dataset, setup_loaders):
+    """Tests visualization of streaming data with bounding boxes."""
+    # arrange
+    instance_loader, frame_loader, annotation_loader = setup_loaders
+
+    # act
+    frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))
+    annotation_loader.load_annotations(NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE))
+
+    frame_loader.wait_for_completion()
+    annotation_loader.wait_for_completion()
+
+    # assert
+    sample_source = SourceNormalizer.normalize(SampleBucketFiles.SAMPLE_VIDEO_FILE)
+    split_buffer = virtual_dataset._get_buffer_for_source(sample_source)
+
+    assert split_buffer.has(sample_source)
+    assert split_buffer.at(sample_source).size() == 208
+
+    batch_size = 5
+    split = virtual_dataset.get_split_for_source(sample_source)
+    shuffled_batch = virtual_dataset.get_shuffled_batch(split, batch_size)
+
+    assert len(shuffled_batch) == batch_size
+
+    for i, (frame, annotations) in enumerate(shuffled_batch):
+        frame = frame.copy()
+        frame_height, frame_width, _ = frame.shape
+
+        if annotations:
+            for behavior, x, y, w, h in annotations:
+                x_min = int((x - w / 2) * frame_width)
+                y_min = int((y - h / 2) * frame_height)
+                x_max = int((x + w / 2) * frame_width)
+                y_max = int((y + h / 2) * frame_height)
+
+                cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+                cv2.putText(
+                    frame, behavior.name.replace("_", " "), (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (0, 255, 0), 1, cv2.LINE_AA
+                )
+
+        plt.figure(figsize=(6, 6))
+        plt.imshow(frame)
+        plt.title(f"Shuffled Frame {i + 1}")
+        plt.axis("off")
+        plt.show()
