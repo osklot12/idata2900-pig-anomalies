@@ -35,4 +35,3 @@ def test_shuffler(mock_data):
     assert len(merged_annotations["images"]) == len(shuffled_frames), "❌ Image count mismatch in JSON"
     assert len(merged_annotations["annotations"]) == len(shuffled_frames), "❌ Annotation count mismatch in JSON"
 
-    print("✅ Shuffling correctly preserves frame-annotation links and outputs merged JSON.")

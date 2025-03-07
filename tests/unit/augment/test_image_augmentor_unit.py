@@ -1,29 +1,30 @@
+import numpy as np
 import pytest
-import tensorflow as tf
 from src.data.augment.image_augmentor import ImageAugmentor
 
-@pytest.fixture
-def test_image():
-    """Creates a test image tensor (random 224x224 RGB image)."""
-    return tf.random.uniform((224, 224, 3), dtype=tf.float32)
 
-def test_flip(test_image):
-    """Tests if the image is correctly flipped."""
+@pytest.mark.parametrize("flip", [True, False])
+@pytest.mark.parametrize("rotation", [-10, 0, 10])
+def test_image_augmentor(flip, rotation):
+    """Test flipping and rotation operations on an image."""
+
     augmentor = ImageAugmentor()
-    flipped_image = augmentor.augment(test_image, flip=True)
+    sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 255  # White image
 
-    assert flipped_image.shape == test_image.shape, "Flipped image has an incorrect shape"
+    aug_image = augmentor.augment(sample_image, rotation=rotation, flip=flip)
 
-def test_rotation(test_image):
-    """Tests if the image is rotated."""
+    assert aug_image is not None, "Augment returned None!"
+    assert aug_image.shape == sample_image.shape, "Augmentation altered image dimensions!"
+
+
+def test_image_augmentor_brightness_contrast():
+    """Test brightness and contrast augmentation."""
+
     augmentor = ImageAugmentor()
-    rotated_image = augmentor.augment(test_image, rotation=10)
+    sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 127  # Mid-gray
 
-    assert rotated_image.shape == test_image.shape, "Rotated image has an incorrect shape"
+    aug_image = augmentor.augment(sample_image)
 
-def test_brightness_contrast(test_image):
-    """Tests if brightness and contrast adjustments apply."""
-    augmentor = ImageAugmentor()
-    adjusted_image = augmentor.augment(test_image)
-
-    assert adjusted_image.shape == test_image.shape, "Brightness/contrast changed the shape"
+    assert aug_image is not None, "Brightness/contrast augmentation returned None!"
+    assert aug_image.shape == sample_image.shape, "Brightness/contrast augmentation altered image dimensions!"
+    assert not np.array_equal(sample_image, aug_image), "Brightness/contrast did not change!"

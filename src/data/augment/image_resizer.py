@@ -1,20 +1,30 @@
-import tensorflow as tf
-from src.data.augment.augmentor_interface import ProcessorBase
+import cv2
+import numpy as np
 
-class ImageResizer(ProcessorBase):
-    """Handles image resizing to a target dimension."""
-
+class ImageResizer:
+    """
+    Resizes images and scales annotations accordingly.
+    """
     def __init__(self, target_size=(224, 224)):
         self.target_size = target_size
 
-    def process(self, image: tf.Tensor) -> tf.Tensor:
-        """Resizes the image to the target dimensions."""
-        self._validate_input(image)
-        return tf.image.resize(image, self.target_size)
+    def process(self, image: np.ndarray, annotations: list):
+        """
+        Resizes the image and scales the annotations.
 
-    def _validate_input(self, image):
-        """Ensures the input is a valid TensorFlow image tensor."""
-        if not isinstance(image, tf.Tensor):
-            raise TypeError(f"❌ Expected TensorFlow tensor, got {type(image)}.")
-        if image.shape.ndims != 3:
-            raise ValueError(f"❌ Expected 3D image tensor, got shape {image.shape}.")
+        :param image: Raw RGB image as a NumPy array.
+        :param annotations: List of tuples (class, x, y, w, h).
+        :return: Resized image and adjusted annotations.
+        """
+        original_h, original_w = image.shape[:2]
+        resized_image = cv2.resize(image, self.target_size)
+
+        scale_x = self.target_size[0] / original_w
+        scale_y = self.target_size[1] / original_h
+
+        resized_annotations = [
+            (cls, x * scale_x, y * scale_y, w * scale_x, h * scale_y)
+            for cls, x, y, w, h in annotations
+        ]
+
+        return resized_image, resized_annotations
