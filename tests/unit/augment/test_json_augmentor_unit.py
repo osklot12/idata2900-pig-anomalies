@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-from src.data.augment import JsonAugmentor
+from src.data.augment.json_augmentor import JsonAugmentor
 
 @pytest.fixture
 def test_image():

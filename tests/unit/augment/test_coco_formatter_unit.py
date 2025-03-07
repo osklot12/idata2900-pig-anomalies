@@ -2,13 +2,13 @@ import pytest
 import json
 import tensorflow as tf
 from src.data.augment.coco_formatter import COCOFormatter
-from tests.conftest import get_test_path
+from src.utils.path_finder import PathFinder
 
 
 @pytest.fixture
 def real_annotation_data():
     """Loads the real annotation file into memory."""
-    annotation_path = get_test_path("tests/data/annotations/annotation_darwin.json")
+    annotation_path = PathFinder.get_abs_path("tests/data/annotations/annotation_darwin.json")
     with open(annotation_path, "r") as f:
         return json.load(f)  # Loads annotations into memory
 
