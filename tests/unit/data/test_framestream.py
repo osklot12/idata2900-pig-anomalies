@@ -1,9 +1,9 @@
 import pytest
 import cppbindings
 
-from tests.conftest import get_test_path
+from src.utils.path_finder import PathFinder
 
-TEST_VIDEO_PATH = get_test_path("tests/data/sample-5s.mp4")
+TEST_VIDEO_PATH = PathFinder.get_abs_path("tests/data/sample-5s.mp4")
 
 
 @pytest.fixture
