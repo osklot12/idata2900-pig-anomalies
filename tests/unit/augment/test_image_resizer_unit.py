@@ -1,16 +1,20 @@
+import numpy as np
 import pytest
-import tensorflow as tf
 from src.data.augment.image_resizer import ImageResizer
 
-@pytest.fixture
-def test_image():
-    """Creates a test image tensor (random 224x224 RGB image)."""
-    return tf.random.uniform((224, 224, 3), dtype=tf.float32)
 
 @pytest.mark.parametrize("target_size", [(128, 128), (256, 256)])
-def test_image_resizer(test_image, target_size):
-    """Tests if images are correctly resized."""
-    resizer = ImageResizer(target_size)
-    resized_image = resizer.process(test_image)
+def test_resize(target_size):
+    """Test if the image resizes correctly and annotations scale accordingly."""
+    resizer = ImageResizer(target_size=target_size)
+    sample_image = np.ones((512, 512, 3), dtype=np.uint8) * 255  # White image
+    sample_annotations = [(1, 50, 50, 100, 100)]  # A bounding box
 
-    assert resized_image.shape[:2] == target_size, f"Expected {target_size}, got {resized_image.shape[:2]}"
+    resized_image, resized_annotations = resizer.process(sample_image, sample_annotations)
+
+    assert resized_image.shape[:2] == target_size
+    scale_x = target_size[0] / 512
+    scale_y = target_size[1] / 512
+    expected_annotations = [(1, 50 * scale_x, 50 * scale_y, 100 * scale_x, 100 * scale_y)]
+
+    assert np.allclose(resized_annotations, expected_annotations), "Annotation scaling failed!"
