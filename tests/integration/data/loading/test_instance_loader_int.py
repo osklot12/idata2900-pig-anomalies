@@ -1,16 +1,14 @@
-from threading import Event
 from unittest.mock import Mock
 
 import pytest
 
 from src.data.bbox_normalizer import BBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.loading.annotation_loader import AnnotationLoader
+from src.data.streamers.annotation_streamer import AnnotationStreamer
 from src.data.loading.feed_status import FeedStatus
 from src.data.loading.instance_loader import InstanceLoader
-from src.data.loading.frame_loader import FrameLoader
+from src.data.streamers.frame_streamer import FrameStreamer
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
-from tests.unit.data.test_framestream import video_data
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
@@ -31,7 +29,7 @@ def integration_setup(dummy_data_loader, mock_callback):
     """Creates a full integration setup with loaders and a FrameAnnotationLoader."""
     frame_annotation_loader = InstanceLoader(callback=mock_callback, buffer_size=1000)
 
-    frame_loader = FrameLoader(
+    frame_loader = FrameStreamer(
         data_loader=dummy_data_loader,
         video_blob_name="test-video",
         callback=frame_annotation_loader.feed_frame,
@@ -40,7 +38,7 @@ def integration_setup(dummy_data_loader, mock_callback):
 
     normalizer = BBoxNormalizer(image_dimensions=(1920, 1080), new_range=(0, 1),
                                 annotation_parser=NorsvinAnnotationParser)
-    annotation_loader = AnnotationLoader(
+    annotation_loader = AnnotationStreamer(
         data_loader=dummy_data_loader,
         annotation_blob_name="test_annotations.json",
         decoder_cls=DarwinDecoder,

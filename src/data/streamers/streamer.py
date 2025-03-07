@@ -9,6 +9,11 @@ class Streamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def stop(self):
+        """Stops streaming data."""
+        pass
+
+    @abstractmethod
     def wait_for_completion(self):
         """Waist for the end of stream while blocking."""
         raise NotImplementedError

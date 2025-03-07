@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from src.data.loading.streamer import Streamer
+from src.data.streamers.streamer import Streamer
 
 
 class StreamerProvider(ABC):

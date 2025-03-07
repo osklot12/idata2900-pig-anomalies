@@ -1,16 +1,15 @@
 import threading
 from typing import Callable, Dict, Tuple, Optional, List, Type
 
-from src.data.annotation_enum_parser import AnnotationEnumParser
 from src.data.decoders.bbox_decoder import BBoxDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.data.bbox_normalizer import BBoxNormalizer
-from src.data.loading.streamer import Streamer
+from src.data.streamers.streamer import Streamer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
 
-class AnnotationLoader(Streamer):
+class AnnotationStreamer(Streamer):
     """
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
@@ -28,6 +27,9 @@ class AnnotationLoader(Streamer):
     def stream(self):
         self._thread = threading.Thread(target=self._process_annotations, args=(self.annotation_blob_name,))
         self._thread.start()
+
+    def stop(self):
+        pass
 
     def wait_for_completion(self):
         if self._thread:
