@@ -7,6 +7,7 @@ import numpy as np
 
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataset_split import DatasetSplit
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 
 class VirtualDataset:
@@ -57,7 +58,7 @@ class VirtualDataset:
         self.max_frames_per_source = max_frames_per_source
 
     def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> List[
-        Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]:
+        Tuple[np.ndarray, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]]]]:
         """
         Samples a randomized batch of frame-annotation pairs from the specified dataset split.
 
@@ -65,33 +66,24 @@ class VirtualDataset:
         :param batch_size: The number of samples to retrieve.
         :return: A list of (frame, annotation) pairs.
         """
-        sampled_batch = []
-        attempts = 0
-
         with self.lock:
             if self.get_frame_count(split) < batch_size:
                 raise ValueError(f"Not enough available data in split {split.name} for batch size {batch_size}.")
 
             buffer = self._get_buffer_for_split(split)
-            keys = list(buffer.keys())
 
-            while len(sampled_batch) < batch_size:
-                if attempts > batch_size * 2:
-                    raise RuntimeError(f"Too many attempts to retrieve batch.")
+            frame_references = [
+                source_buffer.at(frame_index)
+                for source_key in buffer.keys()
+                for source_buffer in [buffer.at(source_key)]
+                if source_buffer and source_buffer.size() > 0
+                for frame_index in source_buffer.keys()
+            ]
 
-                # randomly pick source from split
-                source_key = random.choice(keys)
-                source_buffer = buffer.at(source_key)
+            # ensure "non-deterministic" behavior
+            random.seed(None)
 
-                # ensure source has data
-                if not source_buffer is None and not source_buffer.size() == 0:
-                    frame_indices = list(source_buffer.keys())
-                    random_index = random.choice(frame_indices)
-                    sampled_batch.append(source_buffer.at(random_index))
-
-                attempts += 1
-
-        return sampled_batch
+            return random.sample(frame_references, batch_size)
 
     def get_frame_count(self, split: DatasetSplit) -> int:
         """
@@ -208,3 +200,24 @@ class VirtualDataset:
             raise ValueError(f"Split {split} not found in dataset.")
 
         return buffer
+
+    def get_split_for_source(self, source: str):
+        """
+        Returns the DatasetSplit for the given source.
+
+        Args:
+            source: The ID of the source data.
+
+        Returns:
+            The DatasetSplit for the given source, None if not recognized.
+        """
+        if source in self.train_ids:
+            split = DatasetSplit.TRAIN
+        elif source in self.val_ids:
+            split = DatasetSplit.VAL
+        elif source in self.test_ids:
+            split = DatasetSplit.TEST
+        else:
+            split = None
+
+        return split

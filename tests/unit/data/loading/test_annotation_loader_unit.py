@@ -2,7 +2,11 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
+from src.data.bbox_normalizer import BBoxNormalizer
+from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
@@ -22,15 +26,21 @@ def mock_callback():
 def test_callback_called_correctly(dummy_data_loader, mock_callback):
     """Tests that the callback function is called correctly."""
     # arrange
-    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
+    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
+    annotation_loader = AnnotationLoader(
+        data_loader=dummy_data_loader,
+        decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
+        callback=mock_callback
+    )
 
-    # act
+    # Act
     annotation_loader.load_annotations("test_annotations.json")
     annotation_loader.wait_for_completion()
 
-    # assert
-    total_frames = 171
-    expected_calls = total_frames + 1
+    # Assert
+    total_frames = dummy_data_loader.frame_count  # Use the stored frame count
+    expected_calls = total_frames + 1  # +1 for the termination signal
 
     assert mock_callback.call_count == expected_calls, \
         f"Expected {expected_calls} calls, but got {mock_callback.call_count}"
@@ -41,53 +51,61 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     assert last_annotations is None, "Final callback did not receive None!"
     assert is_complete is True, "Final callback did not indicate completion!"
 
+
 def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     """Tests that annotations are correctly extracted and passed to the callback."""
     # arrange
-    annotation_loader = AnnotationLoader(data_loader=dummy_data_loader, callback=mock_callback)
+    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
+    annotation_loader = AnnotationLoader(
+        data_loader=dummy_data_loader,
+        decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
+        callback=mock_callback
+    )
 
     # act
     annotation_loader.load_annotations("test_annotations.json")
     annotation_loader.wait_for_completion()
 
     # assert
-    expected_annotations = {
-        56: [
-            ("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824),
-            ("g2b_tailbiting", 1925.0824, 1178.3059, 108.3765, 110.6824),
-        ],
-        110: [
-            ("g2b_bellynosing", 1925.0824, 1178.3059, 108.3765, 110.6824),
-            ("g2b_tailbiting", 1925.0824, 1178.3059, 108.3765, 110.6824),
-        ],
-        128: [
-            ("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882),
-            ("g2b_tailbiting", 1920.4706, 1194.4471, 126.8235, 112.9882),
-        ],
-        162: [
-            ("g2b_bellynosing", 1920.4706, 1194.4471, 126.8235, 112.9882),
-            ("g2b_tailbiting", 1920.4706, 1194.4471, 126.8235, 112.9882),
-        ],
-    }
+    total_frames = dummy_data_loader.frame_count
+    expected_annotations = dummy_data_loader.get_annotations()
 
-    # assert
-    total_frames = 171
+    normalized_expected_annotations = _normalize_annotation_dict(dummy_data_loader)
+
     for frame_index in range(total_frames):
         call = mock_callback.call_args_list[frame_index]
         _, received_frame, received_annotations, is_complete = call[0]
 
-        # if frame carries termination signal, it should not have an index or annotations
+        # If the final callback, ensure it's signaling completion
         if is_complete:
             assert received_frame is None, "Final callback should not have a frame index!"
             assert received_annotations is None, "Final callback should not have annotations!"
             continue
 
-        # if frame has annotation, it should match the expected annotation
-        if frame_index in expected_annotations:
-            assert received_annotations == expected_annotations[frame_index], \
+        # If the frame is expected to have annotations, check if they match
+        if frame_index in normalized_expected_annotations:
+            assert received_annotations == normalized_expected_annotations[frame_index], \
                 f"Annotations at frame {frame_index} did not match expected annotations!"
 
-        # if frame has no annotations, it should receive an empty list
+        # If the frame is not expected to have annotations, it should be an empty list
         else:
             assert received_annotations == [], \
                 f"Frame {frame_index} should have no annotations but got {received_annotations}"
+
+
+def _normalize_annotation_dict(dummy_data_loader):
+    normalized_expected_annotations = {
+        frame_index: [
+            (
+                NorsvinAnnotationParser.enum_from_str(behavior),  # Convert string to enum
+                x / 1920,  # Normalize X
+                y / 1080,  # Normalize Y
+                w / 1920,  # Normalize Width
+                h / 1080  # Normalize Height
+            )
+            for behavior, x, y, w, h in annotations
+        ]
+        for frame_index, annotations in dummy_data_loader.get_annotations().items()
+    }
+    return normalized_expected_annotations

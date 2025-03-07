@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 
 class DatasetSplit(Enum):
-    """An enumerations representing the different splits of the dataset."""
+    """An enumeration representing the different splits of the dataset."""
 
     TRAIN = auto()
     """Split of training data."""
