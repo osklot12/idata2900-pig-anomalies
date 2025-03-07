@@ -55,6 +55,7 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
 
     frame_loader = FrameLoader(
         data_loader=frame_data_loader,
+        video_blob_name=NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE),
         callback=instance_loader.feed_frame,
         frame_shape=(1520, 2688),
         resize_shape=(640, 640)
@@ -78,7 +79,7 @@ def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_datas
     instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
-    frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))
+    frame_loader.stream()
     annotation_loader.load_annotations(NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE))
 
     frame_loader.wait_for_completion()
@@ -99,7 +100,7 @@ def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtua
     instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
-    frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))
+    frame_loader.stream()
     annotation_loader.load_annotations(NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE))
 
     frame_loader.wait_for_completion()

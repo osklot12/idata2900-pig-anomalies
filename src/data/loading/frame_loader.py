@@ -7,31 +7,30 @@ from cppbindings import FrameStream
 
 from src.data.dataset_source import DatasetSource
 from src.data.loading.feed_status import FeedStatus
-from src.data.loading.frame_loader_interface import FrameLoaderInterface
+from src.data.loading.streamer import Streamer
 from src.utils.source_normalizer import SourceNormalizer
 
 
-class FrameLoader(FrameLoaderInterface):
+class FrameLoader(Streamer):
     """
     Loads frames from a video and invokes a callable with video name, frame index, and the frame tensor.
     """
 
-    def __init__(self, data_loader, callback: Callable[[str, int, np.ndarray, bool], FeedStatus],
+    def __init__(self, data_loader, video_blob_name: str, callback: Callable[[str, int, np.ndarray, bool], FeedStatus],
                  frame_shape, resize_shape=None):
         self.data_loader = data_loader
+        self.video_blob_name = video_blob_name
         self.callback = callback
         # assumes rgb
         self.frame_shape = (frame_shape[0], frame_shape[1], 3)
         self.resize_shape = resize_shape
         self._thread = None
 
-    def load_frames(self, video_blob_name: str):
-        """Loads frames from a video, feeding them to the callback function."""
-        self._thread = threading.Thread(target=self._process_frames, args=(video_blob_name,))
+    def stream(self):
+        self._thread = threading.Thread(target=self._process_frames, args=(self.video_blob_name,))
         self._thread.start()
 
     def wait_for_completion(self):
-        """Waits for the frame processing thread to finish."""
         if self._thread:
             self._thread.join()
 

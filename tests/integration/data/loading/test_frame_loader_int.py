@@ -28,12 +28,13 @@ def test_load_frames(gcp_data_loader, mock_callback):
     video_blob_name = NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE)
     frame_loader = FrameLoader(
         data_loader=gcp_data_loader,
+        video_blob_name=video_blob_name,
         callback=mock_callback,
         frame_shape=(1520, 2688)
     )
 
     # act
-    frame_loader.load_frames(video_blob_name)
+    frame_loader.stream()
     frame_loader.wait_for_completion()
 
     # assert
