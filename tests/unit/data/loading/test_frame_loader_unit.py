@@ -1,7 +1,3 @@
-import os
-import cv2
-import numpy as np
-
 import pytest
 from unittest.mock import Mock
 
@@ -34,13 +30,14 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     # arrange
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
+        video_blob_name="test_video.mp4",
         callback=mock_callback,
         frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=(224, 224)
     )
 
     # act
-    frame_loader.load_frames("test_video.mp4")
+    frame_loader.stream()
     frame_loader.wait_for_completion()
 
     # assert
@@ -58,13 +55,14 @@ def test_no_resizing_when_resize_none(dummy_data_loader, mock_callback):
     # arrange
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
+        video_blob_name="test_video.mp4",
         callback=mock_callback,
         frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=None
     )
 
     # act
-    frame_loader.load_frames("test_video.mp4")
+    frame_loader.stream()
     frame_loader.wait_for_completion()
     processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
 
@@ -79,13 +77,14 @@ def test_resizing_works_correctly(dummy_data_loader, mock_callback):
     resized_shape = (224, 224)
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
+        video_blob_name="test_video.mp4",
         callback=mock_callback,
         frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=resized_shape
     )
 
     # act
-    frame_loader.load_frames("test_video.mp4")
+    frame_loader.stream()
     frame_loader.wait_for_completion()
     processed_frames = [call[0][2] for call in mock_callback.call_args_list[:-1]]
 
@@ -99,13 +98,14 @@ def test_correct_number_of_frames_loaded(dummy_data_loader, mock_callback):
     # arrange
     frame_loader = FrameLoader(
         data_loader=dummy_data_loader,
+        video_blob_name="test_video.mp4",
         callback=mock_callback,
         frame_shape=(SAMPLE_HEIGHT, SAMPLE_WIDTH),
         resize_shape=(224, 224)
     )
 
     # act
-    frame_loader.load_frames("test_video.mp4")
+    frame_loader.stream()
     frame_loader.wait_for_completion()
     processed_frame_count = len(mock_callback.call_args_list) - 1
 
