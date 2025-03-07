@@ -42,6 +42,7 @@ def integration_setup(dummy_data_loader, mock_callback):
                                 annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
+        annotation_blob_name="test_annotations.json",
         decoder_cls=DarwinDecoder,
         normalizer=normalizer,
         callback=mock_callback
@@ -57,7 +58,7 @@ def test_instance_loader(integration_setup, mock_callback):
 
     # act
     frame_loader.stream()
-    annotation_loader.load_annotations("test_annotation.json")
+    annotation_loader.stream()
 
     frame_loader.wait_for_completion()
     annotation_loader.wait_for_completion()

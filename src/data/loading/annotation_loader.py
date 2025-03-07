@@ -5,36 +5,31 @@ from src.data.annotation_enum_parser import AnnotationEnumParser
 from src.data.decoders.bbox_decoder import BBoxDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.loading.streamer import Streamer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
 
-class AnnotationLoader:
+class AnnotationLoader(Streamer):
     """
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, decoder_cls: Type[BBoxDecoder], normalizer: BBoxNormalizer,
+    def __init__(self, data_loader, annotation_blob_name: str, decoder_cls: Type[BBoxDecoder], normalizer: BBoxNormalizer,
                  callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]],
                                      bool], FeedStatus]):
         self.data_loader = data_loader
+        self.annotation_blob_name = annotation_blob_name
         self.decoder_cls = decoder_cls
         self.normalizer = normalizer
         self.callback = callback
         self._thread = None
 
-    def load_annotations(self, annotation_blob_name: str):
-        """
-        Loads annotations for a video, feeding them to the callback function.
-
-        Args:
-            annotation_blob_name: blob name of the annotation file.
-        """
-        self._thread = threading.Thread(target=self._process_annotations, args=(annotation_blob_name,))
+    def stream(self):
+        self._thread = threading.Thread(target=self._process_annotations, args=(self.annotation_blob_name,))
         self._thread.start()
 
     def wait_for_completion(self):
-        """Waits for the annotation processing thread to finish."""
         if self._thread:
             self._thread.join()
 

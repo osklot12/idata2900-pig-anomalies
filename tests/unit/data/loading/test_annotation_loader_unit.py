@@ -29,13 +29,14 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
+        annotation_blob_name="test_annotations.json",
         decoder_cls=DarwinDecoder,
         normalizer=normalizer,
         callback=mock_callback
     )
 
     # Act
-    annotation_loader.load_annotations("test_annotations.json")
+    annotation_loader.stream()
     annotation_loader.wait_for_completion()
 
     # Assert
@@ -58,13 +59,14 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=dummy_data_loader,
+        annotation_blob_name="test_annotations.json",
         decoder_cls=DarwinDecoder,
         normalizer=normalizer,
         callback=mock_callback
     )
 
     # act
-    annotation_loader.load_annotations("test_annotations.json")
+    annotation_loader.stream()
     annotation_loader.wait_for_completion()
 
     # assert
