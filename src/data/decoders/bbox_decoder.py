@@ -7,7 +7,7 @@ class BBoxDecoder(ABC):
     def __init__(self, json_data: Dict[str, Any]):
         """
         Initializes the decoder with annotation data.
-
+s
         Args:
             json_data (Dict[str, Any]): The annotation data.
         """

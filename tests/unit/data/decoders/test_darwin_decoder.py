@@ -7,18 +7,6 @@ def data_loader():
     """Returns a DummyGCPDataLoader instance."""
     return DummyGCPDataLoader()
 
-def _get_expected_annotations():
-    """Returns the expected annotations for the DummyGCPDataLoader."""
-    expected_annotations = {}
-
-    for behavior, frames, in DummyGCPDataLoader.ANNOTATIONS:
-        for frame, x, y, w, h in frames:
-            frame_idx = int(frame)
-            if frame_idx not in expected_annotations:
-                expected_annotations[frame_idx] = []
-            expected_annotations[frame_idx].append((behavior, x, y, w, h))
-
-    return expected_annotations
 
 def test_get_annotations(data_loader):
     """Tests that get_annotations returns the expected annotations."""
@@ -30,7 +18,7 @@ def test_get_annotations(data_loader):
     decoded_annotations = decoder.get_annotations()
 
     # assert
-    expected_annotations = _get_expected_annotations()
+    expected_annotations = data_loader.get_annotations()
 
     assert len(expected_annotations) == len(decoded_annotations)
 

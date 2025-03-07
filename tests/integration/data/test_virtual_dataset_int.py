@@ -1,16 +1,18 @@
 from unittest.mock import Mock
 import cv2
-import numpy as np
 import matplotlib.pyplot as plt
 
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
+from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
 from src.data.loading.instance_loader import InstanceLoader
 from src.data.loading.frame_loader import FrameLoader
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.data.virtual_dataset import VirtualDataset
+from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from src.utils.source_normalizer import SourceNormalizer
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
@@ -46,23 +48,34 @@ def mock_callback():
     """Fixture to provide a mock callback."""
     return Mock()
 
-@pytest.mark.integration
-def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_dataset, mock_callback):
-    """Tests that data is successfully streamed from the could and stored in the VirtualDataset."""
-    # arrange
-    frame_annotation_loader = InstanceLoader(virtual_dataset.feed)
+@pytest.fixture
+def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
+    """Sets up and returns loaders for testing."""
+    instance_loader = InstanceLoader(virtual_dataset.feed)
 
     frame_loader = FrameLoader(
         data_loader=frame_data_loader,
-        callback=frame_annotation_loader.feed_frame,
+        callback=instance_loader.feed_frame,
         frame_shape=(1520, 2688),
         resize_shape=(640, 640)
     )
 
+    normalizer = BBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
+                                annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationLoader(
         data_loader=annotation_data_loader,
-        callback=frame_annotation_loader.feed_annotation
+        decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
+        callback=instance_loader.feed_annotation
     )
+
+    return instance_loader, frame_loader, annotation_loader
+
+@pytest.mark.integration
+def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_dataset, mock_callback, setup_loaders):
+    """Tests that data is successfully streamed from the could and stored in the VirtualDataset."""
+    # arrange
+    instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
     frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))
@@ -80,22 +93,10 @@ def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_datas
 
 
 @pytest.mark.integration
-def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtual_dataset):
+def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtual_dataset, setup_loaders):
     """Tests visualization of streaming data with bounding boxes."""
     # arrange
-    frame_annotation_loader = InstanceLoader(virtual_dataset.feed)
-
-    frame_loader = FrameLoader(
-        data_loader=frame_data_loader,
-        callback=frame_annotation_loader.feed_frame,
-        frame_shape=(1520, 2688),
-        resize_shape=(640, 640)
-    )
-
-    annotation_loader = AnnotationLoader(
-        data_loader=annotation_data_loader,
-        callback=frame_annotation_loader.feed_annotation
-    )
+    instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
     frame_loader.load_frames(NorsvinBucketParser.get_video_blob_name(SampleBucketFiles.SAMPLE_VIDEO_FILE))

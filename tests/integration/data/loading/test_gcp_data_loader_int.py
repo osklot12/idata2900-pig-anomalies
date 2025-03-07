@@ -1,12 +1,10 @@
 import pytest
-import os
-from io import BytesIO
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.auth.gcp_auth_service import GCPAuthService
-from tests.conftest import get_test_path
+from src.utils.path_finder import PathFinder
 
 # constants
-TEST_CREDENTIALS_PATH = get_test_path(".secrets/service-account.json")
+TEST_CREDENTIALS_PATH = PathFinder.get_abs_path(".secrets/service-account.json")
 TEST_BUCKET = "norsvin-g2b-behavior-prediction"
 TEST_VIDEO_PREFIX = "g2b_behaviour/images/"
 TEST_VIDEO_NAME = "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"

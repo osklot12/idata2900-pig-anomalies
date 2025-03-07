@@ -3,10 +3,13 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.annotation_loader import AnnotationLoader
 from src.data.loading.feed_status import FeedStatus
 from src.data.loading.instance_loader import InstanceLoader
 from src.data.loading.frame_loader import FrameLoader
+from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
@@ -28,11 +31,17 @@ def integration_setup(dummy_data_loader, mock_callback):
     frame_loader = FrameLoader(dummy_data_loader, frame_annotation_loader.feed_frame,
                                frame_shape=(1080, 1920))
 
-    annotation_loader = AnnotationLoader(dummy_data_loader, frame_annotation_loader.feed_annotation)
+    normalizer = BBoxNormalizer(image_dimensions=(1920, 1080), new_range=(0, 1), annotation_parser=NorsvinAnnotationParser)
+    annotation_loader = AnnotationLoader(
+        data_loader=dummy_data_loader,
+        decoder_cls=DarwinDecoder,
+        normalizer=normalizer,
+        callback=mock_callback
+    )
 
     return frame_annotation_loader, frame_loader, annotation_loader
 
-def test_full_pipeline(integration_setup, mock_callback):
+def test_instance_loader(integration_setup, mock_callback):
     """Tests if FrameLoader and AnnotationLoader correctly call FrameAnnotationLoader."""
     # arrange
     frame_annotation_loader, frame_loader, annotation_loader = integration_setup
