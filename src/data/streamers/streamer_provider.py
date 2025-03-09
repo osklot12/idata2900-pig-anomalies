@@ -8,11 +8,11 @@ class StreamerProvider(ABC):
     """Provides streamers on request."""
 
     @abstractmethod
-    def get_streamers(self) -> List[Type[Streamer]]:
+    def get_next_streamer(self) -> Streamer:
         """
-        Returns a list of streamers.
+        Returns the next available streamer.
 
         Returns:
-            List[Type[Streamer]]: List of streamers.
+            Streamer: The next available streamer.
         """
         raise NotImplementedError
