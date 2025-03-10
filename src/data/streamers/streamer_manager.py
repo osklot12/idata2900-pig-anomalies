@@ -21,11 +21,11 @@ class StreamerManager:
         self._streamers = ConcurrentDict[str, Streamer]()
         self._streamer_statuses = ConcurrentDict[str, StreamerStatus]()
         self._running = False
-        self.executor = ConcurrentCommandExecutor()
+        self._executor = ConcurrentCommandExecutor()
 
     def _run_executor(self) -> None:
         """Runs the command executor."""
-        self.executor.run()
+        self._executor.run()
 
     def _get_executor(self) -> CommandExecutor:
         """
@@ -34,11 +34,11 @@ class StreamerManager:
         Returns:
             CommandExecutor: The command executor.
         """
-        return self.executor
+        return self._executor
 
     def _stop_executor(self) -> None:
         """Stops the command executor."""
-        self.executor.stop()
+        self._executor.stop()
 
     def get_streamer_ids(self) -> List[str]:
         """
@@ -66,6 +66,14 @@ class StreamerManager:
             StreamerStatus: The status of the streamer with the given id.
         """
         return self._streamer_statuses.get(streamer_id)
+
+    def _get_streamers(self) -> ConcurrentDict[str, Streamer]:
+        """Returns the streamer dictionary."""
+        return self._streamers
+
+    def _get_streamer_statuses(self) -> ConcurrentDict[str, StreamerStatus]:
+        """Returns the streamer status dictionary."""
+        return self._streamer_statuses
 
     def _add_streamer(self, streamer_id: str, streamer: Streamer) -> None:
         """
