@@ -4,7 +4,7 @@ from src.command.command import Command
 from src.data.streamers.streamer import Streamer
 
 
-class StreamManager:
+class StreamerManager:
     """An interface for stream managers."""
 
     @abstractmethod
