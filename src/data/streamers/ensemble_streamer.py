@@ -62,7 +62,7 @@ class EnsembleStreamer(Streamer, StreamerManager):
         update_status_cmd = UpdateStreamerStatusCommand(
             streamer_id=streamer_id,
             new_status=StreamerStatus.COMPLETED,
-            tracker=self._streamer_statuses
+            tracker=self._get_streamer_statuses()
         )
         return ConcurrentCommand(
             command=update_status_cmd,
@@ -84,7 +84,7 @@ class EnsembleStreamer(Streamer, StreamerManager):
         # only submit and execute eos cmds if all streamers are finished
         condition = lambda: all(
             s in {StreamerStatus.COMPLETED, StreamerStatus.FAILED}
-            for s in self._streamer_statuses.values()
+            for s in self._get_streamer_statuses().values()
         )
 
         cond_eos_cmd = ConditionalCommand(
@@ -108,7 +108,7 @@ class EnsembleStreamer(Streamer, StreamerManager):
 
             streamer_ids = self.get_streamer_ids()
             for streamer_id in streamer_ids:
-                self._streamers.get(streamer_id).stream()
+                self._get_streamers().get(streamer_id).stream()
 
     def streaming(self) -> bool:
         with self._lock:
@@ -118,7 +118,7 @@ class EnsembleStreamer(Streamer, StreamerManager):
         with self._lock:
             streamer_ids = self.get_streamer_ids()
             for streamer_id in streamer_ids:
-                self._streamers.get(streamer_id).stop()
+                self._get_streamers().get(streamer_id).stop()
 
             self._stop_executor()
             self._running = False
@@ -127,7 +127,7 @@ class EnsembleStreamer(Streamer, StreamerManager):
         with self._lock:
             streamer_ids = self.get_streamer_ids()
             for streamer_id in streamer_ids:
-                self._streamers.get(streamer_id).wait_for_completion()
+                self._get_streamers().get(streamer_id).wait_for_completion()
             self._stop_executor()
             self._running = False
 
