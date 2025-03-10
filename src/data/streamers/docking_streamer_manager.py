@@ -2,6 +2,7 @@ import threading
 import uuid
 from typing import Type, Dict
 
+from src.command.command import Command
 from src.data.streamers.streamer_manager import StreamerManager
 from src.data.streamers.streamer_provider import StreamerProvider
 from src.data.streamers.streamer import Streamer
@@ -34,7 +35,7 @@ class DockingStreamerManager(StreamerManager):
     def _is_full(self) -> bool:
         """Indicates whether the manager is full of streamers."""
         with self.lock:
-           return len(self.streamers) == self.n_streamers
+            return len(self.streamers) == self.n_streamers
 
     def stop(self):
         with self.lock:
@@ -49,6 +50,9 @@ class DockingStreamerManager(StreamerManager):
                 streamer.stop()
             else:
                 raise KeyError(f"Streamer ID '{streamer_id}' not found.")
+
+    def queue_command(self, command: Command) -> None:
+        pass
 
     def _dock_next_streamer(self) -> bool:
         """Fetches the next streamer and runs the stream."""
@@ -68,9 +72,11 @@ class DockingStreamerManager(StreamerManager):
         Generates a unique streamer identifier.
         """
         return str(uuid.uuid4())
-
     def _add_streamer(self, streamer: Streamer):
         """Adds a streamer to the manager."""
         streamer_id = self._generate_streamer_id()
         with self.lock:
             self.streamers[streamer_id] = streamer
+
+
+
