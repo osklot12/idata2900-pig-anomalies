@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 import numpy as np
 
-from src.data.loading.instance_loader import InstanceLoader
+from src.data.loading.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.loading.feed_status import FeedStatus
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -15,7 +15,7 @@ def mock_callback():
 @pytest.fixture
 def loader(mock_callback):
     """Creates a FrameAnnotationLoader instance for testing."""
-    return InstanceLoader(callback=mock_callback, buffer_size=3)
+    return BufferedInstanceAggregator(callback=mock_callback, buffer_size=3)
 
 def test_frame_before_annotation(loader, mock_callback):
     """Tests feeding a frame before its annotation."""

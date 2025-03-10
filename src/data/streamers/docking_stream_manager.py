@@ -2,12 +2,12 @@ import threading
 import uuid
 from typing import Type, Dict
 
-from src.data.streamers.stream_manager import StreamManager
+from src.data.streamers.streamer_manager import StreamerManager
 from src.data.streamers.streamer_provider import StreamerProvider
 from src.data.streamers.streamer import Streamer
 
 
-class DockingStreamManager(StreamManager):
+class DockingStreamerManager(StreamerManager):
     """
     A stream manager effective for large sets of finite streams, maintaining a constant number of streams at all time.
     The Streamers "dock" the manager, before leaving and making space for the next streamer.
