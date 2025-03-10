@@ -20,8 +20,6 @@ class StreamerManager:
     def __init__(self):
         """Initializes an instance of StreamerManager."""
         self._streamers = ConcurrentDict[str, Streamer]()
-        self._streamer_statuses = ConcurrentDict[str, StreamerStatus]()
-        self._running = False
         self._executor = ConcurrentCommandExecutor()
 
     def _run_executor(self) -> None:
@@ -59,15 +57,6 @@ class StreamerManager:
         """
         return self._streamers.get(streamer_id)
 
-    def get_streamer_status(self, streamer_id: str) -> StreamerStatus:
-        """
-        Returns the status of the streamer with the given id.
-
-        Returns:
-            StreamerStatus: The status of the streamer with the given id.
-        """
-        return self._streamer_statuses.get(streamer_id)
-
     def _get_streamers(self) -> ConcurrentDict[str, Streamer]:
         """Returns the streamer dictionary."""
         return self._streamers
@@ -75,10 +64,6 @@ class StreamerManager:
     def _clear_streamers(self) -> None:
         """Clears the streamers."""
         self._streamers.clear()
-
-    def _get_streamer_statuses(self) -> ConcurrentDict[str, StreamerStatus]:
-        """Returns the streamer status dictionary."""
-        return self._streamer_statuses
 
     def _add_streamer(self, streamer: Streamer) -> str:
         """
@@ -93,25 +78,6 @@ class StreamerManager:
         unique_id = str(uuid.uuid4())
         self._streamers.set(unique_id, streamer)
         return unique_id
-
-    def _set_streamer_status(self, streamer_id: str, streamer: StreamerStatus) -> None:
-        """
-        Sets the status of the streamer with the given id.
-
-        Args:
-            streamer_id: The streamer id.
-            streamer: The status to set.
-        """
-        self._streamer_statuses.set(streamer_id, streamer)
-
-    def running(self) -> bool:
-        """
-        Indicates whether the stream manager is running.
-
-        Returns:
-            bool: True if the stream manager is running, false otherwise.
-        """
-        return self._running
 
     @staticmethod
     def _generate_streamer_id() -> str:

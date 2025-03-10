@@ -21,10 +21,6 @@ def test_initialization(ensemble_streamer, dummy_streamers):
     """Tests that the EnsembleStreamer initializes correctly."""
     # assert
     assert len(ensemble_streamer._streamers) == len(dummy_streamers)
-    assert len(ensemble_streamer._streamer_statuses) == len(dummy_streamers)
-
-    for status in ensemble_streamer._streamer_statuses.values():
-        assert status == StreamerStatus.PENDING
 
 def test_stream_and_wait_for_completion(ensemble_streamer):
     """Tests that streaming starts all streamers and they complete correctly."""
