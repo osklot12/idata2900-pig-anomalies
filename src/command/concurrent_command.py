@@ -2,7 +2,7 @@ from src.command.command import Command
 from src.command.command_executor import CommandExecutor
 
 
-class RequestExecutionCommand(Command):
+class ConcurrentCommand(Command):
     """
     A command that requests the execution of another command via a CommandExecutor.
 

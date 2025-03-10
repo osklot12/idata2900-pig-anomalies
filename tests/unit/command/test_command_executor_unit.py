@@ -1,6 +1,6 @@
 import pytest
 
-from src.command.command_executor import CommandExecutor
+from src.command.concurrent_command_executor import ConcurrentCommandExecutor
 from tests.utils.dummies.dummy_command import DummyCommand
 from tests.utils.dummies.dummy_failing_command import DummyFailingCommand
 
@@ -8,7 +8,7 @@ from tests.utils.dummies.dummy_failing_command import DummyFailingCommand
 @pytest.fixture
 def executor():
     """Fixture that provides a fresh CommandExecutor for each test."""
-    return CommandExecutor()
+    return ConcurrentCommandExecutor()
 
 
 def test_command_executor_starts_and_stops(executor):
