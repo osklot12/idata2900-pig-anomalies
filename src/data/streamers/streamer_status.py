@@ -5,13 +5,16 @@ class StreamerStatus(Enum):
     """Enumerations for streamer status."""
 
     PENDING = auto()
-    """Streamer is pending."""
+    """Streamer has not started yet."""
 
-    RUNNING = auto()
-    """Streamer is running."""
+    STREAMING = auto()
+    """Streamer is actively streaming."""
+
+    STOPPED = auto()
+    """Streamer was manually stopped."""
 
     COMPLETED = auto()
-    """Streamer has completed."""
+    """Streamer has finished naturally."""
 
     FAILED = auto()
-    """Streamer has failed."""
+    """Streamer has encountered an error."""

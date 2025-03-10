@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.command.command import Command
+from src.data.streamers.streamer_status import StreamerStatus
 
 
 class Streamer(ABC):
@@ -12,19 +13,19 @@ class Streamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def streaming(self) -> bool:
+    def get_status(self) -> StreamerStatus:
         """
-        Returns True if streamer is currently streaming.
+        Returns the current status of the streamer.
 
         Returns:
-            bool: True if streaming, false otherwise.
+            StreamerStatus: The status of the streamer.
         """
         raise NotImplementedError
 
     @abstractmethod
     def stop(self) -> None:
         """Stops streaming data."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def wait_for_completion(self) -> None:
