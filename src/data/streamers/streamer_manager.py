@@ -1,4 +1,5 @@
 import queue
+import uuid
 from abc import abstractmethod
 from typing import List
 
@@ -71,19 +72,27 @@ class StreamerManager:
         """Returns the streamer dictionary."""
         return self._streamers
 
+    def _clear_streamers(self) -> None:
+        """Clears the streamers."""
+        self._streamers.clear()
+
     def _get_streamer_statuses(self) -> ConcurrentDict[str, StreamerStatus]:
         """Returns the streamer status dictionary."""
         return self._streamer_statuses
 
-    def _add_streamer(self, streamer_id: str, streamer: Streamer) -> None:
+    def _add_streamer(self, streamer: Streamer) -> str:
         """
-        Adds a streamer to the manager.
+        Adds a streamer to the manager, creating a unique id for it.
 
         Args:
-            streamer_id: The streamer id.
             streamer: The streamer to be added.
+
+        Returns:
+            str: The id of the added streamer.
         """
-        self._streamers.set(streamer_id, streamer)
+        unique_id = str(uuid.uuid4())
+        self._streamers.set(unique_id, streamer)
+        return unique_id
 
     def _set_streamer_status(self, streamer_id: str, streamer: StreamerStatus) -> None:
         """
@@ -103,3 +112,10 @@ class StreamerManager:
             bool: True if the stream manager is running, false otherwise.
         """
         return self._running
+
+    @staticmethod
+    def _generate_streamer_id() -> str:
+        """
+        Generates a unique streamer identifier.
+        """
+        return str(uuid.uuid4())
