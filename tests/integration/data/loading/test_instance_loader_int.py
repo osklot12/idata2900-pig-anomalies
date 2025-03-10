@@ -6,7 +6,7 @@ from src.data.bbox_normalizer import BBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streamers.annotation_streamer import AnnotationStreamer
 from src.data.loading.feed_status import FeedStatus
-from src.data.loading.buffered_instance_aggregator import BufferedInstanceAggregator
+from src.data.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.streamers.frame_streamer import FrameStreamer
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader

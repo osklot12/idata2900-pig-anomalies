@@ -12,6 +12,16 @@ class Streamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def streaming(self) -> bool:
+        """
+        Returns True if streamer is currently streaming.
+
+        Returns:
+            bool: True if streaming, false otherwise.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def stop(self) -> None:
         """Stops streaming data."""
         pass
