@@ -14,7 +14,7 @@ from src.data.streamers.streamer_manager import StreamerManager
 from src.data.streamers.streamer_status import StreamerStatus
 
 
-class EnsembleStreamer(Streamer, StreamerManager):
+class EnsembleStreamer(StreamerManager, Streamer):
     """A streamer consisting of other streamers, abstracting them as one single streamer."""
 
     def __init__(self, streamers: Tuple[Streamer, ...]):
@@ -37,11 +37,8 @@ class EnsembleStreamer(Streamer, StreamerManager):
             streamers (Tuple[Streamer, ...]): the streamers.
         """
         for streamer in streamers:
-            # generate id
-            streamer_id = self._generate_streamer_id()
-
             # add streamer and id to dicts
-            self._add_streamer(streamer_id, streamer)
+            streamer_id = self._add_streamer(streamer)
             self._set_streamer_status(streamer_id, StreamerStatus.PENDING)
 
             # cmd for updating streamer status once finished
@@ -137,10 +134,3 @@ class EnsembleStreamer(Streamer, StreamerManager):
 
     def add_eos_command(self, command: Command) -> None:
         self._eos_commands.put(command)
-
-    @staticmethod
-    def _generate_streamer_id() -> str:
-        """
-        Generates a unique streamer identifier.
-        """
-        return str(uuid.uuid4())

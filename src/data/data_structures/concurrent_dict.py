@@ -81,6 +81,11 @@ class ConcurrentDict(Generic[K, V]):
         with self._lock:
             return list(self._dict.keys())
 
+    def clear(self) -> None:
+        """Clears the dictionary."""
+        with self._lock:
+            self._dict.clear()
+
     def __len__(self) -> int:
         """
         Returns the length of the dictionary.

@@ -91,6 +91,18 @@ def test_len(concurrent_dict):
     assert initial_len == 0
     assert final_len == 2
 
+def test_clear(concurrent_dict):
+    """Tests that clear() correctly clears the dictionary."""
+    # arrange
+    concurrent_dict.set("one", 1)
+    concurrent_dict.set("two", 2)
+
+    # act
+    concurrent_dict.clear()
+
+    # assert
+    assert len(concurrent_dict) == 0
+
 def test_thread_safety(concurrent_dict):
     """Tests that the ConcurrentDict remains consistent under concurrent access."""
     # arrange
