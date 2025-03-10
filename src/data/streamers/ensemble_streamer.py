@@ -1,6 +1,6 @@
 import threading
 import uuid
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Callable
 
 from src.command.cleanup_streamer_command import CleanupStreamerCommand
 from src.command.command import Command
@@ -13,25 +13,33 @@ from src.data.streamers.streamer_status_tracker import StreamerStatusTracker
 
 
 class EnsembleStreamer(Streamer, StreamerStatusTracker):
-    """A streamer consisting of other streamers."""
+    """A streamer consisting of other streamers, abstracting them as one single streamer."""
 
     def __init__(self, streamers: Tuple[Streamer, ...]):
         """
-        Initializes the StreamerGroup.
+        Initializes an instance of EnsembleStreamer.
 
         Args:
             streamers (Tuple[Streamer, ...]): The streamers belonging to the group.
         """
         self.streamers: Dict[str, Streamer] = {}
         self.streamer_statuses: Dict[str, StreamerStatus] = {}
-        self.streamer_lock = threading.Lock()
-        self.status_lock = threading.Lock()
+
+        self._lock = threading.Lock()
+
         self.eos_commands: List[Command] = []
         self.executor = CommandExecutor()
+        self._running = False
 
         self._init(streamers)
 
     def _init(self, streamers):
+        """
+        Initializes the EnsembleStreamer.
+
+        Args:
+            streamers (Tuple[Streamer, ...]): the streamers.
+        """
         for streamer in streamers:
             # generate id
             streamer_id = self._generate_streamer_id()
@@ -50,12 +58,40 @@ class EnsembleStreamer(Streamer, StreamerStatusTracker):
             streamer.add_eos_command(status_update_cmd)
             streamer.add_eos_command(cleanup_cmd)
 
+    def stream(self) -> None:
+        with self._lock:
+            if self._running:
+                raise RuntimeError("Ensemble streamer already running")
+
+            self._running = True
+            self.executor.run()
+            for streamer in self.streamers.values():
+                streamer.stream()
+
+    def streaming(self) -> bool:
+        with self._lock:
+            return self._running
+
+    def stop(self) -> None:
+        with self._lock:
+            for streamer in self.streamers.values():
+                streamer.stop()
+            self.executor.stop()
+            self._running = False
+
+    def wait_for_completion(self) -> None:
+        with self._lock:
+            for streamer in self.streamers.values():
+                streamer.wait_for_completion()
+            self.executor.stop()
+            self._running = False
+
     def _generate_executor_request(self, command: Command) -> RequestExecutionCommand:
         """Generates a request command to queue a command at the executor."""
         return RequestExecutionCommand(command, self.executor)
 
     def set_streamer_status(self, streamer_id: str, status: StreamerStatus):
-        with self.status_lock:
+        with self._lock:
             self.streamer_statuses[streamer_id] = status
 
             # all streamers are done - signal eos
@@ -71,26 +107,8 @@ class EnsembleStreamer(Streamer, StreamerStatusTracker):
         """Returns True if all streamers have either COMPLETED or FAILED."""
         return all(v in {StreamerStatus.COMPLETED, StreamerStatus.FAILED} for v in self.streamer_statuses.values())
 
-    def stream(self) -> None:
-        with self.streamer_lock:
-            self.executor.run()
-            for streamer in self.streamers.values():
-                streamer.stream()
-
-    def stop(self) -> None:
-        with self.streamer_lock:
-            for streamer in self.streamers.values():
-                streamer.stop()
-            self.executor.stop()
-
-    def wait_for_completion(self) -> None:
-        for streamer in self.streamers.values():
-            streamer.wait_for_completion()
-
-        self.executor.stop()
-
     def add_eos_command(self, command: Command) -> None:
-        with self.streamer_lock:
+        with self.command_lock:
             self.eos_commands.append(command)
 
     @staticmethod

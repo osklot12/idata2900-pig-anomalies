@@ -9,8 +9,6 @@ from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.instance import Instance
 from src.data.loading.feed_status import FeedStatus
 from src.typevars.enum_type import T_Enum
-from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
-from tests.integration.data.test_virtual_dataset_int import frame_data_loader
 
 
 class BufferedInstanceAggregator(InstanceAggregator):
@@ -102,7 +100,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
                 annotations,
                 frame.end_of_stream
             )
-            self._feed_pair(instance)
+            self._feed_instance(instance)
             result=True
 
         return result
@@ -131,13 +129,21 @@ class BufferedInstanceAggregator(InstanceAggregator):
                 annotation.annotations,
                 annotation.end_of_stream
             )
-            self._feed_pair(instance)
+            self._feed_instance(instance)
             result = True
 
         return result
 
-    def _feed_pair(self, instance: Instance) -> FeedStatus:
-        """Feeds matched frame and annotation pair to the callback function."""
+    def _feed_instance(self, instance: Instance) -> FeedStatus:
+        """
+        Feeds forward an instance of a matched frame-annotation pair to the registered callback.
+
+        Args:
+            instance (Instance): The instance to feed forward.
+
+        Returns:
+            FeedStatus: The status of the feed forward.
+        """
         print(f"[FrameAnnotationLoader] Matched frame and annotation pair with index {instance.index}, feeding forward")
         feed_result = FeedStatus.RETRY_LATER
 

@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 import numpy as np
 
-from src.data.loading.buffered_instance_aggregator import BufferedInstanceAggregator
+from src.data.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.loading.feed_status import FeedStatus
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
