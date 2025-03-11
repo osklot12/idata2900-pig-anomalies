@@ -39,7 +39,7 @@ class Streamer(ABC):
     def _stream_worker(self) -> None:
         """Stream worker for streaming in the background."""
         try:
-            self._stream()
+            self._set_status(self._stream())
 
         except Exception as e:
             self._set_status(StreamerStatus.FAILED)
@@ -51,15 +51,17 @@ class Streamer(ABC):
                 cmd.execute()
 
     @abstractmethod
-    def _stream(self) -> None:
+    def _stream(self) -> StreamerStatus:
         """
         Implementation specific streaming logic running in the background.
-        Implementation should set status flag appropriately for events.
+
+        Returns:
+            StreamerStatus: The status of the streamer.
         """
         raise NotImplementedError()
 
     def stop(self) -> None:
-        """Stops streaming data."""
+        """Stops the streamer."""
         with self._stream_lock:
             self._request_stop()
             self._stop()
@@ -68,6 +70,15 @@ class Streamer(ABC):
 
     def _stop(self) -> None:
         """Default stop behavior (can be overridden)."""
+        pass
+
+    def wait_for_completion(self) -> None:
+        """Waits for the end of stream while blocking."""
+        self._safe_join()
+        self._wait_for_completion()
+
+    def _wait_for_completion(self) -> None:
+        """Implementation specific logic ran after joining the worker thread."""
         pass
 
     def get_status(self) -> StreamerStatus:
@@ -84,10 +95,6 @@ class Streamer(ABC):
         """Sets the status of the streamer thread-safe."""
         with self._status_lock:
             self._status = status
-
-    def wait_for_completion(self) -> None:
-        """Waist for the end of stream while blocking."""
-        self._safe_join()
 
     def add_eos_command(self, command: Command) -> None:
         """

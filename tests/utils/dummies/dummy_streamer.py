@@ -11,13 +11,17 @@ class DummyStreamer(Streamer):
         super().__init__()
         self.wait_time = wait_time
 
-    def _stream(self) -> None:
+    def _stream(self) -> StreamerStatus:
+        result = StreamerStatus.FAILED
+
         time.sleep(self.wait_time)
 
         if self._is_requested_to_stop():
             # simulating preemptive stop
-            self._set_status(StreamerStatus.STOPPED)
+            result = StreamerStatus.STOPPED
 
         else:
             # simulating completion
-            self._set_status(StreamerStatus.COMPLETED)
+            result = StreamerStatus.COMPLETED
+
+        return result
