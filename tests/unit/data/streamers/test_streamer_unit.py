@@ -36,6 +36,12 @@ def test_stream_completes_correctly(streamer):
     assert streamer.get_status() == StreamerStatus.COMPLETED
 
 
+def test_wait_for_completion_when_not_streaming(streamer):
+    """Tests that calling wait_for_completion() when not streaming should not raise an exception."""
+    # act
+    streamer.wait_for_completion()
+
+
 def test_stop(streamer):
     """Tests that stopping a streamer updates its status to STOPPED."""
     # arrange
