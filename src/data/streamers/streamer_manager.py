@@ -12,41 +12,11 @@ from src.data.streamers.streamer_status import StreamerStatus
 
 
 class StreamerManager:
-    """
-    A base class for stream managers.
-    The StreamerManager provides a mechanism for streamers to manage themselves by submitting commands.
-    """
+    """A base class for streamer managers."""
 
     def __init__(self):
         """Initializes an instance of StreamerManager."""
         self._streamers = ConcurrentDict[str, Streamer]()
-        self._executor = ConcurrentCommandExecutor()
-
-    def _run_executor(self) -> None:
-        """Runs the command executor."""
-        self._executor.run()
-
-    def _get_executor(self) -> ConcurrentCommandExecutor:
-        """
-        Returns the command executor.
-
-        Returns:
-            ConcurrentCommandExecutor: The command executor.
-        """
-        return self._executor
-
-    def _stop_executor(self) -> None:
-        """Stops the command executor."""
-        self._executor.stop()
-
-    def submit_command(self, command: Command) -> None:
-        """
-        Submits a command to execute.
-
-        Args:
-            command (Command): The command to execute.
-        """
-        self._get_executor().submit(command)
 
     def get_streamer_ids(self) -> List[str]:
         """
