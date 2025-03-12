@@ -1,6 +1,5 @@
 import pytest
 
-from src.command.command import Command
 from src.data.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_command import DummyCommand

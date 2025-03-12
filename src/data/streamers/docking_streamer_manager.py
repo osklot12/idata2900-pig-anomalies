@@ -1,14 +1,16 @@
+import concurrent.futures
 import threading
-import uuid
-from typing import Type, Dict
+from typing import Type
 
-from src.command.command import Command
-from src.data.streamers.streamer_manager import StreamerManager
-from src.data.streamers.streamer_provider import StreamerProvider
+from src.command.concurrent_command import ConcurrentCommand
+from src.command.streamers.notify_stopped_streamer_command import NotifyStoppedStreamerCommand
+from src.command.streamers.stop_streamers_command import StopStreamersCommand
+from src.data.streamers.runnable_streamer_manager import RunnableStreamerManager
 from src.data.streamers.streamer import Streamer
+from src.data.streamers.streamer_provider import StreamerProvider
 
 
-class DockingStreamerManager(StreamerManager):
+class DockingStreamerManager(RunnableStreamerManager):
     """
     A stream manager effective for large sets of finite streams, maintaining a constant number of streams at all time.
     The Streamers "dock" the manager, before leaving and making space for the next streamer.
@@ -22,37 +24,61 @@ class DockingStreamerManager(StreamerManager):
             streamer_provider (Type[StreamerProvider]): Provides streamers.
             n_streamers (int): The number of streamers to maintain at all times.
         """
+        if n_streamers < 1:
+            raise ValueError("n_streamers must be greater than 0")
+
         super().__init__()
-        self.streamer_provider = streamer_provider
-        self.n_streamers = n_streamers
-        self.lock = threading.Lock()
 
-    def run(self):
-        with self.lock:
-            self._run_executor()
-            # dock streamers until full or until no more streamers are available
-            while not self._is_full() and self._dock_next_streamer():
-                pass
+        self._streamer_provider = streamer_provider
+        self._n_streamers = n_streamers
 
-    def _is_full(self) -> bool:
-        """Indicates whether the manager is full of streamers."""
-        with self.lock:
-            return len(self._get_streamers()) == self.n_streamers
+        self._running = False
 
-    def stop(self):
-        with self.lock:
-            for streamer_id in self.get_streamer_ids():
-                self.get_streamer(streamer_id).stop()
-            self._stop_executor()
+        self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=self._n_streamers)
+        self._lock = threading.Lock()
 
-    def _dock_next_streamer(self) -> bool:
-        """Fetches the next streamer and runs the stream."""
-        result = False
+    def run(self) -> None:
+        self._running = True
+        for _ in range(self._n_streamers):
+            self._start_new_streamer()
 
-        streamer = self.streamer_provider.get_next_streamer()
+    def _start_new_streamer(self):
+        """Fetches a new streamer, assigns it an ID, and submits it to the executor."""
+        streamer = self._streamer_provider.get_next_streamer()
+
+        # only start next streamer if the streamer exists
         if streamer:
-            self._add_streamer(streamer)
-            streamer.stream()
-            result = True
+            streamer_id = self._add_streamer(streamer)
 
-        return result
+            streamer.stream()
+            future = self._executor.submit(self._manage_streamer, streamer, streamer_id)
+            future.add_done_callback(self._on_streamer_done)
+
+    @staticmethod
+    def _manage_streamer(streamer: Streamer, streamer_id: str) -> str:
+        """Manages the streamer."""
+        streamer.wait_for_completion()
+        streamer.stop()
+        return streamer_id
+
+    def _on_streamer_done(self, future: concurrent.futures.Future) -> None:
+        """Callback for streamers done streaming."""
+        with self._lock:
+            if self._running:
+                streamer_id = future.result()
+                self._remove_streamer(streamer_id)
+                self._start_new_streamer()
+
+    def stop(self) -> None:
+        with self._lock:
+            self._running = False
+        for streamer_id in self.get_streamer_ids():
+            streamer = self.get_streamer(streamer_id)
+            if streamer:
+                streamer.stop()
+            self._remove_streamer(streamer_id)
+
+        self._executor.shutdown(wait=True)
+
+    def n_active_streamers(self) -> int:
+        return len(self._get_streamers())

@@ -26,18 +26,27 @@ class StreamerManager:
         """Runs the command executor."""
         self._executor.run()
 
-    def _get_executor(self) -> CommandExecutor:
+    def _get_executor(self) -> ConcurrentCommandExecutor:
         """
         Returns the command executor.
 
         Returns:
-            CommandExecutor: The command executor.
+            ConcurrentCommandExecutor: The command executor.
         """
         return self._executor
 
     def _stop_executor(self) -> None:
         """Stops the command executor."""
         self._executor.stop()
+
+    def submit_command(self, command: Command) -> None:
+        """
+        Submits a command to execute.
+
+        Args:
+            command (Command): The command to execute.
+        """
+        self._get_executor().submit(command)
 
     def get_streamer_ids(self) -> List[str]:
         """
@@ -56,6 +65,15 @@ class StreamerManager:
             Streamer: The streamer with the given id.
         """
         return self._streamers.get(streamer_id)
+
+    def has_streamer(self, streamer_id: str) -> bool:
+        """
+        Returns True if the streamer with the given id exists.
+
+        Returns:
+            bool: True if streamer exists, false otherwise.
+        """
+        return self._streamers.contains(streamer_id)
 
     def _get_streamers(self) -> ConcurrentDict[str, Streamer]:
         """Returns the streamer dictionary."""
@@ -78,6 +96,10 @@ class StreamerManager:
         unique_id = str(uuid.uuid4())
         self._streamers.set(unique_id, streamer)
         return unique_id
+
+    def _remove_streamer(self, streamer_id: str) -> None:
+        """Removes the streamer with the given id."""
+        self._streamers.remove(streamer_id)
 
     @staticmethod
     def _generate_streamer_id() -> str:
