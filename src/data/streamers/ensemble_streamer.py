@@ -34,14 +34,8 @@ class EnsembleStreamer(StreamerManager, Streamer):
             # add streamer
             self._add_streamer(streamer)
 
-            # cmd for cleaning up the streamer resources immediately after completing
-            cleanup_cmd = self._get_cleanup_cmd(streamer)
-
-            streamer.add_eos_command(cleanup_cmd)
-
     def _stream(self) -> StreamerStatus:
         with self._lock:
-            self._run_executor()
             for streamer_id in self.get_streamer_ids():
                 self.get_streamer(streamer_id).stream()
 
@@ -67,12 +61,3 @@ class EnsembleStreamer(StreamerManager, Streamer):
         with self._lock:
             for streamer_id in self.get_streamer_ids():
                 self.get_streamer(streamer_id).stop()
-
-            self._stop_executor()
-
-    def _get_cleanup_cmd(self, streamer):
-        """Returns a command that cleans up streamer resources."""
-        return ConcurrentCommand(
-            command=StopStreamerCommand(streamer),
-            executor=self._get_executor()
-        )
