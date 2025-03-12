@@ -1,7 +1,7 @@
 import threading
 from typing import Tuple
 
-from src.command.cleanup_streamer_command import CleanupStreamerCommand
+from src.command.streamers.stop_streamer_command import StopStreamerCommand
 from src.command.concurrent_command import ConcurrentCommand
 from src.data.streamers.streamer import Streamer
 from src.data.streamers.streamer_manager import StreamerManager
@@ -73,6 +73,6 @@ class EnsembleStreamer(StreamerManager, Streamer):
     def _get_cleanup_cmd(self, streamer):
         """Returns a command that cleans up streamer resources."""
         return ConcurrentCommand(
-            command=CleanupStreamerCommand(streamer),
+            command=StopStreamerCommand(streamer),
             executor=self._get_executor()
         )
