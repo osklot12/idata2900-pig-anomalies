@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
 
+from src.data.dataset.matching_error_strategy import MatchingErrorStrategy
+
 
 class DatasetEntryProvider(ABC):
     """An interface for providers of paths of video - annotation pairs in a dataset."""
 
+    @abstractmethod
     def get_random(self) -> Tuple[str, str]:
         """
         Returns video - annotation path pair for a random dataset entry.
