@@ -5,13 +5,12 @@ from typing import Tuple, List, Optional, Dict
 
 from src.data.dataset.data_type import DataType
 from src.data.dataset.dataset_entry_provider import DatasetEntryProvider
-from src.data.dataset.dataset_file_matcher import DatasetFileMatcher
 from src.data.dataset.dataset_source import DatasetSource
 from src.data.dataset.matching_error_strategy import MatchingErrorStrategy
 from src.data.dataset.silent_removal_strategy import SilentRemovalStrategy
 
 
-class SimpleDatasetEntryProvider(DatasetEntryProvider, DatasetFileMatcher):
+class SimpleDatasetEntryProvider(DatasetEntryProvider):
     """A simple dataset entry provider, holding all paths in memory."""
 
     def __init__(self, source: DatasetSource, video_suffixes: List[str], annotation_suffixes: List[str]):
@@ -34,7 +33,7 @@ class SimpleDatasetEntryProvider(DatasetEntryProvider, DatasetFileMatcher):
             DataType.ANNOTATION: annotation_suffixes
         }
 
-        self._match_error_strategy = SilentRemovalStrategy(self)
+        self._match_error_strategy = SilentRemovalStrategy(self.remove_unmatched_file)
 
     def get_random(self) -> Tuple[str, str]:
         if not self._unmatched_files and not self._matched_pairs:
@@ -93,11 +92,13 @@ class SimpleDatasetEntryProvider(DatasetEntryProvider, DatasetFileMatcher):
 
         data_type = self._get_data_type(file)
         if data_type in self._suffixes:
+
             match = self._find_match(file, self._suffixes[data_type])
             if match:
                 result = self._order_pair(file, match, data_type)
             else:
                 self._match_error_strategy.handle_no_match(file)
+
         else:
             self._match_error_strategy.handle_unknown_file(file)
 
@@ -143,8 +144,12 @@ class SimpleDatasetEntryProvider(DatasetEntryProvider, DatasetFileMatcher):
         return any(file_name.endswith(suffix) for suffix in self._suffixes.get(data_type, []))
 
     def remove_unmatched_file(self, file_name: str) -> None:
+        """
+        Removes a file path from the list of unmatched files.
+        Does not remove the file from the source.
+
+        Args:
+            file_name (str): name of file to remove
+        """
         if file_name in self._unmatched_files:
             self._unmatched_files.remove(file_name)
-
-    def set_matching_error_strategy(self, strategy: MatchingErrorStrategy) -> None:
-        self._match_error_strategy = strategy
