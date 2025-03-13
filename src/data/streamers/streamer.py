@@ -26,7 +26,7 @@ class Streamer(ABC):
         self._status = StreamerStatus.PENDING
         self._status_lock = threading.Lock()
 
-    def stream(self) -> None:
+    def start_streaming(self) -> None:
         """Starts streaming data."""
         with self._stream_lock:
             if self._thread:

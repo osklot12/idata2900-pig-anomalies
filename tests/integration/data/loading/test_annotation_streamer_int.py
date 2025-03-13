@@ -37,7 +37,7 @@ def test_real_gcp_annotations_processing(gcp_data_loader, mock_callback):
     )
 
     # act
-    annotation_loader.stream()
+    annotation_loader.start_streaming()
     annotation_loader.wait_for_completion()
 
     # assert

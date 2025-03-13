@@ -1,5 +1,5 @@
 import tensorflow as tf
-from src.data.augment.augmentor_interface import ProcessorBase
+from src.data.augmentation.augmentor_interface import ProcessorBase
 
 class ImageNormalizer(ProcessorBase):
     """Handles normalization of image pixel values."""

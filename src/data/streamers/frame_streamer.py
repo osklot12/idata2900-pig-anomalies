@@ -26,7 +26,7 @@ class FrameStreamer(Streamer):
         self.resize_shape = resize_shape
         self._thread = None
 
-    def stream(self):
+    def start_streaming(self):
         self._thread = threading.Thread(target=self._process_frames)
         self._thread.start()
 

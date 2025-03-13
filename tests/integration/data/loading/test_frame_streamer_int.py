@@ -34,7 +34,7 @@ def test_load_frames(gcp_data_loader, mock_callback):
     )
 
     # act
-    frame_loader.stream()
+    frame_loader.start_streaming()
     frame_loader.wait_for_completion()
 
     # assert

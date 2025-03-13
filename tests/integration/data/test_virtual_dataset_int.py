@@ -11,7 +11,7 @@ from src.data.streamers.annotation_streamer import AnnotationStreamer
 from src.data.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.streamers.frame_streamer import FrameStreamer
 from src.data.loading.gcp_data_loader import GCPDataLoader
-from src.data.virtual_dataset import VirtualDataset
+from src.data.dataset.virtual_dataset import VirtualDataset
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from src.utils.source_normalizer import SourceNormalizer
@@ -80,8 +80,8 @@ def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_datas
     instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
-    frame_loader.stream()
-    annotation_loader.stream()
+    frame_loader.start_streaming()
+    annotation_loader.start_streaming()
 
     frame_loader.wait_for_completion()
     annotation_loader.wait_for_completion()
@@ -101,8 +101,8 @@ def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtua
     instance_loader, frame_loader, annotation_loader = setup_loaders
 
     # act
-    frame_loader.stream()
-    annotation_loader.stream()
+    frame_loader.start_streaming()
+    annotation_loader.start_streaming()
 
     frame_loader.wait_for_completion()
     annotation_loader.wait_for_completion()

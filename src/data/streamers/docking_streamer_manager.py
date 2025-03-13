@@ -50,7 +50,7 @@ class DockingStreamerManager(RunnableStreamerManager):
         if streamer:
             streamer_id = self._add_streamer(streamer)
 
-            streamer.stream()
+            streamer.start_streaming()
             future = self._executor.submit(self._manage_streamer, streamer, streamer_id)
             future.add_done_callback(self._on_streamer_done)
 
