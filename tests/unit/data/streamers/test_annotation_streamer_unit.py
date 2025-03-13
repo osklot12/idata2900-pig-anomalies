@@ -35,7 +35,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
     )
 
     # Act
-    annotation_loader.stream()
+    annotation_loader.start_streaming()
     annotation_loader.wait_for_completion()
 
     # Assert
@@ -65,7 +65,7 @@ def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     )
 
     # act
-    annotation_loader.stream()
+    annotation_loader.start_streaming()
     annotation_loader.wait_for_completion()
 
     # assert

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from src.data.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streamers.frame_streamer import FrameStreamer
 from src.data.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
-from src.data.virtual_dataset import VirtualDataset
+from src.data.dataset.virtual_dataset import VirtualDataset
 
 
 class PipelineConfigurator(ABC):

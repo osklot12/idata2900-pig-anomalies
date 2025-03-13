@@ -28,7 +28,7 @@ def test_initialization(ensemble_streamer, dummy_streamers):
 def test_stream_and_wait_for_completion(ensemble_streamer):
     """Tests that streaming starts all streamers and they complete correctly."""
     # arrange
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
 
     # act
     ensemble_streamer.wait_for_completion()
@@ -45,7 +45,7 @@ def test_streaming_completion_status(ensemble_streamer):
     initial_status = ensemble_streamer.get_status()
 
     # act
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
     ensemble_streamer.wait_for_completion()
     ensemble_streamer.stop()
 
@@ -66,7 +66,7 @@ def test_streaming_failure_status():
     initial_status = streamer.get_status()
 
     # act
-    streamer.stream()
+    streamer.start_streaming()
     streamer.wait_for_completion()
     streamer.stop()
 
@@ -86,7 +86,7 @@ def test_streaming_failure_and_stopped_status():
     )
 
     # act
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
     dummy_streamer.stop()
     ensemble_streamer.wait_for_completion()
     ensemble_streamer.stop()
@@ -109,7 +109,7 @@ def test_streaming_stopped_status():
     )
 
     # act
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
     dummy_streamer_stop.stop()
     ensemble_streamer.wait_for_completion()
     ensemble_streamer.stop()
@@ -127,7 +127,7 @@ def test_streaming_stopped_status():
 def test_stop(ensemble_streamer):
     """Tests that stop() correctly sets the status to STOPPED.s"""
     # arrange
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
 
     # act
     ensemble_streamer.stop()
@@ -145,7 +145,7 @@ def test_eos_commands_execution(ensemble_streamer):
     ensemble_streamer.add_eos_command(eos_command)
 
     # act
-    ensemble_streamer.stream()
+    ensemble_streamer.start_streaming()
     ensemble_streamer.wait_for_completion()
     ensemble_streamer.stop()
 

@@ -1,7 +1,7 @@
 import tensorflow as tf
 import random
 from math import radians, cos, sin
-from src.data.augment.augmentor_interface import AugmentorBase
+from src.data.augmentation.augmentor_interface import AugmentorBase
 
 class ImageAugmentor(AugmentorBase):
     """Applies image augmentations like flipping, rotation, brightness, and contrast."""

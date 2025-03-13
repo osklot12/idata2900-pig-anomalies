@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from src.data.dataset_split import DatasetSplit
-from src.data.virtual_dataset import VirtualDataset
+from src.data.dataset.virtual_dataset import VirtualDataset
 
 
 @pytest.fixture

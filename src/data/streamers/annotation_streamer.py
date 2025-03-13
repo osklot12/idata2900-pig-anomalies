@@ -24,7 +24,7 @@ class AnnotationStreamer(Streamer):
         self.callback = callback
         self._thread = None
 
-    def stream(self):
+    def start_streaming(self):
         self._thread = threading.Thread(target=self._process_annotations, args=(self.annotation_blob_name,))
         self._thread.start()
 

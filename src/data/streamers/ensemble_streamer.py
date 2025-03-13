@@ -37,7 +37,7 @@ class EnsembleStreamer(StreamerManager, Streamer):
     def _stream(self) -> StreamerStatus:
         with self._lock:
             for streamer_id in self.get_streamer_ids():
-                self.get_streamer(streamer_id).stream()
+                self.get_streamer(streamer_id).start_streaming()
 
         for streamer_id in self.get_streamer_ids():
             self.get_streamer(streamer_id).wait_for_completion()

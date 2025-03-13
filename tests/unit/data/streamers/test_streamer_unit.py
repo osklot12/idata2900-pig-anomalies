@@ -25,13 +25,13 @@ def test_initial_status(streamer):
 
 def test_stream_starts_correctly(streamer):
     """Tests that streaming updates the status and starts a thread."""
-    streamer.stream()
+    streamer.start_streaming()
     assert streamer.get_status() == StreamerStatus.STREAMING
 
 
 def test_stream_completes_correctly(streamer):
     """Tests that a streamer completes and updates its status."""
-    streamer.stream()
+    streamer.start_streaming()
     streamer.wait_for_completion()
     assert streamer.get_status() == StreamerStatus.COMPLETED
 
@@ -45,7 +45,7 @@ def test_wait_for_completion_when_not_streaming(streamer):
 def test_stop(streamer):
     """Tests that stopping a streamer updates its status to STOPPED."""
     # arrange
-    streamer.stream()
+    streamer.start_streaming()
 
     # act
     streamer.stop()
@@ -63,7 +63,7 @@ def test_eos_command_executes_correctly(streamer):
     streamer.add_eos_command(cmd_two)
 
     # act
-    streamer.stream()
+    streamer.start_streaming()
     streamer.wait_for_completion()
 
     # assert
@@ -74,7 +74,7 @@ def test_eos_command_executes_correctly(streamer):
 def test_status_set_on_failure(failing_streamer):
     """Tests that a streamer raising an exception while streaming updates the status to FAILED."""
     # act
-    failing_streamer.stream()
+    failing_streamer.start_streaming()
     failing_streamer.wait_for_completion()
 
     # assert
@@ -91,7 +91,7 @@ def test_eos_command_executes_on_failure(failing_streamer):
     failing_streamer.add_eos_command(cmd_two)
 
     # act
-    failing_streamer.stream()
+    failing_streamer.start_streaming()
     failing_streamer.wait_for_completion()
 
     assert cmd_one.executed

@@ -55,8 +55,8 @@ def test_instance_loader(integration_setup, mock_callback):
     frame_annotation_loader, frame_loader, annotation_loader = integration_setup
 
     # act
-    frame_loader.stream()
-    annotation_loader.stream()
+    frame_loader.start_streaming()
+    annotation_loader.start_streaming()
 
     frame_loader.wait_for_completion()
     annotation_loader.wait_for_completion()
