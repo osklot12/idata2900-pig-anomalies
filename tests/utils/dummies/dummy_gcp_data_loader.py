@@ -1,6 +1,6 @@
 from typing import List, Dict, Tuple
 
-from src.data.dataset_source import DatasetSource
+from src.data.dataset.dataset_source import DatasetSource
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 

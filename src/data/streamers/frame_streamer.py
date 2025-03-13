@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 from cppbindings import FrameStream
 
-from src.data.dataset_source import DatasetSource
+from src.data.dataset.dataset_source import DatasetSource
 from src.data.loading.feed_status import FeedStatus
 from src.data.streamers.streamer import Streamer
 from src.utils.source_normalizer import SourceNormalizer
