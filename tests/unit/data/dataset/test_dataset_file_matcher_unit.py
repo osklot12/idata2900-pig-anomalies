@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.dataset.dataset_file_matcher import DatasetFileMatcher
+from src.data.dataset.matching.dataset_file_matcher import DatasetFileMatcher
 from tests.utils.dummies.dummy_dataset_source import DummyDatasetSource
 
 
@@ -36,7 +36,7 @@ def test_get_random_matches_one_pair(file_matcher):
     n_unmatched_before = len(file_matcher._unmatched_files)
 
     # act
-    pair = file_matcher.get_random()
+    pair = file_matcher.get_file_pair()
     n_unmatched_after = len(file_matcher._unmatched_files)
 
     # assert
@@ -49,10 +49,10 @@ def test_get_random_when_already_matched(file_matcher):
     # arrange
     # match all unmatched files first
     while file_matcher._unmatched_files:
-        file_matcher.get_random()
+        file_matcher.get_file_pair()
 
     # act
-    pair = file_matcher.get_random()
+    pair = file_matcher.get_file_pair()
 
     # assert
     assert pair is not None
@@ -75,7 +75,7 @@ def test_get_random_non_determinism(file_matcher):
     for _ in range(runs):
         pairs = []
         for _ in range(pairs_per_run):
-            pairs.append(file_matcher.get_random())
+            pairs.append(file_matcher.get_file_pair())
         results.append(pairs)
 
     # assert
@@ -91,7 +91,7 @@ def test_get_random_removes_unknown_files():
     matcher = DatasetFileMatcher(provider, ["mp4"], ["json"])
 
     # act
-    matcher.get_random()
+    matcher.get_file_pair()
 
     # assert
     assert len(matcher._unmatched_files) == 0
@@ -105,7 +105,7 @@ def test_get_random_returns_none_when_no_files_available():
     matcher = DatasetFileMatcher(provider, ["mp4"], ["json"])
 
     # act
-    pair = matcher.get_random()
+    pair = matcher.get_file_pair()
 
     # assert
     assert pair is None
@@ -123,7 +123,7 @@ def test_get_random_removes_files_without_matches():
 
     # act
     for _ in range(2):
-        matcher.get_random()
+        matcher.get_file_pair()
 
     n_file_paths = matcher.n_file_paths()
 
@@ -142,7 +142,7 @@ def test_get_random_ignores_files_missing_suffix():
     matcher = DatasetFileMatcher(provider, ["mp4"], ["json"])
 
     # act
-    pair = matcher.get_random()
+    pair = matcher.get_file_pair()
 
     # assert
     assert pair is None

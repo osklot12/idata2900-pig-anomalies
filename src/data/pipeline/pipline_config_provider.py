@@ -4,7 +4,7 @@ from src.data.pipeline.pipeline_configurator import PipelineConfigurator
 
 
 class PipelineConfigProvider(ABC):
-    """An interface for providers of pipeline configurators."""
+    """An interface for factories of pipeline configurators."""
 
     @abstractmethod
     def get_configurator(self) -> PipelineConfigurator:

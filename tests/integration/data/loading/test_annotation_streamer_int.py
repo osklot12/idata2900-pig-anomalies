@@ -6,7 +6,7 @@ from src.auth.gcp_auth_service import GCPAuthService
 from src.data.bbox_normalizer import BBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
-from src.data.loading.gcp_data_loader import GCPDataLoader
+from src.data.loading.gcs_data_loader import GCSDataLoader
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
@@ -16,7 +16,7 @@ from tests.utils.constants.sample_bucket_files import SampleBucketFiles
 def gcp_data_loader():
     """Fixture to provide an actual GCPDataLoader."""
     auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
-    return GCPDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
+    return GCSDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
 def mock_callback():

@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from src.data.loading.gcp_data_loader import GCPDataLoader
+from src.data.loading.gcs_data_loader import GCSDataLoader
 from tests.utils.dummies.dummy_gcp_auth_service import DummyGCPAuthService
 
 # Constants for testing
@@ -11,7 +11,7 @@ TEST_JSON_NAME = "test_annotation.json"
 @pytest.fixture
 def gcp_loader():
     """Creates a GCPDataLoader instance with dummy auth service."""
-    return GCPDataLoader(bucket_name=TEST_BUCKET, auth_service=DummyGCPAuthService())
+    return GCSDataLoader(bucket_name=TEST_BUCKET, auth_service=DummyGCPAuthService())
 
 @patch("requests.get")
 def test_fetch_all_files(mock_get, gcp_loader):
