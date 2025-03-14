@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Tuple, Optional
 
-from src.data.dataset.matching_error_strategy import MatchingErrorStrategy
+from src.data.dataclasses.dataset_file_pair import DatasetFilePair
 
 
 class DatasetEntryProvider(ABC):
-    """An interface for providers of paths of video - annotation pairs in a dataset."""
+    """An interface for providers of paths of video-annotation file path pairs in a dataset."""
 
     @abstractmethod
-    def get_random(self) -> Tuple[str, str]:
+    def get_random(self) -> Optional[DatasetFilePair]:
         """
-        Returns video - annotation path pair for a random dataset entry.
+        Returns video-annotation file path pair for a random dataset entry.
 
         Returns:
-            Tuple[str, str]: tuple of video path and annotation path.
+            Optional[DatasetFilePair]: tuple of video path and annotation path.
         """
         raise NotImplementedError
