@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from src.data.streamers.frame_streamer import FrameStreamer
+from src.data.streaming.streamers import FrameStreamer
 
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 

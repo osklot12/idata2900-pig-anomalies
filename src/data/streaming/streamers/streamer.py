@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import logging
 
 from src.command.command import Command
-from src.data.streamers.streamer_status import StreamerStatus
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
 class Streamer(ABC):

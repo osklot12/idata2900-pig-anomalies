@@ -1,14 +1,8 @@
-import queue
 import uuid
-from abc import abstractmethod
 from typing import List
 
-from src.command.command import Command
-from src.command.command_executor import CommandExecutor
-from src.command.concurrent_command_executor import ConcurrentCommandExecutor
 from src.data.data_structures.concurrent_dict import ConcurrentDict
-from src.data.streamers.streamer import Streamer
-from src.data.streamers.streamer_status import StreamerStatus
+from src.data.streaming.streamers.streamer import Streamer
 
 
 class StreamerManager:

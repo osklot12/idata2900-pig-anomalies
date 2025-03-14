@@ -1,6 +1,6 @@
 from src.command.command import Command
 from src.data.data_structures.concurrent_dict import ConcurrentDict
-from src.data.streamers.streamer import Streamer
+from src.data.streaming.streamers import Streamer
 
 
 class StopStreamersCommand(Command):

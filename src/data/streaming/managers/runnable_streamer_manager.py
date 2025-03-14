@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
-from src.data.streamers.streamer_manager import StreamerManager
 
-
-class RunnableStreamerManager(StreamerManager, ABC):
+class RunnableStreamerManager(ABC):
     """An interface for stream managers that can be run automatically."""
 
     @abstractmethod
