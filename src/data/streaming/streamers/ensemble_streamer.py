@@ -1,11 +1,9 @@
 import threading
 from typing import Tuple
 
-from src.command.streamers.stop_streamer_command import StopStreamerCommand
-from src.command.concurrent_command import ConcurrentCommand
-from src.data.streamers.streamer import Streamer
-from src.data.streamers.streamer_manager import StreamerManager
-from src.data.streamers.streamer_status import StreamerStatus
+from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.managers.streamer_manager import StreamerManager
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
 class EnsembleStreamer(StreamerManager, Streamer):

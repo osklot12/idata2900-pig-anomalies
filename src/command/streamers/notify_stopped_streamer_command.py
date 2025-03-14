@@ -1,5 +1,5 @@
 from src.command.command import Command
-from src.data.streamers.runnable_streamer_manager import RunnableStreamerManager
+from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
 
 
 class NotifyStoppedStreamerCommand(Command):

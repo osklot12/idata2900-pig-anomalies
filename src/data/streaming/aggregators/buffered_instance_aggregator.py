@@ -2,7 +2,7 @@ from typing import Callable, Tuple, Optional, List
 import numpy as np
 from threading import Lock
 
-from src.data.aggregators.instance_aggregator import InstanceAggregator
+from src.data.streaming.aggregators.instance_aggregator import InstanceAggregator
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.annotation import Annotation
 from src.data.dataclasses.frame import Frame

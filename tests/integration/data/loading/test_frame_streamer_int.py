@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.streamers.frame_streamer import FrameStreamer
+from src.data.streaming.streamers import FrameStreamer
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles

@@ -5,7 +5,7 @@ import pytest
 from src.auth.gcp_auth_service import GCPAuthService
 from src.data.bbox_normalizer import BBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.streamers.annotation_streamer import AnnotationStreamer
+from src.data.streaming.streamers import AnnotationStreamer
 from src.data.loading.gcp_data_loader import GCPDataLoader
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser

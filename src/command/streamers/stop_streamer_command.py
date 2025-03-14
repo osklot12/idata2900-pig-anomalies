@@ -1,5 +1,5 @@
 from src.command.command import Command
-from src.data.streamers.streamer import Streamer
+from src.data.streaming.streamers import Streamer
 
 
 class StopStreamerCommand(Command):

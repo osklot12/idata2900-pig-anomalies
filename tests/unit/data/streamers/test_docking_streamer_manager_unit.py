@@ -1,7 +1,7 @@
 import pytest
 import time
 
-from src.data.streamers.docking_streamer_manager import DockingStreamerManager
+from src.data.streaming.streamers import DockingStreamerManager
 from tests.utils.dummies.dummy_streamer_provider import DummyStreamerProvider
 
 

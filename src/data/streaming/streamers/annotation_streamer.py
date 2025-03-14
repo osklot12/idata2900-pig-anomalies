@@ -4,7 +4,7 @@ from typing import Callable, Dict, Tuple, Optional, List, Type
 from src.data.decoders.bbox_decoder import BBoxDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.data.bbox_normalizer import BBoxNormalizer
-from src.data.streamers.streamer import Streamer
+from src.data.streaming.streamers.streamer import Streamer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.source_normalizer import SourceNormalizer
 
