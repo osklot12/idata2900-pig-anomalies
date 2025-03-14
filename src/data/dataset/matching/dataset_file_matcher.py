@@ -1,19 +1,18 @@
 import random
-import os
 
 from typing import List, Optional, Dict
 
 from src.data.dataclasses.dataset_file import DatasetFile
 from src.data.dataclasses.dataset_file_pair import DatasetFilePair
 from src.data.dataset.data_type import DataType
-from src.data.dataset.dataset_entry_provider import DatasetEntryProvider
+from src.data.dataset.dataset_file_pair_provider import DatasetFilePairProvider
 from src.data.dataset.dataset_source import DatasetSource
-from src.data.dataset.matching_error_strategy import MatchingErrorStrategy
-from src.data.dataset.silent_removal_strategy import SilentRemovalStrategy
+from src.data.dataset.matching.matching_error_strategy import MatchingErrorStrategy
+from src.data.dataset.matching.silent_removal_strategy import SilentRemovalStrategy
 
 
-class DatasetFileMatcher(DatasetEntryProvider):
-    """A simple dataset entry provider, matching entries based on their suffixes."""
+class DatasetFileMatcher(DatasetFilePairProvider):
+    """A simple dataset entry provider, matching files by basename."""
 
     def __init__(self, source: DatasetSource, video_suffixes: List[str], annotation_suffixes: List[str]):
         """
@@ -37,7 +36,7 @@ class DatasetFileMatcher(DatasetEntryProvider):
 
         self._match_error_strategy = SilentRemovalStrategy(self.remove_unmatched_file)
 
-    def get_random(self) -> Optional[DatasetFilePair]:
+    def get_file_pair(self) -> Optional[DatasetFilePair]:
         pair = None
         if random.random() < self._get_unmatched_ratio():
             pair = self._match_pair()
@@ -126,27 +125,6 @@ class DatasetFileMatcher(DatasetEntryProvider):
         self._unmatched_files.remove(pair.video_file)
         self._unmatched_files.remove(pair.annotation_file)
         self._matched_pairs.append(pair)
-
-    def _find_match(self, file_name: str, target_suffixes: List[str]) -> Optional[str]:
-        """Tries to find a file name matching the given file name, but with a suffix from target_suffixes."""
-        base_name = os.path.splitext(os.path.basename(file_name))[0]
-
-        return next(
-            (
-                match_path for match_path in self._unmatched_files
-                if os.path.splitext(os.path.basename(match_path))[0] == base_name
-                and any(match_path.endswith(suffix) for suffix in target_suffixes)
-            ), None
-        )
-
-    def _which_data_type(self, filename: str) -> DataType:
-        """Returns the DataType corresponding to the filename suffix, or DataType.UNKNOWN if unknown."""
-        return next(
-            (
-                data_type for data_type, suffixes in self._suffixes.items()
-                if any(filename.endswith(suffix) for suffix in suffixes)
-            ), DataType.UNKNOWN
-        )
 
     def set_error_strategy(self, strategy: MatchingErrorStrategy) -> None:
         """

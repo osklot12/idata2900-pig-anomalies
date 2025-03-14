@@ -1,5 +1,5 @@
 from src.data.streaming.streamers import Streamer
-from src.data.streaming.providers.streamer_provider import StreamerFactory
+from src.data.streaming.factories.streamer_factory import StreamerFactory
 from tests.utils.dummies.dummy_streamer import DummyStreamer
 
 

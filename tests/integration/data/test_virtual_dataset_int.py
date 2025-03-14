@@ -10,7 +10,7 @@ from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.streaming.streamers import FrameStreamer
-from src.data.loading.gcp_data_loader import GCPDataLoader
+from src.data.loading.gcs_data_loader import GCSDataLoader
 from src.data.dataset.virtual_dataset import VirtualDataset
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
@@ -22,19 +22,19 @@ from tests.utils.constants.sample_bucket_files import SampleBucketFiles
 def frame_data_loader():
     """Returns a GCPDataLoader instance frame loading."""
     auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
-    return GCPDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
+    return GCSDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
 def annotation_data_loader():
     """Returns a GCPDataLoader instance for annotation loading."""
     auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
-    return GCPDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
+    return GCSDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
 def dataset_id_loader():
     """Returns a GCPDataLoader instance for dataset id loading."""
     auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
-    return GCPDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
+    return GCSDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
 def virtual_dataset(dataset_id_loader):
