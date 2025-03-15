@@ -29,8 +29,10 @@ class SimpleFilePairProvider(DatasetFilePairProvider):
         files = self._source.list_files()
         if files:
             video_file = self._video_selector.select_file(files)
+
             if video_file:
                 annotation_file = self._matcher.find_match(video_file, files)
+
                 if annotation_file:
                     result = DatasetFilePair(video_file, annotation_file)
 
