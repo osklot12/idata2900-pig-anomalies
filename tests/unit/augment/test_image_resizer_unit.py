@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-from src.data.augmentation.image_resizer import ImageResizer
+from src.data.preprocessing.augmentation.image_resizer import ImageResizer
 
 @pytest.fixture
 def test_image():
