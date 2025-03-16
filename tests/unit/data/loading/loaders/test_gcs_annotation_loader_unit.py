@@ -4,13 +4,13 @@ import pytest
 from requests.exceptions import HTTPError
 
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
-from tests.utils.dummies.dummy_gcp_auth_service import DummyGCPAuthService
+from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 
 @pytest.fixture
 def gcs_annotation_loader():
     """Fixture to provide a GCSAnnotationLoader instance."""
-    return GCSAnnotationLoader("test-bucket", DummyGCPAuthService())
+    return GCSAnnotationLoader("test-bucket", DummyAuthService())
 
 @patch.object(GCSAnnotationLoader, "_make_request")
 def test_load_annotation_success(mock_make_request, gcs_annotation_loader):

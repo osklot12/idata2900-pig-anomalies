@@ -1,7 +1,7 @@
 from src.auth.auth_service import AuthService
 
 
-class DummyGCPAuthService(AuthService):
+class DummyAuthService(AuthService):
     """A dummy GCPAuthService for testing, bypassing real authentication."""
 
     def get_access_token(self) -> str:
