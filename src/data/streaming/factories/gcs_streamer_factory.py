@@ -1,11 +1,12 @@
 from src.data.streaming.factories.streamer_factory import StreamerFactory
+from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.streaming.streamers.streamer import Streamer
 
 
 class GCSStreamerFactory(StreamerFactory):
     """A factory that creates streamers streaming from Google Cloud Storage."""
 
-    def __init__(self, bucket_name: str, service_account_path: str):
+    def __init__(self, loader_factory: GCSLoaderFactory):
         """
         Initializes a GCSStreamerFactory instance.
 
