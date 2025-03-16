@@ -1,5 +1,5 @@
 import pytest
-from src.data.loading.gcs_data_loader import GCSDataLoader
+from src.data.loading.loaders.gcs_data_loader_old import GCSDataLoaderOld
 from src.auth.gcp_auth_service import GCPAuthService
 from src.utils.path_finder import PathFinder
 
@@ -15,7 +15,7 @@ TEST_JSON_NAME = "avd13_cam1_20220314072829_20220314073013_fps2.0.json"
 def gcp_loader():
     """Creates a GCPDataLoader instance using real credentials for integration testing."""
     auth_service = GCPAuthService(credentials_path=TEST_CREDENTIALS_PATH)
-    return GCSDataLoader(bucket_name=TEST_BUCKET, auth_service=auth_service)
+    return GCSDataLoaderOld(bucket_name=TEST_BUCKET, auth_service=auth_service)
 
 @pytest.mark.integration
 def test_fetch_all_files(gcp_loader):
