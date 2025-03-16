@@ -4,7 +4,7 @@ import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
 from src.data.streaming.streamers import FrameStreamer
-from src.data.loading.gcs_data_loader import GCSDataLoader
+from src.data.loading.loaders.gcs_data_loader_old import GCSDataLoaderOld
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
 
@@ -13,7 +13,7 @@ from tests.utils.constants.sample_bucket_files import SampleBucketFiles
 def gcp_data_loader():
     """Fixture to provide a GCPDataLoader instance."""
     auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
-    return GCSDataLoader(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
+    return GCSDataLoaderOld(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
 def mock_callback():

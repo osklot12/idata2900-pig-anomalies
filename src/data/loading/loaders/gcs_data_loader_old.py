@@ -6,7 +6,7 @@ from src.auth.gcp_auth_service import GCPAuthService
 from src.data.dataset.dataset_source import DatasetSource
 
 
-class GCSDataLoader(DatasetSource):
+class GCSDataLoaderOld(DatasetSource):
     """
     Handles authentication and efficient data loading from Google Cloud Storage (GCS).
     Now includes deterministic seeding and per-frame shuffling for training.

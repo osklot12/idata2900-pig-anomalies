@@ -1,7 +1,7 @@
 from typing import Optional
 
 from src.data.dataclasses.dataset_file_pair import DatasetFilePair
-from src.data.dataset.dataset_file_pair_provider import DatasetFilePairProvider
+from src.data.dataset.providers.dataset_file_pair_provider import DatasetFilePairProvider
 from src.data.dataset.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_strategy import MatchingStrategy
 from src.data.dataset.selection.file_selection_strategy import FileSelectionStrategy
@@ -28,12 +28,20 @@ class SimpleFilePairProvider(DatasetFilePairProvider):
 
         files = self._source.list_files()
         if files:
-            video_file = self._video_selector.select_file(files)
 
-            if video_file:
-                annotation_file = self._matcher.find_match(video_file, files)
+            searching = True
+            while searching:
+                video_file = self._video_selector.select_file(files)
 
-                if annotation_file:
-                    result = DatasetFilePair(video_file, annotation_file)
+                if video_file:
+                    annotation_file = self._matcher.find_match(video_file, files)
+
+                    if annotation_file:
+                        result = DatasetFilePair(video_file, annotation_file)
+                        searching = False
+                    else:
+                        files.remove(video_file)
+                else:
+                    searching = False
 
         return result
