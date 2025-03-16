@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.dataset.gcs_file_manager import GCSFileManager
+from src.data.dataset.gcs_dataset_source import GCSDatasetSource
 from tests.utils.gcs.test_bucket import TestBucket
 
 
@@ -13,7 +13,7 @@ def gcp_auth_service():
 @pytest.fixture
 def gcs_file_manager(gcp_auth_service):
     """Fixture to provide a GCSFileManager instance."""
-    return GCSFileManager(
+    return GCSDatasetSource(
         bucket_name=TestBucket.BUCKET_NAME,
         auth_service=gcp_auth_service
     )
@@ -31,7 +31,7 @@ def test_list_files_success(gcs_file_manager):
 def test_list_files_bucket_not_found(gcp_auth_service):
     """Integration test for handling non-existent bucket."""
     # act
-    file_manager = GCSFileManager(
+    file_manager = GCSDatasetSource(
         bucket_name="non-existent-bucket-98542354082764032",
         auth_service=gcp_auth_service
     )

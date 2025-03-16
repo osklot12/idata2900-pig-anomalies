@@ -4,8 +4,8 @@ from src.data.dataset.dataset_source import DatasetSource
 from src.data.gcs_bucket_client import GCSBucketClient
 
 
-class GCSFileManager(GCSBucketClient, DatasetSource):
-    """Handles file listing and filtering in a Google Cloud Storage bucket."""
+class GCSDatasetSource(GCSBucketClient, DatasetSource):
+    """Handles file listing in a Google Cloud Storage bucket."""
 
     def list_files(self) -> List[str]:
         response = self._make_request(

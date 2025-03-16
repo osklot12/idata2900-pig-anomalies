@@ -29,6 +29,7 @@ def test_create_video_loader(gcs_loader_factory, bucket_name):
     assert video_loader._bucket_name == bucket_name
     assert isinstance(video_loader._auth_service, DummyAuthService)
 
+
 def test_create_annotation_loader(gcs_loader_factory, bucket_name):
     """Tests that create_annotation_loader() correctly instantiates GCSAnnotationLoader."""
     # act
@@ -38,3 +39,6 @@ def test_create_annotation_loader(gcs_loader_factory, bucket_name):
     assert isinstance(annotation_loader, GCSAnnotationLoader)
     assert annotation_loader._bucket_name == bucket_name
     assert isinstance(annotation_loader._auth_service, DummyAuthService)
+
+def test_create_dataset_source(gcs_loader_factory, bucket_name):
+    """Tests that create_dataset_source() correctly instantiates GCSFileManager"""

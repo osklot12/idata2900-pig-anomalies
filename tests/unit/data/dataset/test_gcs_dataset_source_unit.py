@@ -3,16 +3,16 @@ from unittest.mock import patch, MagicMock
 import pytest
 from requests.exceptions import HTTPError
 
-from src.data.dataset.gcs_file_manager import GCSFileManager
+from src.data.dataset.gcs_dataset_source import GCSDatasetSource
 from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 
 @pytest.fixture
 def gcs_file_manager():
     """Fixture to provide a GCSFileManager instance."""
-    return GCSFileManager("test-bucket", DummyAuthService())
+    return GCSDatasetSource("test-bucket", DummyAuthService())
 
-@patch.object(GCSFileManager, "_make_request")
+@patch.object(GCSDatasetSource, "_make_request")
 def test_list_files_success(mock_make_request, gcs_file_manager):
     """Tests successful listing of files in the GCS bucket."""
     # arrange
@@ -38,7 +38,7 @@ def test_list_files_success(mock_make_request, gcs_file_manager):
     assert isinstance(result, list)
     assert result == ["video_1.mp4", "video_2.mp4", "annotation_1.json"]
 
-@patch.object(GCSFileManager, "_make_request")
+@patch.object(GCSDatasetSource, "_make_request")
 def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
     """Tests listing files when the GCS bucket is empty."""
     # arrange
@@ -54,7 +54,7 @@ def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
     assert isinstance(result, list)
     assert result == []
 
-@patch.object(GCSFileManager, "_make_request")
+@patch.object(GCSDatasetSource, "_make_request")
 def test_list_files_not_found(mock_make_request, gcs_file_manager):
     """Tests handling when the requested bucket is not found."""
     # arrange
