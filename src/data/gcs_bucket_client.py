@@ -48,3 +48,21 @@ class GCSBucketClient:
             raise HTTPError(f"Request to '{url}' failed: {e}")
 
         return response
+
+    def get_bucket_name(self) -> str:
+        """
+        Returns the bucket name.
+
+        Returns:
+            str: the bucket name
+        """
+        return self._bucket_name
+
+    def get_auth_service(self) -> AuthService:
+        """
+        Returns the authentication service.
+
+        Returns:
+            AuthService: the authentication service
+        """
+        return self._auth_service

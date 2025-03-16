@@ -1,4 +1,6 @@
 from src.auth.factories.auth_service_factory import AuthServiceFactory
+from src.data.dataset.dataset_source import DatasetSource
+from src.data.dataset.gcs_dataset_source import GCSDatasetSource
 from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.loading.loaders.annotation_loader import AnnotationLoader
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
@@ -25,3 +27,6 @@ class GCSLoaderFactory(LoaderFactory):
 
     def create_annotation_loader(self) -> AnnotationLoader:
         return GCSAnnotationLoader(self._bucket_name, self._auth_factory.create_auth_service())
+
+    def create_dataset_source(self) -> DatasetSource:
+        return GCSDatasetSource(self._bucket_name, self._auth_factory.create_auth_service())
