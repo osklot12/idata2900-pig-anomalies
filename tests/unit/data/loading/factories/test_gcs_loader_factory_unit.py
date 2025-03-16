@@ -1,5 +1,6 @@
 import pytest
 
+from src.data.dataset.gcs_dataset_source import GCSDatasetSource
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
@@ -26,8 +27,8 @@ def test_create_video_loader(gcs_loader_factory, bucket_name):
 
     # assert
     assert isinstance(video_loader, GCSVideoLoader)
-    assert video_loader._bucket_name == bucket_name
-    assert isinstance(video_loader._auth_service, DummyAuthService)
+    assert video_loader.get_bucket_name() == bucket_name
+    assert isinstance(video_loader.get_auth_service(), DummyAuthService)
 
 
 def test_create_annotation_loader(gcs_loader_factory, bucket_name):
@@ -37,8 +38,15 @@ def test_create_annotation_loader(gcs_loader_factory, bucket_name):
 
     # assert
     assert isinstance(annotation_loader, GCSAnnotationLoader)
-    assert annotation_loader._bucket_name == bucket_name
-    assert isinstance(annotation_loader._auth_service, DummyAuthService)
+    assert annotation_loader.get_bucket_name() == bucket_name
+    assert isinstance(annotation_loader.get_auth_service(), DummyAuthService)
 
 def test_create_dataset_source(gcs_loader_factory, bucket_name):
-    """Tests that create_dataset_source() correctly instantiates GCSFileManager"""
+    """Tests that create_dataset_source() correctly instantiates GCSDatasetSource."""
+    # act
+    dataset_source = gcs_loader_factory.create_dataset_source()
+
+    # assert
+    assert isinstance(dataset_source, GCSDatasetSource)
+    assert dataset_source.get_bucket_name() == bucket_name
+    assert isinstance(dataset_source.get_auth_service(), DummyAuthService)
