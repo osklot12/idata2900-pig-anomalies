@@ -1,7 +1,7 @@
 import pytest
 import json
 import tensorflow as tf
-from src.data.augmentation.coco_formatter import COCOFormatter
+from src.data.preprocessing.augmentation.coco_formatter import COCOFormatter
 from src.utils.path_finder import PathFinder
 
 

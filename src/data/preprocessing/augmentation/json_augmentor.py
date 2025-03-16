@@ -1,6 +1,6 @@
 import numpy as np
 from math import radians, cos, sin
-from src.data.augmentation.augmentor_interface import AugmentorBase
+from src.data.preprocessing.augmentation.augmentor_interface import AugmentorBase
 
 class JsonAugmentor(AugmentorBase):
     """Applies transformations to bounding box annotations."""
