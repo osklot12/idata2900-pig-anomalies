@@ -1,6 +1,6 @@
 from typing import List
 
-from src.data.dataset.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.gcs_bucket_client import GCSBucketClient
 
 

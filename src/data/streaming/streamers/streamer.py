@@ -39,6 +39,7 @@ class Streamer(ABC):
     def _stream_worker(self) -> None:
         """Stream worker for streaming in the background."""
         try:
+            self._setup_stream()
             self._set_status(self._stream())
 
         except Exception as e:
@@ -59,6 +60,10 @@ class Streamer(ABC):
             StreamerStatus: The status of the streamer.
         """
         raise NotImplementedError()
+
+    def _setup_stream(self) -> None:
+        """Can be overridden for custom setup when start_streaming() is called."""
+        pass
 
     def stop(self) -> None:
         """Stops the streamer."""

@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 from requests.exceptions import HTTPError
 
-from src.data.dataset.gcs_dataset_source import GCSDatasetSource
+from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
 from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 

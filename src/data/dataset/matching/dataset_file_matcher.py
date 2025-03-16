@@ -6,7 +6,7 @@ from src.data.dataclasses.dataset_file import DatasetFile
 from src.data.dataclasses.dataset_file_pair import DatasetFilePair
 from src.data.dataset.data_type import DataType
 from src.data.dataset.providers.dataset_file_pair_provider import DatasetFilePairProvider
-from src.data.dataset.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_error_strategy import MatchingErrorStrategy
 from src.data.dataset.matching.silent_removal_strategy import SilentRemovalStrategy
 

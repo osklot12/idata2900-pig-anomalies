@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.dataset.gcs_dataset_source import GCSDatasetSource
+from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
 from tests.utils.gcs.test_bucket import TestBucket
 
 

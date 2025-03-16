@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.dataset.gcs_dataset_source import GCSDatasetSource
+from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader

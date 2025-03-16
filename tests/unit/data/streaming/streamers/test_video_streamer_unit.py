@@ -1,0 +1,51 @@
+from unittest.mock import MagicMock
+
+import pytest
+
+from src.data.dataclasses.frame import Frame
+from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
+from tests.utils.testables.testable_video_streamer import TestableVideoStreamer
+
+
+@pytest.fixture
+def dummy_resize_strategy():
+    """Fixture to provide a dummy resize strategy."""
+    return DummyFrameResizeStrategy((720, 1280))
+
+
+@pytest.fixture
+def mock_callback():
+    """Fixture to provide a mock callback."""
+    return MagicMock()
+
+@pytest.mark.parametrize("n_frames", [0, 1, 5, 10])
+def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, mock_callback):
+    """Tests that the VideoStreamer produces and feeds the correct number of frames."""
+    # arrange
+    streamer = TestableVideoStreamer(n_frames, mock_callback)
+
+    # act
+    streamer.start_streaming()
+    streamer.wait_for_completion()
+
+    # assert
+    assert mock_callback.call_count == n_frames
+
+    for call_args in mock_callback.call_args_list:
+        frame = call_args[0][0]
+        assert isinstance(frame, Frame)
+
+def test_video_streamer_resizes_all_frames(mock_callback, dummy_resize_strategy):
+    """Tests that the VideoStreamer resizes all frames while streaming."""
+    # arrange
+    streamer = TestableVideoStreamer(5, mock_callback, dummy_resize_strategy)
+
+    # act
+    streamer.start_streaming()
+    streamer.wait_for_completion()
+
+    # assert
+    for call_args in mock_callback.call_args_list:
+        frame = call_args[0][0]
+        assert isinstance(frame, Frame)
+        assert frame.data.shape == (*dummy_resize_strategy.resize_shape, 3)

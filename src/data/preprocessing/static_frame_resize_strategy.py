@@ -14,7 +14,7 @@ class StaticFrameResizeStrategy(FrameResizeStrategy):
         Initializes a StaticFrameResizeStrategy instance.
 
         Args:
-            resize_shape (Tuple[int, int]): the shape of the resized frame
+            resize_shape (Tuple[int, int]): the shape (height, width) of the resized frame
         """
         self._resize_shape = resize_shape
 
