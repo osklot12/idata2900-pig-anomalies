@@ -25,4 +25,3 @@ class GCSLoaderFactory(LoaderFactory):
 
     def create_annotation_loader(self) -> AnnotationLoader:
         return GCSAnnotationLoader(self._bucket_name, self._auth_factory.create_auth_service())
-
