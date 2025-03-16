@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError
 
 from src.auth.auth_service import AuthService
 
@@ -40,7 +41,10 @@ class GCSBucketClient:
         url = url
 
         response = requests.get(url, headers=headers, stream=stream)
-        if response.status_code != 200:
-            raise RuntimeError(f"Request to '{url}' failed: {response.status_code} - {response.text}")
+
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            raise HTTPError(f"Request to '{url}' failed: {e}")
 
         return response
