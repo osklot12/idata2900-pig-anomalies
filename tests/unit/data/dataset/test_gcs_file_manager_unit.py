@@ -4,13 +4,13 @@ import pytest
 from requests.exceptions import HTTPError
 
 from src.data.dataset.gcs_file_manager import GCSFileManager
-from tests.utils.dummies.dummy_gcp_auth_service import DummyGCPAuthService
+from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 
 @pytest.fixture
 def gcs_file_manager():
     """Fixture to provide a GCSFileManager instance."""
-    return GCSFileManager("test-bucket", DummyGCPAuthService())
+    return GCSFileManager("test-bucket", DummyAuthService())
 
 @patch.object(GCSFileManager, "_make_request")
 def test_list_files_success(mock_make_request, gcs_file_manager):

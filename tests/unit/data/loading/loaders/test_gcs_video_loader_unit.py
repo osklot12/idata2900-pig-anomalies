@@ -4,13 +4,13 @@ from requests.exceptions import HTTPError
 import pytest
 
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
-from tests.utils.dummies.dummy_gcp_auth_service import DummyGCPAuthService
+from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 
 @pytest.fixture
 def gcs_video_loader():
     """Fixture to provide a GCSVideoLoader instance."""
-    return GCSVideoLoader("test-bucket", DummyGCPAuthService())
+    return GCSVideoLoader("test-bucket", DummyAuthService())
 
 @patch.object(GCSVideoLoader, "_make_request")
 def test_load_video_success(mock_make_request, gcs_video_loader):
