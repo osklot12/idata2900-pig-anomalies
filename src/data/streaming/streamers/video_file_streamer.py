@@ -12,7 +12,7 @@ from src.data.streaming.streamers.video_streamer import VideoStreamer
 class VideoFileStreamer(VideoStreamer):
     """A streamer for streaming video file data."""
 
-    def __init(self, video: Video, callback: Callable[[Frame], FeedStatus],
+    def __init__(self, video: Video, callback: Callable[[Frame], FeedStatus],
                resize_strategy: FrameResizeStrategy = None):
         """
         Initializes a VideoFileStreamer instance.
@@ -29,13 +29,14 @@ class VideoFileStreamer(VideoStreamer):
 
     def _setup_stream(self) -> None:
         video_data = self._video.loader.load_video(self._video.id)
-        self._fstream = FrameStream(video_data)
+        self._fstream = FrameStream(bytearray(video_data))
 
     def _get_next_frame(self) -> Optional[Frame]:
-        frame_data = self._fstream.read()
-        end_of_stream = not frame_data
-        frame = Frame(self._video.id, self._frame_index, frame_data, end_of_stream)
+        frame = None
 
-        self._frame_index += 1
+        frame_data = self._fstream.read()
+        if frame_data:
+            frame = Frame(self._video.id, self._frame_index, frame_data, False)
+            self._frame_index += 1
 
         return frame
