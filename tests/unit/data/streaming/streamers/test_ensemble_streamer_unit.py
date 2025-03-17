@@ -1,7 +1,7 @@
 import pytest
 
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
-from src.data.streaming.streamers import StreamerStatus
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_command import DummyCommand
 from tests.utils.dummies.dummy_failing_streamer import DummyFailingStreamer
 from tests.utils.dummies.dummy_streamer import DummyStreamer

@@ -41,6 +41,6 @@ class VideoStreamer(Streamer):
         Returns the next frame for the stream.
 
         Returns:
-            Frame: next Frame, or None if end of stream
+            Optional[Frame]: next Frame, or None if end of stream
         """
         raise NotImplementedError
