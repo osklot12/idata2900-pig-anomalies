@@ -24,6 +24,8 @@ class VideoStreamer(Streamer):
         self._resize_strategy = resize_strategy
 
     def _stream(self) -> StreamerStatus:
+        result = StreamerStatus.COMPLETED
+
         frame = self._get_next_frame()
         while frame is not None and not self._is_requested_to_stop():
             if self._resize_strategy:
@@ -33,7 +35,10 @@ class VideoStreamer(Streamer):
             self._callback(frame)
             frame = self._get_next_frame()
 
-        return StreamerStatus.STOPPED if frame is None and self._is_requested_to_stop() else StreamerStatus.COMPLETED
+        if frame and self._is_requested_to_stop():
+            result = StreamerStatus.STOPPED
+
+        return result
 
     @abstractmethod
     def _get_next_frame(self) -> Optional[Frame]:

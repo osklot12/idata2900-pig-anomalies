@@ -52,3 +52,16 @@ def test_video_streamer_resizes_all_frames(mock_callback, dummy_resize_strategy)
         frame = call_args[0][0]
         assert isinstance(frame, Frame)
         assert frame.data.shape == (*dummy_resize_strategy.resize_shape, 3)
+
+
+def test_video_streamer_should_indicate_stopping_when_stopped_early(mock_callback):
+    """Tests that the VideoStreamer indicates that it was stopped when stopped early."""
+    # arrange
+    streamer = DummyVideoStreamer(100, mock_callback)
+    streamer.start_streaming()
+
+    # act
+    streamer.stop()
+
+    # assert
+    assert streamer.get_status() == StreamerStatus.STOPPED
