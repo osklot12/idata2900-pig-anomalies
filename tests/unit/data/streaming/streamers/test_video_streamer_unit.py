@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.data.dataclasses.frame import Frame
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
 from tests.utils.dummies.dummy_video_streamer import DummyVideoStreamer
 
@@ -34,6 +35,8 @@ def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, m
     for call_args in mock_callback.call_args_list:
         frame = call_args[0][0]
         assert isinstance(frame, Frame)
+
+    assert streamer.get_status() == StreamerStatus.COMPLETED
 
 def test_video_streamer_resizes_all_frames(mock_callback, dummy_resize_strategy):
     """Tests that the VideoStreamer resizes all frames while streaming."""
