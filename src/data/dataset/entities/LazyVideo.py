@@ -13,11 +13,11 @@ class LazyVideo(Video):
             video_id (str): the video id
             video_loader (VideoLoader): the video loader
         """
-        self._video_id = video_id
-        self._video_loader = video_loader
+        self._id = video_id
+        self._loader = video_loader
 
     def get_id(self) -> str:
-        return self._video_id
+        return self._id
 
     def get_data(self) -> bytes:
-        return self._video_loader.load_video(self._video_id)
+        return self._loader.load_video(self._id)
