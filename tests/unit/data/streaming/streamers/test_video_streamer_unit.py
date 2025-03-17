@@ -4,7 +4,7 @@ import pytest
 
 from src.data.dataclasses.frame import Frame
 from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
-from tests.utils.testables.testable_video_streamer import TestableVideoStreamer
+from tests.utils.dummies.dummy_video_streamer import DummyVideoStreamer
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def mock_callback():
 def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, mock_callback):
     """Tests that the VideoStreamer produces and feeds the correct number of frames."""
     # arrange
-    streamer = TestableVideoStreamer(n_frames, mock_callback)
+    streamer = DummyVideoStreamer(n_frames, mock_callback)
 
     # act
     streamer.start_streaming()
@@ -38,7 +38,7 @@ def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, m
 def test_video_streamer_resizes_all_frames(mock_callback, dummy_resize_strategy):
     """Tests that the VideoStreamer resizes all frames while streaming."""
     # arrange
-    streamer = TestableVideoStreamer(5, mock_callback, dummy_resize_strategy)
+    streamer = DummyVideoStreamer(5, mock_callback, dummy_resize_strategy)
 
     # act
     streamer.start_streaming()

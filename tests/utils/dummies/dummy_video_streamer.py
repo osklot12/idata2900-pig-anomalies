@@ -8,13 +8,13 @@ from src.data.preprocessing.frame_resize_strategy import FrameResizeStrategy
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 
 
-class TestableVideoStreamer(VideoStreamer):
+class DummyVideoStreamer(VideoStreamer):
     """A testable implementation of the abstract class VideoStreamer."""
 
     def __init__(self, n_frames: int, callback: Callable[[Frame], FeedStatus],
                  resize_strategy: FrameResizeStrategy = None):
         """
-        Initializes a TestableVideoStreamer instance.
+        Initializes a DummyVideoStreamer instance.
 
         Args:
             n_frames (int): the number of frames in the stream
