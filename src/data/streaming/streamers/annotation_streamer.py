@@ -22,12 +22,17 @@ class AnnotationStreamer(Streamer):
         self._callback = callback
 
     def _stream(self) -> StreamerStatus:
+        result = StreamerStatus.COMPLETED
+
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
             self._callback(annotation)
             annotation = self._get_next_annotation()
 
-        return StreamerStatus.STOPPED if annotation and self._is_requested_to_stop() else StreamerStatus.COMPLETED
+        if annotation and self._is_requested_to_stop():
+            result = StreamerStatus.STOPPED
+
+        return result
 
     @abstractmethod
     def _get_next_annotation(self) -> Optional[Annotation]:

@@ -34,7 +34,7 @@ def test_annotation_streamer_produces_and_feeds_expected_number_of_annotations(n
 
 
 def test_annotation_streamer_should_indicate_stopping_when_stopped_early(mock_callback):
-    """Tests that the AnnotationStreamer should indicate that it was stopped when stopped early."""
+    """Tests that the AnnotationStreamer indicates that it was stopped when stopped early."""
     # arrange
     streamer = DummyAnnotationStreamer(100, mock_callback)
     streamer.start_streaming()

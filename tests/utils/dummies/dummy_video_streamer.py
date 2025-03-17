@@ -1,6 +1,7 @@
 from typing import Optional, Callable
 
 import numpy as np
+import time
 
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
@@ -30,6 +31,7 @@ class DummyVideoStreamer(VideoStreamer):
         frame = None
 
         if self.frame_index < self.n_frames:
+            time.sleep(.005)
             frame_data = np.random.randint(0, 256, (1920, 1080, 3), dtype=np.uint8)
             frame = Frame(self.source, self.frame_index, frame_data, False)
             self.frame_index += 1
