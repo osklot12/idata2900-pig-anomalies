@@ -24,7 +24,7 @@ def test_load_annotation_success(mock_make_request, gcs_annotation_loader):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_annotation_loader.load_annotation(annotation_id)
+    result = gcs_annotation_loader.load_video_annotations(annotation_id)
 
     # assert
     mock_make_request.assert_called_once_with(gcs_annotation_loader._get_file_url(annotation_id))
@@ -42,6 +42,6 @@ def test_load_annotation_not_found(mock_make_request, gcs_annotation_loader):
 
     # act & assert
     with pytest.raises(HTTPError, match=error_msg):
-        gcs_annotation_loader.load_annotation(annotation_id)
+        gcs_annotation_loader.load_video_annotations(annotation_id)
 
     mock_make_request.assert_called_once_with(gcs_annotation_loader._get_file_url(annotation_id))

@@ -1,7 +1,7 @@
 from typing import Optional, Callable
 
 from src.data.dataclasses.frame_annotation import FrameAnnotation
-from src.data.dataset.entities.lazy_annotation_json import LazyAnnotationJson
+from src.data.dataset.entities.lazy_annotation import LazyAnnotationJson
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 

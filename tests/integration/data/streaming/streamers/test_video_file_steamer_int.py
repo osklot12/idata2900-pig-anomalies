@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.data.dataclasses.frame import Frame
-from src.data.dataset.entities.LazyVideo import LazyVideo
+from src.data.dataset.entities.lazy_video_file import LazyVideoFile
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 from src.utils.path_finder import PathFinder
 from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
@@ -24,7 +24,7 @@ def mock_callback():
 def dummy_video():
     """Fixture to provide a test video object."""
     video_path = PathFinder.get_abs_path("tests/data/sample-5s.mp4")
-    return LazyVideo(str(video_path), DummyVideoLoader())
+    return LazyVideoFile(str(video_path), DummyVideoLoader())
 
 @pytest.mark.integration
 def test_video_file_streamer_streams_all_frames(dummy_video, mock_callback, dummy_resize_strategy):

@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import List
 
-class AnnotationJson(ABC):
-    """An interface for annotations."""
+from src.data.dataclasses.frame_annotation import FrameAnnotation
+
+
+class VideoAnnotations(ABC):
+    """An interface for video annotations."""
 
     @abstractmethod
     def get_id(self) -> str:
@@ -14,11 +18,11 @@ class AnnotationJson(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data(self) -> dict:
+    def get_data(self) -> List[FrameAnnotation]:
         """
         Returns the annotation data.
 
         Returns:
-            dict: the annotation data
+            List[FrameAnnotation]: list of annotations for video frames
         """
         raise NotImplementedError

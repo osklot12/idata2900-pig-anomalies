@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-class Video(ABC):
-    """An interface for videos."""
+class VideoFile(ABC):
+    """An interface for video files."""
 
     @abstractmethod
     def get_id(self) -> str:
