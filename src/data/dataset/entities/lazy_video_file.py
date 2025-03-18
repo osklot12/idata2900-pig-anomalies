@@ -1,5 +1,5 @@
 from src.data.dataset.entities.video_file import VideoFile
-from src.data.loading.loaders.video_loader import VideoFileLoader
+from src.data.loading.loaders.video_file_loader import VideoFileLoader
 
 
 class LazyVideoFile(VideoFile):

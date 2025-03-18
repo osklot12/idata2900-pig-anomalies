@@ -1,0 +1,21 @@
+from abc import ABC, abstractmethod
+from typing import List
+
+from src.data.dataclasses.frame_annotation import FrameAnnotation
+
+
+class VideoAnnotationsDataLoader(ABC):
+    """An interface for video annotations data loaders."""
+
+    @abstractmethod
+    def load_video_annotations_data(self, annotations_id: str) -> List[FrameAnnotation]:
+        """
+        Loads video annotations data.
+
+        Args:
+            annotations_id (str): the ID of annotations to load
+
+        Returns:
+            List[FrameAnnotation]: the loaded video annotations
+        """
+        raise NotImplementedError

@@ -2,10 +2,10 @@ from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
 from src.data.loading.factories.loader_factory import LoaderFactory
-from src.data.loading.loaders.annotation_loader import VideoAnnotationsLoader
+from src.data.loading.loaders.video_annotation_loader import VideoAnnotationsLoader
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
-from src.data.loading.loaders.video_loader import VideoFileLoader
+from src.data.loading.loaders.video_file_loader import VideoFileLoader
 
 
 class GCSLoaderFactory(LoaderFactory):

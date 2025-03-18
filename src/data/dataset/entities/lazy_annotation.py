@@ -1,5 +1,5 @@
 from src.data.dataset.entities.video_annotations import VideoAnnotations
-from src.data.loading.loaders.annotation_loader import VideoAnnotationsLoader
+from src.data.loading.loaders.video_annotation_loader import VideoAnnotationsLoader
 
 
 class LazyAnnotationJson(VideoAnnotations):
