@@ -1,18 +1,18 @@
 from typing import Optional
 
-from src.data.dataclasses.dataset_file_pair import DatasetFilePair
-from src.data.dataset.providers.dataset_file_pair_provider import DatasetFilePairProvider
+from src.data.dataclasses.dataset_file_pair import DatasetInstance
+from src.data.dataset.providers.dataset_file_pair_provider import DatasetInstanceProvider
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_strategy import MatchingStrategy
 from src.data.dataset.selection.file_selection_strategy import FileSelectionStrategy
 
 
-class SimpleFilePairProvider(DatasetFilePairProvider):
-    """Returns randomly picked dataset file pair instances."""
+class SimpleDatasetInstanceProvider(DatasetInstanceProvider):
+    """Returns randomly picked dataset instances."""
 
     def __init__(self, source: DatasetSource, video_selector: FileSelectionStrategy, annotation_matcher: MatchingStrategy):
         """
-        Initializes a RandomFilePairProvider instance.
+        Initializes a SimpleDatasetInstanceProvider instance.
 
         Args:
             source (DatasetSource): a dataset source
@@ -23,7 +23,7 @@ class SimpleFilePairProvider(DatasetFilePairProvider):
         self._video_selector = video_selector
         self._matcher = annotation_matcher
 
-    def get_file_pair(self) -> Optional[DatasetFilePair]:
+    def get_dataset_instance(self) -> Optional[DatasetInstance]:
         result = None
 
         files = self._source.list_files()
@@ -37,7 +37,7 @@ class SimpleFilePairProvider(DatasetFilePairProvider):
                     annotation_file = self._matcher.find_match(video_file, files)
 
                     if annotation_file:
-                        result = DatasetFilePair(video_file, annotation_file)
+                        result = DatasetInstance(video_file, annotation_file)
                         searching = False
                     else:
                         files.remove(video_file)

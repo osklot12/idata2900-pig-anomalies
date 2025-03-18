@@ -1,7 +1,7 @@
 import pytest
 
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
-from src.data.dataset.providers.simple_file_pair_provider import SimpleFilePairProvider
+from src.data.dataset.providers.simple_file_pair_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selection.random_file_selection_strategy import RandomFileSelectionStrategy
 from tests.utils.dummies.dummy_dataset_source import DummyDatasetSource
 
@@ -48,10 +48,10 @@ def test_get_random_returns_file_pair(dataset_source, video_selector, annotation
     ]
     dataset_source.set_file_paths(files)
 
-    file_pair_provider = SimpleFilePairProvider(dataset_source, video_selector, annotation_matcher)
+    file_pair_provider = SimpleDatasetInstanceProvider(dataset_source, video_selector, annotation_matcher)
 
     # act
-    result = file_pair_provider.get_file_pair()
+    result = file_pair_provider.get_dataset_instance()
 
     # assert
     assert result is not None
@@ -68,12 +68,12 @@ def test_get_random_called_consecutively_gives_file_pairs(dataset_source, video_
     ]
     dataset_source.set_file_paths(files)
 
-    file_pair_provider = SimpleFilePairProvider(dataset_source, video_selector, annotation_matcher)
+    file_pair_provider = SimpleDatasetInstanceProvider(dataset_source, video_selector, annotation_matcher)
     result = []
 
     # act
     for _ in range(10):
-        result.append(file_pair_provider.get_file_pair())
+        result.append(file_pair_provider.get_dataset_instance())
 
     # assert
     print(f"{result}")
@@ -90,10 +90,10 @@ def test_get_random_returns_none_on_no_match(dataset_source, video_selector, ann
     ]
     dataset_source.set_file_paths(files)
 
-    file_pair_provider = SimpleFilePairProvider(dataset_source, video_selector, annotation_matcher)
+    file_pair_provider = SimpleDatasetInstanceProvider(dataset_source, video_selector, annotation_matcher)
 
     # act
-    result = file_pair_provider.get_file_pair()
+    result = file_pair_provider.get_dataset_instance()
 
     # assert
     assert result is None

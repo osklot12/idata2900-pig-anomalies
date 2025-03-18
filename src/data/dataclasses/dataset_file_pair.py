@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class DatasetFilePair:
-    """Holds a video-annotation file path pair for a dataset in an immutable structure."""
+class DatasetInstance:
+    """Represents a single labeled video data instance in a dataset."""
     video_file: str
     annotation_file: str
