@@ -3,15 +3,15 @@ import random
 from typing import List, Optional, Dict
 
 from src.data.dataclasses.dataset_file import DatasetFile
-from src.data.dataclasses.dataset_file_pair import DatasetFilePair
+from src.data.dataclasses.dataset_file_pair import DatasetInstance
 from src.data.dataset.data_type import DataType
-from src.data.dataset.providers.dataset_file_pair_provider import DatasetFilePairProvider
+from src.data.dataset.providers.dataset_file_pair_provider import DatasetInstanceProvider
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_error_strategy import MatchingErrorStrategy
 from src.data.dataset.matching.silent_removal_strategy import SilentRemovalStrategy
 
 
-class DatasetFileMatcher(DatasetFilePairProvider):
+class DatasetFileMatcher(DatasetInstanceProvider):
     """A simple dataset entry provider, matching files by basename."""
 
     def __init__(self, source: DatasetSource, video_suffixes: List[str], annotation_suffixes: List[str]):
@@ -27,7 +27,7 @@ class DatasetFileMatcher(DatasetFilePairProvider):
             raise ValueError("Source cannot be None")
 
         self._unmatched_files = source.list_files()
-        self._matched_pairs: List[DatasetFilePair] = []
+        self._matched_pairs: List[DatasetInstance] = []
 
         self._suffixes: Dict[DataType, List[str]] = {
             DataType.VIDEO: video_suffixes,
@@ -36,7 +36,7 @@ class DatasetFileMatcher(DatasetFilePairProvider):
 
         self._match_error_strategy = SilentRemovalStrategy(self.remove_unmatched_file)
 
-    def get_file_pair(self) -> Optional[DatasetFilePair]:
+    def get_dataset_instance(self) -> Optional[DatasetInstance]:
         pair = None
         if random.random() < self._get_unmatched_ratio():
             pair = self._match_pair()
@@ -55,7 +55,7 @@ class DatasetFileMatcher(DatasetFilePairProvider):
         """
         return len(self._unmatched_files) + 2 * len(self._matched_pairs)
 
-    def _match_pair(self) -> Optional[DatasetFilePair]:
+    def _match_pair(self) -> Optional[DatasetInstance]:
         """Matches a new pair from unmatched files."""
         result = None
 
@@ -70,7 +70,7 @@ class DatasetFileMatcher(DatasetFilePairProvider):
 
         return result
 
-    def _get_matched_pair(self) -> DatasetFilePair:
+    def _get_matched_pair(self) -> DatasetInstance:
         """Returns a random pair from the matched pairs."""
         if not self._matched_pairs:
             raise ValueError("No available pairs to sample from.")
@@ -116,11 +116,11 @@ class DatasetFileMatcher(DatasetFilePairProvider):
         return DatasetFile(file, data_type)
 
     @staticmethod
-    def _create_pair(file_a: str, file_b: str, first_data_type: DataType) -> DatasetFilePair:
+    def _create_pair(file_a: str, file_b: str, first_data_type: DataType) -> DatasetInstance:
         """Creates a DatasetFilePair from two file paths."""
-        return DatasetFilePair(file_a, file_b) if first_data_type == DataType.VIDEO else DatasetFilePair(file_b, file_a)
+        return DatasetInstance(file_a, file_b) if first_data_type == DataType.VIDEO else DatasetInstance(file_b, file_a)
 
-    def _handle_matched_pair(self, pair: DatasetFilePair):
+    def _handle_matched_pair(self, pair: DatasetInstance):
         """Handles the matching of a new pair, moving data between internal structures."""
         self._unmatched_files.remove(pair.video_file)
         self._unmatched_files.remove(pair.annotation_file)

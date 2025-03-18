@@ -1,4 +1,4 @@
-from src.data.dataset.providers.dataset_file_pair_provider import DatasetFilePairProvider
+from src.data.dataset.providers.dataset_file_pair_provider import DatasetInstanceProvider
 from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.streaming.factories.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.streamer import Streamer
@@ -7,7 +7,7 @@ from src.data.streaming.streamers.streamer import Streamer
 class FileStreamerFactory(StreamerFactory):
     """A simple streamer factory."""
 
-    def __init__(self, loader_factory: LoaderFactory, file_provider: DatasetFilePairProvider):
+    def __init__(self, loader_factory: LoaderFactory, file_provider: DatasetInstanceProvider):
         """
         Initializes a FileStreamerFactory instance.
 
@@ -19,5 +19,5 @@ class FileStreamerFactory(StreamerFactory):
         self._file_provider = file_provider
 
     def get_next_streamer(self) -> Streamer:
-        file_pair = self._file_provider.get_file_pair()
+        file_pair = self._file_provider.get_dataset_instance()
         frame_

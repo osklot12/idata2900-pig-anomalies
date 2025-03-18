@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.data.dataclasses.dataset_file_pair import DatasetFilePair
+from src.data.dataclasses.dataset_file_pair import DatasetInstance
 
 
-class DatasetFilePairProvider(ABC):
-    """An interface for providers DatasetFilePair."""
+class DatasetInstanceProvider(ABC):
+    """An interface for providers of DatasetInstance."""
 
     @abstractmethod
-    def get_file_pair(self) -> Optional[DatasetFilePair]:
+    def get_dataset_instance(self) -> Optional[DatasetInstance]:
         """
-        Returns a DatasetFilePair instance.
+        Returns a DatasetInstance instance.
 
         Returns:
-            Optional[DatasetFilePair]: a dataset file pair
+            Optional[DatasetInstance]: a dataset instance
         """
         raise NotImplementedError
