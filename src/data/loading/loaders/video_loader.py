@@ -1,17 +1,20 @@
 from abc import ABC, abstractmethod
 
-class VideoLoader(ABC):
-    """An interface for video loaders."""
+from src.data.dataset.entities.video_file import VideoFile
+
+
+class VideoFileLoader(ABC):
+    """An interface for video file loaders."""
 
     @abstractmethod
-    def load_video(self, video_id: str) -> bytes:
+    def load_video_file(self, video_id: str) -> VideoFile:
         """
         Loads a video file.
 
         Args:
-            video_id (str): the video identifier
+            video_id (str): the video file identifier
 
         Returns:
-            bytes: the video file in bytes
+            VideoFile: the video file
         """
         raise NotImplementedError

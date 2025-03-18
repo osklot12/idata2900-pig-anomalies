@@ -21,7 +21,7 @@ def test_load_annotation_success(gcs_annotation_loader):
     annotation_id = TestBucket.SAMPLE_ANNOTATION
 
     # act
-    annotation = gcs_annotation_loader.load_annotation(annotation_id)
+    annotation = gcs_annotation_loader.load_video_annotations(annotation_id)
 
     # assert
     assert isinstance(annotation, dict)
@@ -35,4 +35,4 @@ def test_load_annotation_not_found(gcs_annotation_loader):
 
     # act & assert
     with pytest.raises(Exception, match="404 Client Error"):
-        gcs_annotation_loader.load_annotation(annotation_id)
+        gcs_annotation_loader.load_video_annotations(annotation_id)

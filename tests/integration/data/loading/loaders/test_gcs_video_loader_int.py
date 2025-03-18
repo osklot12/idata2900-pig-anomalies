@@ -21,7 +21,7 @@ def test_load_video_success(gcs_video_loader):
     video_id = TestBucket.SAMPLE_VIDEO
 
     # act
-    video_content = gcs_video_loader.load_video(video_id)
+    video_content = gcs_video_loader.load_video_file(video_id)
 
     # assert
     assert isinstance(video_content, bytearray)
@@ -35,4 +35,4 @@ def test_load_video_not_found(gcs_video_loader):
 
     # act & assert
     with pytest.raises(Exception, match="404 Client Error"):
-        gcs_video_loader.load_video(video_id)
+        gcs_video_loader.load_video_file(video_id)

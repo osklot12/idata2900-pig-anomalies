@@ -2,10 +2,10 @@ from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
 from src.data.loading.factories.loader_factory import LoaderFactory
-from src.data.loading.loaders.annotation_loader import AnnotationLoader
+from src.data.loading.loaders.annotation_loader import VideoAnnotationsLoader
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
-from src.data.loading.loaders.video_loader import VideoLoader
+from src.data.loading.loaders.video_loader import VideoFileLoader
 
 
 class GCSLoaderFactory(LoaderFactory):
@@ -22,10 +22,10 @@ class GCSLoaderFactory(LoaderFactory):
         self._bucket_name = bucket_name
         self._auth_factory = auth_factory
 
-    def create_video_loader(self) -> VideoLoader:
+    def create_video_loader(self) -> VideoFileLoader:
         return GCSVideoLoader(self._bucket_name, self._auth_factory.create_auth_service())
 
-    def create_annotation_loader(self) -> AnnotationLoader:
+    def create_annotation_loader(self) -> VideoAnnotationsLoader:
         return GCSAnnotationLoader(self._bucket_name, self._auth_factory.create_auth_service())
 
     def create_dataset_source(self) -> DatasetSource:

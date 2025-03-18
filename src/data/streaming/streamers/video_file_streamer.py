@@ -3,7 +3,7 @@ from typing import Optional, Callable
 from cppbindings import FrameStream
 
 from src.data.dataclasses.frame import Frame
-from src.data.dataset.entities.video import Video
+from src.data.dataset.entities.video_file import VideoFile
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.frame_resize_strategy import FrameResizeStrategy
 from src.data.streaming.streamers.video_streamer import VideoStreamer
@@ -12,13 +12,13 @@ from src.data.streaming.streamers.video_streamer import VideoStreamer
 class VideoFileStreamer(VideoStreamer):
     """A streamer for streaming video file data."""
 
-    def __init__(self, video: Video, callback: Callable[[Frame], FeedStatus],
-               resize_strategy: FrameResizeStrategy = None):
+    def __init__(self, video: VideoFile, callback: Callable[[Frame], FeedStatus],
+                 resize_strategy: FrameResizeStrategy = None):
         """
         Initializes a VideoFileStreamer instance.
 
         Args:
-            video (Video): the video to stream
+            video (VideoFile): the video to stream
             callback (Callable[[Frame], FeedStatus]): the callback function to feed data
             resize_strategy (Optional[FrameResizeStrategy]): the frame resize strategy to use
         """

@@ -24,7 +24,7 @@ def test_load_video_success(mock_make_request, gcs_video_loader):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_video_loader.load_video(video_id)
+    result = gcs_video_loader.load_video_file(video_id)
 
     # assert
     mock_make_request.assert_called_once_with(gcs_video_loader._get_file_url(video_id))
@@ -42,6 +42,6 @@ def test_load_video_not_found(mock_make_request, gcs_video_loader):
 
     # act & assert
     with pytest.raises(HTTPError, match=error_msg):
-        gcs_video_loader.load_video(video_id)
+        gcs_video_loader.load_video_file(video_id)
 
     mock_make_request.assert_called_once_with(gcs_video_loader._get_file_url(video_id))

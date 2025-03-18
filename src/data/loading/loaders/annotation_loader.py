@@ -1,17 +1,20 @@
 from abc import ABC, abstractmethod
 
-class AnnotationLoader(ABC):
-    """An interface for annotation loaders."""
+from src.data.dataset.entities.video_annotations import VideoAnnotations
+
+
+class VideoAnnotationsLoader(ABC):
+    """An interface for video annotations loaders."""
 
     @abstractmethod
-    def load_annotation(self, annotation_id: str) -> dict:
+    def load_video_annotations(self, annotation_id: str) -> VideoAnnotations:
         """
-        Loads an annotation file.
+        Loads video annotations.
 
         Args:
-            annotation_id (str): the annotation identifier
+            annotation_id (str): the video annotations identifier
 
         Returns:
-            dict: the annotation file as a dictionary
+            VideoAnnotations: the video annotations
         """
         raise NotImplementedError

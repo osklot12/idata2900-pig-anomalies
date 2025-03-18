@@ -5,7 +5,7 @@ from src.typevars.enum_type import T_Enum
 
 
 @dataclass(frozen=True)
-class Annotation:
+class BBoxAnnotation:
     """Represents an object detected within a frame."""
     cls: T_Enum
     bbox: BoundingBox
