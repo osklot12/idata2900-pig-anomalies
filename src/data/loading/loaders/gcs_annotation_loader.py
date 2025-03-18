@@ -1,12 +1,14 @@
-from src.data.dataset.entities.video_annotations import VideoAnnotations
-from src.data.loading.loaders.annotation_loader import VideoAnnotationsLoader
+from typing import List
+
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.gcs_bucket_client import GCSBucketClient
+from src.data.loading.loaders.video_annotations_data_loader import VideoAnnotationsDataLoader
 
 
-class GCSAnnotationLoader(GCSBucketClient, VideoAnnotationsLoader):
+class GCSAnnotationLoader(GCSBucketClient, VideoAnnotationsDataLoader):
     """Handles downloading and parsing annotation files from Google Cloud Storage."""
 
-    def load_video_annotations(self, annotation_id: str) -> VideoAnnotations:
+    def load_video_annotations_data(self, annotations_id: str) -> List[FrameAnnotation]:
         return self._make_request(
-            self._get_file_url(annotation_id)
+            self._get_file_url(annotations_id)
         ).json()

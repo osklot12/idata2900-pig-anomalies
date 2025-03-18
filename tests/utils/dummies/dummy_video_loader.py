@@ -1,4 +1,4 @@
-from src.data.loading.loaders.video_loader import VideoFileLoader
+from src.data.loading.loaders.video_file_loader import VideoFileLoader
 
 
 class DummyVideoLoader(VideoFileLoader):
