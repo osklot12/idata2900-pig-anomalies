@@ -4,7 +4,7 @@ import pytest
 
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
-from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
@@ -25,7 +25,7 @@ def mock_callback():
 def test_callback_called_correctly(dummy_data_loader, mock_callback):
     """Tests that the callback function is called correctly."""
     # arrange
-    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
+    normalizer = SimpleBBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationStreamer(
         data_loader=dummy_data_loader,
         annotation_blob_name="test_annotations.json",
@@ -55,7 +55,7 @@ def test_callback_called_correctly(dummy_data_loader, mock_callback):
 def test_annotations_correctly_parsed(dummy_data_loader, mock_callback):
     """Tests that annotations are correctly extracted and passed to the callback."""
     # arrange
-    normalizer = BBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
+    normalizer = SimpleBBoxNormalizer((1920, 1080), (0, 1), NorsvinAnnotationParser)
     annotation_loader = AnnotationStreamer(
         data_loader=dummy_data_loader,
         annotation_blob_name="test_annotations.json",

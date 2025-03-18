@@ -1,13 +1,11 @@
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, TypeVar
 
+from src.data.dataclasses.bounding_box import BoundingBox
 from src.typevars.enum_type import T_Enum
 
 
 @dataclass(frozen=True)
 class Annotation:
-    """Holds annotation-related information in an immutable structure."""
-    source: str
-    index: int
-    annotations: Optional[List[Tuple[T_Enum, float, float, float, float]]]
-    end_of_stream: bool
+    """Represents an object detected within a frame."""
+    cls: T_Enum
+    bbox: BoundingBox

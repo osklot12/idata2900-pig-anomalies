@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Annotation(ABC):
+class AnnotationJson(ABC):
     """An interface for annotations."""
 
     @abstractmethod

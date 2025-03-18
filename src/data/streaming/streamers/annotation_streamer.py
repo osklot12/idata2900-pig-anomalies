@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from typing import Callable, Optional
 
-from src.data.dataclasses.annotation import Annotation
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
@@ -11,7 +11,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class AnnotationStreamer(Streamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, callback: Callable[[Annotation], FeedStatus]):
+    def __init__(self, callback: Callable[[FrameAnnotation], FeedStatus]):
         """
         Initializes a AnnotationStreamer instance.
 
@@ -35,11 +35,11 @@ class AnnotationStreamer(Streamer):
         return result
 
     @abstractmethod
-    def _get_next_annotation(self) -> Optional[Annotation]:
+    def _get_next_annotation(self) -> Optional[FrameAnnotation]:
         """
         Returns the next annotation for the stream.
 
         Returns:
-            Optional[Annotation]: the next annotation, or None if end of stream
+            Optional[FrameAnnotation]: the next annotation, or None if end of stream
         """
         raise NotImplementedError

@@ -3,7 +3,7 @@ from typing import Tuple, List, Any, Type
 from src.data.annotation_enum_parser import AnnotationEnumParser
 
 
-class BBoxNormalizer:
+class SimpleBBoxNormalizer:
     """Normalizes bounding box annotations based on image dimensions and target range."""
 
     def __init__(self, image_dimensions: Tuple[float, float], new_range: Tuple[float, float],

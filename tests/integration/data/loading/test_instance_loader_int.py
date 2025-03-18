@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.loading.feed_status import FeedStatus
@@ -36,8 +36,8 @@ def integration_setup(dummy_data_loader, mock_callback):
         frame_shape=(1080, 1920)
     )
 
-    normalizer = BBoxNormalizer(image_dimensions=(1920, 1080), new_range=(0, 1),
-                                annotation_parser=NorsvinAnnotationParser)
+    normalizer = SimpleBBoxNormalizer(image_dimensions=(1920, 1080), new_range=(0, 1),
+                                      annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationStreamer(
         data_loader=dummy_data_loader,
         annotation_blob_name="test_annotations.json",

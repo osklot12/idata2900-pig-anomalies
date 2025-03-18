@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.data.dataclasses.annotation import Annotation
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
 
@@ -21,12 +21,12 @@ class InstanceAggregator(ABC):
         """
         raise NotImplementedError
 
-    def feed_annotation(self, annotation: Annotation) -> FeedStatus:
+    def feed_annotation(self, annotation: FrameAnnotation) -> FeedStatus:
         """
         Feeds an annotation to the aggregator.
 
         Args:
-            annotation (Annotation): The annotation the feed.
+            annotation (FrameAnnotation): The annotation the feed.
 
         Returns:
             a FeedStatus indicating how the annotation was received.

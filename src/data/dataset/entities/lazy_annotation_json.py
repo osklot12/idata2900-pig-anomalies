@@ -1,8 +1,8 @@
-from src.data.dataset.entities.annotation import Annotation
+from src.data.dataset.entities.annotation_json import AnnotationJson
 from src.data.loading.loaders.annotation_loader import AnnotationLoader
 
 
-class LazyAnnotation(Annotation):
+class LazyAnnotationJson(AnnotationJson):
     """An annotation that lazy loads the annotation data."""
 
     def __init__(self, annotation_id: str, annotation_loader: AnnotationLoader):

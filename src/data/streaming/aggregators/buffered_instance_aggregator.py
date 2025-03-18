@@ -4,7 +4,7 @@ from threading import Lock
 
 from src.data.streaming.aggregators.instance_aggregator import InstanceAggregator
 from src.data.data_structures.hash_buffer import HashBuffer
-from src.data.dataclasses.annotation import Annotation
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.instance import Instance
 from src.data.loading.feed_status import FeedStatus
@@ -56,7 +56,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
 
         return result
 
-    def feed_annotation(self, annotation: Annotation) -> FeedStatus:
+    def feed_annotation(self, annotation: FrameAnnotation) -> FeedStatus:
         with self.lock:
             result = FeedStatus.DROP
             index = annotation.index
@@ -106,13 +106,13 @@ class BufferedInstanceAggregator(InstanceAggregator):
         return result
 
 
-    def _match_annotation(self, annotation: Annotation) -> bool:
+    def _match_annotation(self, annotation: FrameAnnotation) -> bool:
         """
         Tries to match an annotation with an existing frame.
         If successful, the paired instance will be fed forward.
 
         Args:
-            annotation (Annotation): The annotation to match.
+            annotation (FrameAnnotation): The annotation to match.
 
         Returns:
             True if successful, False otherwise.
