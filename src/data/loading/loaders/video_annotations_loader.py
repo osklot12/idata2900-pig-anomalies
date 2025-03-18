@@ -4,11 +4,11 @@ from typing import List
 from src.data.dataclasses.frame_annotation import FrameAnnotation
 
 
-class VideoAnnotationsDataLoader(ABC):
-    """An interface for video annotations data loaders."""
+class VideoAnnotationsLoader(ABC):
+    """An interface for video annotations loaders."""
 
     @abstractmethod
-    def load_video_annotations_data(self, annotations_id: str) -> List[FrameAnnotation]:
+    def load_video_annotations(self, annotations_id: str) -> List[FrameAnnotation]:
         """
         Loads video annotations data.
 
