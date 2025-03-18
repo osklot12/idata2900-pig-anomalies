@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
@@ -61,8 +61,8 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
         resize_shape=(640, 640)
     )
 
-    normalizer = BBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
-                                annotation_parser=NorsvinAnnotationParser)
+    normalizer = SimpleBBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
+                                      annotation_parser=NorsvinAnnotationParser)
     annotation_loader = AnnotationStreamer(
         data_loader=annotation_data_loader,
         annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.data.annotation_enum_parser import AnnotationEnumParser
-from src.data.bbox_normalizer import BBoxNormalizer
+from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def test_normalize_annotations(mock_annotation_parser, annotations, expected_nor
     # arrange
     image_dimensions = (1920, 1080)
     new_range = (0, 1)
-    normalizer = BBoxNormalizer(image_dimensions, new_range, mock_annotation_parser)
+    normalizer = SimpleBBoxNormalizer(image_dimensions, new_range, mock_annotation_parser)
 
     # act
     normalized_annotations = normalizer.normalize_annotations(annotations)
@@ -50,7 +50,7 @@ def test_normalize_annotations_swap_range(mock_annotation_parser, annotations, e
     # arrange
     image_dimensions = (1920, 1080)
     new_range = (1, 0)
-    normalizer = BBoxNormalizer(image_dimensions, new_range, mock_annotation_parser)
+    normalizer = SimpleBBoxNormalizer(image_dimensions, new_range, mock_annotation_parser)
 
     # act
     normalized_annotations = normalizer.normalize_annotations(annotations)
@@ -64,7 +64,7 @@ def test_normalize_annotations_without_parser(annotations):
     # arrange
     image_dimensions = (1920, 1080)
     new_range = (0, 1)
-    normalizer = BBoxNormalizer(image_dimensions, new_range, None)
+    normalizer = SimpleBBoxNormalizer(image_dimensions, new_range, None)
 
     # act & assert
     with pytest.raises(ValueError, match="An annotation parser must be provided to map string labels to enums."):

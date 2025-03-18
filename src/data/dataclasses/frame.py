@@ -5,7 +5,7 @@ import numpy as np
 
 @dataclass(frozen=True)
 class Frame:
-    """Holds frame-related information in an immutable structure."""
+    """Represents a single video frame containing raw pixel data."""
     source: str
     index: int
     data: np.ndarray
