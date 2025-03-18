@@ -1,9 +1,12 @@
+from typing import List
+
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.dataset.entities.video_annotations import VideoAnnotations
-from src.data.loading.loaders.video_annotation_loader import VideoAnnotationsLoader
+from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
 
 
-class LazyAnnotationJson(VideoAnnotations):
-    """An annotation that lazy loads the annotation data."""
+class LazyVideoAnnotations(VideoAnnotations):
+    """Video annotations that lazy loads the annotation data."""
 
     def __init__(self, annotation_id: str, annotation_loader: VideoAnnotationsLoader):
         """
@@ -19,5 +22,5 @@ class LazyAnnotationJson(VideoAnnotations):
     def get_id(self) -> str:
         return self._id
 
-    def get_data(self) -> dict:
+    def get_data(self) -> List[FrameAnnotation]:
         return self._loader.load_video_annotations(self._id)
