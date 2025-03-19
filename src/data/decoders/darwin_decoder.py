@@ -1,4 +1,6 @@
-from typing import Dict, Tuple, List, Any
+from typing import Dict, Tuple, List
+
+import json
 
 from src.data.label_parser import LabelParser
 from src.data.dataclasses.bbox_annotation import BBoxAnnotation
@@ -11,20 +13,24 @@ from src.typevars.enum_type import T_Enum
 class DarwinDecoder(AnnotationDecoder):
     """Decodes annotations stored in Darwin JSON format."""
 
-    def __init__(self, json_data: Dict[str, Any], label_parser: LabelParser):
+    def __init__(self, label_parser: LabelParser):
         """
         Initializes a DarwinDecoder instance.
 
         Args:
-            json_data (Dict[str, Any]): the Darwin JSON format
             label_parser (LabelParser): parses class labels
         """
-        self._json_data = json_data
         self._label_parser = label_parser
 
-    def decode_annotations(self) -> List[FrameAnnotation]:
-        annotations = self._combine_annotations_by_frame(self._extract_annotations())
-        return self._create_frame_annotation_list(annotations, self._extract_source())
+    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotation]:
+        json_data = DarwinDecoder._get_json(raw_data)
+        annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
+        return self._create_frame_annotation_list(annotations, self._extract_source(json_data))
+
+    @staticmethod
+    def _get_json(raw_bytes: bytes):
+        """Decodes raw bytes to a JSON format."""
+        return json.loads(raw_bytes.decode("utf-8"))
 
     def _combine_annotations_by_frame(self, annotations: List[Dict]) -> Dict[int, List[BBoxAnnotation]]:
         """Groups annotations by their respective frame index."""
@@ -52,47 +58,69 @@ class DarwinDecoder(AnnotationDecoder):
 
         return frame_data_map
 
-    def _create_bbox_annotation(self, label: T_Enum, frame_data: Dict) -> BBoxAnnotation:
+    @staticmethod
+    def _create_bbox_annotation(label: T_Enum, frame_data: Dict) -> BBoxAnnotation:
         """Creates a bounding box annotation for a given frame."""
         return BBoxAnnotation(
             cls=label,
-            bbox=self._create_bounding_box(frame_data)
+            bbox=DarwinDecoder._create_bounding_box(frame_data)
         )
 
     def _parse_label(self, label: str) -> T_Enum:
         """Extracts and parses the class label from an annotation."""
         return self._label_parser.enum_from_str(label)
 
-    def get_frame_count(self) -> int:
-        """Retrieves the total number of frames in the dataset."""
+    @staticmethod
+    def get_frame_count(raw_bytes: bytes) -> int:
+        """
+        Returns the total number of frames for the annotations file.
+
+        Args:
+            raw_bytes (bytes): the Darwin JSON data in raw bytes
+
+        Returns:
+            int: the total number of frames
+        """
         result = -1
 
-        slots = self._extract_metadata_slots()
+        slots = DarwinDecoder._extract_metadata_slots(DarwinDecoder._get_json(raw_bytes))
         if slots and "frame_count" in slots[0]:
             result = slots[0]["frame_count"]
 
         return result
 
-    def get_frame_dimensions(self) -> Tuple[int, int]:
-        """Retrieves the frame width and height."""
+    @staticmethod
+    def get_frame_dimensions(raw_bytes: bytes) -> Tuple[int, int]:
+        """
+        Returns the frame dimensions (height, width) for the annotated frames.
+
+        Args:
+            raw_bytes (bytes): the Darwin JSON data in raw bytes
+
+        Returns:
+            Tuple[int, int]: the frame dimensions (height, width)
+        """
         result = (0, 0)
 
-        slots = self._extract_metadata_slots()
+        slots = DarwinDecoder._extract_metadata_slots(DarwinDecoder._get_json(raw_bytes))
         if slots and "width" in slots[0] and "height" in slots[0]:
             result = slots[0]["width"], slots[0]["height"]
         return result
 
-    def _extract_source(self) -> str:
+    @staticmethod
+    def _extract_source(json_data) -> str:
         """Extracts the source from the Darwin JSON format."""
-        return self._json_data.get("item", {}).get("name", "unknown_source")
+        return json_data.get("item", {}).get("name", "unknown_source")
 
-    def _extract_metadata_slots(self) -> List[Dict]:
+    @staticmethod
+    def _extract_metadata_slots(json_data) -> List[Dict]:
         """Extracts the slots for the Darwin JSON structure."""
-        return self._json_data.get("item", {}).get("slots", [])
+        return json_data.get("item", {}).get("slots", [])
 
-    def _extract_annotations(self) -> List[Dict]:
+    @staticmethod
+    def _extract_annotations(json_data) -> List[Dict]:
         """Extracts the annotations for the Darwin JSON structure."""
-        return self._json_data.get("annotations", [])
+        return json_data.get("annotations", [])
 
     @staticmethod
     def _extract_class_name(annotations: Dict) -> str:
