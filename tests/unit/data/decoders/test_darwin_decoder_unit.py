@@ -29,11 +29,11 @@ def expected_sample_annotations():
 
 
 @pytest.fixture
-def sample_json():
+def sample_json_bytes():
     """Fixture to provide a sample Darwin JSON annotation file."""
     test_file_path = PathFinder.get_abs_path("tests/data/annotations/test-darwin.json")
     with open(test_file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        return f.read().encode("utf-8")
 
 
 @pytest.fixture
@@ -43,15 +43,15 @@ def label_parser():
 
 
 @pytest.fixture
-def decoder(sample_json, label_parser):
+def decoder(sample_json_bytes, label_parser):
     """Fixture to initialize DarwinDecoder with test data."""
-    return DarwinDecoder(sample_json, label_parser)
+    return DarwinDecoder(label_parser)
 
 
-def test_get_annotations(decoder, expected_sample_annotations, sample_json):
+def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes):
     """Tests that get_annotations returns the expected annotations."""
     # act
-    decoded_annotations = decoder.decode_annotations()
+    decoded_annotations = decoder.decode_annotations(sample_json_bytes)
 
     # assert
     assert decoded_annotations, "Decoded annotations should not be empty"
@@ -82,20 +82,20 @@ def test_get_annotations(decoder, expected_sample_annotations, sample_json):
         )
 
 
-def test_get_frame_count(decoder):
+def test_get_frame_count(decoder, sample_json_bytes):
     """Tests that get_frame_count returns the expected frame count."""
     # act
-    frame_count = decoder.get_frame_count()
+    frame_count = decoder.get_frame_count(sample_json_bytes)
 
     # assert
     assert frame_count == 6
 
 
 
-def test_get_frame_dimensions(decoder):
+def test_get_frame_dimensions(decoder, sample_json_bytes):
     """Tests that get_frame_dimensions returns the expected frame dimensions."""
     # act
-    frame_dimensions = decoder.get_frame_dimensions()
+    frame_dimensions = decoder.get_frame_dimensions(sample_json_bytes)
 
     # assert
     assert frame_dimensions == (2688, 1520)
