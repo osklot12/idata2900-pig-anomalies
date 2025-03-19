@@ -5,17 +5,13 @@ import pytest
 from src.auth.gcp_auth_service import GCPAuthService
 from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.streaming.streamers import AnnotationStreamer
-from src.data.loading.loaders.gcs_data_loader_old import GCSDataLoaderOld
-from src.utils.norsvin.norsvin_annotation_parser import NorsvinLabelParser
-from src.utils.norsvin_bucket_parser import NorsvinBucketParser
-from tests.utils.constants.sample_bucket_files import SampleBucketFiles
+from tests.utils.gcs.test_bucket import TestBucket
 
 
 @pytest.fixture
 def gcp_data_loader():
     """Fixture to provide an actual GCPDataLoader."""
-    auth_service = GCPAuthService(credentials_path=NorsvinBucketParser.CREDENTIALS_PATH)
+    auth_service = GCPAuthService(credentials_path=TestBucket.SERVICE_ACCOUNT_FILE)
     return GCSDataLoaderOld(bucket_name=NorsvinBucketParser.BUCKET_NAME, auth_service=auth_service)
 
 @pytest.fixture
