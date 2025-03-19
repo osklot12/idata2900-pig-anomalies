@@ -7,7 +7,7 @@ from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBB
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.loading.loaders.gcs_data_loader_old import GCSDataLoaderOld
-from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
+from src.utils.norsvin.norsvin_annotation_parser import NorsvinLabelParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
 
@@ -27,7 +27,7 @@ def mock_callback():
 def test_real_gcp_annotations_processing(gcp_data_loader, mock_callback):
     """Integration test: verify real GCP annotation processing."""
     # arrange
-    normalizer = SimpleBBoxNormalizer(image_dimensions=(2688, 1502), new_range=(0, 1), annotation_parser=NorsvinAnnotationParser)
+    normalizer = SimpleBBoxNormalizer(image_dimensions=(2688, 1502), new_range=(0, 1), annotation_parser=NorsvinLabelParser)
     annotation_loader = AnnotationStreamer(
         data_loader=gcp_data_loader,
         annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),

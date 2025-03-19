@@ -12,7 +12,7 @@ from src.data.streaming.aggregators.buffered_instance_aggregator import Buffered
 from src.data.streaming.streamers import FrameStreamer
 from src.data.loading.loaders.gcs_data_loader_old import GCSDataLoaderOld
 from src.data.dataset.virtual_dataset import VirtualDataset
-from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
+from src.utils.norsvin.norsvin_annotation_parser import NorsvinLabelParser
 from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from src.utils.source_normalizer import SourceNormalizer
 from tests.utils.constants.sample_bucket_files import SampleBucketFiles
@@ -62,7 +62,7 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
     )
 
     normalizer = SimpleBBoxNormalizer(image_dimensions=(2688, 1520), new_range=(0, 1),
-                                      annotation_parser=NorsvinAnnotationParser)
+                                      annotation_parser=NorsvinLabelParser)
     annotation_loader = AnnotationStreamer(
         data_loader=annotation_data_loader,
         annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),

@@ -1,0 +1,159 @@
+{
+  "version": "2.0",
+  "schema_ref": "https://darwin-public.s3.eu-west-1.amazonaws.com/darwin_json/2.0/schema.json",
+  "item": {
+    "name": "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4",
+    "path": "/",
+    "source_info": {
+      "item_id": "018b66ba-a4bd-52a6-0624-547b5bed92d2",
+      "dataset": {
+        "name": "g2b_behaviour",
+        "slug": "g2b_behaviour",
+        "dataset_management_url": "https://darwin.v7labs.com/datasets/621601/dataset-management"
+      },
+      "team": {
+        "name": "TopigsNorsvin",
+        "slug": "topigsnorsvin"
+      },
+      "workview_url": "https://darwin.v7labs.com/workview?dataset=621601&item=018b66ba-a4bd-52a6-0624-547b5bed92d2"
+    },
+    "slots": [
+      {
+        "type": "video",
+        "slot_name": "0",
+        "width": 2688,
+        "height": 1520,
+        "fps": 2,
+        "thumbnail_url": "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/thumbnail",
+        "source_files": [
+          {
+            "file_name": "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4",
+            "url": "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/uploads/cb2fef6a-e739-4013-9e9b-7dd4b221a536",
+            "local_path": "/home/muhammad.u.hassan/muhammad.u.hassan/dataset/topigsnorsvin/g2b_behaviour/images/avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"
+          }
+        ],
+        "frame_count": 6,
+        "frame_urls": [
+
+        ]
+      }
+    ]
+  },
+  "annotations": [
+    {
+      "frames": {
+        "56": {
+          "bounding_box": {
+            "x": 110,
+            "y": 100,
+            "w": 400,
+            "h": 300
+          },
+          "keyframe": true,
+          "text": {
+            "text": "Behavior A"
+          }
+        },
+        "60": {
+          "bounding_box": {
+            "x": 115,
+            "y": 105,
+            "w": 405,
+            "h": 305
+          },
+          "keyframe": false,
+          "text": {
+            "text": "Behavior A"
+          }
+        }
+      },
+      "name": "g2b_bellynosing",
+      "id": "ann-001",
+      "interpolated": true,
+      "interpolate_algorithm": "linear-1.1",
+      "ranges": [
+        [
+          56,
+          60
+        ]
+      ]
+    },
+    {
+      "frames": {
+        "56": {
+          "bounding_box": {
+            "x": 300,
+            "y": 250,
+            "w": 500,
+            "h": 600
+          },
+          "keyframe": true,
+          "text": {
+            "text": "Behavior B"
+          }
+        },
+        "60": {
+          "bounding_box": {
+            "x": 305,
+            "y": 255,
+            "w": 505,
+            "h": 605
+          },
+          "keyframe": false,
+          "text": {
+            "text": "Behavior B"
+          }
+        }
+      },
+      "name": "g2b_tailbiting",
+      "id": "ann-002",
+      "interpolated": true,
+      "interpolate_algorithm": "linear-1.1",
+      "ranges": [
+        [
+          56,
+          60
+        ]
+      ]
+    },
+    {
+      "frames": {
+        "140": {
+          "bounding_box": {
+            "x": 112,
+            "y": 126,
+            "w": 420,
+            "h": 320
+          },
+          "keyframe": true,
+          "text": {
+            "text": "Behavior C"
+          }
+        },
+        "144": {
+          "bounding_box": {
+            "x": 120,
+            "y": 130,
+            "w": 430,
+            "h": 330
+          },
+          "keyframe": false,
+          "text": {
+            "text": "Behavior C"
+          }
+        }
+      },
+      "name": "g2b_bellynosing",
+      "id": "ann-003",
+      "interpolated": true,
+      "interpolate_algorithm": "linear-1.1",
+      "ranges": [
+        [
+          140,
+          144
+        ]
+      ]
+    }
+  ]
+}
+

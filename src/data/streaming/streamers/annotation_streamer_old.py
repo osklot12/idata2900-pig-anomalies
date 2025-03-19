@@ -1,7 +1,7 @@
 import threading
 from typing import Callable, Dict, Tuple, Optional, List, Type
 
-from src.data.decoders.bbox_decoder import BBoxDecoder
+from src.data.decoders.annotation_decoder import AnnotationDecoder
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.streaming.streamers.streamer import Streamer
@@ -14,7 +14,7 @@ class AnnotationStreamerOld(Streamer):
     Loads annotations for video streams and invokes callable, feeding the annotations forward.
     """
 
-    def __init__(self, data_loader, annotation_blob_name: str, decoder_cls: Type[BBoxDecoder], normalizer: SimpleBBoxNormalizer,
+    def __init__(self, data_loader, annotation_blob_name: str, decoder_cls: Type[AnnotationDecoder], normalizer: SimpleBBoxNormalizer,
                  callback: Callable[[str, int, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]],
                                      bool], FeedStatus]):
         self.data_loader = data_loader

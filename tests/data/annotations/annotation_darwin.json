@@ -1,1 +1,1368 @@
-{"version":"2.0","schema_ref":"https://darwin-public.s3.eu-west-1.amazonaws.com/darwin_json/2.0/schema.json","item":{"name":"avd13_cam1_20220314072829_20220314073013_fps2.0.mp4","path":"/","source_info":{"item_id":"018b66ba-a4bd-52a6-0624-547b5bed92d2","dataset":{"name":"g2b_behaviour","slug":"g2b_behaviour","dataset_management_url":"https://darwin.v7labs.com/datasets/621601/dataset-management"},"team":{"name":"TopigsNorsvin","slug":"topigsnorsvin"},"workview_url":"https://darwin.v7labs.com/workview?dataset=621601&item=018b66ba-a4bd-52a6-0624-547b5bed92d2"},"slots":[{"type":"video","slot_name":"0","width":2688,"height":1520,"fps":2,"thumbnail_url":"https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/thumbnail","source_files":[{"file_name":"avd13_cam1_20220314072829_20220314073013_fps2.0.mp4","url":"https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/uploads/cb2fef6a-e739-4013-9e9b-7dd4b221a536","local_path":"/home/muhammad.u.hassan/muhammad.u.hassan/dataset/topigsnorsvin/g2b_behaviour/images/avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"}],"frame_count":208,"frame_urls":["https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/0","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/1","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/2","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/3","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/4","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/5","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/6","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/7","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/8","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/9","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/10","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/11","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/12","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/13","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/14","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/15","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/16","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/17","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/18","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/19","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/20","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/21","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/22","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/23","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/24","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/25","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/26","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/27","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/28","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/29","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/30","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/31","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/32","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/33","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/34","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/35","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/36","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/37","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/38","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/39","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/40","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/41","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/42","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/43","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/44","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/45","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/46","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/47","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/48","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/49","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/50","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/51","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/52","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/53","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/54","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/55","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/56","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/57","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/58","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/59","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/60","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/61","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/62","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/63","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/64","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/65","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/66","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/67","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/68","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/69","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/70","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/71","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/72","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/73","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/74","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/75","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/76","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/77","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/78","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/79","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/80","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/81","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/82","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/83","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/84","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/85","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/86","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/87","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/88","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/89","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/90","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/91","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/92","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/93","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/94","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/95","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/96","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/97","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/98","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/99","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/100","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/101","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/102","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/103","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/104","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/105","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/106","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/107","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/108","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/109","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/110","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/111","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/112","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/113","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/114","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/115","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/116","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/117","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/118","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/119","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/120","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/121","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/122","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/123","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/124","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/125","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/126","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/127","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/128","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/129","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/130","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/131","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/132","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/133","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/134","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/135","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/136","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/137","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/138","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/139","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/140","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/141","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/142","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/143","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/144","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/145","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/146","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/147","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/148","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/149","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/150","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/151","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/152","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/153","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/154","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/155","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/156","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/157","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/158","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/159","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/160","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/161","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/162","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/163","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/164","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/165","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/166","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/167","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/168","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/169","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/170","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/171","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/172","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/173","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/174","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/175","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/176","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/177","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/178","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/179","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/180","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/181","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/182","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/183","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/184","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/185","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/186","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/187","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/188","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/189","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/190","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/191","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/192","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/193","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/194","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/195","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/196","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/197","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/198","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/199","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/200","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/201","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/202","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/203","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/204","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/205","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/206","https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/207"]}]},"annotations":[{"frames":{"56":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":true,"text":{"text":"6147,6148"}},"57":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"58":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"59":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"60":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"61":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"62":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"63":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"64":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"65":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"66":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"67":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"68":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"69":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"70":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"71":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"72":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"73":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"74":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"75":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"76":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"77":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"78":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"79":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"80":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"81":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"82":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"83":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"84":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"85":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"86":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"87":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"88":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"89":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"90":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"91":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"92":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"93":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"94":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"95":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"96":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"97":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"98":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"99":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"100":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"101":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"102":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"103":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"104":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"105":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"106":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"107":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"108":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"109":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":false,"text":{"text":"6147,6148"}},"110":{"bounding_box":{"h":110.6824,"w":108.3765,"x":1925.0824,"y":1178.3059},"keyframe":true,"text":{"text":"6147,6148"}}},"id":"35d2ea59-8b2b-4906-b8c6-067cc8650023","interpolate_algorithm":"linear-1.1","interpolated":true,"name":"g2b_bellynosing","properties":[],"ranges":[[56,111]],"slot_names":["0"]},{"frames":{"128":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":true,"text":{"text":"1,2"}},"129":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"130":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"131":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"132":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"133":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"134":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"135":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"136":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"137":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"138":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"139":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"140":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"141":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"142":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"143":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"144":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"145":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"146":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"147":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"148":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"149":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"150":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"151":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"152":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"153":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"154":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"155":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"156":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"157":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"158":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"159":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"160":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"161":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":false,"text":{"text":"1,2"}},"162":{"bounding_box":{"h":112.9882,"w":126.8235,"x":1920.4706,"y":1194.4471},"keyframe":true,"text":{"text":"1,2"}}},"id":"ecc1dacd-bedd-418d-beb1-3f0695b0f7e2","interpolate_algorithm":"linear-1.1","interpolated":true,"name":"g2b_bellynosing","properties":[],"ranges":[[128,163]],"slot_names":["0"]}],"properties":[]}
+{
+  "version": "2.0",
+  "schema_ref": "https://darwin-public.s3.eu-west-1.amazonaws.com/darwin_json/2.0/schema.json",
+  "item": {
+    "name": "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4",
+    "path": "/",
+    "source_info": {
+      "item_id": "018b66ba-a4bd-52a6-0624-547b5bed92d2",
+      "dataset": {
+        "name": "g2b_behaviour",
+        "slug": "g2b_behaviour",
+        "dataset_management_url": "https://darwin.v7labs.com/datasets/621601/dataset-management"
+      },
+      "team": {
+        "name": "TopigsNorsvin",
+        "slug": "topigsnorsvin"
+      },
+      "workview_url": "https://darwin.v7labs.com/workview?dataset=621601&item=018b66ba-a4bd-52a6-0624-547b5bed92d2"
+    },
+    "slots": [
+      {
+        "type": "video",
+        "slot_name": "0",
+        "width": 2688,
+        "height": 1520,
+        "fps": 2,
+        "thumbnail_url": "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/thumbnail",
+        "source_files": [
+          {
+            "file_name": "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4",
+            "url": "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/uploads/cb2fef6a-e739-4013-9e9b-7dd4b221a536",
+            "local_path": "/home/muhammad.u.hassan/muhammad.u.hassan/dataset/topigsnorsvin/g2b_behaviour/images/avd13_cam1_20220314072829_20220314073013_fps2.0.mp4"
+          }
+        ],
+        "frame_count": 208,
+        "frame_urls": [
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/0",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/1",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/2",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/3",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/4",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/5",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/6",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/7",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/8",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/9",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/10",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/11",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/12",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/13",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/14",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/15",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/16",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/17",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/18",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/19",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/20",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/21",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/22",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/23",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/24",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/25",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/26",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/27",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/28",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/29",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/30",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/31",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/32",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/33",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/34",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/35",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/36",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/37",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/38",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/39",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/40",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/41",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/42",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/43",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/44",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/45",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/46",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/47",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/48",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/49",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/50",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/51",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/52",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/53",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/54",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/55",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/56",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/57",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/58",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/59",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/60",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/61",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/62",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/63",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/64",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/65",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/66",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/67",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/68",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/69",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/70",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/71",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/72",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/73",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/74",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/75",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/76",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/77",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/78",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/79",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/80",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/81",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/82",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/83",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/84",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/85",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/86",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/87",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/88",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/89",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/90",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/91",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/92",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/93",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/94",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/95",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/96",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/97",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/98",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/99",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/100",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/101",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/102",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/103",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/104",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/105",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/106",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/107",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/108",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/109",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/110",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/111",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/112",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/113",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/114",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/115",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/116",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/117",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/118",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/119",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/120",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/121",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/122",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/123",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/124",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/125",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/126",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/127",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/128",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/129",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/130",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/131",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/132",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/133",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/134",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/135",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/136",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/137",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/138",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/139",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/140",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/141",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/142",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/143",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/144",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/145",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/146",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/147",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/148",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/149",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/150",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/151",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/152",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/153",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/154",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/155",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/156",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/157",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/158",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/159",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/160",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/161",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/162",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/163",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/164",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/165",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/166",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/167",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/168",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/169",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/170",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/171",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/172",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/173",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/174",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/175",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/176",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/177",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/178",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/179",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/180",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/181",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/182",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/183",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/184",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/185",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/186",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/187",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/188",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/189",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/190",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/191",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/192",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/193",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/194",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/195",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/196",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/197",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/198",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/199",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/200",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/201",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/202",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/203",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/204",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/205",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/206",
+          "https://darwin.v7labs.com/api/v2/teams/topigsnorsvin/files/47b7203e-e1f9-4093-a529-b79f66ff7a04/sections/207"
+        ]
+      }
+    ]
+  },
+  "annotations": [
+    {
+      "frames": {
+        "56": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": true,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "57": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "58": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "59": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "60": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "61": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "62": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "63": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "64": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "65": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "66": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "67": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "68": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "69": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "70": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "71": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "72": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "73": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "74": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "75": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "76": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "77": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "78": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "79": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "80": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "81": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "82": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "83": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "84": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "85": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "86": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "87": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "88": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "89": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "90": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "91": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "92": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "93": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "94": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "95": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "96": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "97": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "98": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "99": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "100": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "101": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "102": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "103": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "104": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "105": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "106": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "107": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "108": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "109": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": false,
+          "text": {
+            "text": "6147,6148"
+          }
+        },
+        "110": {
+          "bounding_box": {
+            "h": 110.6824,
+            "w": 108.3765,
+            "x": 1925.0824,
+            "y": 1178.3059
+          },
+          "keyframe": true,
+          "text": {
+            "text": "6147,6148"
+          }
+        }
+      },
+      "id": "35d2ea59-8b2b-4906-b8c6-067cc8650023",
+      "interpolate_algorithm": "linear-1.1",
+      "interpolated": true,
+      "name": "g2b_bellynosing",
+      "properties": [],
+      "ranges": [
+        [
+          56,
+          111
+        ]
+      ],
+      "slot_names": [
+        "0"
+      ]
+    },
+    {
+      "frames": {
+        "128": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": true,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "129": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "130": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "131": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "132": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "133": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "134": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "135": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "136": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "137": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "138": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "139": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "140": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "141": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "142": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "143": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "144": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "145": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "146": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "147": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "148": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "149": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "150": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "151": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "152": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "153": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "154": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "155": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "156": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "157": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "158": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "159": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "160": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "161": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": false,
+          "text": {
+            "text": "1,2"
+          }
+        },
+        "162": {
+          "bounding_box": {
+            "h": 112.9882,
+            "w": 126.8235,
+            "x": 1920.4706,
+            "y": 1194.4471
+          },
+          "keyframe": true,
+          "text": {
+            "text": "1,2"
+          }
+        }
+      },
+      "id": "ecc1dacd-bedd-418d-beb1-3f0695b0f7e2",
+      "interpolate_algorithm": "linear-1.1",
+      "interpolated": true,
+      "name": "g2b_bellynosing",
+      "properties": [],
+      "ranges": [
+        [
+          128,
+          163
+        ]
+      ],
+      "slot_names": [
+        "0"
+      ]
+    }
+  ],
+  "properties": []
+}

@@ -1,13 +1,13 @@
 from typing import Tuple, List, Any, Type
 
-from src.data.annotation_enum_parser import AnnotationEnumParser
+from src.data.label_parser import LabelParser
 
 
 class SimpleBBoxNormalizer:
     """Normalizes bounding box annotations based on image dimensions and target range."""
 
     def __init__(self, image_dimensions: Tuple[float, float], new_range: Tuple[float, float],
-                 annotation_parser: Type[AnnotationEnumParser]):
+                 annotation_parser: Type[LabelParser]):
         """
         Initializes the annotation normalizer with fixed image dimensions and a target range.
 
