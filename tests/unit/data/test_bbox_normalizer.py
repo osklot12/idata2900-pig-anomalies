@@ -2,14 +2,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.data.annotation_enum_parser import AnnotationEnumParser
+from src.data.label_parser import LabelParser
 from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 
 @pytest.fixture
 def mock_annotation_parser():
     """Creates a mock annotation parser that converts string labels to enums."""
-    mock_parser = MagicMock(spec=AnnotationEnumParser)
+    mock_parser = MagicMock(spec=LabelParser)
 
     mock_parser.enum_from_str.side_effect = lambda label: f"ENUM_{label.upper()}"
 

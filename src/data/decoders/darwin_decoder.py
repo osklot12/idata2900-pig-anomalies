@@ -1,61 +1,129 @@
 from typing import Dict, Tuple, List, Any
 
-from src.data.decoders.bbox_decoder import BBoxDecoder
+from src.data.label_parser import LabelParser
+from src.data.dataclasses.bbox_annotation import BBoxAnnotation
+from src.data.dataclasses.bounding_box import BoundingBox
+from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.decoders.annotation_decoder import AnnotationDecoder
+from src.typevars.enum_type import T_Enum
 
 
-class DarwinDecoder(BBoxDecoder):
+class DarwinDecoder(AnnotationDecoder):
     """Decodes annotations stored in Darwin JSON format."""
 
-    def get_annotations(self) -> Dict[int, List[Tuple[str, float, float, float, float]]]:
-        frame_annotations = {}
+    def __init__(self, json_data: Dict[str, Any], label_parser: LabelParser):
+        """
+        Initializes a DarwinDecoder instance.
 
-        for annotation in self.json_data.get("annotations", []):
-            behavior = annotation.get("name", "unknown_behavior")
+        Args:
+            json_data (Dict[str, Any]): the Darwin JSON format
+            label_parser (LabelParser): parses class labels
+        """
+        self._json_data = json_data
+        self._label_parser = label_parser
 
-            for frame_index, frame_data in annotation.get("frames", {}).items():
-                frame_index = int(frame_index)
+    def decode_annotations(self) -> List[FrameAnnotation]:
+        annotations = self._combine_annotations_by_frame(self._extract_annotations())
+        return self._create_frame_annotation_list(annotations, self._extract_source())
 
-                h, w, x, y = DarwinDecoder._get_bounding_box_values(frame_data)
+    def _combine_annotations_by_frame(self, annotations: List[Dict]) -> Dict[int, List[BBoxAnnotation]]:
+        """Groups annotations by their respective frame index."""
+        frame_annotations: Dict[int, List[BBoxAnnotation]] = {}
 
+        for annotation in annotations:
+            for frame_index, bbox_annotations in self._parse_annotation_frames(annotation).items():
                 if frame_index not in frame_annotations:
                     frame_annotations[frame_index] = []
 
-                frame_annotations[frame_index].append(
-                    (behavior, x, y, w, h)
-                )
+                for bbox_annotation in bbox_annotations:
+                    frame_annotations[frame_index].append(bbox_annotation)
 
         return frame_annotations
 
+    def _parse_annotation_frames(self, annotation: Dict) -> Dict[int, List[BBoxAnnotation]]:
+        """Parses and maps annotation data to frame indices."""
+        frame_data_map = {}
+
+        parsed_label = self._parse_label(self._extract_class_name(annotation))
+        for frame_index, frame_data in self._extract_frame_data(annotation):
+            frame_index = int(frame_index)
+            bbox_annotation = self._create_bbox_annotation(parsed_label, frame_data)
+            frame_data_map.setdefault(frame_index, []).append(bbox_annotation)
+
+        return frame_data_map
+
+    def _create_bbox_annotation(self, label: T_Enum, frame_data: Dict) -> BBoxAnnotation:
+        """Creates a bounding box annotation for a given frame."""
+        return BBoxAnnotation(
+            cls=label,
+            bbox=self._create_bounding_box(frame_data)
+        )
+
+    def _parse_label(self, label: str) -> T_Enum:
+        """Extracts and parses the class label from an annotation."""
+        return self._label_parser.enum_from_str(label)
+
     def get_frame_count(self) -> int:
+        """Retrieves the total number of frames in the dataset."""
         result = -1
 
-        slots = DarwinDecoder._get_slots(self.json_data)
+        slots = self._extract_metadata_slots()
         if slots and "frame_count" in slots[0]:
             result = slots[0]["frame_count"]
 
         return result
 
     def get_frame_dimensions(self) -> Tuple[int, int]:
+        """Retrieves the frame width and height."""
         result = (0, 0)
 
-        slots = DarwinDecoder._get_slots(self.json_data)
+        slots = self._extract_metadata_slots()
         if slots and "width" in slots[0] and "height" in slots[0]:
             result = slots[0]["width"], slots[0]["height"]
         return result
 
-    @staticmethod
-    def _get_slots(json_data):
+    def _extract_source(self) -> str:
+        """Extracts the source from the Darwin JSON format."""
+        return self._json_data.get("item", {}).get("name", "unknown_source")
+
+    def _extract_metadata_slots(self) -> List[Dict]:
         """Extracts the slots for the Darwin JSON structure."""
-        return json_data.get("item", {}).get("slots", [])
+        return self._json_data.get("item", {}).get("slots", [])
+
+    def _extract_annotations(self) -> List[Dict]:
+        """Extracts the annotations for the Darwin JSON structure."""
+        return self._json_data.get("annotations", [])
 
     @staticmethod
-    def _get_bounding_box_values(frame_data):
+    def _extract_class_name(annotations: Dict) -> str:
+        """Extracts the class for an annotation in Darwin JSON format."""
+        return annotations.get("name", "unknown_class")
+
+    @staticmethod
+    def _extract_frame_data(annotation: Dict) -> List[Tuple[int, Dict]]:
+        """Extracts the frames for an annotation in Darwin JSON format."""
+        return list(annotation.get("frames", {}).items())
+
+    @staticmethod
+    def _create_bounding_box(frame_data) -> BoundingBox:
         """Parses and retrieves bounding box values from a Darwin JSON annotation."""
         bbox = frame_data.get("bounding_box", {})
-        x, y, w, h = (
-            bbox.get("x", 0),
-            bbox.get("y", 0),
-            bbox.get("w", 0),
-            bbox.get("h", 0)
+        return BoundingBox(
+            center_x=bbox.get("x", 0),
+            center_y=bbox.get("y", 0),
+            width=bbox.get("w", 0),
+            height=bbox.get("h", 0)
         )
-        return h, w, x, y
+
+    @staticmethod
+    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str) -> List[FrameAnnotation]:
+        """Constructs a list of FrameAnnotation objects from grouped annotation data."""
+        return [
+            FrameAnnotation(
+                source=source,
+                index=frame_index,
+                annotations=annotations,
+                end_of_stream=False
+            )
+            for frame_index, annotations in sorted(data.items())
+        ]

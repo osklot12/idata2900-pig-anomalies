@@ -15,3 +15,19 @@ class NorsvinBehaviorClass(Enum):
 
     TAIL_DOWN = auto()
     """Behavior where pigs puts their tail down."""
+
+    _LABEL_MAP = {
+        "g2b_tailbiting": TAIL_BITING,
+        "g2b_earbiting": EAR_BITING,
+        "g2b_bellynosing": BELLY_NOSING,
+        "g2b_taildown": TAIL_DOWN,
+    }
+
+    @classmethod
+    def get_label_map(cls):
+        return {
+            "g2b_tailbiting": NorsvinBehaviorClass.TAIL_BITING,
+            "g2b_earbiting": NorsvinBehaviorClass.EAR_BITING,
+            "g2b_bellynosing": NorsvinBehaviorClass.BELLY_NOSING,
+            "g2b_taildown": NorsvinBehaviorClass.TAIL_DOWN,
+        }

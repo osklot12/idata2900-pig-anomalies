@@ -8,7 +8,7 @@ from src.data.streaming.streamers import AnnotationStreamer
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.streaming.streamers import FrameStreamer
-from src.utils.norsvin_annotation_parser import NorsvinAnnotationParser
+from src.utils.norsvin.norsvin_annotation_parser import NorsvinLabelParser
 from tests.utils.dummies.dummy_gcp_data_loader import DummyGCPDataLoader
 
 
@@ -37,7 +37,7 @@ def integration_setup(dummy_data_loader, mock_callback):
     )
 
     normalizer = SimpleBBoxNormalizer(image_dimensions=(1920, 1080), new_range=(0, 1),
-                                      annotation_parser=NorsvinAnnotationParser)
+                                      annotation_parser=NorsvinLabelParser)
     annotation_loader = AnnotationStreamer(
         data_loader=dummy_data_loader,
         annotation_blob_name="test_annotations.json",
