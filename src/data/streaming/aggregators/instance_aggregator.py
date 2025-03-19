@@ -21,6 +21,7 @@ class InstanceAggregator(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def feed_annotation(self, annotation: FrameAnnotation) -> FeedStatus:
         """
         Feeds an annotation to the aggregator.
