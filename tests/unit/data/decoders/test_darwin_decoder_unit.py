@@ -1,5 +1,4 @@
 import pytest
-import json
 
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.simple_label_parser import SimpleLabelParser
@@ -8,9 +7,15 @@ from src.utils.path_finder import PathFinder
 
 
 @pytest.fixture
-def expected_sample_annotations():
+def expected_frame_count():
+    """Fixture to provide the expected frame count."""
+    return 208
+
+
+@pytest.fixture
+def expected_sample_annotations(expected_frame_count):
     """Fixture to provide sampled expected annotations."""
-    return {
+    annotations = {
         56: [
             (110, 100, 400, 300, NorsvinBehaviorClass.BELLY_NOSING),
             (300, 250, 500, 600, NorsvinBehaviorClass.TAIL_BITING)
@@ -26,6 +31,7 @@ def expected_sample_annotations():
             (120, 130, 430, 330, NorsvinBehaviorClass.BELLY_NOSING)
         ]
     }
+    return {i: annotations.get(i, []) for i in range(expected_frame_count)}
 
 
 @pytest.fixture
@@ -71,15 +77,16 @@ def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes
             for ann in frame.annotations
         ]
 
+    assert set(decoded_dict.keys()) == set(expected_sample_annotations.keys()), (
+        f"Frame keys mismatch: Expected {set(expected_sample_annotations.keys())}, Got {set(decoded_dict.keys())}"
+    )
+
     for frame_index, expected_annotations in expected_sample_annotations.items():
-        assert frame_index in decoded_dict, f"Frame {frame_index} missing in decoded annotations"
-        assert len(decoded_dict[frame_index]) == len(expected_annotations), (
-            f"Mismatch in annotation count at frame {frame_index}: "
-            f"Expected {len(expected_annotations)}, Got {len(decoded_dict[frame_index])}"
-        )
-        assert set(decoded_dict[frame_index]) == set(expected_annotations), (
+        assert decoded_dict[frame_index] == expected_annotations, (
             f"Mismatch at frame {frame_index}: Expected {expected_annotations}, Got {decoded_dict[frame_index]}"
         )
+
+    print(f"{decoded_annotations}")
 
 
 def test_get_frame_count(decoder, sample_json_bytes):
@@ -89,7 +96,6 @@ def test_get_frame_count(decoder, sample_json_bytes):
 
     # assert
     assert frame_count == 6
-
 
 
 def test_get_frame_dimensions(decoder, sample_json_bytes):

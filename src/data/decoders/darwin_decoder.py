@@ -25,7 +25,11 @@ class DarwinDecoder(AnnotationDecoder):
     def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotation]:
         json_data = DarwinDecoder._get_json(raw_data)
         annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
-        return self._create_frame_annotation_list(annotations, self._extract_source(json_data))
+        return self._create_frame_annotation_list(
+            annotations,
+            self._extract_source(json_data),
+            DarwinDecoder.get_frame_count(raw_data)
+        )
 
     @staticmethod
     def _get_json(raw_bytes: bytes):
@@ -144,14 +148,14 @@ class DarwinDecoder(AnnotationDecoder):
         )
 
     @staticmethod
-    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str) -> List[FrameAnnotation]:
+    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str, frame_count: int) -> List[FrameAnnotation]:
         """Constructs a list of FrameAnnotation objects from grouped annotation data."""
         return [
             FrameAnnotation(
                 source=source,
                 index=frame_index,
-                annotations=annotations,
+                annotations=data.get(frame_index, []),
                 end_of_stream=False
             )
-            for frame_index, annotations in sorted(data.items())
+            for frame_index in range(frame_count)
         ]

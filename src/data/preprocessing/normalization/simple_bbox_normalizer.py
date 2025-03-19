@@ -1,4 +1,4 @@
-from typing import Tuple, Type
+from typing import Tuple
 
 from src.data.dataclasses.bounding_box import BoundingBox
 from src.data.preprocessing.normalization.bbox_normalization_strategy import BBoxNormalizationStrategy
