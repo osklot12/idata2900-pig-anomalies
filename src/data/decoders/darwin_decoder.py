@@ -148,7 +148,8 @@ class DarwinDecoder(AnnotationDecoder):
         )
 
     @staticmethod
-    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str, frame_count: int) -> List[FrameAnnotation]:
+    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str, frame_count: int) -> List[
+        FrameAnnotation]:
         """Constructs a list of FrameAnnotation objects from grouped annotation data."""
         return [
             FrameAnnotation(

@@ -89,13 +89,13 @@ def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes
     print(f"{decoded_annotations}")
 
 
-def test_get_frame_count(decoder, sample_json_bytes):
+def test_get_frame_count(decoder, sample_json_bytes, expected_frame_count):
     """Tests that get_frame_count returns the expected frame count."""
     # act
     frame_count = decoder.get_frame_count(sample_json_bytes)
 
     # assert
-    assert frame_count == 6
+    assert frame_count == expected_frame_count
 
 
 def test_get_frame_dimensions(decoder, sample_json_bytes):
