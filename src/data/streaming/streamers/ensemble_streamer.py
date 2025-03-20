@@ -1,8 +1,8 @@
 import threading
 from typing import Tuple
 
-from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.managers.streamer_manager import StreamerManager
+from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 

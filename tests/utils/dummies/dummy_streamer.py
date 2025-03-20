@@ -1,7 +1,7 @@
 import time
 
-from src.data.streaming.streamers import Streamer
-from src.data.streaming.streamers import StreamerStatus
+from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
 class DummyStreamer(Streamer):
