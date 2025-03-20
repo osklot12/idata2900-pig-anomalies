@@ -19,6 +19,7 @@ def mock_callback():
     """Fixture to provide a mock callback."""
     return MagicMock()
 
+
 @pytest.mark.parametrize("n_frames", [0, 1, 5, 10])
 def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, mock_callback):
     """Tests that the VideoStreamer produces and feeds the correct number of frames."""
@@ -37,6 +38,7 @@ def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, m
         assert isinstance(frame, Frame)
 
     assert streamer.get_status() == StreamerStatus.COMPLETED
+
 
 def test_video_streamer_resizes_all_frames(mock_callback, dummy_resize_strategy):
     """Tests that the VideoStreamer resizes all frames while streaming."""

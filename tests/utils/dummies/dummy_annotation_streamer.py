@@ -4,7 +4,7 @@ import time
 from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
-from tests.utils.test_annotation_class import TestBehaviorClass
+from tests.utils.test_annotation_class import TestAnnotationLabel
 
 
 class DummyAnnotationStreamer(AnnotationStreamer):
@@ -29,7 +29,7 @@ class DummyAnnotationStreamer(AnnotationStreamer):
         if self.frame_index < self.n_annotations:
             time.sleep(.005)
             annotations_list = [
-                (TestBehaviorClass.CODING, 3242.234, 3432.4, 234.4, 895.4)
+                (TestAnnotationLabel.CODING, 3242.234, 3432.4, 234.4, 895.4)
             ]
             annotation = FrameAnnotation("test-source", self.frame_index, annotations_list, False)
 

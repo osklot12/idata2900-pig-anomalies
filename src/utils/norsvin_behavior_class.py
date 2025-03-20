@@ -16,9 +16,6 @@ class NorsvinBehaviorClass(Enum):
     TAIL_DOWN = auto()
     """Behavior where pigs puts their tail down."""
 
-    NORMAL = auto()
-    """Behavior considered normal."""
-
     _LABEL_MAP = {
         "g2b_tailbiting": TAIL_BITING,
         "g2b_earbiting": EAR_BITING,

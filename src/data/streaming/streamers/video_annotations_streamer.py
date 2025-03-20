@@ -1,18 +1,18 @@
+import queue
 from typing import Optional, Callable
 
 from src.data.dataclasses.frame_annotation import FrameAnnotation
-from src.data.dataset.entities.lazy_video_annotations import LazyVideoAnnotations
 from src.data.dataset.entities.video_annotations import VideoAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 
 
-class AnnotationFileStreamer(AnnotationStreamer):
-    """A streamer for streaming annotation file data."""
+class VideoAnnotationsStreamer(AnnotationStreamer):
+    """A streamer for streaming video annotations data."""
 
     def __init__(self, annotations: VideoAnnotations, callback: Callable[[FrameAnnotation], FeedStatus]):
         """
-        Initializes an AnnotationFileStreamer instance.
+        Initializes an VideoAnnotationStreamer instance.
 
         Args:
             annotations (VideoAnnotations): the video annotation data
@@ -20,9 +20,13 @@ class AnnotationFileStreamer(AnnotationStreamer):
         """
         super().__init__(callback)
         self._annotations = annotations
-        self._data = None
+        self._frame_queue = queue.Queue()
 
     def _setup_stream(self) -> None:
-        self._data = self._annotations.get_data()
+        frame_annotations = self._annotations.get_data()
+
+        for frame_annotation in frame_annotations:
+            self._frame_queue.put(frame_annotation)
 
     def _get_next_annotation(self) -> Optional[FrameAnnotation]:
+        return self._frame_queue.get() if not self._frame_queue.empty() else None
