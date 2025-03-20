@@ -1,4 +1,4 @@
-from src.data.streaming.streamers import Streamer
+from src.data.streaming.streamers.streamer import Streamer
 
 
 class DummyFailingStreamer(Streamer):
