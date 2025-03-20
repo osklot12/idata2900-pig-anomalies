@@ -13,7 +13,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class AnnotationStreamer(Streamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, callback: Callable[[FrameAnnotation], FeedStatus], normalizer: Optional[BBoxNormalizationStrategy] = None):
+    def __init__(self, callback: Callable[[FrameAnnotation], FeedStatus], normalizer: Optional[BBoxNormalizationStrategy]):
         """
         Initializes a AnnotationStreamer instance.
 
@@ -30,9 +30,9 @@ class AnnotationStreamer(Streamer):
 
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
-            self._callback(
-                self._normalize_annotation(annotation)
-            )
+            normalized_annotation = self._normalize_annotation(annotation)
+            self._callback(normalized_annotation)
+
             annotation = self._get_next_annotation()
 
         if annotation and self._is_requested_to_stop():
