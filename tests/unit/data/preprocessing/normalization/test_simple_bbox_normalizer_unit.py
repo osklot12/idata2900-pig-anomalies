@@ -1,10 +1,7 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from src.data.dataclasses.bounding_box import BoundingBox
-from src.data.label_parser import LabelParser
-from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 @pytest.fixture
 def bboxes():

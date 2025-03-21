@@ -3,7 +3,7 @@ from typing import Callable, Optional
 
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
-from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
 from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 

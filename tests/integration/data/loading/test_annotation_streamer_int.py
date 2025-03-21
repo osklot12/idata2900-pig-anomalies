@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from tests.utils.gcs.test_bucket import TestBucket
 

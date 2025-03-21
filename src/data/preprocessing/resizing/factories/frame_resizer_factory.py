@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
 
 
 class FrameResizerFactory(ABC):

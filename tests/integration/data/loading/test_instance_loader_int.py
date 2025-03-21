@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.loading.feed_status import FeedStatus

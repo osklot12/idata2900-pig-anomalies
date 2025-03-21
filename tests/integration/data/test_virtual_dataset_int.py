@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.streaming.streamers import AnnotationStreamer
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator

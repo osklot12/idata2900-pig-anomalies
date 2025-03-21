@@ -7,8 +7,8 @@ from src.data.dataset.providers.dataset_instance_provider import DatasetInstance
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_factory import FrameResizerFactory
-from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
-from src.data.preprocessing.normalization.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer

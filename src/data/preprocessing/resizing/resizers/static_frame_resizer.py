@@ -3,15 +3,15 @@ from typing import Tuple
 import numpy as np
 import cv2
 
-from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
 
 
-class StaticFrameResizeStrategy(FrameResizeStrategy):
+class StaticFrameResizer(FrameResizeStrategy):
     """A frame resize strategy that resizes frames to a static shape."""
 
     def __init__(self, resize_shape: Tuple[int, int]):
         """
-        Initializes a StaticFrameResizeStrategy instance.
+        Initializes a StaticFrameResizer instance.
 
         Args:
             resize_shape (Tuple[int, int]): the shape (height, width) of the resized frame
