@@ -1,10 +1,10 @@
 import time
 
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class DummyStreamer(Streamer):
+class DummyStreamer(ThreadedStreamer):
     """A dummy streamer for testing."""
 
     def __init__(self, wait_time: float = 0.1):

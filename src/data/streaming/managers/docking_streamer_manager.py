@@ -3,7 +3,7 @@ import threading
 from typing import Type
 
 from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.factories.streamer_factory import StreamerFactory
 
@@ -53,7 +53,7 @@ class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
             future.add_done_callback(self._on_streamer_done)
 
     @staticmethod
-    def _manage_streamer(streamer: Streamer, streamer_id: str) -> str:
+    def _manage_streamer(streamer: ThreadedStreamer, streamer_id: str) -> str:
         """Manages the streamer."""
         streamer.wait_for_completion()
         streamer.stop()

@@ -3,20 +3,21 @@ from typing import Tuple
 
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class EnsembleStreamer(StreamerManager, Streamer):
+class EnsembleStreamer(StreamerManager, ThreadedStreamer):
     """A streamer consisting of other streamers, abstracting them as one single streamer."""
 
-    def __init__(self, streamers: Tuple[Streamer, ...]):
+    def __init__(self, *streamers: Streamer):
         """
         Initializes an instance of EnsembleStreamer.
 
         Args:
             streamers (Tuple[Streamer, ...]): The streamers belonging to the group.
         """
-        Streamer.__init__(self)
+        ThreadedStreamer.__init__(self)
         StreamerManager.__init__(self)
         self._lock = threading.Lock()
         self._init(streamers)
@@ -58,4 +59,4 @@ class EnsembleStreamer(StreamerManager, Streamer):
     def _stop(self) -> None:
         with self._lock:
             for streamer_id in self.get_streamer_ids():
-                self.get_streamer(streamer_id).stop()
+                self.get_streamer(streamer_id).stop_streaming()

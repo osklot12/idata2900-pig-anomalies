@@ -10,13 +10,13 @@ from tests.utils.dummies.dummy_streamer import DummyStreamer
 @pytest.fixture
 def dummy_streamers():
     """Creates a tuple of two DummyStreamer instances."""
-    return DummyStreamer(wait_time=.05), DummyStreamer(wait_time=.05)
+    return [DummyStreamer(wait_time=.05), DummyStreamer(wait_time=.05)]
 
 
 @pytest.fixture
 def ensemble_streamer(dummy_streamers):
     """Creates an instance of EnsembleStreamer with DummyStreamers."""
-    return EnsembleStreamer(dummy_streamers)
+    return EnsembleStreamer(*dummy_streamers)
 
 
 def test_initialization(ensemble_streamer, dummy_streamers):
@@ -32,7 +32,7 @@ def test_stream_and_wait_for_completion(ensemble_streamer):
 
     # act
     ensemble_streamer.wait_for_completion()
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
 
     # assert
     for streamer_id in ensemble_streamer.get_streamer_ids():
@@ -47,7 +47,7 @@ def test_streaming_completion_status(ensemble_streamer):
     # act
     ensemble_streamer.start_streaming()
     ensemble_streamer.wait_for_completion()
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
 
     end_status = ensemble_streamer.get_status()
 
@@ -60,15 +60,15 @@ def test_streaming_failure_status():
     """Tests that streaming() correctly sets the status to FAILED if a streamer fails."""
     # arrange
     streamer = EnsembleStreamer(
-        (DummyStreamer(wait_time=.05),
-         DummyFailingStreamer())
+        DummyStreamer(wait_time=.05),
+        DummyFailingStreamer()
     )
     initial_status = streamer.get_status()
 
     # act
     streamer.start_streaming()
     streamer.wait_for_completion()
-    streamer.stop()
+    streamer.stop_streaming()
 
     end_status = streamer.get_status()
 
@@ -82,14 +82,14 @@ def test_streaming_failure_and_stopped_status():
     # arrange
     dummy_streamer = DummyStreamer(wait_time=.05)
     ensemble_streamer = EnsembleStreamer(
-        (dummy_streamer, DummyFailingStreamer())
+        dummy_streamer, DummyFailingStreamer()
     )
 
     # act
     ensemble_streamer.start_streaming()
-    dummy_streamer.stop()
+    dummy_streamer.stop_streaming()
     ensemble_streamer.wait_for_completion()
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
 
     end_status_dummy = dummy_streamer.get_status()
     end_status_ensemble = ensemble_streamer.get_status()
@@ -105,14 +105,14 @@ def test_streaming_stopped_status():
     dummy_streamer_stop = DummyStreamer(wait_time=.05)
     dummy_streamer_complete = DummyStreamer(wait_time=.05)
     ensemble_streamer = EnsembleStreamer(
-        (dummy_streamer_stop, dummy_streamer_complete)
+        dummy_streamer_stop, dummy_streamer_complete
     )
 
     # act
     ensemble_streamer.start_streaming()
-    dummy_streamer_stop.stop()
+    dummy_streamer_stop.stop_streaming()
     ensemble_streamer.wait_for_completion()
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
 
     end_status_dummy_stop = dummy_streamer_stop.get_status()
     end_status_dummy_complete = dummy_streamer_complete.get_status()
@@ -130,7 +130,7 @@ def test_stop(ensemble_streamer):
     ensemble_streamer.start_streaming()
 
     # act
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
     end_status = ensemble_streamer.get_status()
 
     # assert
@@ -147,7 +147,7 @@ def test_eos_commands_execution(ensemble_streamer):
     # act
     ensemble_streamer.start_streaming()
     ensemble_streamer.wait_for_completion()
-    ensemble_streamer.stop()
+    ensemble_streamer.stop_streaming()
 
     # assert
     assert eos_command.executed

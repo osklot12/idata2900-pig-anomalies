@@ -1,7 +1,7 @@
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 
 
-class DummyFailingStreamer(Streamer):
+class DummyFailingStreamer(ThreadedStreamer):
     """A dummy streamer that fails (raises exception when streaming)."""
 
     def _stream(self) -> None:
