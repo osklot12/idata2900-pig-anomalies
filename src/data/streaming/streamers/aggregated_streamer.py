@@ -3,33 +3,39 @@ from typing import Callable
 from src.data.dataclasses.instance import Instance
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
-from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
+from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
+from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
-from src.data.streaming.streamers.video_streamer import VideoStreamer
 
 
 class AggregatedStreamer(Streamer):
     """A streamer consisting of a video and annotation streamer, aggregating the stream data."""
 
-    def __init__(self, video_streamer: VideoStreamer, annotation_streamer: AnnotationStreamer,
-                 callback: Callable[[Instance], FeedStatus]):
+    def __init__(self, streamers_factory: StreamerPairFactory, callback: Callable[[Instance], FeedStatus]):
         """
         Initializes an AggregatedStreamer instance.
 
         Args:
-            video_streamer (VideoStreamer): the video streamer
-            annotation_streamer (AnnotationStreamer): the annotation streamer
+            streamers_factory (StreamerPairFactory): the factory used to create the streamers
             callback (Callable[[Instance], FeedStatus]): the callback function that will be fed with aggregated data
         """
         self._aggregator = BufferedInstanceAggregator(callback)
-        video
+        streamer_pair = streamers_factory.create_streamer_pair(
+            self._aggregator.feed_frame,
+            self._aggregator.feed_annotation
+        )
+        
+        if streamer_pair is None:
+            raise RuntimeError("Failed to create streamers")
+
+        self._ensemble_streamer = EnsembleStreamer(*streamer_pair)
 
     def start_streaming(self) -> None:
-        pass
+        self._ensemble_streamer.start_streaming()
 
     def stop_streaming(self) -> None:
-        pass
+        self._ensemble_streamer.stop_streaming()
 
     def wait_for_completion(self) -> None:
-        pass
+        self._ensemble_streamer.wait_for_completion()
 
