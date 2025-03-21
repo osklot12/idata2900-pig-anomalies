@@ -5,7 +5,7 @@ from typing import List, Optional, Dict
 from src.data.dataclasses.dataset_file import DatasetFile
 from src.data.dataclasses.dataset_file_pair import DatasetInstance
 from src.data.dataset.data_type import DataType
-from src.data.dataset.providers.dataset_file_pair_provider import DatasetInstanceProvider
+from src.data.dataset.providers.dataset_instance_provider import DatasetInstanceProvider
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_error_strategy import MatchingErrorStrategy
 from src.data.dataset.matching.silent_removal_strategy import SilentRemovalStrategy

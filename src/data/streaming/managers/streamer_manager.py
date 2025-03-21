@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 from src.data.data_structures.concurrent_dict import ConcurrentDict
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 
 
 class StreamerManager:
@@ -10,7 +10,7 @@ class StreamerManager:
 
     def __init__(self):
         """Initializes an instance of StreamerManager."""
-        self._streamers = ConcurrentDict[str, Streamer]()
+        self._streamers = ConcurrentDict[str, ThreadedStreamer]()
 
     def get_streamer_ids(self) -> List[str]:
         """
@@ -21,12 +21,12 @@ class StreamerManager:
         """
         return self._streamers.keys()
 
-    def get_streamer(self, streamer_id: str) -> Streamer:
+    def get_streamer(self, streamer_id: str) -> ThreadedStreamer:
         """
         Returns the streamer with the given id.
 
         Returns:
-            Streamer: The streamer with the given id.
+            ThreadedStreamer: The streamer with the given id.
         """
         return self._streamers.get(streamer_id)
 
@@ -39,7 +39,7 @@ class StreamerManager:
         """
         return self._streamers.contains(streamer_id)
 
-    def _get_streamers(self) -> ConcurrentDict[str, Streamer]:
+    def _get_streamers(self) -> ConcurrentDict[str, ThreadedStreamer]:
         """Returns the streamer dictionary."""
         return self._streamers
 
@@ -47,7 +47,7 @@ class StreamerManager:
         """Clears the streamers."""
         self._streamers.clear()
 
-    def _add_streamer(self, streamer: Streamer) -> str:
+    def _add_streamer(self, streamer: ThreadedStreamer) -> str:
         """
         Adds a streamer to the manager, creating a unique id for it.
 
