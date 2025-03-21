@@ -13,12 +13,14 @@ def dummy_callback():
     """Fixture to provide a dummy callback."""
     return Mock()
 
+
 @pytest.fixture
 def dummy_streamers():
     """Fixture to provide dummy streamers."""
     video_streamer = Mock(spec=VideoStreamer)
     annotation_streamer = Mock(spec=AnnotationStreamer)
     return video_streamer, annotation_streamer
+
 
 @pytest.fixture
 def streamer_pair_factory(dummy_streamers):
@@ -27,10 +29,12 @@ def streamer_pair_factory(dummy_streamers):
     factory.create_streamer_pair.return_value = dummy_streamers
     return factory
 
+
 @pytest.fixture
 def aggregated_streamer(streamer_pair_factory, dummy_callback):
     """Fixture to provide an AggregatedStreamer instance."""
     return AggregatedStreamer(streamer_pair_factory, dummy_callback)
+
 
 def test_start_streaming(aggregated_streamer, dummy_streamers):
     """Tests that start_streaming() streams successfully."""

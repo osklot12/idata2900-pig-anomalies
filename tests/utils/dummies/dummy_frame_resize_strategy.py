@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
 
 
 class DummyFrameResizeStrategy(FrameResizeStrategy):

@@ -5,7 +5,7 @@ from typing import Callable, Optional
 from src.data.dataclasses.bbox_annotation import BBoxAnnotation
 from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.loading.feed_status import FeedStatus
-from src.data.preprocessing.normalization.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 

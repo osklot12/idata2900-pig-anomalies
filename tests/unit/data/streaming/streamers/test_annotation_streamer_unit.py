@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.data.dataclasses.frame_annotation import FrameAnnotation
-from src.data.preprocessing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_annotation_streamer import DummyAnnotationStreamer
 

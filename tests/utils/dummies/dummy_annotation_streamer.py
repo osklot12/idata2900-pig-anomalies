@@ -6,7 +6,7 @@ from src.data.dataclasses.bbox_annotation import BBoxAnnotation
 from src.data.dataclasses.bounding_box import BoundingBox
 from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.data.loading.feed_status import FeedStatus
-from src.data.preprocessing.normalization.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from tests.utils.test_annotation_class import TestAnnotationLabel
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.data.preprocessing.normalization.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 
 
 class BBoxNormalizerFactory(ABC):
