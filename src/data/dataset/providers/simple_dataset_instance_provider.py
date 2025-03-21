@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.data.dataclasses.dataset_file_pair import DatasetInstance
+from src.data.dataclasses.dataset_instance import DatasetInstance
 from src.data.dataset.providers.dataset_instance_provider import DatasetInstanceProvider
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.dataset.matching.matching_strategy import MatchingStrategy

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.data.dataclasses.dataset_file_pair import DatasetInstance
+from src.data.dataclasses.dataset_instance import DatasetInstance
 
 
 class DatasetInstanceProvider(ABC):

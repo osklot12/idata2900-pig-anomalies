@@ -5,7 +5,7 @@ import time
 
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
-from src.data.preprocessing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 
 
