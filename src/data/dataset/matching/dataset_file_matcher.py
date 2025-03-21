@@ -3,7 +3,7 @@ import random
 from typing import List, Optional, Dict
 
 from src.data.dataclasses.dataset_file import DatasetFile
-from src.data.dataclasses.dataset_file_pair import DatasetInstance
+from src.data.dataclasses.dataset_instance import DatasetInstance
 from src.data.dataset.data_type import DataType
 from src.data.dataset.providers.dataset_instance_provider import DatasetInstanceProvider
 from src.data.dataset.sources.dataset_source import DatasetSource

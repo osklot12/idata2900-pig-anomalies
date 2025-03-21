@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 import cv2
 
-from src.data.preprocessing.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.frame_resize_strategy import FrameResizeStrategy
 
 
 class StaticFrameResizeStrategy(FrameResizeStrategy):

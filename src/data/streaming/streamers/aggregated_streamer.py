@@ -21,6 +21,8 @@ class AggregatedStreamer(Streamer):
             annotation_streamer (AnnotationStreamer): the annotation streamer
             callback (Callable[[Instance], FeedStatus]): the callback function that will be fed with aggregated data
         """
+        self._aggregator = BufferedInstanceAggregator(callback)
+        video
 
     def start_streaming(self) -> None:
         pass
