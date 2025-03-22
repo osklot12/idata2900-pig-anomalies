@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 
 
 class VideoAnnotations(ABC):
@@ -18,11 +18,11 @@ class VideoAnnotations(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data(self) -> List[FrameAnnotation]:
+    def get_data(self) -> List[FrameAnnotations]:
         """
         Returns the annotation data.
 
         Returns:
-            List[FrameAnnotation]: list of annotations for video frames
+            List[FrameAnnotations]: list of annotations for video frames
         """
         raise NotImplementedError

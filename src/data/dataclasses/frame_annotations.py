@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.data.dataclasses.bbox_annotation import BBoxAnnotation
+from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 
 
 @dataclass(frozen=True)
-class FrameAnnotation:
+class FrameAnnotations:
     """Represents annotations associated with a specific frame in a video stream."""
     source: str
     index: int
-    annotations: [List[BBoxAnnotation]]
+    annotations: List[AnnotatedBBox]
     end_of_stream: bool

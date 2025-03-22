@@ -1,6 +1,6 @@
 from typing import Callable
 
-from src.data.dataclasses.instance import Instance
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.factories.streamer_factory import StreamerFactory
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
@@ -10,7 +10,7 @@ from src.data.streaming.streamers.aggregated_streamer import AggregatedStreamer
 class AggregatedStreamerFactory(StreamerFactory):
     """A factory for creating AggregatedStreamer instances."""
 
-    def __init__(self, streamer_pair_factory: StreamerPairFactory, callback: Callable[[Instance], FeedStatus]):
+    def __init__(self, streamer_pair_factory: StreamerPairFactory, callback: Callable[[AnnotatedFrame], FeedStatus]):
         """
         Initializes an AggregatedStreamer instance.
 
@@ -21,5 +21,5 @@ class AggregatedStreamerFactory(StreamerFactory):
         self._streamer_pair_factory = streamer_pair_factory
         self._callback = callback
 
-    def get_next_streamer(self) -> AggregatedStreamer:
+    def create_streamer(self) -> AggregatedStreamer:
         return AggregatedStreamer(self._streamer_pair_factory, self._callback)

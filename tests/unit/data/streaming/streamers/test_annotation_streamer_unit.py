@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_annotation_streamer import DummyAnnotationStreamer
@@ -29,7 +29,7 @@ def test_annotation_streamer_produces_and_feeds_expected_number_of_annotations(n
 
     for call_args in mock_callback.call_args_list:
         annotation = call_args[0][0]
-        assert isinstance(annotation, FrameAnnotation)
+        assert isinstance(annotation, FrameAnnotations)
 
     assert streamer.get_status() == StreamerStatus.COMPLETED
 

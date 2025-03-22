@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Tuple, Optional
 
 from src.data.dataclasses.frame import Frame
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streaming.streamers.video_streamer import VideoStreamer
@@ -13,7 +13,7 @@ class StreamerPairFactory(ABC):
 
     @abstractmethod
     def create_streamer_pair(self, frame_cb: Callable[[Frame], FeedStatus],
-                             annotation_cb: Callable[[FrameAnnotation], FeedStatus]
+                             annotation_cb: Callable[[FrameAnnotations], FeedStatus]
                              ) -> Optional[Tuple[VideoStreamer, AnnotationStreamer]]:
         """
         Creates a pair of video and annotation streamers.

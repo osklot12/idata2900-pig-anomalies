@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.label.simple_label_parser import SimpleLabelParser
@@ -38,7 +38,7 @@ def test_load_annotation_success(gcs_annotation_loader):
     # assert
     assert isinstance(annotations, list)
     assert len(annotations) > 0
-    assert all(isinstance(a, FrameAnnotation) for a in annotations)
+    assert all(isinstance(a, FrameAnnotations) for a in annotations)
 
 
 @pytest.mark.integration
