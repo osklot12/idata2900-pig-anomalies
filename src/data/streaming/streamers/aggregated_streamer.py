@@ -31,7 +31,6 @@ class AggregatedStreamer(Streamer):
         self._ensemble_streamer = EnsembleStreamer(*streamer_pair)
 
     def start_streaming(self) -> None:
-        print(f"[AggregatedStreamer] Started streaming...")
         self._ensemble_streamer.start_streaming()
 
     def stop_streaming(self) -> None:

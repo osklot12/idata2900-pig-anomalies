@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
+from src.data.dataclasses.instance import Instance
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
@@ -73,7 +74,7 @@ def dataset_entity_factory(loader_factory):
 @pytest.fixture
 def resizer_factory():
     """Fixture to provide a FrameResizerFactory instance."""
-    return StaticFrameResizerFactory((2688, 1520))
+    return StaticFrameResizerFactory((640, 640))
 
 
 @pytest.fixture
@@ -102,6 +103,14 @@ def callback():
     return Mock()
 
 
+def _validate_callbacks(callback: Mock):
+    """Validates callbacks."""
+    for call_args in callback.call_args_list:
+        instance = call_args[0][0]
+        assert isinstance(instance, Instance)
+        assert instance.data.size > 0
+
+
 @pytest.mark.integration
 def test_start_streaming(streamer_pair_factory, callback):
     """Tests that start_streaming() successfully streams video frames and annotations."""
@@ -112,5 +121,26 @@ def test_start_streaming(streamer_pair_factory, callback):
     streamer.start_streaming()
     streamer.wait_for_completion()
 
-    for call in callback.call_args_list:
-        print("Received instance:", call.args[0])
+    # assert
+    _validate_callbacks(callback)
+
+
+@pytest.mark.integration
+def test_start_streaming_parallel(streamer_pair_factory, callback):
+    """Tests that start_streaming() for two AggregatedStreamers in parallel does not cause problems."""
+    # arrange
+    streamer = AggregatedStreamer(streamer_pair_factory, callback)
+
+    another_callback = Mock()
+    another_streamer = AggregatedStreamer(streamer_pair_factory, another_callback)
+
+    # act
+    streamer.start_streaming()
+    another_streamer.start_streaming()
+
+    streamer.wait_for_completion()
+    another_streamer.wait_for_completion()
+
+    # assert
+    _validate_callbacks(callback)
+    _validate_callbacks(another_callback)

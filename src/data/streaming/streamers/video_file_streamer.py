@@ -1,5 +1,6 @@
 from typing import Optional, Callable
 
+import numpy as np
 from cppbindings import FrameStream
 
 from src.data.dataclasses.frame import Frame
@@ -36,7 +37,10 @@ class VideoFileStreamer(VideoStreamer):
 
         frame_data = self._fstream.read()
         if frame_data:
-            frame = Frame(self._video.get_id(), self._frame_index, frame_data, False)
+            width, height, channels = self._fstream.get_frame_shape()
+            np_data = np.frombuffer(frame_data, dtype=np.uint8)
+            np_data = np_data.reshape((height, width, channels))
+            frame = Frame(self._video.get_id(), self._frame_index, np_data, False)
             self._frame_index += 1
 
         return frame
