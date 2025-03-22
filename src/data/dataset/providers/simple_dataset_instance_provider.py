@@ -44,5 +44,4 @@ class SimpleDatasetInstanceProvider(DatasetInstanceProvider):
                 else:
                     searching = False
 
-        print(f"[SimpleDatasetInstanceProvider] Provided dataset instance {result}")
         return result

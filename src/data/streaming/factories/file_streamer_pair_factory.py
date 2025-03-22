@@ -50,5 +50,4 @@ class FileStreamerPairFactory(StreamerPairFactory):
                                                                self._bbox_normalizer_factory.create_bbox_normalizer())
                 streamer_pair = (video_streamer, annotation_streamer)
 
-        print(f"[FileStreamerPairFactory] Created file streamer pair {streamer_pair}")
         return streamer_pair

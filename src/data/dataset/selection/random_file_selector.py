@@ -23,7 +23,6 @@ class RandomFileSelector(FileSelectionStrategy):
         if valid_files:
             selected_file = random.choice(valid_files)
 
-        print(f"[RandomFileSelector] Selected file {selected_file}")
         return selected_file
 
     def _has_valid_suffix(self, file_name: str) -> bool:

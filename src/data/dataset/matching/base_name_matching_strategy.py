@@ -25,14 +25,10 @@ class BaseNameMatchingStrategy(MatchingStrategy):
 
         base_name = os.path.splitext(os.path.basename(file_name))[0]
 
-        match = next(
+        return next(
             (
                 match_path for match_path in candidates
                 if os.path.splitext(os.path.basename(match_path))[0] == base_name
                    and any(match_path.endswith(suffix) for suffix in self._suffixes)
             ), None
         )
-
-        print(f"[BaseNameMatchingStrategy] Matched file {match}")
-
-        return match
