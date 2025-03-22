@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 from typing import Callable, Optional
 
-from src.data.dataclasses.bbox_annotation import BBoxAnnotation
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.annotated_bbox import AnnotatedBBox
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
@@ -13,7 +13,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class AnnotationStreamer(ThreadedStreamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, callback: Callable[[FrameAnnotation], FeedStatus], normalizer: Optional[BBoxNormalizationStrategy]):
+    def __init__(self, callback: Callable[[FrameAnnotations], FeedStatus], normalizer: Optional[BBoxNormalizationStrategy]):
         """
         Initializes a AnnotationStreamer instance.
 
@@ -40,19 +40,19 @@ class AnnotationStreamer(ThreadedStreamer):
 
         return result
 
-    def _normalize_annotation(self, annotation: FrameAnnotation) -> FrameAnnotation:
+    def _normalize_annotation(self, annotation: FrameAnnotations) -> FrameAnnotations:
         """Normalizes an annotation."""
         if self._normalizer:
             normalized_bboxes = []
             for anno_box in annotation.annotations:
                 normalized_bboxes.append(
-                    BBoxAnnotation(
+                    AnnotatedBBox(
                         cls=anno_box.cls,
                         bbox=self._normalizer.normalize_bounding_box(anno_box.bbox)
                     )
                 )
 
-            annotation = FrameAnnotation(
+            annotation = FrameAnnotations(
                 source=annotation.source,
                 index=annotation.index,
                 annotations=normalized_bboxes,
@@ -62,11 +62,11 @@ class AnnotationStreamer(ThreadedStreamer):
         return annotation
 
     @abstractmethod
-    def _get_next_annotation(self) -> Optional[FrameAnnotation]:
+    def _get_next_annotation(self) -> Optional[FrameAnnotations]:
         """
         Returns the next annotation for the stream.
 
         Returns:
-            Optional[FrameAnnotation]: the next annotation, or None if end of stream
+            Optional[FrameAnnotations]: the next annotation, or None if end of stream
         """
         raise NotImplementedError

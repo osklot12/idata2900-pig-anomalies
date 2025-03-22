@@ -42,7 +42,7 @@ class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
 
     def _start_new_streamer(self):
         """Fetches a new streamer, assigns it an ID, and submits it to the executor."""
-        streamer = self._streamer_provider.get_next_streamer()
+        streamer = self._streamer_provider.create_streamer()
 
         # only start next streamer if the streamer exists
         if streamer:

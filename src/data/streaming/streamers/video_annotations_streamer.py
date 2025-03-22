@@ -1,7 +1,7 @@
 import queue
 from typing import Optional, Callable
 
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.entities.video_annotations import VideoAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
@@ -11,7 +11,7 @@ from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 class VideoAnnotationsStreamer(AnnotationStreamer):
     """A streamer for streaming video annotations data."""
 
-    def __init__(self, annotations: VideoAnnotations, callback: Callable[[FrameAnnotation], FeedStatus],
+    def __init__(self, annotations: VideoAnnotations, callback: Callable[[FrameAnnotations], FeedStatus],
                  bbox_normalizer: BBoxNormalizationStrategy):
         """
         Initializes an VideoAnnotationStreamer instance.
@@ -31,5 +31,5 @@ class VideoAnnotationsStreamer(AnnotationStreamer):
         for frame_annotation in frame_annotations:
             self._frame_queue.put(frame_annotation)
 
-    def _get_next_annotation(self) -> Optional[FrameAnnotation]:
+    def _get_next_annotation(self) -> Optional[FrameAnnotations]:
         return self._frame_queue.get() if not self._frame_queue.empty() else None

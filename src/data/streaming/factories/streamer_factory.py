@@ -8,7 +8,7 @@ class StreamerFactory(ABC):
     """Factory interface for creating streamers."""
 
     @abstractmethod
-    def get_next_streamer(self) -> Streamer:
+    def create_streamer(self) -> Streamer:
         """
         Creates and returns the next available streamer.
 

@@ -22,7 +22,7 @@ class DummyStreamerProvider(StreamerFactory):
 
         self._counter = 0
 
-    def get_next_streamer(self) -> Streamer:
+    def create_streamer(self) -> Streamer:
         result = None
 
         streamers_left = self._n_streamers - self._counter

@@ -1,7 +1,7 @@
 from typing import List
 
 from src.auth.auth_service import AuthService
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.annotation_decoder import AnnotationDecoder
 from src.data.gcs_bucket_client import GCSBucketClient
 from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
@@ -22,6 +22,6 @@ class GCSAnnotationLoader(GCSBucketClient, VideoAnnotationsLoader):
         super().__init__(bucket_name, auth_service)
         self._decoder = decoder
 
-    def load_video_annotations(self, annotations_id: str) -> List[FrameAnnotation]:
+    def load_video_annotations(self, annotations_id: str) -> List[FrameAnnotations]:
         raw_data = self._make_request(self._get_file_url(annotations_id)).content
         return self._decoder.decode_annotations(raw_data)

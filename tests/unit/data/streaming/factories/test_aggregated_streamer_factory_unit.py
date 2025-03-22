@@ -28,7 +28,7 @@ def test_aggregated_streamer_factory_returns_aggregated_streamer(streamer_pair_f
     factory = AggregatedStreamerFactory(streamer_pair_factory, callback)
 
     # act
-    streamer = factory.get_next_streamer()
+    streamer = factory.create_streamer()
 
     # assert
     assert isinstance(streamer, AggregatedStreamer)

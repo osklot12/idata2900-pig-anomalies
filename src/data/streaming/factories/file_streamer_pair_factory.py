@@ -1,7 +1,7 @@
 from typing import Callable, Tuple, Optional
 
 from src.data.dataclasses.frame import Frame
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.factories.dataset_entity_factory import DatasetEntityFactory
 from src.data.dataset.providers.dataset_instance_provider import DatasetInstanceProvider
 from src.data.loading.feed_status import FeedStatus
@@ -36,7 +36,7 @@ class FileStreamerPairFactory(StreamerPairFactory):
         self._bbox_normalizer_factory = bbox_normalizer_factory
 
     def create_streamer_pair(self, frame_cb: Callable[[Frame], FeedStatus],
-                             annotation_cb: Callable[[FrameAnnotation], FeedStatus]) -> Optional[Tuple[
+                             annotation_cb: Callable[[FrameAnnotations], FeedStatus]) -> Optional[Tuple[
         VideoStreamer, AnnotationStreamer]]:
         streamer_pair = None
 

@@ -1,22 +1,22 @@
 import pytest
 
-from src.data.dataclasses.bounding_box import BoundingBox
+from src.data.dataclasses.bbox import BBox
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 @pytest.fixture
 def bboxes():
     """Returns a list of annotations for testing purposes."""
     return [
-        BoundingBox(576, 324, 192, 108),
-        BoundingBox(1920, 1080, 288, 162)
+        BBox(576, 324, 192, 108),
+        BBox(1920, 1080, 288, 162)
     ]
 
 @pytest.fixture
 def expected_normalized_bboxes(bboxes):
     """Returns a list of expected normalized annotations for range [0, 1]"""
     return [
-        BoundingBox(0.3, 0.3, 0.1, 0.1),
-        BoundingBox(1.0, 1.0, 0.15, 0.15)
+        BBox(0.3, 0.3, 0.1, 0.1),
+        BBox(1.0, 1.0, 0.15, 0.15)
     ]
 
 def test_normalize_bboxes(bboxes, expected_normalized_bboxes):

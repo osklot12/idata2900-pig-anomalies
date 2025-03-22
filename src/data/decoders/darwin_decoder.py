@@ -3,9 +3,9 @@ from typing import Dict, Tuple, List
 import json
 
 from src.data.label.label_parser import LabelParser
-from src.data.dataclasses.bbox_annotation import BBoxAnnotation
-from src.data.dataclasses.bounding_box import BoundingBox
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.annotated_bbox import AnnotatedBBox
+from src.data.dataclasses.bbox import BBox
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.annotation_decoder import AnnotationDecoder
 from src.typevars.enum_type import T_Enum
 
@@ -22,7 +22,7 @@ class DarwinDecoder(AnnotationDecoder):
         """
         self._label_parser = label_parser
 
-    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotation]:
+    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotations]:
         json_data = DarwinDecoder._get_json(raw_data)
         annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
         return self._create_frame_annotation_list(
@@ -36,9 +36,9 @@ class DarwinDecoder(AnnotationDecoder):
         """Decodes raw bytes to a JSON format."""
         return json.loads(raw_bytes.decode("utf-8"))
 
-    def _combine_annotations_by_frame(self, annotations: List[Dict]) -> Dict[int, List[BBoxAnnotation]]:
+    def _combine_annotations_by_frame(self, annotations: List[Dict]) -> Dict[int, List[AnnotatedBBox]]:
         """Groups annotations by their respective frame index."""
-        frame_annotations: Dict[int, List[BBoxAnnotation]] = {}
+        frame_annotations: Dict[int, List[AnnotatedBBox]] = {}
 
         for annotation in annotations:
             for frame_index, bbox_annotations in self._parse_annotation_frames(annotation).items():
@@ -50,7 +50,7 @@ class DarwinDecoder(AnnotationDecoder):
 
         return frame_annotations
 
-    def _parse_annotation_frames(self, annotation: Dict) -> Dict[int, List[BBoxAnnotation]]:
+    def _parse_annotation_frames(self, annotation: Dict) -> Dict[int, List[AnnotatedBBox]]:
         """Parses and maps annotation data to frame indices."""
         frame_data_map = {}
 
@@ -63,9 +63,9 @@ class DarwinDecoder(AnnotationDecoder):
         return frame_data_map
 
     @staticmethod
-    def _create_bbox_annotation(label: T_Enum, frame_data: Dict) -> BBoxAnnotation:
+    def _create_bbox_annotation(label: T_Enum, frame_data: Dict) -> AnnotatedBBox:
         """Creates a bounding box annotation for a given frame."""
-        return BBoxAnnotation(
+        return AnnotatedBBox(
             cls=label,
             bbox=DarwinDecoder._create_bounding_box(frame_data)
         )
@@ -137,10 +137,10 @@ class DarwinDecoder(AnnotationDecoder):
         return list(annotation.get("frames", {}).items())
 
     @staticmethod
-    def _create_bounding_box(frame_data) -> BoundingBox:
+    def _create_bounding_box(frame_data) -> BBox:
         """Parses and retrieves bounding box values from a Darwin JSON annotation."""
         bbox = frame_data.get("bounding_box", {})
-        return BoundingBox(
+        return BBox(
             center_x=bbox.get("x", 0),
             center_y=bbox.get("y", 0),
             width=bbox.get("w", 0),
@@ -148,11 +148,11 @@ class DarwinDecoder(AnnotationDecoder):
         )
 
     @staticmethod
-    def _create_frame_annotation_list(data: Dict[int, List[BBoxAnnotation]], source: str, frame_count: int) -> List[
-        FrameAnnotation]:
+    def _create_frame_annotation_list(data: Dict[int, List[AnnotatedBBox]], source: str, frame_count: int) -> List[
+        FrameAnnotations]:
         """Constructs a list of FrameAnnotation objects from grouped annotation data."""
         return [
-            FrameAnnotation(
+            FrameAnnotations(
                 source=source,
                 index=frame_index,
                 annotations=data.get(frame_index, []),

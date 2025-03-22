@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from src.data.dataclasses.bounding_box import BoundingBox
+from src.data.dataclasses.bbox import BBox
 from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 
 
@@ -31,15 +31,15 @@ class SimpleBBoxNormalizer(BBoxNormalizationStrategy):
         """
         self.image_width, self.image_height = image_dimensions
 
-    def normalize_bounding_box(self, bbox: BoundingBox) -> BoundingBox:
+    def normalize_bounding_box(self, bbox: BBox) -> BBox:
         """
         Normalizes a bounding box to the configured range.
 
         Args:
-            bbox (BoundingBox): the bounding box to normalize
+            bbox (BBox): the bounding box to normalize
 
         Returns:
-            BoundingBox: the normalized bounding box
+            BBox: the normalized bounding box
         """
         range_interval = self.new_range[1] - self.new_range[0]
         normalized_x = (bbox.center_x / self.image_width) * range_interval + self.new_range[0]
@@ -47,4 +47,4 @@ class SimpleBBoxNormalizer(BBoxNormalizationStrategy):
         normalized_h = (bbox.height / self.image_height) * range_interval
         normalized_w = (bbox.width / self.image_width) * range_interval
 
-        return BoundingBox(normalized_x, normalized_y, normalized_w, normalized_h)
+        return BBox(normalized_x, normalized_y, normalized_w, normalized_h)

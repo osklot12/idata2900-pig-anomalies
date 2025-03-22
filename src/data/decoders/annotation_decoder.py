@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.data.dataclasses.frame_annotation import FrameAnnotation
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 
 
 class AnnotationDecoder(ABC):
     """An interface for annotation decoders."""
 
     @abstractmethod
-    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotation]:
+    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotations]:
         """
         Decodes and returns the annotations.
 
@@ -16,6 +16,6 @@ class AnnotationDecoder(ABC):
             raw_data (bytes): the raw annotations data
 
         Returns:
-            List[FrameAnnotation]: the decoded annotations.
+            List[FrameAnnotations]: the decoded annotations.
         """
         raise NotImplementedError
