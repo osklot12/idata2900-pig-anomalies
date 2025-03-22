@@ -63,7 +63,7 @@ def test_video_streamer_should_indicate_stopping_when_stopped_early(mock_callbac
     streamer.start_streaming()
 
     # act
-    streamer.stop()
+    streamer.stop_streaming()
 
     # assert
     assert streamer.get_status() == StreamerStatus.STOPPED

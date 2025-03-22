@@ -2,7 +2,7 @@ import pytest
 
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
-from src.data.dataset.selection.random_file_selection_strategy import RandomFileSelectionStrategy
+from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from tests.utils.dummies.dummy_dataset_source import DummyDatasetSource
 
 
@@ -30,7 +30,7 @@ def annotation_suffixes():
 @pytest.fixture
 def video_selector(video_suffixes):
     """Fixture to provide a RandomFileSelectionStrategy."""
-    return RandomFileSelectionStrategy(video_suffixes)
+    return RandomFileSelector(video_suffixes)
 
 @pytest.fixture
 def annotation_matcher(annotation_suffixes):

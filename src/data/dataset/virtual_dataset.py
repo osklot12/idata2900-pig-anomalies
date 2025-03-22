@@ -6,6 +6,7 @@ from typing import List, Tuple, Optional
 import numpy as np
 
 from src.data.data_structures.hash_buffer import HashBuffer
+from src.data.dataclasses.instance import Instance
 from src.data.dataset_split import DatasetSplit
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -57,8 +58,7 @@ class VirtualDataset:
 
         self.max_frames_per_source = max_frames_per_source
 
-    def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> List[
-        Tuple[np.ndarray, Optional[List[Tuple[NorsvinBehaviorClass, float, float, float, float]]]]]:
+    def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> Instance:
         """
         Samples a randomized batch of frame-annotation pairs from the specified dataset split.
 
@@ -102,16 +102,12 @@ class VirtualDataset:
 
         return total_frames
 
-    def feed(self, source: str, frame_index: int, frame: np.ndarray,
-             annotation: Optional[List[Tuple[str, float, float, float, float]]], end_of_stream: bool):
+    def feed(self, instance: Instance) -> None:
         """
         Feeds a frame into the appropriate buffer.
 
-        :param source: The ID of the source of the frame.
-        :param frame_index: The index of the frame within the source.
-        :param frame: The frame data.
-        :param annotation: The annotation data.
-        :param end_of_stream: Boolean indicating whether the frame is the last in the source.
+        Args:
+            instance (Instance): the data instance to feed
         """
         with self.lock:
             # get correct split

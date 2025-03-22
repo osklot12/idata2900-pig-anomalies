@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.data.dataset.sources.dataset_source import DatasetSource
-from src.data.loading.loaders.video_annotation_loader import VideoAnnotationsLoader
+from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
 from src.data.loading.loaders.video_file_loader import VideoFileLoader
 
 

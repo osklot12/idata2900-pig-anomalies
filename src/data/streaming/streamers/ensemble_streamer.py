@@ -36,6 +36,7 @@ class EnsembleStreamer(StreamerManager, ThreadedStreamer):
     def _stream(self) -> StreamerStatus:
         with self._lock:
             for streamer_id in self.get_streamer_ids():
+                print(f"[EnsembleStreamer] Started streamer {streamer_id}")
                 self.get_streamer(streamer_id).start_streaming()
 
         for streamer_id in self.get_streamer_ids():

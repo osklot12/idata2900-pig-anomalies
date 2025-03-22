@@ -1,6 +1,6 @@
 from typing import Dict
 
-from src.data.label_parser import LabelParser
+from src.data.label.label_parser import LabelParser
 from src.typevars.enum_type import T_Enum
 
 
