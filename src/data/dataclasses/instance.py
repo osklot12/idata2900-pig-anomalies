@@ -3,6 +3,8 @@ from typing import Tuple, List, Optional
 
 import numpy as np
 
+from src.data.dataclasses.bbox_annotation import BBoxAnnotation
+from src.data.dataclasses.frame_annotation import FrameAnnotation
 from src.typevars.enum_type import T_Enum
 
 
@@ -12,5 +14,5 @@ class Instance:
     source: str
     index: int
     data: np.ndarray
-    annotations: Optional[List[Tuple[T_Enum, float, float, float, float]]]
+    annotation: List[BBoxAnnotation]
     end_of_stream: bool

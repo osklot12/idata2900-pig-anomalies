@@ -37,6 +37,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
 
     def feed_frame(self, frame: Frame) -> FeedStatus:
         with self.lock:
+            print(f"[BufferedInstanceAggregator] Received frame {frame}")
             result = FeedStatus.DROP
             index = frame.index
 
@@ -58,6 +59,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
 
     def feed_annotation(self, annotation: FrameAnnotation) -> FeedStatus:
         with self.lock:
+            print(f"[BufferedInstanceAggregator] Received annotation {annotation}")
             result = FeedStatus.DROP
             index = annotation.index
 

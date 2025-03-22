@@ -2,7 +2,7 @@ from typing import Dict, Tuple, List
 
 import json
 
-from src.data.label_parser import LabelParser
+from src.data.label.label_parser import LabelParser
 from src.data.dataclasses.bbox_annotation import BBoxAnnotation
 from src.data.dataclasses.bounding_box import BoundingBox
 from src.data.dataclasses.frame_annotation import FrameAnnotation

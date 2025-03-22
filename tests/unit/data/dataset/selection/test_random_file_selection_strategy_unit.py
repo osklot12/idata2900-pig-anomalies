@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.dataset.selection.random_file_selection_strategy import RandomFileSelectionStrategy
+from src.data.dataset.selection.random_file_selector import RandomFileSelector
 
 @pytest.fixture
 def suffixes():
@@ -15,7 +15,7 @@ def suffixes():
 @pytest.fixture
 def random_selector(suffixes):
     """Fixture to provide a RandomFileSelectionStrategy instance."""
-    return RandomFileSelectionStrategy(suffixes)
+    return RandomFileSelector(suffixes)
 
 def test_select_file_returns_file_with_valid_suffix(random_selector, suffixes):
     """Tests that select_file() returns a file with a valid suffix."""

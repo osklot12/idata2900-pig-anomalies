@@ -1,7 +1,7 @@
 import pytest
 
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.simple_label_parser import SimpleLabelParser
+from src.data.label.simple_label_parser import SimpleLabelParser
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 

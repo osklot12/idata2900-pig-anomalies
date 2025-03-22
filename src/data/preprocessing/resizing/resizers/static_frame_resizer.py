@@ -22,4 +22,9 @@ class StaticFrameResizer(FrameResizeStrategy):
         if frame_data is None:
             raise ValueError("frame_data cannot be None")
 
-        return cv2.resize(frame_data, (self._resize_shape[1], self._resize_shape[0]))
+        resized = cv2.resize(frame_data, self._resize_shape)
+
+        if frame_data.ndim == 3 and frame_data.shape[2] == 1:
+            resized = resized[:, :, np.newaxis]
+
+        return resized
