@@ -1,5 +1,5 @@
 import hashlib
-from typing import List, Dict, Iterable
+from typing import List, Dict, Iterable, Optional
 
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset_split import DatasetSplit
@@ -8,7 +8,8 @@ from src.data.dataset_split import DatasetSplit
 class ConsistentDatasetSplitter(DatasetSplitter):
     """A consistent dataset splitter, always putting the same ID's in the same split."""
 
-    def __init__(self, dataset_ids: Iterable[str] = None, train_ratio: float = 0.8, val_ratio: float = 0.1, seed: int = 42):
+    def __init__(self, dataset_ids: Iterable[str] = None, train_ratio: float = 0.8, val_ratio: float = 0.1,
+                 seed: int = 42):
         """
         Initializes a ConsistentDatasetSplitter instance.
 
@@ -45,6 +46,31 @@ class ConsistentDatasetSplitter(DatasetSplitter):
 
     def get_split(self, split: DatasetSplit) -> set[str]:
         return set(self._split_map.get(split, []))
+
+    def get_split_ratio(self, split: DatasetSplit) -> float:
+        ratio = -1
+
+        if split == DatasetSplit.TRAIN:
+            ratio = self._train_threshold
+        elif split == DatasetSplit.VAL:
+            ratio = self._val_threshold
+        elif split == DatasetSplit.TEST:
+            ratio = 1 - self._val_threshold - self._train_threshold
+
+        return ratio
+
+    def get_split_for_id(self, id_: str) -> Optional[DatasetSplit]:
+        split = None
+
+        items = list(self._split_map.items())
+        i = 0
+        while not split and i < len(items):
+            current_split, ids = items[i]
+            if id_ in ids:
+                split = current_split
+            i += 1
+
+        return split
 
     def _update_splits(self) -> None:
         """Updates the internal splits."""

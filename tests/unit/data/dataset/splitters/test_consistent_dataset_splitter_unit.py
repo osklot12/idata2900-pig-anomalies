@@ -1,3 +1,5 @@
+import math
+import random
 import re
 from typing import List, Tuple, Iterable
 
@@ -40,6 +42,41 @@ def test_initialization_invalid_ratios():
     with pytest.raises(ValueError,
                        match=re.escape("The sum of train_ratio and val_ratio must be in the interval [0, 1]")):
         ConsistentDatasetSplitter(train_ratio=1, val_ratio=1)
+
+
+def test_get_split_ratio():
+    """Tests that get_split_ratio() returns the correct split ratios."""
+    # arrange
+    ratios = (
+        0.6,  # train
+        0.2,  # val
+        0.2  # test
+    )
+
+    splitter = ConsistentDatasetSplitter(train_ratio=ratios[0], val_ratio=ratios[1])
+
+    # act
+    returned_ratios = (
+        splitter.get_split_ratio(DatasetSplit.TRAIN),
+        splitter.get_split_ratio(DatasetSplit.VAL),
+        splitter.get_split_ratio(DatasetSplit.TEST)
+    )
+
+    # assert
+    for i in range(len(ratios)):
+        assert math.isclose(returned_ratios[i], ratios[i], rel_tol=1e-9)
+
+
+def test_get_split_for_id(dataset_ids):
+    """Tests that get_split_for_id() returns the correct split for the given id."""
+    # arrange
+    splitter = ConsistentDatasetSplitter(dataset_ids=dataset_ids, train_ratio=1, val_ratio=0)
+
+    # act
+    returned_split = splitter.get_split_for_id("id5")
+
+    # assert
+    assert returned_split == DatasetSplit.TRAIN
 
 
 def test_update_dataset_and_get_split(dataset_ids):
