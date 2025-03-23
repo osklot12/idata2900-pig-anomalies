@@ -22,7 +22,7 @@ class AggregatedStreamer(Streamer):
         self._aggregator = BufferedInstanceAggregator(callback)
         streamer_pair = streamers_factory.create_streamer_pair(
             self._aggregator.feed_frame,
-            self._aggregator.feed_annotation
+            self._aggregator.feed_annotations
         )
         
         if streamer_pair is None:

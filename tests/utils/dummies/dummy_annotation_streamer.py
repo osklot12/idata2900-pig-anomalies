@@ -8,7 +8,7 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
-from tests.utils.test_annotation_class import TestAnnotationLabel
+from tests.utils.test_annotation_label import TestAnnotationLabel
 
 
 class DummyAnnotationStreamer(AnnotationStreamer):

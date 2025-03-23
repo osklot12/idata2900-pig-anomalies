@@ -4,7 +4,7 @@ from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
-from tests.utils.test_annotation_class import TestAnnotationLabel
+from tests.utils.test_annotation_label import TestAnnotationLabel
 
 
 class DummyVideoAnnotationsLoader(VideoAnnotationsLoader):
