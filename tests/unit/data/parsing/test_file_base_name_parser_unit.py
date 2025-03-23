@@ -8,6 +8,7 @@ def parser():
     """Fixture to provide a FileBaseNameParser instance."""
     return FileBaseNameParser()
 
+
 @pytest.mark.parametrize("input_path,expected", [
     ("video1.mp4", "video1"),
     ("some/path/to/video2.avi", "video2"),
