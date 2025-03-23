@@ -8,15 +8,21 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from tests.utils.test_annotation_label import TestAnnotationLabel
 
 
 @pytest.fixture
-def matching_frame():
+def matching_source_id():
+    """Fixture to provide the source ID for the matching data."""
+    return "id1"
+
+@pytest.fixture
+def matching_frame(matching_source_id):
     """Fixture to provide a Frame instance that has matching annotations."""
     return Frame(
-        source="dataset/videos/id1.mp4",
+        source="dataset/videos/" + matching_source_id + ".mp4",
         index=34,
         data=np.random.randint(0, 256, size=(100, 200), dtype=np.uint8),
         end_of_stream=False
@@ -24,10 +30,10 @@ def matching_frame():
 
 
 @pytest.fixture
-def matching_annotations():
+def matching_annotations(matching_source_id):
     """Fixture to provide a FrameAnnotations instance that has a matching frame."""
     return FrameAnnotations(
-        source="dataset/annotations/id1.json",
+        source="dataset/annotations/" + matching_source_id + ".json",
         index=34,
         annotations=[
             AnnotatedBBox(
@@ -143,6 +149,23 @@ def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annot
 
     # assert
     assert not callback.called
+
+
+def test_source_parsing(matching_frame, matching_annotations, callback, matching_source_id):
+    """Tests that a BufferedInstanceAggregator with a source parser parses the source as expected."""
+    # arrange
+    parser = FileBaseNameParser()
+    buffered_aggregator = BufferedInstanceAggregator(callback=callback, source_parser=parser)
+
+    # act
+    buffered_aggregator.feed_frame(matching_frame)
+    buffered_aggregator.feed_annotations(matching_annotations)
+
+    # assert
+    assert callback.call_count == 1
+
+    fed_instance = callback.call_args[0][0]
+    assert fed_instance.source == matching_source_id
 
 
 def test_feed_none_frame_raises(aggregator):
