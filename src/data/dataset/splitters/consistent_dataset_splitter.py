@@ -1,0 +1,71 @@
+import hashlib
+from typing import List, Dict
+
+from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
+from src.data.dataset_split import DatasetSplit
+
+
+class ConsistentDatasetSplitter(DatasetSplitter):
+    """A consistent dataset splitter, always putting the same ID's in the same split."""
+
+    def __init__(self, dataset_ids: List[str] = None, train_ratio: float = 0.8, val_ratio: float = 0.1, seed: int = 42):
+        """
+        Initializes a ConsistentDatasetSplitter instance.
+
+        Args:
+            dataset_ids (List[str]): optional list of dataset id's to update the dataset upon construction
+            train_ratio (float): the ratio of the training set size
+            val_ratio (float): the ratio of the validation set size
+            seed (int): the random seed
+        """
+        if train_ratio + val_ratio < 0 or train_ratio + val_ratio > 1:
+            raise ValueError("The sum of train_ratio and val_ratio must be in the interval [0, 1]")
+
+        self._train_threshold = train_ratio
+        self._val_threshold = val_ratio
+        self._seed = seed
+
+        self._dataset: List[str] = []
+        self._train_split: List[str] = []
+        self._val_split: List[str] = []
+        self._test_split: List[str] = []
+
+        self._split_map: Dict[DatasetSplit, List[str]] = {
+            DatasetSplit.TRAIN: self._train_split,
+            DatasetSplit.VAL: self._val_split,
+            DatasetSplit.TEST: self._test_split
+        }
+
+        if dataset_ids:
+            self.update_dataset(dataset_ids)
+
+    def update_dataset(self, new_dataset: List[str]) -> None:
+        self._dataset = new_dataset
+        self._update_splits()
+
+    def get_split(self, split: DatasetSplit) -> List[str]:
+        return list(self._split_map.get(split, []))
+
+    def _update_splits(self) -> None:
+        """Updates the internal splits."""
+        self._train_split.clear()
+        self._val_split.clear()
+        self._test_split.clear()
+
+        for id_ in self._dataset:
+            p = self._normalized_hash(id_)
+            if p < self._train_threshold:
+                self._train_split.append(id_)
+            elif p < self._train_threshold + self._val_threshold:
+                self._val_split.append(id_)
+            else:
+                self._test_split.append(id_)
+
+    def _stable_hash(self, s: str) -> int:
+        """Gives a stable hash for a given string."""
+        key = f"{self._seed}_{s}".encode("utf-8")
+        return int(hashlib.md5(key).hexdigest(), 16)
+
+    def _normalized_hash(self, s: str) -> float:
+        """Gives a normalized hash for a given string."""
+        return self._stable_hash(s) / 2 ** 128

@@ -8,6 +8,7 @@ import numpy as np
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataset.providers.source_ids_provider import SourceIDsProvider
 from src.data.dataset_split import DatasetSplit
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -18,12 +19,12 @@ class VirtualDataset:
     mimicking a traditional dataset stored on disk.
     """
 
-    def __init__(self, dataset_ids: List[str], max_sources: int, max_frames_per_source: int,
+    def __init__(self, dataset_ids_provider: SourceIDsProvider, max_sources: int, max_frames_per_source: int,
                  train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, seed=42):
         if train_ratio + val_ratio + test_ratio != 1:
             raise ValueError("Train, validation, and test ratios must sum to 1.")
 
-        self.dataset_ids = dataset_ids
+        self.dataset_ids =
         self.train_ratio = train_ratio
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
