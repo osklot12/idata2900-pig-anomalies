@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 
 import pytest
 
@@ -10,10 +10,10 @@ from src.data.dataset_split import DatasetSplit
 @pytest.fixture
 def dataset_ids():
     """Fixture to provide the dataset IDs."""
-    return [
+    return {
         "id1", "id2", "id3", "id4", "id5",
         "id6", "id7", "id8", "id9", "id10"
-    ]
+    }
 
 
 def _get_splits(splitter: ConsistentDatasetSplitter):
@@ -25,7 +25,7 @@ def _get_splits(splitter: ConsistentDatasetSplitter):
     )
 
 
-def _get_splits_before_and_after_update(splitter: ConsistentDatasetSplitter, updated_dataset_ids: List[str]):
+def _get_splits_before_and_after_update(splitter: ConsistentDatasetSplitter, updated_dataset_ids: Iterable[str]):
     """Returns the dataset splits before and after updating the dataset IDs."""
     splits_before = _get_splits(splitter)
     splitter.update_dataset(updated_dataset_ids)
@@ -60,7 +60,7 @@ def test_adding_ids_keep_consistency(dataset_ids):
     # arrange
     splitter = ConsistentDatasetSplitter(dataset_ids=dataset_ids)
     updated_list = dataset_ids.copy()
-    dataset_ids.append("id11")
+    dataset_ids.add("id11")
 
     # act
     splits_before, splits_after = _get_splits_before_and_after_update(splitter, updated_list)
