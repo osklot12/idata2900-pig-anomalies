@@ -1,6 +1,6 @@
 from typing import Callable
 
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.loading.feed_status import FeedStatus
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
@@ -11,7 +11,7 @@ from src.data.streaming.streamers.streamer import Streamer
 class AggregatedStreamer(Streamer):
     """A streamer consisting of a video and annotation streamer, aggregating the stream data."""
 
-    def __init__(self, streamers_factory: StreamerPairFactory, callback: Callable[[AnnotatedFrame], FeedStatus]):
+    def __init__(self, streamers_factory: StreamerPairFactory, callback: Callable[[StreamedAnnotatedFrame], FeedStatus]):
         """
         Initializes an AggregatedStreamer instance.
 

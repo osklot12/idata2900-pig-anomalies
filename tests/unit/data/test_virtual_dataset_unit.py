@@ -8,15 +8,19 @@ from src.data.dataset.virtual_dataset import VirtualDataset
 
 
 @pytest.fixture
-def virtual_dataset():
-    """Creates a VirtualDataset instance with mock dataset IDs."""
-    dataset_ids = [
+def source_ids():
+    """Fixture to provide dataset source ids."""
+    return [
         "video1", "video2", "video3",
         "video4", "video5", "video6",
         "video7", "video8", "video9"
     ]
+
+@pytest.fixture
+def virtual_dataset(source_ids):
+    """Creates a VirtualDataset instance with mock dataset IDs."""
     return VirtualDataset(
-        dataset_ids, max_sources=10, max_frames_per_source=15,
+        dataset_ids=source_ids, max_sources=10, max_frames_per_source=15,
         train_ratio=0.4, val_ratio=0.3, test_ratio=0.3
     )
 

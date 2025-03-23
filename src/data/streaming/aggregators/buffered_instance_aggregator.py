@@ -6,7 +6,7 @@ from src.data.streaming.aggregators.instance_aggregator import InstanceAggregato
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.loading.feed_status import FeedStatus
 from src.typevars.enum_type import T_Enum
 
@@ -14,7 +14,7 @@ from src.typevars.enum_type import T_Enum
 class BufferedInstanceAggregator(InstanceAggregator):
     """Buffers incoming frames and annotations and feeds forward an aggregated instance once matched."""
 
-    def __init__(self, callback: Callable[[AnnotatedFrame], FeedStatus], buffer_size: int = 1000):
+    def __init__(self, callback: Callable[[StreamedAnnotatedFrame], FeedStatus], buffer_size: int = 1000):
         """
         Initializes an instance of BufferedInstanceAggregator.
 
@@ -93,7 +93,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
         if self.annotation_buffer.has(frame.index):
             # match found
             annotations, annotation_end = self.annotation_buffer.pop(frame.index)[1:]
-            instance = AnnotatedFrame(
+            instance = StreamedAnnotatedFrame(
                 frame.source,
                 frame.index,
                 frame.data,
@@ -122,7 +122,7 @@ class BufferedInstanceAggregator(InstanceAggregator):
         if self.frame_buffer.has(annotation.index):
             # match found
             frame_data, frame_end = self.frame_buffer.pop(annotation.index)[1:]
-            instance = AnnotatedFrame(
+            instance = StreamedAnnotatedFrame(
                 annotation.source,
                 annotation.index,
                 frame_data,
@@ -134,12 +134,12 @@ class BufferedInstanceAggregator(InstanceAggregator):
 
         return result
 
-    def _feed_instance(self, instance: AnnotatedFrame) -> FeedStatus:
+    def _feed_instance(self, instance: StreamedAnnotatedFrame) -> FeedStatus:
         """
         Feeds forward an instance of a matched frame-annotation pair to the registered callback.
 
         Args:
-            instance (AnnotatedFrame): The instance to feed forward.
+            instance (StreamedAnnotatedFrame): The instance to feed forward.
 
         Returns:
             FeedStatus: The status of the feed forward.
