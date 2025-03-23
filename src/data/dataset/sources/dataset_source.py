@@ -2,13 +2,14 @@ from abc import ABC, abstractmethod
 from typing import List
 
 class DatasetSource(ABC):
-    """
-    An interface for a source of dataset instances.
-    """
+    """An interface for dataset sources."""
 
     @abstractmethod
-    def list_files(self) -> List[str]:
+    def get_source_ids(self) -> set[str]:
         """
-        Should return a list of available instances.
+        Returns a set of the source IDs.
+
+        Returns:
+            set[str]: set of source IDs
         """
-        pass
+        raise NotImplementedError

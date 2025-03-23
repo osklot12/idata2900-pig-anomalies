@@ -32,7 +32,7 @@ class DummyGCPDataLoader(DatasetSource):
         ],
     }
 
-    def list_files(self) -> List[str]:
+    def get_source_ids(self) -> List[str]:
         return self.fetch_all_files()
 
     def __init__(self, bucket_name: str = "test-bucket", credentials_path: str = "test_credentials.json"):

@@ -27,7 +27,7 @@ def parser():
 def test_get_source_ids(dataset_source, parser):
     """Tests that get_source_ids() returns the parsed source IDs."""
     # arrange
-    sources_before = dataset_source.list_files()
+    sources_before = dataset_source.get_source_ids()
     provider = FileSourceIDsProvider(dataset_source, parser)
 
     # act

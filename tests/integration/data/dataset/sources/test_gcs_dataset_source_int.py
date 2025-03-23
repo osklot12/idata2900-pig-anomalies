@@ -22,7 +22,7 @@ def gcs_file_manager(gcp_auth_service):
 def test_list_files_success(gcs_file_manager):
     """Integration test for successfully listing all files."""
     # act
-    result = gcs_file_manager.list_files()
+    result = gcs_file_manager.get_source_ids()
 
     # assert
     assert isinstance(result, list)
@@ -38,4 +38,4 @@ def test_list_files_bucket_not_found(gcp_auth_service):
 
     # act & assert
     with pytest.raises(Exception, match="404 Client Error"):
-        file_manager.list_files()
+        file_manager.get_source_ids()
