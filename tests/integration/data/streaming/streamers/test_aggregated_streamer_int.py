@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
@@ -107,8 +107,8 @@ def _validate_callbacks(callback: Mock):
     """Validates callbacks."""
     for call_args in callback.call_args_list:
         instance = call_args[0][0]
-        assert isinstance(instance, AnnotatedFrame)
-        assert instance.data.size > 0
+        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert instance.frame.size > 0
 
 
 @pytest.mark.integration

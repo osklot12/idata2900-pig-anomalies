@@ -7,6 +7,7 @@ import numpy as np
 
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset_split import DatasetSplit
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -42,29 +43,26 @@ class VirtualDataset:
         self.test_max_sources = math.floor(test_ratio * max_sources)
 
         # train split buffer
-        self.train_buffer = HashBuffer[
-            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
-        ](max_size=self.train_max_sources)
+        self.train_buffer = HashBuffer[HashBuffer[AnnotatedFrame]](max_size=self.train_max_sources)
 
         # val split buffer
-        self.val_buffer = HashBuffer[
-            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
-        ](max_size=self.val_max_sources)
+        self.val_buffer = HashBuffer[HashBuffer[AnnotatedFrame]](max_size=self.val_max_sources)
 
         # test split buffer
-        self.test_buffer = HashBuffer[
-            HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]]
-        ](max_size=self.test_max_sources)
+        self.test_buffer = HashBuffer[HashBuffer[AnnotatedFrame]](max_size=self.test_max_sources)
 
         self.max_frames_per_source = max_frames_per_source
 
-    def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> AnnotatedFrame:
+    def get_shuffled_batch(self, split: DatasetSplit, batch_size: int) -> List[AnnotatedFrame]:
         """
         Samples a randomized batch of frame-annotation pairs from the specified dataset split.
 
-        :param split: The dataset split.
-        :param batch_size: The number of samples to retrieve.
-        :return: A list of (frame, annotation) pairs.
+        Args:
+            split (DatasetSplit): the dataset split to sample from
+            batch_size (int): the number of frames to sample
+
+        Returns:
+            List[AnnotatedFrame]: the randomized batch of frame-annotation pairs
         """
         with self.lock:
             if self.get_frame_count(split) < batch_size:
@@ -102,50 +100,48 @@ class VirtualDataset:
 
         return total_frames
 
-    def feed(self, instance: AnnotatedFrame) -> None:
+    def feed(self, anno_frame: StreamedAnnotatedFrame) -> None:
         """
         Feeds a frame into the appropriate buffer.
 
         Args:
-            instance (AnnotatedFrame): the data instance to feed
+            anno_frame (StreamedAnnotatedFrame): the data instance to feed
         """
         with self.lock:
             # get correct split
-            split_buffer = self._get_buffer_for_source(source)
+            split_buffer = self._get_buffer_for_source(anno_frame.source)
 
-            if split_buffer and frame_index < 0:
-                print(f"[VirtualDataset] End of stream signal received for source {source}.")
+            if split_buffer and anno_frame.index < 0:
+                print(f"[VirtualDataset] End of stream signal received for source {anno_frame.source}.")
 
             elif split_buffer:
                 # allocates buffer for source if new
-                source_buffer = self._get_source_buffer(source, split_buffer)
+                source_buffer = self._get_source_buffer(anno_frame.source, split_buffer)
 
                 # add instance to source buffer
-                source_buffer.add(
-                    frame_index, (frame, annotation)
-                )
+                source_buffer.add(anno_frame.index, AnnotatedFrame(anno_frame.frame, anno_frame.annotations))
 
-                print(f"[VirtualDataset] Instance {frame_index} from source {source} received and stored")
+                print(f"[VirtualDataset] Instance {anno_frame.index} from source {anno_frame.source} received and stored")
                 print(f"[VirtualDataset] Train split: {self.get_frame_count(DatasetSplit.TRAIN)}")
                 print(f"[VirtualDataset] Val split: {self.get_frame_count(DatasetSplit.VAL)}")
                 print(f"[VirtualDataset] Test split: {self.get_frame_count(DatasetSplit.TEST)}")
 
             else:
-                print(f"[VirtualDataset] Source {source} not recognized.")
+                print(f"[VirtualDataset] Source {anno_frame.source} not recognized.")
 
-    def _get_source_buffer(self, source_key, split_buffer):
+    def _get_source_buffer(self, source_key: str, split_buffer: HashBuffer) -> HashBuffer:
         """
-        Returns the appropriate source buffer for the specified source key.
+        Returns the source buffer associated with the specified source key.
         Creates a new source buffer if it does not exist.
 
-        :param source_key: The key of the source data.
-        :param split_buffer: The split buffer.
+        Args:
+            source_key (str): the source key
+            split_buffer (HashBuffer): the source buffer to search in
         """
         if not split_buffer.has(source_key):
-            new_buffer = HashBuffer[Tuple[np.ndarray, Optional[List[Tuple[str, float, float, float, float]]]]](
-                max_size=self.max_frames_per_source,
-            )
+            new_buffer = HashBuffer[AnnotatedFrame](max_size=self.max_frames_per_source)
             split_buffer.add(source_key, new_buffer)
+
         return split_buffer.at(source_key)
 
     def _shuffle_and_split(self):
