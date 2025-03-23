@@ -1,11 +1,11 @@
 from typing import List
 
-from src.data.dataset.providers.source_ids_provider import SourceIDsProvider
+from src.data.dataset.providers.source_id_provider import SourceIdProvider
 from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.parsing.string_parser import StringParser
 
 
-class FileSourceIDsProvider(SourceIDsProvider):
+class FileSourceIDsProvider(SourceIdProvider):
     """A provider of dataset file source IDs using string parsing."""
 
     def __init__(self, dataset_source: DatasetSource, string_parser: StringParser):
@@ -20,4 +20,4 @@ class FileSourceIDsProvider(SourceIDsProvider):
         self._string_parser = string_parser
 
     def get_source_ids(self) -> List[str]:
-        return [self._string_parser.parse_string(f) for f in self._dataset_source.list_files()]
+        return [self._string_parser.parse_string(f) for f in self._dataset_source.get_source_ids()]

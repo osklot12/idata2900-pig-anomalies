@@ -39,7 +39,7 @@ def dataset_id_loader():
 @pytest.fixture
 def virtual_dataset(dataset_id_loader):
     """Returns a VirtualDataset instance."""
-    dataset_ids = dataset_id_loader.list_files(NorsvinBucketParser.VIDEO_PREFIX, "")
+    dataset_ids = dataset_id_loader.get_source_ids(NorsvinBucketParser.VIDEO_PREFIX, "")
     dataset_ids = [SourceNormalizer.normalize(id) for id in dataset_ids]
     return VirtualDataset(dataset_ids, max_sources=10, max_frames_per_source=300)
 
@@ -88,7 +88,7 @@ def test_streaming_data(frame_data_loader, annotation_data_loader, virtual_datas
 
     # assert
     sample_source = SourceNormalizer.normalize(SampleBucketFiles.SAMPLE_VIDEO_FILE)
-    split_buffer = virtual_dataset._get_buffer_for_source(sample_source)
+    split_buffer = virtual_dataset._get_split_buffer_for_source(sample_source)
 
     assert split_buffer.has(sample_source)
     assert split_buffer.at(sample_source).size() == 208
@@ -109,7 +109,7 @@ def test_visualize_annotations(frame_data_loader, annotation_data_loader, virtua
 
     # assert
     sample_source = SourceNormalizer.normalize(SampleBucketFiles.SAMPLE_VIDEO_FILE)
-    split_buffer = virtual_dataset._get_buffer_for_source(sample_source)
+    split_buffer = virtual_dataset._get_split_buffer_for_source(sample_source)
 
     assert split_buffer.has(sample_source)
     assert split_buffer.at(sample_source).size() == 208

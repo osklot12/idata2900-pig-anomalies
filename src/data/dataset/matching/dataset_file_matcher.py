@@ -26,7 +26,7 @@ class DatasetFileMatcher(DatasetInstanceProvider):
         if source is None:
             raise ValueError("Source cannot be None")
 
-        self._unmatched_files = source.list_files()
+        self._unmatched_files = source.get_source_ids()
         self._matched_pairs: List[DatasetInstance] = []
 
         self._suffixes: Dict[DataType, List[str]] = {

@@ -29,7 +29,7 @@ def test_list_files_success(mock_make_request, gcs_file_manager):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_file_manager.list_files()
+    result = gcs_file_manager.get_source_ids()
 
     # assert
     mock_make_request.assert_called_once_with(
@@ -47,7 +47,7 @@ def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_file_manager.list_files()
+    result = gcs_file_manager.get_source_ids()
 
     # assert
     mock_make_request.assert_called_once()
@@ -63,6 +63,6 @@ def test_list_files_not_found(mock_make_request, gcs_file_manager):
 
     # act & assert
     with pytest.raises(HTTPError, match=error_msg):
-        gcs_file_manager.list_files()
+        gcs_file_manager.get_source_ids()
 
     mock_make_request.assert_called_once()

@@ -26,5 +26,5 @@ class DummyDatasetSource(DatasetSource):
         """
         self.file_paths = file_paths
 
-    def list_files(self) -> List[str]:
+    def get_source_ids(self) -> List[str]:
         return self.file_paths

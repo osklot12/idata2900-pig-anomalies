@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 
-class SourceIDsProvider(ABC):
+class SourceIdProvider(ABC):
     """An interface for providers of source IDs."""
 
     @abstractmethod

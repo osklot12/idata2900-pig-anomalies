@@ -26,7 +26,7 @@ class SimpleDatasetInstanceProvider(DatasetInstanceProvider):
     def get_dataset_instance(self) -> Optional[DatasetInstance]:
         result = None
 
-        files = self._source.list_files()
+        files = self._source.get_source_ids()
         if files:
 
             searching = True
