@@ -9,34 +9,19 @@ from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.providers.source_ids_provider import SourceIDsProvider
+from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset_split import DatasetSplit
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 
 class VirtualDataset:
-    """
-    Organizes streamed frames with annotations into train, validation, and test sets while
-    mimicking a traditional dataset stored on disk.
-    """
 
-    def __init__(self, dataset_ids_provider: SourceIDsProvider, max_sources: int, max_frames_per_source: int,
-                 train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, seed=42):
-        if train_ratio + val_ratio + test_ratio != 1:
-            raise ValueError("Train, validation, and test ratios must sum to 1.")
+    def __init__(self, ids_provider: SourceIDsProvider, splitter: DatasetSplitter,
+                 max_sources: int, max_frames_per_source: int):
 
-        self.dataset_ids =
-        self.train_ratio = train_ratio
-        self.val_ratio = val_ratio
-        self.test_ratio = test_ratio
-        self.seed = seed
+        self._ids_provider = ids_provider
 
         self.lock = threading.Lock()
-
-        self.train_ids: List[str] = []
-        self.val_ids: List[str] = []
-        self.test_ids: List[str] = []
-
-        self._shuffle_and_split()
 
         # floor each max buffer size to never exceed the total max buffer size
         self.train_max_sources = math.floor(train_ratio * max_sources)
