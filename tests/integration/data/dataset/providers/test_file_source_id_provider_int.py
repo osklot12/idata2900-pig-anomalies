@@ -16,10 +16,12 @@ def dataset_source():
         auth_service=auth_service
     )
 
+
 @pytest.fixture
 def parser():
     """Fixture to provide a StringParser instance."""
     return FileBaseNameParser()
+
 
 @pytest.mark.integration
 def test_get_source_ids(dataset_source, parser):

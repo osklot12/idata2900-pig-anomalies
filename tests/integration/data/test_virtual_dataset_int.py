@@ -68,7 +68,7 @@ def setup_loaders(virtual_dataset, frame_data_loader, annotation_data_loader):
         annotation_blob_name=NorsvinBucketParser.get_annotation_blob_name(SampleBucketFiles.SAMPLE_JSON_FILE),
         decoder_cls=DarwinDecoder,
         normalizer=normalizer,
-        callback=instance_loader.feed_annotation
+        callback=instance_loader.feed_annotations
     )
 
     return instance_loader, frame_loader, annotation_loader
