@@ -1,5 +1,5 @@
 import hashlib
-from typing import List, Dict
+from typing import List, Dict, Iterable
 
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset_split import DatasetSplit
@@ -8,12 +8,12 @@ from src.data.dataset_split import DatasetSplit
 class ConsistentDatasetSplitter(DatasetSplitter):
     """A consistent dataset splitter, always putting the same ID's in the same split."""
 
-    def __init__(self, dataset_ids: List[str] = None, train_ratio: float = 0.8, val_ratio: float = 0.1, seed: int = 42):
+    def __init__(self, dataset_ids: Iterable[str] = None, train_ratio: float = 0.8, val_ratio: float = 0.1, seed: int = 42):
         """
         Initializes a ConsistentDatasetSplitter instance.
 
         Args:
-            dataset_ids (List[str]): optional list of dataset id's to update the dataset upon construction
+            dataset_ids (Iterable[str]): optional iterable of dataset id's to update the dataset upon construction
             train_ratio (float): the ratio of the training set size
             val_ratio (float): the ratio of the validation set size
             seed (int): the random seed
@@ -25,12 +25,12 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         self._val_threshold = val_ratio
         self._seed = seed
 
-        self._dataset: List[str] = []
-        self._train_split: List[str] = []
-        self._val_split: List[str] = []
-        self._test_split: List[str] = []
+        self._dataset: set[str] = set()
+        self._train_split: set[str] = set()
+        self._val_split: set[str] = set()
+        self._test_split: set[str] = set()
 
-        self._split_map: Dict[DatasetSplit, List[str]] = {
+        self._split_map: Dict[DatasetSplit, set[str]] = {
             DatasetSplit.TRAIN: self._train_split,
             DatasetSplit.VAL: self._val_split,
             DatasetSplit.TEST: self._test_split
@@ -39,12 +39,12 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         if dataset_ids:
             self.update_dataset(dataset_ids)
 
-    def update_dataset(self, new_dataset: List[str]) -> None:
-        self._dataset = new_dataset
+    def update_dataset(self, new_dataset: Iterable[str]) -> None:
+        self._dataset = set(new_dataset)
         self._update_splits()
 
-    def get_split(self, split: DatasetSplit) -> List[str]:
-        return list(self._split_map.get(split, []))
+    def get_split(self, split: DatasetSplit) -> set[str]:
+        return set(self._split_map.get(split, []))
 
     def _update_splits(self) -> None:
         """Updates the internal splits."""
@@ -55,11 +55,11 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         for id_ in self._dataset:
             p = self._normalized_hash(id_)
             if p < self._train_threshold:
-                self._train_split.append(id_)
+                self._train_split.add(id_)
             elif p < self._train_threshold + self._val_threshold:
-                self._val_split.append(id_)
+                self._val_split.add(id_)
             else:
-                self._test_split.append(id_)
+                self._test_split.add(id_)
 
     def _stable_hash(self, s: str) -> int:
         """Gives a stable hash for a given string."""
