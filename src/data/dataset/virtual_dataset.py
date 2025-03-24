@@ -93,14 +93,7 @@ class VirtualDataset(Dataset):
 
                 # add instance to source buffer
                 source_buffer.add(anno_frame.index, AnnotatedFrame(anno_frame.frame, anno_frame.annotations))
-
-                print(
-                    f"[VirtualDataset] Instance {anno_frame.index} from source {anno_frame.source} received and stored")
-                print(f"[VirtualDataset] Annotations: {anno_frame.annotations}")
-                print(f"[VirtualDataset] Train split: {self.get_frame_count(DatasetSplit.TRAIN)}")
-                print(f"[VirtualDataset] Val split: {self.get_frame_count(DatasetSplit.VAL)}")
-                print(f"[VirtualDataset] Test split: {self.get_frame_count(DatasetSplit.TEST)}")
-
+                print(f"[VirtualDataset] Received frame {anno_frame.index}")
             else:
                 print(f"[VirtualDataset] Source {anno_frame.source} not recognized.")
 

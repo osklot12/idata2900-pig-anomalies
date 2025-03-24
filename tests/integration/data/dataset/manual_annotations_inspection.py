@@ -24,7 +24,122 @@ from tests.utils.gcs.test_bucket import TestBucket
 
 
 def manual_visualize_annotations():
-    # --- Manual "fixture" setup ---
+    # setup
+    loader_factory = _get_loader_factory()
+
+    instance_provider = _get_instance_provider(loader_factory)
+
+    streamer_pair_factory = _get_streamer_pair_factory(instance_provider, loader_factory)
+
+    virtual_dataset = _get_virtual_dataset(loader_factory)
+
+    aggregated_streamer_factory = _get_aggregated_streamer(streamer_pair_factory, virtual_dataset)
+
+    # stream
+    _stream_frames(aggregated_streamer_factory)
+
+    # get batch
+    batch_size = 10
+    shuffled_batch = _get_shuffled_batch(virtual_dataset, batch_size)
+
+    # visualize
+    for instance in shuffled_batch:
+        frame = instance.frame.copy()
+        annotations = instance.annotations.copy()
+        frame_height, frame_width, _ = frame.shape
+
+        for annotation in annotations:
+            behavior = annotation.cls
+            x_max, x_min, y_max, y_min = _get_absolute_coordinates(annotation, frame_width, frame_height)
+
+            _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min)
+
+        _show_plot(frame)
+
+
+def _show_plot(frame):
+    plt.figure(figsize=(6, 6))
+    plt.imshow(frame)
+    plt.title(f"Shuffled Frame")
+    plt.axis("off")
+    plt.show()
+
+
+def _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min):
+    cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+    cv2.putText(
+        frame, behavior.name.replace("_", " "), (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
+        0.5, (0, 255, 0), 1, cv2.LINE_AA
+    )
+
+
+def _get_absolute_coordinates(annotation, frame_width, frame_height):
+    x = annotation.bbox.center_x
+    y = annotation.bbox.center_y
+    w = annotation.bbox.width
+    h = annotation.bbox.height
+
+    x_min = int((x - w / 2) * frame_width)
+    y_min = int((y - h / 2) * frame_height)
+    x_max = int((x + w / 2) * frame_width)
+    y_max = int((y + h / 2) * frame_height)
+
+    return x_max, x_min, y_max, y_min
+
+
+def _get_shuffled_batch(virtual_dataset, batch_size):
+    if virtual_dataset.get_frame_count(DatasetSplit.TRAIN):
+        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
+    elif virtual_dataset.get_frame_count(DatasetSplit.VAL):
+        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.VAL, batch_size)
+    else:
+        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TEST, batch_size)
+    return shuffled_batch
+
+
+def _stream_frames(aggregated_streamer_factory):
+    streamer = aggregated_streamer_factory.create_streamer()
+    streamer.start_streaming()
+    streamer.wait_for_completion()
+
+
+def _get_aggregated_streamer(streamer_pair_factory, virtual_dataset):
+    source_parser_factory = FileBaseNameParserFactory()
+    aggregated_streamer_factory = AggregatedStreamerFactory(
+        streamer_pair_factory=streamer_pair_factory,
+        callback=virtual_dataset.feed,
+        source_parser_factory=source_parser_factory
+    )
+    return aggregated_streamer_factory
+
+
+def _get_virtual_dataset(loader_factory):
+    source_id_provider = FileSourceIdProvider(loader_factory.create_dataset_source(), FileBaseNameParser())
+    dataset_splitter = ConsistentDatasetSplitter()
+    virtual_dataset = VirtualDataset(source_id_provider, dataset_splitter, max_sources=10, max_frames_per_source=200)
+    return virtual_dataset
+
+
+def _get_streamer_pair_factory(instance_provider, loader_factory):
+    entity_factory = LazyEntityFactory(loader_factory)
+    frame_resizer_factory = StaticFrameResizerFactory((2688, 1520))
+    bbox_normalizer_factory = SimpleBBoxNormalizerFactory((2688, 1520), (0, 1))
+    streamer_pair_factory = FileStreamerPairFactory(
+        instance_provider, entity_factory, frame_resizer_factory, bbox_normalizer_factory
+    )
+    return streamer_pair_factory
+
+
+def _get_instance_provider(loader_factory):
+    instance_provider = SimpleDatasetInstanceProvider(
+        source=loader_factory.create_dataset_source(),
+        video_selector=RandomFileSelector(["mp4"]),
+        annotation_matcher=BaseNameMatchingStrategy(["json"])
+    )
+    return instance_provider
+
+
+def _get_loader_factory():
     auth_factory = GCPAuthServiceFactory(TestBucket.SERVICE_ACCOUNT_FILE)
     label_parser_factory = SimpleLabelParserFactory(NorsvinBehaviorClass.get_label_map())
     decoder_factory = DarwinDecoderFactory(label_parser_factory)
@@ -33,66 +148,7 @@ def manual_visualize_annotations():
         auth_factory=auth_factory,
         decoder_factory=decoder_factory
     )
-    instance_provider = SimpleDatasetInstanceProvider(
-        source=loader_factory.create_dataset_source(),
-        video_selector=RandomFileSelector(["mp4"]),
-        annotation_matcher=BaseNameMatchingStrategy(["json"])
-    )
-    entity_factory = LazyEntityFactory(loader_factory)
-    frame_resizer_factory = StaticFrameResizerFactory((2688, 1520))
-    bbox_normalizer_factory = SimpleBBoxNormalizerFactory((2688, 1520), (0, 1))
-    streamer_pair_factory = FileStreamerPairFactory(
-        instance_provider, entity_factory, frame_resizer_factory, bbox_normalizer_factory
-    )
-    source_id_provider = FileSourceIdProvider(loader_factory.create_dataset_source(), FileBaseNameParser())
-    dataset_splitter = ConsistentDatasetSplitter()
-    virtual_dataset = VirtualDataset(source_id_provider, dataset_splitter, max_sources=10, max_frames_per_source=200)
-    source_parser_factory = FileBaseNameParserFactory()
-    aggregated_streamer_factory = AggregatedStreamerFactory(
-        streamer_pair_factory, callback=virtual_dataset.feed, source_parser_factory=source_parser_factory
-    )
-
-    # --- Start streaming ---
-    streamer = aggregated_streamer_factory.create_streamer()
-    streamer.start_streaming()
-    streamer.wait_for_completion()
-
-    # --- Visualization ---
-    batch_size = 40
-    if virtual_dataset.get_frame_count(DatasetSplit.TRAIN):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
-    elif virtual_dataset.get_frame_count(DatasetSplit.VAL):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.VAL, batch_size)
-    else:
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TEST, batch_size)
-
-    for instance in shuffled_batch:
-        frame = instance.frame.copy()
-        annotations = instance.annotations.copy()
-        frame_height, frame_width, _ = frame.shape
-
-        for annotation in annotations:
-            behavior = annotation.cls
-            x = annotation.bbox.center_x
-            y = annotation.bbox.center_y
-            w = annotation.bbox.width
-            h = annotation.bbox.height
-            x_min = int((x - w / 2) * frame_width)
-            y_min = int((y - h / 2) * frame_height)
-            x_max = int((x + w / 2) * frame_width)
-            y_max = int((y + h / 2) * frame_height)
-
-            cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
-            cv2.putText(
-                frame, behavior.name.replace("_", " "), (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (0, 255, 0), 1, cv2.LINE_AA
-            )
-
-        plt.figure(figsize=(6, 6))
-        plt.imshow(frame)
-        plt.title(f"Shuffled Frame")
-        plt.axis("off")
-        plt.show()
+    return loader_factory
 
 
 if __name__ == "__main__":
