@@ -17,11 +17,14 @@ def streamer_pair_factory():
 
     return factory
 
+
 @pytest.fixture
 def callback():
     """Fixture to provide a mock callback."""
     return Mock()
 
+
+@pytest.mark.unit
 def test_aggregated_streamer_factory_returns_aggregated_streamer(streamer_pair_factory, callback):
     """Tests that get_next_streamer() returns an AggregatedStreamer instance."""
     # arrange

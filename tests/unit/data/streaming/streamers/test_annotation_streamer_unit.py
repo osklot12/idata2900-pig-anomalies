@@ -14,6 +14,7 @@ def mock_callback():
     return MagicMock()
 
 
+@pytest.mark.unit
 @pytest.mark.parametrize("n_annotations", [0, 1, 5, 10])
 def test_annotation_streamer_produces_and_feeds_expected_number_of_annotations(n_annotations, mock_callback):
     """Tests that the AnnotationStreamer produces and feeds the correct number of annotations."""
@@ -34,6 +35,7 @@ def test_annotation_streamer_produces_and_feeds_expected_number_of_annotations(n
     assert streamer.get_status() == StreamerStatus.COMPLETED
 
 
+@pytest.mark.unit
 def test_annotation_streamer_should_indicate_stopping_when_stopped_early(mock_callback):
     """Tests that the AnnotationStreamer indicates that it was stopped when stopped early."""
     # arrange
@@ -41,12 +43,13 @@ def test_annotation_streamer_should_indicate_stopping_when_stopped_early(mock_ca
     streamer.start_streaming()
 
     # act
-    streamer.stop()
+    streamer.stop_streaming()
 
     # assert
     assert streamer.get_status() == StreamerStatus.STOPPED
 
 
+@pytest.mark.unit
 def test_annotation_streamer_should_normalize_bboxes(mock_callback):
     """Tests that the AnnotationStreamer normalizes bboxes when provided a normalizer."""
     # arrange

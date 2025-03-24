@@ -11,6 +11,7 @@ def dataset_source():
     """Fixture to provide a DummyDatasetSource instance."""
     return DummyDatasetSource()
 
+
 @pytest.fixture
 def video_suffixes():
     """Fixture to provide suffixes for video files."""
@@ -18,6 +19,7 @@ def video_suffixes():
         "mp4",
         "mov"
     ]
+
 
 @pytest.fixture
 def annotation_suffixes():
@@ -27,16 +29,20 @@ def annotation_suffixes():
         "txt"
     ]
 
+
 @pytest.fixture
 def video_selector(video_suffixes):
     """Fixture to provide a RandomFileSelectionStrategy."""
     return RandomFileSelector(video_suffixes)
+
 
 @pytest.fixture
 def annotation_matcher(annotation_suffixes):
     """Fixture to provide a BaseNameMatchingStrategy."""
     return BaseNameMatchingStrategy(annotation_suffixes)
 
+
+@pytest.mark.unit
 def test_get_random_returns_file_pair(dataset_source, video_selector, annotation_matcher):
     """Tests that get_random() returns a file pair when a match exists."""
     # arrange
@@ -56,6 +62,8 @@ def test_get_random_returns_file_pair(dataset_source, video_selector, annotation
     # assert
     assert result is not None
 
+
+@pytest.mark.unit
 def test_get_random_called_consecutively_gives_file_pairs(dataset_source, video_selector, annotation_matcher):
     """Tests that get_random() returns the expected amount of file pairs when called consecutively."""
     # arrange
@@ -81,6 +89,8 @@ def test_get_random_called_consecutively_gives_file_pairs(dataset_source, video_
     for pair in result:
         assert pair is not None
 
+
+@pytest.mark.unit
 def test_get_random_returns_none_on_no_match(dataset_source, video_selector, annotation_matcher):
     """Tests that get_random() returns a None when no match exists."""
     # arrange

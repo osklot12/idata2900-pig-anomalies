@@ -10,6 +10,7 @@ def sample_frame():
     return np.random.randint(0, 256, size=(240, 320, 3), dtype=np.uint8)
 
 
+@pytest.mark.unit
 def test_resize_frame_correct_shape(sample_frame):
     """Tests that the frame is resized correctly to the target shape."""
     # arrange
@@ -23,6 +24,7 @@ def test_resize_frame_correct_shape(sample_frame):
     assert resized.shape == (target_shape[1], target_shape[0], 3)
 
 
+@pytest.mark.unit
 def test_resize_frame_raises_on_none():
     """Tests that passing None as frame_data raises ValueError."""
     # assert
@@ -33,6 +35,7 @@ def test_resize_frame_raises_on_none():
         resizer.resize_frame(None)
 
 
+@pytest.mark.unit
 def test_resize_frame_same_shape(sample_frame):
     """Tests that resizing a frame to the same shape still returns a valid frame."""
     # arrange
@@ -46,6 +49,7 @@ def test_resize_frame_same_shape(sample_frame):
     assert resized.shape == (shape[1], shape[0], 3)
 
 
+@pytest.mark.unit
 def test_resize_grayscale_frame():
     """Tests resizing a grayscale (2D) frame to a new shape."""
     # arrange
@@ -59,6 +63,7 @@ def test_resize_grayscale_frame():
     resized.shape = (target_shape[1], target_shape[0])
 
 
+@pytest.mark.unit
 def test_resize_single_channel():
     """Tests resizing a single-channel image."""
     # arrange

@@ -36,6 +36,7 @@ def _get_splits_before_and_after_update(splitter: ConsistentDatasetSplitter, upd
     return splits_before, splits_after
 
 
+@pytest.mark.unit
 def test_initialization_invalid_ratios():
     """Tests that initialization with invalid split ratios will raise an error."""
     # act & assert
@@ -44,6 +45,7 @@ def test_initialization_invalid_ratios():
         ConsistentDatasetSplitter(train_ratio=1, val_ratio=1)
 
 
+@pytest.mark.unit
 def test_get_split_ratio():
     """Tests that get_split_ratio() returns the correct split ratios."""
     # arrange
@@ -67,6 +69,7 @@ def test_get_split_ratio():
         assert math.isclose(returned_ratios[i], ratios[i], rel_tol=1e-9)
 
 
+@pytest.mark.unit
 def test_get_split_for_id(dataset_ids):
     """Tests that get_split_for_id() returns the correct split for the given id."""
     # arrange
@@ -79,6 +82,7 @@ def test_get_split_for_id(dataset_ids):
     assert returned_split == DatasetSplit.TRAIN
 
 
+@pytest.mark.unit
 def test_update_dataset_and_get_split(dataset_ids):
     """Tests that updating the dataset and getting the splits works as expected."""
     # arrange
@@ -92,6 +96,7 @@ def test_update_dataset_and_get_split(dataset_ids):
     assert len(train_split) + len(val_split) + len(test_split) == len(dataset_ids)
 
 
+@pytest.mark.unit
 def test_adding_ids_keep_consistency(dataset_ids):
     """Tests that adding IDs to the dataset keeps the existing distribution consistent."""
     # arrange
@@ -110,6 +115,7 @@ def test_adding_ids_keep_consistency(dataset_ids):
             assert id_ in after_split
 
 
+@pytest.mark.unit
 def test_removing_ids_keep_consistency(dataset_ids):
     """Tests that removing IDs from the dataset keeps the existing distribution consistent."""
     # arrange

@@ -10,13 +10,14 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
-from tests.utils.test_annotation_label import TestAnnotationLabel
+from tests.utils.annotation_label import AnnotationLabel
 
 
 @pytest.fixture
 def matching_source_id():
     """Fixture to provide the source ID for the matching data."""
     return "id1"
+
 
 @pytest.fixture
 def matching_frame(matching_source_id):
@@ -37,7 +38,7 @@ def matching_annotations(matching_source_id):
         index=34,
         annotations=[
             AnnotatedBBox(
-                cls=TestAnnotationLabel.CODING,
+                cls=AnnotationLabel.CODING,
                 bbox=BBox(0.743, 0.3491, 0.12, 0.14325)
             )
         ],
@@ -53,7 +54,7 @@ def single_annotations():
         index=35,
         annotations=[
             AnnotatedBBox(
-                cls=TestAnnotationLabel.CODING,
+                cls=AnnotationLabel.CODING,
                 bbox=BBox(0.743, 0.3491, 0.12, 0.14325)
             )
         ],
@@ -73,6 +74,7 @@ def aggregator(callback):
     return BufferedInstanceAggregator(callback)
 
 
+@pytest.mark.unit
 def _validate_fed_pair(callback: Mock, frame: Frame, annotations: FrameAnnotations):
     """Validates that the fed StreamedAnnotatedFrame is consistent with the fed frame and annotations."""
     fed_instance = callback.call_args[0][0]
@@ -89,6 +91,7 @@ def _validate_fed_pair(callback: Mock, frame: Frame, annotations: FrameAnnotatio
     assert fed_instance.end_of_stream == annotations.end_of_stream
 
 
+@pytest.mark.unit
 def test_matches_matching_pair_frame_first(aggregator, matching_annotations, matching_frame, callback):
     """Tests that BufferedInstanceAggregator pairs matching data when frame is fed first."""
     # act
@@ -101,6 +104,7 @@ def test_matches_matching_pair_frame_first(aggregator, matching_annotations, mat
     _validate_fed_pair(callback, matching_frame, matching_annotations)
 
 
+@pytest.mark.unit
 def test_matches_matching_pair_annotations_first(aggregator, matching_annotations, matching_frame, callback):
     """Tests that BufferedInstanceAggregator pairs matching data even if annotations are fed first."""
     # act
@@ -112,6 +116,7 @@ def test_matches_matching_pair_annotations_first(aggregator, matching_annotation
     _validate_fed_pair(callback, matching_frame, matching_annotations)
 
 
+@pytest.mark.unit
 def test_non_matching_data_is_not_matched(aggregator, matching_frame, single_annotations, callback):
     """Tests that feeding non-matching data to BufferedInstanceAggregator will not cause any matching."""
     # act
@@ -122,6 +127,7 @@ def test_non_matching_data_is_not_matched(aggregator, matching_frame, single_ann
     assert not callback.called
 
 
+@pytest.mark.unit
 def test_feeding_non_matching_data_between_matches_still_causes_matching(aggregator, matching_frame,
                                                                          matching_annotations, single_annotations,
                                                                          callback):
@@ -137,6 +143,7 @@ def test_feeding_non_matching_data_between_matches_still_causes_matching(aggrega
     _validate_fed_pair(callback, matching_frame, matching_annotations)
 
 
+@pytest.mark.unit
 def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annotations, single_annotations, callback):
     """Tests that feeding more than the capacity can hold results in data being evicted."""
     # arrange
@@ -151,6 +158,7 @@ def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annot
     assert not callback.called
 
 
+@pytest.mark.unit
 def test_source_parsing(matching_frame, matching_annotations, callback, matching_source_id):
     """Tests that a BufferedInstanceAggregator with a source parser parses the source as expected."""
     # arrange
@@ -168,6 +176,7 @@ def test_source_parsing(matching_frame, matching_annotations, callback, matching
     assert fed_instance.source == matching_source_id
 
 
+@pytest.mark.unit
 def test_feed_none_frame_raises(aggregator):
     """Tests that feeding a frame equal None raises an exception."""
     # act & assert
@@ -175,6 +184,7 @@ def test_feed_none_frame_raises(aggregator):
         aggregator.feed_frame(None)
 
 
+@pytest.mark.unit
 def test_feed_none_annotation_raises(aggregator):
     """Tests that feeding annotations equal None raises an exception."""
     # act & assert

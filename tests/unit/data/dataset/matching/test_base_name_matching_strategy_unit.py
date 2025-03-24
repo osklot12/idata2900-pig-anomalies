@@ -11,11 +11,14 @@ def suffixes():
         "txt"
     ]
 
+
 @pytest.fixture
 def matcher(suffixes):
     """Fixture to provide a BaseNameMatcherStrategy instance."""
     return BaseNameMatchingStrategy(suffixes)
 
+
+@pytest.mark.unit
 def test_find_match_returns_matching_file(matcher):
     """Tests that find_match() returns a matching file successfully."""
     # arrange
@@ -36,6 +39,8 @@ def test_find_match_returns_matching_file(matcher):
     # assert
     assert result == valid_candidate
 
+
+@pytest.mark.unit
 def test_find_match_returns_none_on_no_valid_match(matcher):
     """Tests that find_match() returns None when no valid match is found."""
     # arrange
@@ -53,6 +58,8 @@ def test_find_match_returns_none_on_no_valid_match(matcher):
     # assert
     assert result is None
 
+
+@pytest.mark.unit
 def test_find_match_raises_exception_on_none_file(matcher):
     """Tests that find_match() raises an exception when the file provided is None."""
     # arrange
@@ -65,6 +72,8 @@ def test_find_match_raises_exception_on_none_file(matcher):
     # assert
     assert str(exc_info.value) == expected_error_msg
 
+
+@pytest.mark.unit
 def test_find_match_raises_exception_on_none_candidates(matcher):
     """Tests that find_match() raises an exception when the candidates provided is None."""
     # arrange

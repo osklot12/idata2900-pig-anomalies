@@ -9,6 +9,8 @@ def concurrent_dict():
     """Fixture that provides a new ConcurrentDict instance for each test."""
     return ConcurrentDict[str, int]()
 
+
+@pytest.mark.unit
 def test_set_and_get(concurrent_dict):
     """Tests that setting and getting values works correctly."""
     # act
@@ -17,6 +19,8 @@ def test_set_and_get(concurrent_dict):
     # assert
     assert concurrent_dict.get("a") == 1
 
+
+@pytest.mark.unit
 def test_remove(concurrent_dict):
     """Tests that removing a key deletes it from the dictionary."""
     # arrange
@@ -28,6 +32,8 @@ def test_remove(concurrent_dict):
     # assert
     assert not concurrent_dict.contains("key1")
 
+
+@pytest.mark.unit
 def test_contains(concurrent_dict):
     """Tests that contains() correctly checks for key existence."""
     # arrange
@@ -41,6 +47,8 @@ def test_contains(concurrent_dict):
     assert exists
     assert not nonexistent
 
+
+@pytest.mark.unit
 def test_items(concurrent_dict):
     """Tests that items() returns all key-value pairs in a thread-safe copy."""
     # arrange
@@ -53,6 +61,8 @@ def test_items(concurrent_dict):
     # assert
     assert set(items) == {("one", 1), ("two", 2)}
 
+
+@pytest.mark.unit
 def test_keys(concurrent_dict):
     """Tests that keys() returns all keys in a thread-safe copy."""
     # arrange
@@ -65,6 +75,8 @@ def test_keys(concurrent_dict):
     # assert
     assert set(keys) == {"one", "two"}
 
+
+@pytest.mark.unit
 def test_values(concurrent_dict):
     """Tests that values() returns all values in a thread-safe copy."""
     # arrange
@@ -77,6 +89,8 @@ def test_values(concurrent_dict):
     # assert
     assert set(values) == {1, 2}
 
+
+@pytest.mark.unit
 def test_len(concurrent_dict):
     """Tests that __len__ correctly returns the number of items."""
     # arrange
@@ -91,6 +105,8 @@ def test_len(concurrent_dict):
     assert initial_len == 0
     assert final_len == 2
 
+
+@pytest.mark.unit
 def test_clear(concurrent_dict):
     """Tests that clear() correctly clears the dictionary."""
     # arrange
@@ -103,8 +119,11 @@ def test_clear(concurrent_dict):
     # assert
     assert len(concurrent_dict) == 0
 
+
+@pytest.mark.unit
 def test_thread_safety(concurrent_dict):
     """Tests that the ConcurrentDict remains consistent under concurrent access."""
+
     # arrange
     def writer():
         for i in range(1000):

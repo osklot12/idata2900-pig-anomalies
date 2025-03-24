@@ -5,7 +5,7 @@ from src.data.dataset.sources.dataset_source import DatasetSource
 from src.data.parsing.string_parser import StringParser
 
 
-class FileSourceIDsProvider(SourceIdProvider):
+class FileSourceIdProvider(SourceIdProvider):
     """A provider of dataset file source IDs using string parsing."""
 
     def __init__(self, dataset_source: DatasetSource, string_parser: StringParser):

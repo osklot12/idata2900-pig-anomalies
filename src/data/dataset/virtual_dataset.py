@@ -11,6 +11,7 @@ from src.data.dataset.dataset import Dataset
 from src.data.dataset.providers.source_id_provider import SourceIdProvider
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset_split import DatasetSplit
+from src.data.loading.feed_status import FeedStatus
 
 
 class VirtualDataset(Dataset):
@@ -76,7 +77,7 @@ class VirtualDataset(Dataset):
 
             return random.sample(frame_references, batch_size)
 
-    def feed(self, anno_frame: StreamedAnnotatedFrame) -> None:
+    def feed(self, anno_frame: StreamedAnnotatedFrame) -> FeedStatus:
         """
         Feeds an annotated frame into the virtual dataset.
 
@@ -95,6 +96,7 @@ class VirtualDataset(Dataset):
 
                 print(
                     f"[VirtualDataset] Instance {anno_frame.index} from source {anno_frame.source} received and stored")
+                print(f"[VirtualDataset] Annotations: {anno_frame.annotations}")
                 print(f"[VirtualDataset] Train split: {self.get_frame_count(DatasetSplit.TRAIN)}")
                 print(f"[VirtualDataset] Val split: {self.get_frame_count(DatasetSplit.VAL)}")
                 print(f"[VirtualDataset] Test split: {self.get_frame_count(DatasetSplit.TEST)}")

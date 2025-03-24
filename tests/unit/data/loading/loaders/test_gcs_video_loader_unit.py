@@ -12,6 +12,8 @@ def gcs_video_loader():
     """Fixture to provide a GCSVideoLoader instance."""
     return GCSVideoLoader("test-bucket", DummyAuthService())
 
+
+@pytest.mark.unit
 @patch.object(GCSVideoLoader, "_make_request")
 def test_load_video_success(mock_make_request, gcs_video_loader):
     """Tests successful loading of video data."""
@@ -31,6 +33,8 @@ def test_load_video_success(mock_make_request, gcs_video_loader):
     assert isinstance(result, bytearray)
     assert result == bytearray(mock_video_content)
 
+
+@pytest.mark.unit
 @patch.object(GCSVideoLoader, "_make_request")
 def test_load_video_not_found(mock_make_request, gcs_video_loader):
     """Tests handling when the requested video is not found."""

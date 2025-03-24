@@ -10,7 +10,7 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.virtual_dataset import VirtualDataset
 from src.data.dataset_split import DatasetSplit
-from tests.utils.test_annotation_label import TestAnnotationLabel
+from tests.utils.annotation_label import AnnotationLabel
 
 
 @pytest.fixture
@@ -82,7 +82,7 @@ def _gen_dummy_annotated_frames(n: int, source: str):
                 frame=np.random.randint(0, 256, size=(240, 320, 3), dtype=np.uint8),
                 annotations=[
                     AnnotatedBBox(
-                        cls=TestAnnotationLabel.CODING,
+                        cls=AnnotationLabel.CODING,
                         bbox=BBox(0.6346, 0.4726, 0.1262, 0.0983)
                     )
                 ],
@@ -113,6 +113,7 @@ def fed_dataset(standard_dataset):
     return standard_dataset
 
 
+@pytest.mark.unit
 def test_feed_valid_frames(standard_dataset):
     """Tests that feeding valid frames to VirtualDataset succeeds."""
     # arrange
@@ -129,6 +130,7 @@ def test_feed_valid_frames(standard_dataset):
     assert standard_dataset.get_frame_count(DatasetSplit.TEST) == 0
 
 
+@pytest.mark.unit
 def test_feed_invalid_frames(standard_dataset):
     """Tests that feeding invalid frames to VirtualDataset results in rejection."""
     # arrange
@@ -145,6 +147,7 @@ def test_feed_invalid_frames(standard_dataset):
     assert standard_dataset.get_frame_count(DatasetSplit.TEST) == 0
 
 
+@pytest.mark.unit
 def test_feed_frames_over_frame_capacity(standard_dataset):
     """Tests that feeding more frames than VirtualDataset's set capacity allows will evict older frames."""
     # arrange
@@ -159,6 +162,7 @@ def test_feed_frames_over_frame_capacity(standard_dataset):
     assert standard_dataset.get_frame_count(DatasetSplit.TRAIN) == 20
 
 
+@pytest.mark.unit
 def test_feed_frames_over_source_capacity(id_provider, splitter):
     """Tests that feeding frames from more distinct sources than allowed will evict older sources."""
     # arrange
@@ -184,6 +188,7 @@ def test_feed_frames_over_source_capacity(id_provider, splitter):
     assert dataset.get_frame_count(DatasetSplit.TRAIN) == 1
 
 
+@pytest.mark.unit
 def test_get_shuffled_batch_returns_valid_frames(fed_dataset):
     """Tests that get_shuffled_batch() returns valid AnnotatedFrame instances."""
     # act
@@ -193,6 +198,8 @@ def test_get_shuffled_batch_returns_valid_frames(fed_dataset):
     for frame in batch:
         assert isinstance(frame, AnnotatedFrame)
 
+
+@pytest.mark.unit
 def test_get_shuffled_batch_non_determinism(fed_dataset):
     """Tests that get_shuffled_batch() is non-deterministic."""
     # assert

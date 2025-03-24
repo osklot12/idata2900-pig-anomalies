@@ -2,6 +2,7 @@ import pytest
 
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 
+
 @pytest.fixture
 def suffixes():
     """Returns a list of file suffixes."""
@@ -12,11 +13,14 @@ def suffixes():
         "docx"
     ]
 
+
 @pytest.fixture
 def random_selector(suffixes):
     """Fixture to provide a RandomFileSelectionStrategy instance."""
     return RandomFileSelector(suffixes)
 
+
+@pytest.mark.unit
 def test_select_file_returns_file_with_valid_suffix(random_selector, suffixes):
     """Tests that select_file() returns a file with a valid suffix."""
     # arrange
@@ -36,6 +40,8 @@ def test_select_file_returns_file_with_valid_suffix(random_selector, suffixes):
     assert result is not None
     assert result == valid_file
 
+
+@pytest.mark.unit
 def test_select_file_returns_none_on_no_valid_files(random_selector, suffixes):
     """Tests that select_file() returns None when no valid files are given."""
     # arrange
@@ -50,6 +56,8 @@ def test_select_file_returns_none_on_no_valid_files(random_selector, suffixes):
     # assert
     assert result is None
 
+
+@pytest.mark.unit
 def test_select_file_is_random(random_selector, suffixes):
     """Tests that select_file() returns a file picked randomly."""
     # arrange
@@ -63,7 +71,7 @@ def test_select_file_is_random(random_selector, suffixes):
     iterations = 20
 
     # act
-    for _ in range (runs):
+    for _ in range(runs):
         picked_files = []
         for _ in range(iterations):
             picked_files.append(random_selector.select_file(files))

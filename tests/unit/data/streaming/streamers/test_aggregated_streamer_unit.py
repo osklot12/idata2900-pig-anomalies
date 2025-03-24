@@ -36,6 +36,7 @@ def aggregated_streamer(streamer_pair_factory, dummy_callback):
     return AggregatedStreamer(streamer_pair_factory, dummy_callback)
 
 
+@pytest.mark.unit
 def test_start_streaming(aggregated_streamer, dummy_streamers):
     """Tests that start_streaming() streams successfully."""
     # arrange
@@ -51,6 +52,7 @@ def test_start_streaming(aggregated_streamer, dummy_streamers):
     aggregated_streamer.stop_streaming()
 
 
+@pytest.mark.unit
 def test_wait_for_completion(aggregated_streamer, dummy_streamers):
     """Tests that wait_for_completion() is called on the underlying streamers correctly."""
     # arrange
@@ -67,6 +69,7 @@ def test_wait_for_completion(aggregated_streamer, dummy_streamers):
     aggregated_streamer.stop_streaming()
 
 
+@pytest.mark.unit
 def test_stop_streaming(aggregated_streamer, dummy_streamers):
     """Tests that stop_streaming() stops the underlying streamers correctly."""
     # arrange
@@ -81,6 +84,7 @@ def test_stop_streaming(aggregated_streamer, dummy_streamers):
     annotation_streamer.stop_streaming.assert_called_once()
 
 
+@pytest.mark.unit
 def test_raises_when_streamer_pair_is_none(dummy_callback):
     """Tests that AggregatedStreamer raises RuntimeError if the factory returns None."""
     # arrange
