@@ -7,6 +7,7 @@ from src.data.streaming.aggregators.buffered_instance_aggregator import Buffered
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
 class AggregatedStreamer(Streamer):
@@ -30,7 +31,7 @@ class AggregatedStreamer(Streamer):
             self._aggregator.feed_frame,
             self._aggregator.feed_annotations
         )
-        
+
         if streamer_pair is None:
             raise RuntimeError("Failed to create streamers")
 
@@ -44,4 +45,7 @@ class AggregatedStreamer(Streamer):
 
     def wait_for_completion(self) -> None:
         self._ensemble_streamer.wait_for_completion()
+
+    def get_status(self) -> StreamerStatus:
+        return self._ensemble_streamer.get_status()
 

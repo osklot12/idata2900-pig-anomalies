@@ -30,6 +30,7 @@ class VideoFileStreamer(VideoStreamer):
 
     def _setup_stream(self) -> None:
         video_data = self._video.get_data()
+        print(f"[VideoFileStreamer] Received video data of size {len(video_data)}")
         self._fstream = FrameStream(bytearray(video_data))
 
     def _get_next_frame(self) -> Optional[Frame]:
@@ -42,5 +43,7 @@ class VideoFileStreamer(VideoStreamer):
             np_data = np_data.reshape((height, width, channels))
             frame = Frame(self._video.get_id(), self._frame_index, np_data, False)
             self._frame_index += 1
+
+            print(f"[VideoFileStreamer] Streamed frame {self._frame_index}")
 
         return frame

@@ -9,5 +9,5 @@ class GCSVideoLoader(GCSBucketClient, VideoFileLoader):
         video_data = self._make_request(
             self._get_file_url(video_id)
         ).content
-
+        print(f"[GCSVideoLoader] Loaded video file: {video_id}")
         return bytearray(video_data)
