@@ -25,7 +25,7 @@ def test_list_files_success(gcs_file_manager):
     result = gcs_file_manager.get_source_ids()
 
     # assert
-    assert isinstance(result, list)
+    assert isinstance(result, set)
     assert len(result) > 0
 
 def test_list_files_bucket_not_found(gcp_auth_service):
