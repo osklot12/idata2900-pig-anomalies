@@ -142,54 +142,9 @@ def test_streaming_data(virtual_dataset, aggregated_streamer_factory):
     streamer.start_streaming()
     streamer.wait_for_completion()
 
-
-@pytest.mark.integration
-def test_visualize_annotations(virtual_dataset, aggregated_streamer_factory):
-    """Tests visualization of streaming data with bounding boxes."""
-    # arrange
-    streamer = aggregated_streamer_factory.create_streamer()
-
-    # act
-    streamer.start_streaming()
-    streamer.wait_for_completion()
-
     # assert
-    shuffled_batch = None
+    n_frames_train = virtual_dataset.get_frame_count(DatasetSplit.TRAIN)
+    n_frames_val = virtual_dataset.get_frame_count(DatasetSplit.VAL)
+    n_frames_test = virtual_dataset.get_frame_count(DatasetSplit.TEST)
 
-    batch_size = 40
-    if virtual_dataset.get_frame_count(DatasetSplit.TRAIN):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
-    elif virtual_dataset.get_frame_count(DatasetSplit.VAL):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.VAL, batch_size)
-    else:
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TEST, batch_size)
-
-    for instance in shuffled_batch:
-        frame = instance.frame.copy()
-        annotations = instance.annotations.copy()
-        frame_height, frame_width, _ = frame.shape
-
-        if annotations:
-            for annotation in annotations:
-                print(f"{annotation}")
-                behavior = annotation.cls
-                x = annotation.bbox.center_x
-                y = annotation.bbox.center_y
-                w = annotation.bbox.width
-                h = annotation.bbox.height
-                x_min = int((x - w / 2) * frame_width)
-                y_min = int((y - h / 2) * frame_height)
-                x_max = int((x + w / 2) * frame_width)
-                y_max = int((y + h / 2) * frame_height)
-
-                cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
-                cv2.putText(
-                    frame, behavior.name.replace("_", " "), (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 255, 0), 1, cv2.LINE_AA
-                )
-
-        plt.figure(figsize=(6, 6))
-        plt.imshow(frame)
-        plt.title(f"Shuffled Frame")
-        plt.axis("off")
-        plt.show()
+    assert n_frames_train or n_frames_val or n_frames_test
