@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.streaming.streamers import StreamerStatus
+from src.data.streaming.streamers.streamer_status import StreamerStatus
 from tests.utils.dummies.dummy_command import DummyCommand
 from tests.utils.dummies.dummy_failing_streamer import DummyFailingStreamer
 from tests.utils.dummies.dummy_streamer import DummyStreamer
@@ -18,17 +18,20 @@ def failing_streamer():
     return DummyFailingStreamer()
 
 
+@pytest.mark.unit
 def test_initial_status(streamer):
     """Tests that a newly created streamer is in PENDING state."""
     assert streamer.get_status() == StreamerStatus.PENDING
 
 
+@pytest.mark.unit
 def test_stream_starts_correctly(streamer):
     """Tests that streaming updates the status and starts a thread."""
     streamer.start_streaming()
     assert streamer.get_status() == StreamerStatus.STREAMING
 
 
+@pytest.mark.unit
 def test_stream_completes_correctly(streamer):
     """Tests that a streamer completes and updates its status."""
     streamer.start_streaming()
@@ -36,24 +39,27 @@ def test_stream_completes_correctly(streamer):
     assert streamer.get_status() == StreamerStatus.COMPLETED
 
 
+@pytest.mark.unit
 def test_wait_for_completion_when_not_streaming(streamer):
     """Tests that calling wait_for_completion() when not streaming should not raise an exception."""
     # act
     streamer.wait_for_completion()
 
 
+@pytest.mark.unit
 def test_stop(streamer):
     """Tests that stopping a streamer updates its status to STOPPED."""
     # arrange
     streamer.start_streaming()
 
     # act
-    streamer.stop()
+    streamer.stop_streaming()
 
     # assert
     assert streamer.get_status() == StreamerStatus.STOPPED
 
 
+@pytest.mark.unit
 def test_eos_command_executes_correctly(streamer):
     """Tests that eos commands executes correctly."""
     # arrange
@@ -71,6 +77,7 @@ def test_eos_command_executes_correctly(streamer):
     assert cmd_two.executed
 
 
+@pytest.mark.unit
 def test_status_set_on_failure(failing_streamer):
     """Tests that a streamer raising an exception while streaming updates the status to FAILED."""
     # act
@@ -81,6 +88,7 @@ def test_status_set_on_failure(failing_streamer):
     assert failing_streamer.get_status() == StreamerStatus.FAILED
 
 
+@pytest.mark.unit
 def test_eos_command_executes_on_failure(failing_streamer):
     """Tests that eos commands executes when an exception is raised while streaming."""
     # arrange

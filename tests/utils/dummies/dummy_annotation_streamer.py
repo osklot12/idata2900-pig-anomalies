@@ -8,7 +8,7 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
-from tests.utils.test_annotation_label import TestAnnotationLabel
+from tests.utils.annotation_label import AnnotationLabel
 
 
 class DummyAnnotationStreamer(AnnotationStreamer):
@@ -36,7 +36,7 @@ class DummyAnnotationStreamer(AnnotationStreamer):
             time.sleep(.005)
             annotations_list = [
                 AnnotatedBBox(
-                    cls=TestAnnotationLabel.CODING,
+                    cls=AnnotationLabel.CODING,
                     bbox=BBox(
                         center_x=1240.6,
                         center_y=980.04,

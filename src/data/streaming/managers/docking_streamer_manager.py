@@ -56,7 +56,7 @@ class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
     def _manage_streamer(streamer: ThreadedStreamer, streamer_id: str) -> str:
         """Manages the streamer."""
         streamer.wait_for_completion()
-        streamer.stop()
+        streamer.stop_streaming()
         return streamer_id
 
     def _on_streamer_done(self, future: concurrent.futures.Future) -> None:
@@ -73,7 +73,7 @@ class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
         for streamer_id in self.get_streamer_ids():
             streamer = self.get_streamer(streamer_id)
             if streamer:
-                streamer.stop()
+                streamer.stop_streaming()
             self._remove_streamer(streamer_id)
 
         self._executor.shutdown(wait=True)

@@ -57,6 +57,8 @@ def streamer_pair_factory(instance_provider, entity_factory, frame_resizer_facto
         bbox_normalizer_factory=bbox_normalizer_factory
     )
 
+
+@pytest.mark.unit
 def test_create_streamer_pair_success(streamer_pair_factory):
     """Tests that calling create_streamer_pair() successfully creates a pair of video and annotation streamers."""
     # arrange
@@ -73,6 +75,7 @@ def test_create_streamer_pair_success(streamer_pair_factory):
     assert isinstance(annotation_streamer, VideoAnnotationsStreamer)
 
 
+@pytest.mark.unit
 def test_create_streamer_pair_no_instance(entity_factory, frame_resizer_factory, bbox_normalizer_factory):
     """Tests that calling create_streamer_pair() returns None when no available instance is provided."""
     # arrange

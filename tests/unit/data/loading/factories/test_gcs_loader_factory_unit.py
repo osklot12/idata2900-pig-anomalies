@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
@@ -15,11 +17,18 @@ def bucket_name():
 
 
 @pytest.fixture
-def gcs_loader_factory(bucket_name):
+def decoder_factory():
+    """Fixture to provide a mock DecoderFactory instance."""
+    return Mock()
+
+
+@pytest.fixture
+def gcs_loader_factory(bucket_name, decoder_factory):
     """Fixture to provide a GCSLoaderFactory instance."""
-    return GCSLoaderFactory(bucket_name, DummyAuthServiceFactory())
+    return GCSLoaderFactory(bucket_name, DummyAuthServiceFactory(), decoder_factory)
 
 
+@pytest.mark.unit
 def test_create_video_loader(gcs_loader_factory, bucket_name):
     """Tests that create_video_loader() correctly instantiates GCSVideoLoader."""
     # act
@@ -31,6 +40,7 @@ def test_create_video_loader(gcs_loader_factory, bucket_name):
     assert isinstance(video_loader.get_auth_service(), DummyAuthService)
 
 
+@pytest.mark.unit
 def test_create_annotation_loader(gcs_loader_factory, bucket_name):
     """Tests that create_annotation_loader() correctly instantiates GCSAnnotationLoader."""
     # act
@@ -41,6 +51,8 @@ def test_create_annotation_loader(gcs_loader_factory, bucket_name):
     assert annotation_loader.get_bucket_name() == bucket_name
     assert isinstance(annotation_loader.get_auth_service(), DummyAuthService)
 
+
+@pytest.mark.unit
 def test_create_dataset_source(gcs_loader_factory, bucket_name):
     """Tests that create_dataset_source() correctly instantiates GCSDatasetSource."""
     # act

@@ -19,12 +19,14 @@ def ensemble_streamer(dummy_streamers):
     return EnsembleStreamer(*dummy_streamers)
 
 
+@pytest.mark.unit
 def test_initialization(ensemble_streamer, dummy_streamers):
     """Tests that the EnsembleStreamer initializes correctly."""
     # assert
     assert len(ensemble_streamer._streamers) == len(dummy_streamers)
 
 
+@pytest.mark.unit
 def test_stream_and_wait_for_completion(ensemble_streamer):
     """Tests that streaming starts all streamers and they complete correctly."""
     # arrange
@@ -39,6 +41,7 @@ def test_stream_and_wait_for_completion(ensemble_streamer):
         assert not ensemble_streamer.get_streamer(streamer_id).get_status() == StreamerStatus.STREAMING
 
 
+@pytest.mark.unit
 def test_streaming_completion_status(ensemble_streamer):
     """Tests that streaming() correctly sets the status to COMPLETED if all streamers completes."""
     # arrange
@@ -56,6 +59,7 @@ def test_streaming_completion_status(ensemble_streamer):
     assert end_status == StreamerStatus.COMPLETED
 
 
+@pytest.mark.unit
 def test_streaming_failure_status():
     """Tests that streaming() correctly sets the status to FAILED if a streamer fails."""
     # arrange
@@ -77,6 +81,7 @@ def test_streaming_failure_status():
     assert end_status == StreamerStatus.FAILED
 
 
+@pytest.mark.unit
 def test_streaming_failure_and_stopped_status():
     """Tests that streaming() correctly sets the status to FAILED if one streamer has failed while another stopped."""
     # arrange
@@ -99,6 +104,7 @@ def test_streaming_failure_and_stopped_status():
     assert end_status_ensemble == StreamerStatus.FAILED
 
 
+@pytest.mark.unit
 def test_streaming_stopped_status():
     """Tests that streaming() correctly sets the status to STOPPED if one streamer has stopped."""
     # arrange
@@ -124,6 +130,7 @@ def test_streaming_stopped_status():
     assert end_status_ensemble == StreamerStatus.STOPPED
 
 
+@pytest.mark.unit
 def test_stop(ensemble_streamer):
     """Tests that stop() correctly sets the status to STOPPED.s"""
     # arrange
@@ -137,6 +144,7 @@ def test_stop(ensemble_streamer):
     assert end_status == StreamerStatus.STOPPED
 
 
+@pytest.mark.unit
 def test_eos_commands_execution(ensemble_streamer):
     """Tests that EOS commands execute properly when all streamers complete."""
     # arrange

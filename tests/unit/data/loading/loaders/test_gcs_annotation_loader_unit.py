@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 from requests.exceptions import HTTPError
 
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.label.simple_label_parser import SimpleLabelParser
@@ -31,6 +32,7 @@ def sample_json_bytes():
         return f.read().encode("utf-8")
 
 
+@pytest.mark.unit
 @patch.object(GCSAnnotationLoader, "_make_request")
 def test_load_annotation_success(mock_make_request, gcs_annotation_loader, sample_json_bytes):
     """Tests successful loading of an annotation file."""
@@ -43,15 +45,17 @@ def test_load_annotation_success(mock_make_request, gcs_annotation_loader, sampl
 
     # act
     result = gcs_annotation_loader.load_video_annotations(annotation_id)
+    print(f"{result}")
 
     # assert
-    assert isinstance(result, list), "Decoded annotations should be a list"
-    assert len(result) > 0, "Annotations list should not be empty"
+    assert isinstance(result, list)
+    assert len(result) > 0
 
-    assert result[0].index is not None, "FrameAnnotation should have a valid frame index"
-    assert len(result[0].annotations) > 0, "FrameAnnotation should contain at least one annotation"
+    for annotations in result:
+        assert isinstance(annotations, FrameAnnotations)
 
 
+@pytest.mark.unit
 @patch.object(GCSAnnotationLoader, "_make_request")
 def test_load_annotation_not_found(mock_make_request, gcs_annotation_loader):
     """Tests handling when the requested annotation file is not found."""

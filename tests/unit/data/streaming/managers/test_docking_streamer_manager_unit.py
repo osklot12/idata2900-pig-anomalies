@@ -1,7 +1,7 @@
 import pytest
 import time
 
-from src.data.streaming.streamers import DockingStreamerManager
+from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
 from tests.utils.dummies.dummy_streamer_provider import DummyStreamerProvider
 
 
@@ -10,6 +10,8 @@ def manager():
     """Fixture to provide a DockingStreamerManager instance."""
     return DockingStreamerManager(DummyStreamerProvider(), 4)
 
+
+@pytest.mark.unit
 def test_initialization_with_valid_arguments():
     """Tests that initialization works correctly."""
     # arrange
@@ -25,6 +27,7 @@ def test_initialization_with_valid_arguments():
     assert manager.n_active_streamers() == 0
 
 
+@pytest.mark.unit
 def test_initialization_with_invalid_n_streamers():
     """Tests that initialization with an invalid number of streamers fails."""
     # arrange
@@ -39,6 +42,7 @@ def test_initialization_with_invalid_n_streamers():
     assert str(exc_info.value) == "n_streamers must be greater than 0"
 
 
+@pytest.mark.unit
 def test_run_should_activate_n_streamers(manager):
     """Tests that running the manager immediately activates n streamers."""
     # act
@@ -49,6 +53,8 @@ def test_run_should_activate_n_streamers(manager):
     # assert
     assert n_streamers == 4
 
+
+@pytest.mark.unit
 def test_streamers_are_replaced_after_completion(manager):
     """Tests that streamers are replaced after the complete."""
     # arrange
@@ -64,6 +70,8 @@ def test_streamers_are_replaced_after_completion(manager):
     # assert
     assert active_streamers == 2
 
+
+@pytest.mark.unit
 def test_no_more_streamers_should_be_handled_correctly():
     """Tests that running of out streamers in StreamerProvider is handled gracefully."""
     # arrange
@@ -79,6 +87,8 @@ def test_no_more_streamers_should_be_handled_correctly():
     # assert
     assert active_streamers == 1
 
+
+@pytest.mark.unit
 def test_stop_should_prevent_new_streamers():
     """Tests that stopping the manager prevents new streamers from starting."""
     # arrange
@@ -93,4 +103,3 @@ def test_stop_should_prevent_new_streamers():
 
     # assert
     assert active_after_stop == 0
-

@@ -54,6 +54,7 @@ def decoder(sample_json_bytes, label_parser):
     return DarwinDecoder(label_parser)
 
 
+@pytest.mark.unit
 def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes):
     """Tests that get_annotations returns the expected annotations."""
     # act
@@ -89,6 +90,7 @@ def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes
     print(f"{decoded_annotations}")
 
 
+@pytest.mark.unit
 def test_get_frame_count(decoder, sample_json_bytes, expected_frame_count):
     """Tests that get_frame_count returns the expected frame count."""
     # act
@@ -98,6 +100,7 @@ def test_get_frame_count(decoder, sample_json_bytes, expected_frame_count):
     assert frame_count == expected_frame_count
 
 
+@pytest.mark.unit
 def test_get_frame_dimensions(decoder, sample_json_bytes):
     """Tests that get_frame_dimensions returns the expected frame dimensions."""
     # act
