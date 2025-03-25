@@ -160,8 +160,8 @@ class DarwinDecoder(AnnotationDecoder):
         """Parses and retrieves bounding box values from a Darwin JSON annotation."""
         bbox = frame_data.get("bounding_box", {})
         return BBox(
-            center_x=bbox.get("x", 0),
-            center_y=bbox.get("y", 0),
+            x=bbox.get("x", 0),
+            y=bbox.get("y", 0),
             width=bbox.get("w", 0),
             height=bbox.get("h", 0)
         )

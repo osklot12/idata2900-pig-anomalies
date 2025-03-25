@@ -1,7 +1,3 @@
-from unittest.mock import Mock
-import cv2
-import matplotlib.pyplot as plt
-
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
@@ -67,7 +63,7 @@ def instance_provider(loader_factory):
 @pytest.fixture
 def entity_factory(loader_factory):
     """Fixture to provide a DatasetEntityFactory instance."""
-    return LazyEntityFactory(loader_factory)
+    return LazyEntityFactory(loader_factory, FileBaseNameParser())
 
 
 @pytest.fixture
@@ -79,7 +75,7 @@ def frame_resizer_factory():
 @pytest.fixture
 def bbox_normalizer_factory():
     """Fixture to provide a BBoxNormalizerFactory instance."""
-    return SimpleBBoxNormalizerFactory((2688, 1520), (0, 1))
+    return SimpleBBoxNormalizerFactory((0, 1))
 
 
 @pytest.fixture

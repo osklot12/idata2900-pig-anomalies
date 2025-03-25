@@ -84,12 +84,14 @@ class VirtualDataset(Dataset):
         Args:
             anno_frame (StreamedAnnotatedFrame): the data instance to feed
         """
+        source_id = anno_frame.source.source_id
+
         with self.lock:
-            split_buffer = self._get_split_buffer_for_source(anno_frame.source)
+            split_buffer = self._get_split_buffer_for_source(source_id)
 
             if split_buffer is not None:
                 # allocates buffer for source if new
-                source_buffer = self._get_source_buffer(anno_frame.source, split_buffer)
+                source_buffer = self._get_source_buffer(source_id, split_buffer)
 
                 # add instance to source buffer
                 source_buffer.add(anno_frame.index, AnnotatedFrame(anno_frame.frame, anno_frame.annotations))

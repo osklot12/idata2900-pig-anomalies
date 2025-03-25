@@ -1,17 +1,16 @@
 from dataclasses import dataclass
-from typing import Tuple, List, Optional
+from typing import List
 
 import numpy as np
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
-from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.typevars.enum_type import T_Enum
+from src.data.dataclasses.source_metadata import SourceMetadata
 
 
 @dataclass(frozen=True)
 class StreamedAnnotatedFrame:
     """Represents a single video frame along with its associated annotations and metadata."""
-    source: str
+    source: SourceMetadata
     index: int
     frame: np.ndarray
     annotations: List[AnnotatedBBox]

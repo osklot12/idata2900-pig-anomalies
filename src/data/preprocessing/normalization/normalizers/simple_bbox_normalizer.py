@@ -22,8 +22,8 @@ class SimpleBBoxNormalizer(BBoxNormalizer):
 
     def normalize_bounding_box(self, bbox: BBox, resolution: Tuple[int, int]) -> BBox:
         range_interval = self.new_range[1] - self.new_range[0]
-        normalized_x = (bbox.center_x / resolution[0]) * range_interval + self.new_range[0]
-        normalized_y = (bbox.center_y / resolution[1]) * range_interval + self.new_range[0]
+        normalized_x = (bbox.x / resolution[0]) * range_interval + self.new_range[0]
+        normalized_y = (bbox.y / resolution[1]) * range_interval + self.new_range[0]
         normalized_h = (bbox.height / resolution[1]) * range_interval
         normalized_w = (bbox.width / resolution[0]) * range_interval
 
