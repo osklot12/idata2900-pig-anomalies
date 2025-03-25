@@ -159,24 +159,6 @@ def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annot
 
 
 @pytest.mark.unit
-def test_source_parsing(matching_frame, matching_annotations, callback, matching_source_id):
-    """Tests that a BufferedInstanceAggregator with a source parser parses the source as expected."""
-    # arrange
-    parser = FileBaseNameParser()
-    buffered_aggregator = BufferedInstanceAggregator(callback=callback, source_parser=parser)
-
-    # act
-    buffered_aggregator.feed_frame(matching_frame)
-    buffered_aggregator.feed_annotations(matching_annotations)
-
-    # assert
-    assert callback.call_count == 1
-
-    fed_instance = callback.call_args[0][0]
-    assert fed_instance.source == matching_source_id
-
-
-@pytest.mark.unit
 def test_feed_none_frame_raises(aggregator):
     """Tests that feeding a frame equal None raises an exception."""
     # act & assert

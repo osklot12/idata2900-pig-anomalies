@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
@@ -30,7 +30,7 @@ class AnnotationStreamer(ThreadedStreamer):
 
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
-            normalized_annotation = self._normalize_annotation(annotation)
+            normalized_annotation = self._normalize_frame_annotations(annotation)
             self._callback(normalized_annotation)
 
             annotation = self._get_next_annotation()
@@ -40,26 +40,36 @@ class AnnotationStreamer(ThreadedStreamer):
 
         return result
 
-    def _normalize_annotation(self, annotation: FrameAnnotations) -> FrameAnnotations:
-        """Normalizes an annotation."""
+    def _normalize_frame_annotations(self, annotations: FrameAnnotations) -> FrameAnnotations:
+        """Normalizes annotations for a frame."""
         if self._normalizer:
-            normalized_bboxes = []
-            for anno_box in annotation.annotations:
-                normalized_bboxes.append(
-                    AnnotatedBBox(
-                        cls=anno_box.cls,
-                        bbox=self._normalizer.normalize_bounding_box(anno_box.bbox)
-                    )
-                )
-
-            annotation = FrameAnnotations(
-                source=annotation.source,
-                index=annotation.index,
-                annotations=normalized_bboxes,
-                end_of_stream=annotation.end_of_stream,
+            normalized_bboxes = self._get_normalized_bboxes(
+                annotations.annotations,
+                annotations.source.frame_resolution
             )
 
-        return annotation
+            annotations = FrameAnnotations(
+                source=annotations.source,
+                index=annotations.index,
+                annotations=normalized_bboxes,
+                end_of_stream=annotations.end_of_stream,
+            )
+
+        return annotations
+
+    def _get_normalized_bboxes(self, bboxes: List[AnnotatedBBox], resolution: Tuple[int, int]) -> List[AnnotatedBBox]:
+        """Normalizes a list of AnnotatedBBox instances."""
+        normalized_bboxes = []
+
+        for anno_box in bboxes:
+            normalized_bboxes.append(
+                AnnotatedBBox(
+                    cls=anno_box.cls,
+                    bbox=self._normalizer.normalize_bounding_box(anno_box.bbox, resolution)
+                )
+            )
+
+        return normalized_bboxes
 
     @abstractmethod
     def _get_next_annotation(self) -> Optional[FrameAnnotations]:

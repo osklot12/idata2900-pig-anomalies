@@ -23,10 +23,7 @@ class AggregatedStreamer(Streamer):
             callback (Callable[[Instance], FeedStatus]): the callback function that will be fed with aggregated data
             source_parser (StringParser):
         """
-        self._aggregator = BufferedInstanceAggregator(
-            callback=callback,
-            source_parser=source_parser
-        )
+        self._aggregator = BufferedInstanceAggregator(callback)
         streamer_pair = streamers_factory.create_streamer_pair(
             self._aggregator.feed_frame,
             self._aggregator.feed_annotations
@@ -48,4 +45,3 @@ class AggregatedStreamer(Streamer):
 
     def get_status(self) -> StreamerStatus:
         return self._ensemble_streamer.get_status()
-

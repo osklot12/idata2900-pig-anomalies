@@ -5,6 +5,7 @@ import time
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
+from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
@@ -45,7 +46,12 @@ class DummyAnnotationStreamer(AnnotationStreamer):
                     )
                 )
             ]
-            annotation = FrameAnnotations("test-source", self.frame_index, annotations_list, False)
+            annotation = FrameAnnotations(
+                source=SourceMetadata("test-source-id", (1920, 1080)),
+                index=self.frame_index,
+                annotations=annotations_list,
+                end_of_stream=False
+            )
 
             self.frame_index += 1
 

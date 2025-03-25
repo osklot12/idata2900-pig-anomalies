@@ -1,22 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import List
 
 from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.data.dataclasses.source_metadata import SourceMetadata
+from src.data.dataset.entities.dataset_file import DatasetFile
 
 
-class VideoAnnotations(ABC):
+class VideoAnnotations(DatasetFile, ABC):
     """An interface for video annotations."""
-
-    @abstractmethod
-    def get_id(self) -> str:
-        """
-        Returns the annotation ID.
-
-        Returns:
-            str: the annotation ID
-        """
-        raise NotImplementedError
 
     @abstractmethod
     def get_data(self) -> List[FrameAnnotations]:
