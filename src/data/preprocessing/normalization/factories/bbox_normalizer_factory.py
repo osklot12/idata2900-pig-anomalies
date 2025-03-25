@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 
-from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 
 
 class BBoxNormalizerFactory(ABC):
     """An interface for BBoxNormalizationStrategy factories."""
 
     @abstractmethod
-    def create_bbox_normalizer(self) -> BBoxNormalizationStrategy:
+    def create_bbox_normalizer(self) -> BBoxNormalizer:
         """
         Creates a BBoxNormalizationStrategy instance.
 
         Returns:
-            BBoxNormalizationStrategy: the BBoxNormalizationStrategy instance
+            BBoxNormalizer: the BBoxNormalizationStrategy instance
         """
         raise NotImplementedError

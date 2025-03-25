@@ -2,7 +2,7 @@
   "version": "2.0",
   "schema_ref": "https://darwin-public.s3.eu-west-1.amazonaws.com/darwin_json/2.0/schema.json",
   "item": {
-    "name": "avd13_cam1_20220314072829_20220314073013_fps2.0.mp4",
+    "name": "test-source-id",
     "path": "/",
     "source_info": {
       "item_id": "018b66ba-a4bd-52a6-0624-547b5bed92d2",

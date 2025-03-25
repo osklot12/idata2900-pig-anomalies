@@ -1,7 +1,8 @@
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Optional
 
 import json
 
+from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.label.label_parser import LabelParser
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
@@ -27,7 +28,7 @@ class DarwinDecoder(AnnotationDecoder):
         annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
         return self._create_frame_annotation_list(
             annotations,
-            self._extract_source(json_data),
+            self._create_source_metadata(json_data),
             DarwinDecoder.get_frame_count(raw_data)
         )
 
@@ -104,15 +105,33 @@ class DarwinDecoder(AnnotationDecoder):
         Returns:
             Tuple[int, int]: the frame dimensions (height, width)
         """
-        result = (0, 0)
+        dimensions = DarwinDecoder._extract_frame_dimensions(DarwinDecoder._get_json(raw_bytes))
+        if not dimensions:
+            raise RuntimeError("Could not extract frame dimensions")
 
-        slots = DarwinDecoder._extract_metadata_slots(DarwinDecoder._get_json(raw_bytes))
+        return dimensions
+
+    @staticmethod
+    def _extract_frame_dimensions(json_data) -> Optional[Tuple[int, int]]:
+        """Returns the frame dimensions from the metadata."""
+        result = None
+
+        slots = DarwinDecoder._extract_metadata_slots(json_data)
         if slots and "width" in slots[0] and "height" in slots[0]:
             result = slots[0]["width"], slots[0]["height"]
+
         return result
 
     @staticmethod
-    def _extract_source(json_data) -> str:
+    def _create_source_metadata(json_data) -> SourceMetadata:
+        """Creates and returns the source metadata."""
+        return SourceMetadata(
+            source_id=DarwinDecoder._extract_source_id(json_data),
+            frame_resolution=DarwinDecoder._extract_frame_dimensions(json_data)
+        )
+
+    @staticmethod
+    def _extract_source_id(json_data) -> str:
         """Extracts the source from the Darwin JSON format."""
         return json_data.get("item", {}).get("name", "unknown_source")
 
@@ -148,8 +167,8 @@ class DarwinDecoder(AnnotationDecoder):
         )
 
     @staticmethod
-    def _create_frame_annotation_list(data: Dict[int, List[AnnotatedBBox]], source: str, frame_count: int) -> List[
-        FrameAnnotations]:
+    def _create_frame_annotation_list(data: Dict[int, List[AnnotatedBBox]], source: SourceMetadata,
+                                      frame_count: int) -> List[FrameAnnotations]:
         """Constructs a list of FrameAnnotation objects from grouped annotation data."""
         return [
             FrameAnnotations(
