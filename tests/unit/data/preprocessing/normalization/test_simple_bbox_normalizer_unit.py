@@ -26,14 +26,12 @@ def expected_normalized_bboxes(bboxes):
 def test_normalize_bboxes(bboxes, expected_normalized_bboxes):
     """Tests that normalize_bounding_box() normalizes values as expected."""
     # arrange
-    normalizer = SimpleBBoxNormalizer(
-        (1920, 1080), (0, 1)
-    )
+    normalizer = SimpleBBoxNormalizer((0, 1))
     normalized_bboxes = []
 
     # act
     for bbox in bboxes:
-        normalized_bboxes.append(normalizer.normalize_bounding_box(bbox))
+        normalized_bboxes.append(normalizer.normalize_bounding_box(bbox, (1920, 1080)))
 
     # assert
     assert normalized_bboxes == expected_normalized_bboxes
@@ -43,14 +41,12 @@ def test_normalize_bboxes(bboxes, expected_normalized_bboxes):
 def test_normalizer_swaps_range_for_decreasing_values(bboxes, expected_normalized_bboxes):
     """Tests that the range values gets automatically swapped when provided in decreasing order."""
     # arrange
-    normalizer = SimpleBBoxNormalizer(
-        (1920, 1080), (1, 0)
-    )
+    normalizer = SimpleBBoxNormalizer((1, 0))
     normalized_bboxes = []
 
     # act
     for bbox in bboxes:
-        normalized_bboxes.append(normalizer.normalize_bounding_box(bbox))
+        normalized_bboxes.append(normalizer.normalize_bounding_box(bbox, (1920, 1080)))
 
     # assert
     assert normalized_bboxes == expected_normalized_bboxes

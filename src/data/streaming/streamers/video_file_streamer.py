@@ -4,6 +4,7 @@ import numpy as np
 from cppbindings import FrameStream
 
 from src.data.dataclasses.frame import Frame
+from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataset.entities.video_file import VideoFile
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
@@ -41,7 +42,10 @@ class VideoFileStreamer(VideoStreamer):
             width, height, channels = self._fstream.get_frame_shape()
             np_data = np.frombuffer(frame_data, dtype=np.uint8)
             np_data = np_data.reshape((height, width, channels))
-            frame = Frame(self._video.get_id(), self._frame_index, np_data, False)
+
+            source_meta = SourceMetadata(self._video.get_instance_id(), (width, height))
+            frame = Frame(source_meta, self._frame_index, np_data, False)
+
             self._frame_index += 1
 
             print(f"[VideoFileStreamer] Streamed frame {self._frame_index}")

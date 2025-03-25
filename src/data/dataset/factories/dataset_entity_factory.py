@@ -8,12 +8,12 @@ class DatasetEntityFactory(ABC):
     """Abstract factory for dataset entities."""
 
     @abstractmethod
-    def create_video_file(self, video_id: str) -> VideoFile:
+    def create_video_file(self, source: str) -> VideoFile:
         """
         Creates a VideoFile instance.
 
         Args:
-            video_id (str): the video ID
+            source (str): the source of the video file
 
         Returns:
             VideoFile: the VideoFile instance
@@ -21,12 +21,12 @@ class DatasetEntityFactory(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_video_annotations(self, annotations_id: str) -> VideoAnnotations:
+    def create_video_annotations(self, source: str) -> VideoAnnotations:
         """
         Creates a VideoAnnotations instance.
 
         Args:
-            annotations_id (str): the annotation ID
+            source (str): the source of the video file
 
         Returns:
             VideoAnnotations: the VideoAnnotations instance

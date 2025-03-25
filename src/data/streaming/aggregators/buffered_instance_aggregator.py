@@ -15,15 +15,13 @@ from src.typevars.enum_type import T_Enum
 class BufferedInstanceAggregator(InstanceAggregator):
     """Buffers incoming frames and annotations and feeds forward an aggregated instance once matched."""
 
-    def __init__(self, callback: Callable[[StreamedAnnotatedFrame], FeedStatus], buffer_size: int = 1000,
-                 source_parser: Optional[StringParser] = None):
+    def __init__(self, callback: Callable[[StreamedAnnotatedFrame], FeedStatus], buffer_size: int = 1000):
         """
         Initializes an instance of BufferedInstanceAggregator.
 
         Args:
             callback (Callable): Function that will be called and fed with a matched frame-annotation pair.
             buffer_size (int): The maximum capacity of the buffer.
-            source_parser (Optional[StringParser]): if provided, the data will be fed forward using the parsed frame source
         """
         self.callback = callback
         self.lock = Lock()
@@ -33,8 +31,6 @@ class BufferedInstanceAggregator(InstanceAggregator):
 
         # annotation buffer
         self.annotation_buffer = HashBuffer[FrameAnnotations](max_size=buffer_size)
-
-        self._source_parser = source_parser
 
     def feed_frame(self, frame: Frame) -> FeedStatus:
         if frame is None:
@@ -123,8 +119,6 @@ class BufferedInstanceAggregator(InstanceAggregator):
     def _feed_forward(self, frame: Frame, annotations: FrameAnnotations) -> None:
         """Feeds forward the matched frame and annotations."""
         source = frame.source
-        if self._source_parser:
-            source = self._source_parser.parse_string(source)
 
         instance = StreamedAnnotatedFrame(
             source=source,

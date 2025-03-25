@@ -53,7 +53,7 @@ def test_annotation_streamer_should_indicate_stopping_when_stopped_early(mock_ca
 def test_annotation_streamer_should_normalize_bboxes(mock_callback):
     """Tests that the AnnotationStreamer normalizes bboxes when provided a normalizer."""
     # arrange
-    normalizer = SimpleBBoxNormalizer((1920, 1080), (0, 1))
+    normalizer = SimpleBBoxNormalizer((0, 1))
     streamer = DummyAnnotationStreamer(3, mock_callback, normalizer)
 
     # act

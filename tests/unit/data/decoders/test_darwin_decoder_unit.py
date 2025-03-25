@@ -71,14 +71,14 @@ def decoder(sample_json_bytes, label_parser):
 
 
 @pytest.mark.unit
-def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes):
+def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes,expected_frame_count):
     """Tests that get_annotations returns the expected annotations."""
     # act
     decoded_list = decoder.decode_annotations(sample_json_bytes)
 
     # assert
     assert decoded_list
-    assert len(decoded_list) == 208
+    assert len(decoded_list) == expected_frame_count
 
     for decoded_frame_anno in decoded_list:
         assert decoded_frame_anno.source.source_id == "test-source-id"
