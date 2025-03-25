@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from src.data.dataclasses.bbox import BBox
 
 
-class BBoxNormalizationStrategy(ABC):
+class BBoxNormalizer(ABC):
     """A strategy for normalizing bounding boxes."""
 
     @abstractmethod

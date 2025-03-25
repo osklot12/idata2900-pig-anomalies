@@ -5,7 +5,7 @@ from typing import Callable, Optional
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
-from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
@@ -13,13 +13,13 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class AnnotationStreamer(ThreadedStreamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, callback: Callable[[FrameAnnotations], FeedStatus], normalizer: Optional[BBoxNormalizationStrategy]):
+    def __init__(self, callback: Callable[[FrameAnnotations], FeedStatus], normalizer: Optional[BBoxNormalizer]):
         """
         Initializes a AnnotationStreamer instance.
 
         Args:
             callback (Callable[[Annotation], FeedStatus]): the callback to feed data
-            normalizer (BBoxNormalizationStrategy): the bounding box normalization strategy
+            normalizer (BBoxNormalizer): the bounding box normalization strategy
         """
         super().__init__()
         self._callback = callback

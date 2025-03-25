@@ -1,10 +1,10 @@
 from typing import Tuple
 
 from src.data.dataclasses.bbox import BBox
-from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 
 
-class SimpleBBoxNormalizer(BBoxNormalizationStrategy):
+class SimpleBBoxNormalizer(BBoxNormalizer):
     """Normalizes bounding box annotations based on image dimensions and target range."""
 
     def __init__(self, image_dimensions: Tuple[float, float], new_range: Tuple[float, float]):

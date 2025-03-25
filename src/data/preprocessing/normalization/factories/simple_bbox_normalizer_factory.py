@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory
-from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 
@@ -19,5 +19,5 @@ class SimpleBBoxNormalizerFactory(BBoxNormalizerFactory):
         self._image_dimensions = image_dimensions
         self._new_range = new_range
 
-    def create_bbox_normalizer(self) -> BBoxNormalizationStrategy:
+    def create_bbox_normalizer(self) -> BBoxNormalizer:
         return SimpleBBoxNormalizer(self._image_dimensions, self._new_range)

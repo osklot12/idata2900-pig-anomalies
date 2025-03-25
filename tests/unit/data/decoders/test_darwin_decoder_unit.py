@@ -1,7 +1,10 @@
 import pytest
 
+from src.data.dataclasses.annotated_bbox import AnnotatedBBox
+from src.data.dataclasses.bbox import BBox
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.label.simple_label_parser import SimpleLabelParser
+from src.typevars.enum_type import T_Enum
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 
@@ -17,21 +20,34 @@ def expected_sample_annotations(expected_frame_count):
     """Fixture to provide sampled expected annotations."""
     annotations = {
         56: [
-            (110, 100, 400, 300, NorsvinBehaviorClass.BELLY_NOSING),
-            (300, 250, 500, 600, NorsvinBehaviorClass.TAIL_BITING)
+            _create_anno_bbox(NorsvinBehaviorClass.BELLY_NOSING, 110, 100, 400, 300),
+            _create_anno_bbox(NorsvinBehaviorClass.TAIL_BITING, 300, 250, 500, 600)
         ],
         60: [
-            (115, 105, 405, 305, NorsvinBehaviorClass.BELLY_NOSING),
-            (305, 255, 505, 605, NorsvinBehaviorClass.TAIL_BITING)
+            _create_anno_bbox(NorsvinBehaviorClass.BELLY_NOSING, 115, 105, 405, 305),
+            _create_anno_bbox(NorsvinBehaviorClass.TAIL_BITING, 305, 255, 505, 605)
         ],
         140: [
-            (112, 126, 420, 320, NorsvinBehaviorClass.BELLY_NOSING)
+            _create_anno_bbox(NorsvinBehaviorClass.BELLY_NOSING, 112, 126, 420, 320)
         ],
         144: [
-            (120, 130, 430, 330, NorsvinBehaviorClass.BELLY_NOSING)
+            _create_anno_bbox(NorsvinBehaviorClass.BELLY_NOSING, 120, 130, 430, 330)
         ]
     }
     return {i: annotations.get(i, []) for i in range(expected_frame_count)}
+
+
+def _create_anno_bbox(cls: T_Enum, center_x: float, center_y: float, width: float, height: float) -> AnnotatedBBox:
+    """Creates a AnnotatedBBox instance."""
+    return AnnotatedBBox(
+        cls=cls,
+        bbox=BBox(
+            center_x=center_x,
+            center_y=center_y,
+            width=width,
+            height=height
+        )
+    )
 
 
 @pytest.fixture
@@ -58,36 +74,23 @@ def decoder(sample_json_bytes, label_parser):
 def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes):
     """Tests that get_annotations returns the expected annotations."""
     # act
-    decoded_annotations = decoder.decode_annotations(sample_json_bytes)
+    decoded_list = decoder.decode_annotations(sample_json_bytes)
 
     # assert
-    assert decoded_annotations, "Decoded annotations should not be empty"
+    assert decoded_list
+    assert len(decoded_list) == 208
 
-    decoded_dict = {}
+    for decoded_frame_anno in decoded_list:
+        assert decoded_frame_anno.source.source_id == "test-source-id"
+        assert decoded_frame_anno.source.frame_resolution == (2688, 1520)
 
-    for frame in decoded_annotations:
-        frame_index = frame.index
-        decoded_dict[frame_index] = [
-            (
-                ann.bbox.center_x,
-                ann.bbox.center_y,
-                ann.bbox.width,
-                ann.bbox.height,
-                ann.cls
-            )
-            for ann in frame.annotations
-        ]
+        decoded_annotations = decoded_frame_anno.annotations
+        expected_annotations = expected_sample_annotations.get(decoded_frame_anno.index, [])
 
-    assert set(decoded_dict.keys()) == set(expected_sample_annotations.keys()), (
-        f"Frame keys mismatch: Expected {set(expected_sample_annotations.keys())}, Got {set(decoded_dict.keys())}"
-    )
+        assert len(decoded_annotations) == len(expected_annotations)
 
-    for frame_index, expected_annotations in expected_sample_annotations.items():
-        assert decoded_dict[frame_index] == expected_annotations, (
-            f"Mismatch at frame {frame_index}: Expected {expected_annotations}, Got {decoded_dict[frame_index]}"
-        )
-
-    print(f"{decoded_annotations}")
+        for anno_bbox in decoded_annotations:
+            assert anno_bbox in expected_annotations
 
 
 @pytest.mark.unit

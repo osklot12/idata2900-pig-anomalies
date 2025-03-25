@@ -8,7 +8,7 @@ from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_factory import FrameResizerFactory
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
-from src.data.preprocessing.normalization.normalizers.bbox_normalization_strategy import BBoxNormalizationStrategy
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
@@ -28,7 +28,7 @@ class FileStreamerPairFactory(StreamerPairFactory):
             instance_provider (DatasetInstanceProvider): a provider of dataset instances
             entity_factory (DatasetEntityFactory): a factory for creating the dataset entities
             frame_resizer_factory (FrameResizeStrategy): a factory for frame resizing strategies
-            bbox_normalizer_factory (BBoxNormalizationStrategy): a factory for BBoxNormalization strategies
+            bbox_normalizer_factory (BBoxNormalizer): a factory for BBoxNormalization strategies
         """
         self._instance_provider = instance_provider
         self._entity_factory = entity_factory
