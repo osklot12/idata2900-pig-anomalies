@@ -39,28 +39,33 @@ def manual_visualize_annotations():
     _stream_frames(aggregated_streamer_factory)
 
     # get batch
-    batch_size = 10
-    shuffled_batch = _get_shuffled_batch(virtual_dataset, batch_size)
+    split_buffer = _get_non_empty_internal_buffer(virtual_dataset)
+    key = split_buffer.keys()[0]
+    source_buffer = split_buffer.at(key)
 
     # visualize
-    for instance in shuffled_batch:
-        frame = instance.frame.copy()
-        annotations = instance.annotations.copy()
+    for frame_index in source_buffer.keys():
+        instance = source_buffer.at(frame_index)
+        frame = instance.frame
+        annotations = instance.annotations
+        print(f"{annotations}")
         frame_height, frame_width, _ = frame.shape
 
         for annotation in annotations:
             behavior = annotation.cls
-            x_max, x_min, y_max, y_min = _get_absolute_coordinates(annotation, frame_width, frame_height)
+            print(f"Stored annotation {frame_index}: {annotation}")
+            x_min, y_min, x_max, y_max = _get_absolute_coordinates(annotation, frame_width, frame_height)
+            print(f"Absolute coordinates: x({(x_min + x_max) / 2}), y({(y_min + y_max) / 2}), w({x_max - x_min}), h({y_max - y_min})")
 
             _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min)
 
-        _show_plot(frame)
+        _show_plot(frame, frame_index)
 
 
-def _show_plot(frame):
+def _show_plot(frame, frame_index):
     plt.figure(figsize=(6, 6))
     plt.imshow(frame)
-    plt.title(f"Shuffled Frame")
+    plt.title(f"Frame {frame_index}")
     plt.axis("off")
     plt.show()
 
@@ -74,27 +79,30 @@ def _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min):
 
 
 def _get_absolute_coordinates(annotation, frame_width, frame_height):
-    x = annotation.bbox.center_x
-    y = annotation.bbox.center_y
+    x = annotation.bbox.x
+    y = annotation.bbox.y
     w = annotation.bbox.width
     h = annotation.bbox.height
 
-    x_min = int((x - w / 2) * frame_width)
-    y_min = int((y - h / 2) * frame_height)
-    x_max = int((x + w / 2) * frame_width)
-    y_max = int((y + h / 2) * frame_height)
+    # flip y axis for opencv
+    #y = 1.0 - y
 
-    return x_max, x_min, y_max, y_min
+    x_min = int(x * frame_width)
+    x_max = int((x + w) * frame_width)
+    y_min = int(y * frame_height)
+    y_max = int((y + h) * frame_height)
+
+    return x_min, y_min, x_max, y_max
 
 
-def _get_shuffled_batch(virtual_dataset, batch_size):
+def _get_non_empty_internal_buffer(virtual_dataset):
     if virtual_dataset.get_frame_count(DatasetSplit.TRAIN):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TRAIN, batch_size)
+        frames = virtual_dataset._buffer_map.get(DatasetSplit.TRAIN)
     elif virtual_dataset.get_frame_count(DatasetSplit.VAL):
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.VAL, batch_size)
+        frames = virtual_dataset._buffer_map.get(DatasetSplit.VAL)
     else:
-        shuffled_batch = virtual_dataset.get_shuffled_batch(DatasetSplit.TEST, batch_size)
-    return shuffled_batch
+        frames = virtual_dataset._buffer_map.get(DatasetSplit.TEST)
+    return frames
 
 
 def _stream_frames(aggregated_streamer_factory):
@@ -116,14 +124,14 @@ def _get_aggregated_streamer(streamer_pair_factory, virtual_dataset):
 def _get_virtual_dataset(loader_factory):
     source_id_provider = FileSourceIdProvider(loader_factory.create_dataset_source(), FileBaseNameParser())
     dataset_splitter = ConsistentDatasetSplitter()
-    virtual_dataset = VirtualDataset(source_id_provider, dataset_splitter, max_sources=10, max_frames_per_source=200)
+    virtual_dataset = VirtualDataset(source_id_provider, dataset_splitter, max_sources=10, max_frames_per_source=1000)
     return virtual_dataset
 
 
 def _get_streamer_pair_factory(instance_provider, loader_factory):
-    entity_factory = LazyEntityFactory(loader_factory)
-    frame_resizer_factory = StaticFrameResizerFactory((2688, 1520))
-    bbox_normalizer_factory = SimpleBBoxNormalizerFactory((2688, 1520), (0, 1))
+    entity_factory = LazyEntityFactory(loader_factory, FileBaseNameParser())
+    frame_resizer_factory = StaticFrameResizerFactory((640, 640))
+    bbox_normalizer_factory = SimpleBBoxNormalizerFactory((0, 1))
     streamer_pair_factory = FileStreamerPairFactory(
         instance_provider, entity_factory, frame_resizer_factory, bbox_normalizer_factory
     )

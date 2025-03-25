@@ -7,6 +7,7 @@ from _pytest._code import source
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.bbox import BBox
+from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.virtual_dataset import VirtualDataset
 from src.data.dataset_split import DatasetSplit
@@ -71,13 +72,16 @@ def standard_dataset(id_provider, splitter):
     )
 
 
-def _gen_dummy_annotated_frames(n: int, source: str):
+def _gen_dummy_annotated_frames(n: int, source_id: str):
     """Helper function to generate dummy StreamedAnnotatedFrame instances."""
     anno_frames = []
     for i in range(n):
         anno_frames.append(
             StreamedAnnotatedFrame(
-                source=source,
+                source=SourceMetadata(
+                    source_id=source_id,
+                    frame_resolution=(1920, 1080)
+                ),
                 index=i,
                 frame=np.random.randint(0, 256, size=(240, 320, 3), dtype=np.uint8),
                 annotations=[

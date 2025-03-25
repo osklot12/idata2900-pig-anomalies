@@ -65,7 +65,7 @@ def test_annotation_streamer_should_normalize_bboxes(mock_callback):
     for call_args in mock_callback.call_args_list:
         annotation = call_args[0][0]
         for anno_bbox in annotation.annotations:
-            assert anno_bbox.bbox.center_x < 1
-            assert anno_bbox.bbox.center_x > 0
-            assert anno_bbox.bbox.center_y < 1
-            assert anno_bbox.bbox.center_y > 0
+            assert anno_bbox.bbox.x < 1
+            assert anno_bbox.bbox.x > 0
+            assert anno_bbox.bbox.y < 1
+            assert anno_bbox.bbox.y > 0

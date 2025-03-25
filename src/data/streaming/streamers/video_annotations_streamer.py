@@ -33,5 +33,10 @@ class VideoAnnotationsStreamer(AnnotationStreamer):
             self._frame_queue.put(frame_annotation)
 
     def _get_next_annotation(self) -> Optional[FrameAnnotations]:
-        print(f"[VideoAnnotationsStreamer] Streamed next annotation")
-        return self._frame_queue.get() if not self._frame_queue.empty() else None
+        annotation = None
+
+        if not self._frame_queue.empty():
+            annotation = self._frame_queue.get()
+
+        print(f"[VideoAnnotationsStreamer] Streamed next annotation: {annotation}")
+        return annotation

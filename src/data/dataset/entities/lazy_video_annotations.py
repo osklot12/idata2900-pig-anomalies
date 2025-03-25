@@ -22,4 +22,4 @@ class LazyVideoAnnotations(VideoAnnotations):
         self._loader = annotation_loader
 
     def get_data(self) -> List[FrameAnnotations]:
-        return self._loader.load_video_annotations(self._instance_id)
+        return self._loader.load_video_annotations(self._file_path)

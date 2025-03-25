@@ -42,8 +42,8 @@ def _create_anno_bbox(cls: T_Enum, center_x: float, center_y: float, width: floa
     return AnnotatedBBox(
         cls=cls,
         bbox=BBox(
-            center_x=center_x,
-            center_y=center_y,
+            x=center_x,
+            y=center_y,
             width=width,
             height=height
         )

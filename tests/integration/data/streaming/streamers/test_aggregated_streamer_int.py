@@ -11,6 +11,7 @@ from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
+from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
@@ -68,7 +69,7 @@ def instance_provider(loader_factory, video_selector, annotation_matcher):
 @pytest.fixture
 def dataset_entity_factory(loader_factory):
     """Fixture to provide a DatasetEntityFactory instance."""
-    return LazyEntityFactory(loader_factory)
+    return LazyEntityFactory(loader_factory, FileBaseNameParser())
 
 
 @pytest.fixture
@@ -80,10 +81,7 @@ def resizer_factory():
 @pytest.fixture
 def bbox_normalizer_factory():
     """Fixture to provide a BBoxNormalizerFactory instance."""
-    return SimpleBBoxNormalizerFactory(
-        image_dimensions=(2688, 1520),
-        new_range=(0, 1)
-    )
+    return SimpleBBoxNormalizerFactory((0, 1))
 
 
 @pytest.fixture

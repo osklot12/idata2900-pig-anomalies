@@ -39,8 +39,8 @@ class DummyAnnotationStreamer(AnnotationStreamer):
                 AnnotatedBBox(
                     cls=AnnotationLabel.CODING,
                     bbox=BBox(
-                        center_x=1240.6,
-                        center_y=980.04,
+                        x=1240.6,
+                        y=980.04,
                         width=234.4,
                         height=895.4
                     )

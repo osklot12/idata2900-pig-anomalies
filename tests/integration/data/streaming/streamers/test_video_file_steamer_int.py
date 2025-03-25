@@ -25,7 +25,7 @@ def mock_callback():
 def dummy_video():
     """Fixture to provide a test video object."""
     video_path = PathFinder.get_abs_path("tests/data/sample-5s.mp4")
-    return LazyVideoFile(str(video_path), DummyVideoLoader())
+    return LazyVideoFile(str(video_path), "sample-5s", DummyVideoLoader())
 
 @pytest.fixture
 def expected_frames():
