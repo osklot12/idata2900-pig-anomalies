@@ -1,7 +1,6 @@
 import math
-import random
 import re
-from typing import List, Tuple, Iterable
+from typing import Callable, Any
 
 import pytest
 
@@ -27,10 +26,10 @@ def _get_splits(splitter: ConsistentDatasetSplitter):
     )
 
 
-def _get_splits_before_and_after_update(splitter: ConsistentDatasetSplitter, updated_dataset_ids: Iterable[str]):
+def _get_splits_before_and_after(splitter: ConsistentDatasetSplitter, func: Callable[..., Any]):
     """Returns the dataset splits before and after updating the dataset IDs."""
     splits_before = _get_splits(splitter)
-    splitter.update_dataset(updated_dataset_ids)
+    func()
     splits_after = _get_splits(splitter)
 
     return splits_before, splits_after
@@ -97,7 +96,7 @@ def test_update_dataset_and_get_split(dataset_ids):
 
 
 @pytest.mark.unit
-def test_adding_ids_keep_consistency(dataset_ids):
+def test_update_ids_adding_keep_consistency(dataset_ids):
     """Tests that adding IDs to the dataset keeps the existing distribution consistent."""
     # arrange
     splitter = ConsistentDatasetSplitter(dataset_ids=dataset_ids)
@@ -105,7 +104,10 @@ def test_adding_ids_keep_consistency(dataset_ids):
     dataset_ids.add("id11")
 
     # act
-    splits_before, splits_after = _get_splits_before_and_after_update(splitter, updated_list)
+    splits_before, splits_after = _get_splits_before_and_after(
+        splitter,
+        lambda: splitter.update_dataset(updated_list)
+    )
 
     # assert
     for i in range(len(splits_before)):
@@ -116,7 +118,7 @@ def test_adding_ids_keep_consistency(dataset_ids):
 
 
 @pytest.mark.unit
-def test_removing_ids_keep_consistency(dataset_ids):
+def test_update_ids_removal_keep_consistency(dataset_ids):
     """Tests that removing IDs from the dataset keeps the existing distribution consistent."""
     # arrange
     splitter = ConsistentDatasetSplitter(dataset_ids=dataset_ids)
@@ -125,16 +127,81 @@ def test_removing_ids_keep_consistency(dataset_ids):
     updated_list.remove(id_to_remove)
 
     # act
-    splits_before, splits_after = _get_splits_before_and_after_update(splitter, updated_list)
+    splits_before, splits_after = _get_splits_before_and_after(
+        splitter,
+        lambda: splitter.update_dataset(updated_list)
+    )
 
     # assert
     for i in range(len(splits_before)):
         before_split = splits_before[i]
-        print(f"Before split: {before_split}")
         after_split = splits_after[i]
-        print(f"After split: {after_split}")
+
         for id_ in before_split:
             if id_ == id_to_remove:
                 assert id_ not in after_split
             else:
                 assert id_ in after_split
+
+
+def test_add_instance_keeps_consistency():
+    """Tests that add_instance() adds an instance while keeping consistency."""
+    # arrange
+    splitter = ConsistentDatasetSplitter()
+
+    first_instance = "id1"
+    second_instance = "id2"
+
+    # act
+    splitter.add_instance(first_instance)
+
+    splits_before, splits_after = _get_splits_before_and_after(
+        splitter,
+        lambda: splitter.add_instance(second_instance)
+    )
+
+    # assert
+    added_found = False
+    for i in range(len(splits_before)):
+        before_split = splits_before[i]
+        after_split = splits_after[i]
+        assert len(before_split) <= len(after_split)
+
+
+        for id_ in before_split:
+            assert id_ in after_split
+            assert second_instance not in before_split
+            added_found = second_instance in after_split
+
+    assert added_found
+
+
+def test_remove_instance_keeps_consistency():
+    """Tests that remove_instance() removes an instance while keeping consistency."""
+    # arrange
+    splitter = ConsistentDatasetSplitter()
+
+    first_instance = "id1"
+    second_instance = "id2"
+
+    splitter.add_instance(first_instance)
+    splitter.add_instance(second_instance)
+
+    # act
+    splits_before, splits_after = _get_splits_before_and_after(
+        splitter,
+        lambda: splitter.remove_instance(first_instance)
+    )
+
+    # assert
+    for i in range(len(splits_before)):
+        before_split = splits_before[i]
+        after_split = splits_after[i]
+        print(f"Before: {before_split}")
+        print(f"After: {after_split}")
+        assert len(before_split) >= len(after_split)
+
+        assert first_instance not in after_split
+
+        for id_ in after_split:
+            assert id_ in before_split

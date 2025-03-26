@@ -1,5 +1,5 @@
 import hashlib
-from typing import List, Dict, Iterable, Optional
+from typing import Dict, Iterable, Optional
 
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset_split import DatasetSplit
@@ -42,7 +42,21 @@ class ConsistentDatasetSplitter(DatasetSplitter):
 
     def update_dataset(self, new_dataset: Iterable[str]) -> None:
         self._dataset = set(new_dataset)
-        self._update_splits()
+
+        self._clear_splits()
+        for id_ in self._dataset:
+            self._add_id(id_)
+
+    def add_instance(self, instance: str) -> None:
+        self._add_id(instance)
+
+    def remove_instance(self, instance: str) -> None:
+        split_set = self._split_map.get(self.get_split_for_id(instance), None)
+        if split_set:
+            split_set.remove(instance)
+
+        if instance in self._dataset:
+            self._dataset.remove(instance)
 
     def get_split(self, split: DatasetSplit) -> set[str]:
         return set(self._split_map.get(split, []))
@@ -72,20 +86,23 @@ class ConsistentDatasetSplitter(DatasetSplitter):
 
         return split
 
-    def _update_splits(self) -> None:
-        """Updates the internal splits."""
+    def _clear_splits(self) -> None:
+        """Clears the internal splits."""
         self._train_split.clear()
         self._val_split.clear()
         self._test_split.clear()
 
-        for id_ in self._dataset:
-            p = self._normalized_hash(id_)
-            if p < self._train_threshold:
-                self._train_split.add(id_)
-            elif p < self._train_threshold + self._val_threshold:
-                self._val_split.add(id_)
-            else:
-                self._test_split.add(id_)
+    def _add_id(self, id_: str) -> None:
+        """Adds an ID to the appropriate split."""
+        self._dataset.add(id_)
+
+        p = self._normalized_hash(id_)
+        if p < self._train_threshold:
+            self._train_split.add(id_)
+        elif p < self._train_threshold + self._val_threshold:
+            self._val_split.add(id_)
+        else:
+            self._test_split.add(id_)
 
     def _stable_hash(self, s: str) -> int:
         """Gives a stable hash for a given string."""
