@@ -81,22 +81,20 @@ class VirtualDataset(Dataset):
 
         with self.lock:
             split_buffer = self._get_split_buffer_for_source(source_id)
+            if split_buffer is None:
+                raise RuntimeError(f"Could not get split buffer for source {source_id}.")
 
-            if split_buffer is not None:
-                # allocates buffer for source if new
-                source_buffer = self._get_source_buffer(source_id, split_buffer)
+            # allocates buffer for source if new
+            source_buffer = self._get_source_buffer(source_id, split_buffer)
 
-                # add instance to source buffer
-                evicted = source_buffer.add(
-                    anno_frame.index,
-                    AnnotatedFrame(anno_frame.frame, anno_frame.annotations)
-                )
+            # add instance to source buffer
+            evicted = source_buffer.add(
+                anno_frame.index,
+                AnnotatedFrame(anno_frame.frame, anno_frame.annotations)
+            )
 
-                for id_ in evicted:
-                    self._splitter.remove_instance(id_)
-                print(f"[VirtualDataset] Received frame {anno_frame.index}")
-            else:
-                print(f"[VirtualDataset] Source {anno_frame.source} not recognized.")
+            for id_ in evicted:
+                self._splitter.remove_instance(id_)
 
     def get_frame_count(self, split: DatasetSplit) -> int:
         """
