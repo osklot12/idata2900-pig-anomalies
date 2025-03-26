@@ -1,6 +1,6 @@
 from typing import List, Dict, Tuple
 
-from src.data.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source import DatasetSource
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 
@@ -32,7 +32,7 @@ class DummyGCPDataLoader(DatasetSource):
         ],
     }
 
-    def list_files(self) -> List[str]:
+    def get_source_ids(self) -> List[str]:
         return self.fetch_all_files()
 
     def __init__(self, bucket_name: str = "test-bucket", credentials_path: str = "test_credentials.json"):
