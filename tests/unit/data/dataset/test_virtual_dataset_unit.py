@@ -23,15 +23,6 @@ def source_ids():
 
 
 @pytest.fixture
-def id_provider(source_ids):
-    """Fixture to provide a mock SourceIdProvider instance."""
-    provider = Mock()
-    provider.get_source_ids.return_value = source_ids
-
-    return provider
-
-
-@pytest.fixture
 def splitter(source_ids):
     """Fixture to provide a mock DatasetSplitter instance."""
     mock_splitter = Mock()
@@ -62,10 +53,9 @@ def splitter(source_ids):
 
 
 @pytest.fixture
-def standard_dataset(id_provider, splitter):
+def standard_dataset(splitter):
     """Fixture to provide a standard VirtualDataset instance."""
     return VirtualDataset(
-        id_provider=id_provider,
         splitter=splitter,
         max_sources=10,
         max_frames_per_source=20
@@ -135,23 +125,6 @@ def test_feed_valid_frames(standard_dataset):
 
 
 @pytest.mark.unit
-def test_feed_invalid_frames(standard_dataset):
-    """Tests that feeding invalid frames to VirtualDataset results in rejection."""
-    # arrange
-    n_frames = 10
-    frames = _gen_dummy_annotated_frames(n_frames, "unknown-id")
-
-    # act
-    for frame in frames:
-        standard_dataset.feed(frame)
-
-    # assert
-    assert standard_dataset.get_frame_count(DatasetSplit.TRAIN) == 0
-    assert standard_dataset.get_frame_count(DatasetSplit.VAL) == 0
-    assert standard_dataset.get_frame_count(DatasetSplit.TEST) == 0
-
-
-@pytest.mark.unit
 def test_feed_frames_over_frame_capacity(standard_dataset):
     """Tests that feeding more frames than VirtualDataset's set capacity allows will evict older frames."""
     # arrange
@@ -167,11 +140,10 @@ def test_feed_frames_over_frame_capacity(standard_dataset):
 
 
 @pytest.mark.unit
-def test_feed_frames_over_source_capacity(id_provider, splitter):
+def test_feed_frames_over_source_capacity(splitter):
     """Tests that feeding frames from more distinct sources than allowed will evict older sources."""
     # arrange
     dataset = VirtualDataset(
-        id_provider=id_provider,
         splitter=splitter,
         max_sources=3,
         max_frames_per_source=20

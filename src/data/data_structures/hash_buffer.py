@@ -3,10 +3,11 @@ from collections import deque
 from typing import Dict, Generic, TypeVar, Optional, Hashable, List
 
 # generic type for stored data
+K = TypeVar('K', bound=Hashable)
 T = TypeVar('T')
 
 
-class HashBuffer(Generic[T]):
+class HashBuffer(Generic[K, T]):
     """Thread-safe buffer that stores mapped data with automatic eviction."""
 
     def __init__(self, max_size: int = 1000):
@@ -16,19 +17,24 @@ class HashBuffer(Generic[T]):
         Args:
             max_size (int, optional): the maximum size of the buffer, defaults to 1000
         """
-        self._data: Dict[Hashable, T] = {}
+        self._data: Dict[K, T] = {}
         self._order = deque()
         self._max_size = max_size
         self._lock = threading.Lock()
 
-    def add(self, key: Hashable, value: T):
+    def add(self, key: K, value: T) -> List[K]:
         """
         Adds an item with any hashable key, handling automatic eviction.
 
         Args:
-            key (Hashable): the hashable key
+            key (K): the hashable key
             value (T): the value to store
+
+        Returns:
+            List[K]: list of evicted keys
         """
+        evicted_keys = []
+
         with self._lock:
             if key not in self._data:
                 self._data[key] = value
@@ -37,13 +43,16 @@ class HashBuffer(Generic[T]):
                 if len(self._order) > self._max_size:
                     old_index = self._order.popleft()
                     del self._data[old_index]
+                    evicted_keys.append(old_index)
 
-    def pop(self, key: Hashable) -> Optional[T]:
+        return evicted_keys
+
+    def pop(self, key: K) -> Optional[T]:
         """
         Removes and returns an item if it exists.
 
         Args:
-            key (Hashable): the hashable key
+            key (K): the hashable key
 
         Returns:
             T: the item if it exists
@@ -57,7 +66,7 @@ class HashBuffer(Generic[T]):
 
         return result
 
-    def has(self, key: Hashable) -> bool:
+    def has(self, key: K) -> bool:
         """
         Checks if an item exists.
 
@@ -67,12 +76,12 @@ class HashBuffer(Generic[T]):
         with self._lock:
             return key in self._data
 
-    def at(self, key: Hashable) -> Optional[T]:
+    def at(self, key: K) -> Optional[T]:
         """
         Thread-safe retrieval without removing the item.
 
         Args:
-            key (Hashable): the hashable key
+            key (K): the hashable key
 
         Returns:
             T: the item if it exists, None otherwise
@@ -80,12 +89,12 @@ class HashBuffer(Generic[T]):
         with self._lock:
             return self._data.get(key, None)
 
-    def keys(self) -> List[Hashable]:
+    def keys(self) -> List[K]:
         """
         Thread-safe retrieval of all keys.
 
         Returns:
-            List[Hashable]: the keys
+            List[K]: the keys
         """
         with self._lock:
             return list(self._data.keys())
