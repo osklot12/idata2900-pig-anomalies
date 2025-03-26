@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from src.auth.gcp_auth_service import GCPAuthService
 
-TEST_CREDENTIALS_PATH = "fake_servie_account.json"
+TEST_CREDENTIALS_PATH = "fake_service_account.json"
 
 
 @pytest.fixture
@@ -22,11 +22,14 @@ def mock_auth_service():
             return auth_service
 
 
+@pytest.mark.unit
 def test_authentication(mock_auth_service):
     """Tests that authentication initializes correctly and a token is set."""
     assert mock_auth_service.creds is not None
     assert mock_auth_service.creds.token == "mock_access_token"
 
+
+@pytest.mark.unit
 @patch("src.auth.gcp_auth_service.service_account.Credentials.from_service_account_file")
 def test_refresh_token(mock_creds, mock_auth_service):
     """Tests if refresh_token correctly updates the token."""
@@ -42,11 +45,15 @@ def test_refresh_token(mock_creds, mock_auth_service):
     assert mock_auth_service.creds.valid
     assert mock_auth_service.creds.token == "new_mock_token"
 
+
+@pytest.mark.unit
 def test_get_access_token(mock_auth_service):
-    """Tests if get_access_token correctly retrieves a valid token."""
+    """Tests that get_access_token correctly retrieves a valid token."""
     token = mock_auth_service.get_access_token()
     assert token == "mock_access_token"
 
+
+@pytest.mark.unit
 @patch("os.path.exists", return_value=False)
 def test_authenticate_with_missing_credentials(mock_exists):
     """Tests if authenticate raises FileNotFoundError when credentials are missing."""

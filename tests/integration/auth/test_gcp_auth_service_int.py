@@ -1,14 +1,14 @@
 import pytest
 from src.auth.gcp_auth_service import GCPAuthService
-from src.utils.norsvin_bucket_parser import NorsvinBucketParser
 from src.utils.path_finder import PathFinder
-
-TEST_CREDENTIALS_PATH = PathFinder.get_abs_path(NorsvinBucketParser.CREDENTIALS_PATH)
+from tests.utils.gcs.test_bucket import TestBucket
 
 @pytest.fixture(scope="module")
 def gcp_auth_service():
     """Creates a GCPAuthService instance using real credentials."""
-    return GCPAuthService(credentials_path=TEST_CREDENTIALS_PATH)
+    return GCPAuthService(
+        str(PathFinder.get_abs_path(TestBucket.SERVICE_ACCOUNT_FILE))
+    )
 
 @pytest.mark.integration
 def test_authenticate(gcp_auth_service):

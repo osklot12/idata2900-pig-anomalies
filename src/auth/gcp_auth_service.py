@@ -1,8 +1,12 @@
 import os
+
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 
-class GCPAuthService:
+from src.auth.auth_service import AuthService
+
+
+class GCPAuthService(AuthService):
     """Handles authentication and token management for Google Cloud Platform."""
 
     def __init__(self, credentials_path: str):
@@ -16,7 +20,7 @@ class GCPAuthService:
         self.creds = None
         self.authenticate()
 
-    def authenticate(self):
+    def authenticate(self) -> None:
         """Authenticates with GCP using a service account."""
         if not os.path.exists(self.credentials_path):
             raise FileNotFoundError(f"Service account file not found: {self.credentials_path}")
@@ -26,13 +30,12 @@ class GCPAuthService:
         )
         self.refresh_token()
 
-    def refresh_token(self):
+    def refresh_token(self) -> None:
         """Refreshes the token if needed."""
         if not self.creds or not self.creds.valid:
             self.creds.refresh(Request())
         self.token = self.creds.token
 
-    def get_access_token(self):
-        """Returns a valid access token, refreshing if necessary."""
+    def get_access_token(self) -> str:
         self.refresh_token()
         return self.token
