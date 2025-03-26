@@ -2,10 +2,11 @@ import socket
 import pickle
 import struct
 import threading
+import traceback
 import multiprocessing
-from src.network.ddp_receiver_interface import DDPReceiverInterface
-
-data_queue = multiprocessing.Queue(maxsize=100)  # Shared queue for incoming training data
+from src.worker.ddp_receiver_interface import DDPReceiverInterface
+from src.worker.tensor_converter import convert_to_tensor_format
+from src.worker.data_queue import data_queue
 
 
 class PipelineDataReceiver(DDPReceiverInterface):
@@ -34,11 +35,24 @@ class PipelineDataReceiver(DDPReceiverInterface):
         try:
             while True:
                 data = self.receive_data(client_socket)
+
                 if data is not None:
-                    frame, annotations = data["frame"], data["annotations"]
-                    data_queue.put((frame, annotations))
-        except Exception:
-            pass
+                    frame = data["frame"]  # np.ndarray (H, W, 3)
+                    annotations = data["annotations"]  # List[Dict] like [{"bbox": [...], "label": ...}]
+
+                    # Convert to PyTorch tensor format for Faster R-CNN
+                    image_tensor, target = convert_to_tensor_format(frame, annotations)
+
+                    # Push into the shared training queue
+                    data_queue.put((image_tensor, target))
+
+
+        except Exception as e:
+
+            print("[Receiver] Exception in handle_client:")
+
+            traceback.print_exc()
+
         finally:
             client_socket.close()
 

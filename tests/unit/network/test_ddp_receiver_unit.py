@@ -4,7 +4,7 @@ import struct
 import numpy as np
 from unittest.mock import patch, MagicMock
 from multiprocessing import Queue
-from src.network.pipeline_ddp_receiver import PipelineDataReceiver
+from src.worker.pipeline_ddp_receiver import PipelineDataReceiver
 
 @pytest.fixture
 def receiver():
