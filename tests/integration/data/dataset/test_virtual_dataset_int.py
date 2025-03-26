@@ -3,7 +3,6 @@ import pytest
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
-from src.data.dataset.providers.file_source_id_provider import FileSourceIdProvider
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
@@ -90,22 +89,15 @@ def streamer_pair_factory(instance_provider, entity_factory, frame_resizer_facto
 
 
 @pytest.fixture
-def source_id_provider(loader_factory):
-    """Fixture to provide a SourceIdProvider instance."""
-    return FileSourceIdProvider(loader_factory.create_dataset_source(), FileBaseNameParser())
-
-
-@pytest.fixture
 def dataset_splitter():
     """Fixture to provide a DatasetSplitter instance."""
     return ConsistentDatasetSplitter()
 
 
 @pytest.fixture
-def virtual_dataset(source_id_provider, dataset_splitter):
+def virtual_dataset(dataset_splitter):
     """Fixture to provide a VirtualDataset instance."""
     return VirtualDataset(
-        id_provider=source_id_provider,
         splitter=dataset_splitter,
         max_sources=10,
         max_frames_per_source=200

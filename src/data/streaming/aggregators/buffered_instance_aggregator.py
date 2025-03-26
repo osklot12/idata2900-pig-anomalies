@@ -27,10 +27,10 @@ class BufferedInstanceAggregator(InstanceAggregator):
         self.lock = Lock()
 
         # frame buffer
-        self.frame_buffer = HashBuffer[Frame](max_size=buffer_size)
+        self.frame_buffer = HashBuffer[int, Frame](max_size=buffer_size)
 
         # annotation buffer
-        self.annotation_buffer = HashBuffer[FrameAnnotations](max_size=buffer_size)
+        self.annotation_buffer = HashBuffer[int, FrameAnnotations](max_size=buffer_size)
 
     def feed_frame(self, frame: Frame) -> FeedStatus:
         if frame is None:

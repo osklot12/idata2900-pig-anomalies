@@ -7,7 +7,7 @@ from src.data.data_structures.hash_buffer import HashBuffer
 def test_hash_buffer_add():
     """Tests adding elements to the buffer."""
     # arrange
-    buffer = HashBuffer[int](max_size=3)
+    buffer = HashBuffer[int, int](max_size=3)
 
     # act
     buffer.add(1, 100)
@@ -25,7 +25,7 @@ def test_hash_buffer_add():
 def test_hash_buffer_pop():
     """Tests popping elements from the buffer."""
     # arrange
-    buffer = HashBuffer[int](max_size=3)
+    buffer = HashBuffer[int, int](max_size=3)
     first_added_element = 100
     second_added_element = 200
     third_added_element = 300
@@ -51,13 +51,13 @@ def test_hash_buffer_pop():
 def test_hash_buffer_eviction():
     """Tests that the buffer evicts old entries when full."""
     # arrange
-    buffer = HashBuffer[int](max_size=3)
+    buffer = HashBuffer[int, int](max_size=3)
     buffer.add(1, 100)
     buffer.add(2, 200)
     buffer.add(3, 300)
 
     # act
-    buffer.add(4, 400)
+    evicted_keys = buffer.add(4, 400)
 
     # assert
     assert not buffer.has(1)
@@ -65,13 +65,15 @@ def test_hash_buffer_eviction():
     assert buffer.has(3)
     assert buffer.has(4)
 
+    assert evicted_keys == [1]
+
 
 @pytest.mark.unit
 def test_hash_buffer_thread_safety():
     """Tests concurrent access to the buffer."""
     # arrange
     import threading
-    buffer = HashBuffer[int](max_size=5)
+    buffer = HashBuffer[int, int](max_size=5)
 
     def add_item():
         for i_ in range(10):
@@ -95,7 +97,7 @@ def test_hash_buffer_thread_safety():
 def test_hash_buffer_remove_nonexistent():
     """Tests that popping a non-existent index returns None."""
     # arrange
-    buffer = HashBuffer[int](max_size=2)
+    buffer = HashBuffer[int, int](max_size=2)
 
     # act
     popped_element = buffer.pop(17)
