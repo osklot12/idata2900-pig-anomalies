@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
-from src.data.dataset.providers.file_source_id_provider import FileSourceIdProvider
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
@@ -55,7 +54,8 @@ def manual_visualize_annotations():
             behavior = annotation.cls
             print(f"Stored annotation {frame_index}: {annotation}")
             x_min, y_min, x_max, y_max = _get_absolute_coordinates(annotation, frame_width, frame_height)
-            print(f"Absolute coordinates: x({(x_min + x_max) / 2}), y({(y_min + y_max) / 2}), w({x_max - x_min}), h({y_max - y_min})")
+            print(
+                f"Absolute coordinates: x({(x_min + x_max) / 2}), y({(y_min + y_max) / 2}), w({x_max - x_min}), h({y_max - y_min})")
 
             _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min)
 
@@ -85,7 +85,7 @@ def _get_absolute_coordinates(annotation, frame_width, frame_height):
     h = annotation.bbox.height
 
     # flip y axis for opencv
-    #y = 1.0 - y
+    # y = 1.0 - y
 
     x_min = int(x * frame_width)
     x_max = int((x + w) * frame_width)
@@ -122,9 +122,8 @@ def _get_aggregated_streamer(streamer_pair_factory, virtual_dataset):
 
 
 def _get_virtual_dataset(loader_factory):
-    source_id_provider = FileSourceIdProvider(loader_factory.create_dataset_source(), FileBaseNameParser())
     dataset_splitter = ConsistentDatasetSplitter()
-    virtual_dataset = VirtualDataset(source_id_provider, dataset_splitter, max_sources=10, max_frames_per_source=1000)
+    virtual_dataset = VirtualDataset(dataset_splitter, max_sources=10, max_frames_per_source=1000)
     return virtual_dataset
 
 
