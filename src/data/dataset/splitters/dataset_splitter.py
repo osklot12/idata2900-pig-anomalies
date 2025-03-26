@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Iterable, Optional
+from typing import Iterable, Optional
 
 from src.data.dataset_split import DatasetSplit
 
@@ -10,10 +10,30 @@ class DatasetSplitter(ABC):
     @abstractmethod
     def update_dataset(self, new_dataset: Iterable[str]) -> None:
         """
-        Updates the dataset.
+        Replaces the current dataset with the new dataset.
 
         Args:
             new_dataset (Iterable[str]): an iterable of the id's of the updated dataset
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_instance(self, instance: str) -> None:
+        """
+        Adds an instance to the dataset.
+
+        Args:
+            instance (str): the id of the instance to add
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def remove_instance(self, instance: str) -> None:
+        """
+        Removes an instance from the dataset.
+
+        Args:
+            instance (str): the id of the instance to remove
         """
         raise NotImplementedError
 
