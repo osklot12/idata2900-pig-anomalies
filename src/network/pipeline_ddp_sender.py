@@ -4,7 +4,10 @@ import struct
 import threading
 import numpy as np
 from typing import List, Dict
+
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.network.ddp_sender_interface import DDPSenderInterface
+
 
 class PipelineDataSender(DDPSenderInterface):
     """
@@ -27,35 +30,30 @@ class PipelineDataSender(DDPSenderInterface):
             except Exception as e:
                 print(f"[PipelineDataSender] Connection failed: {ip} ({e})")
 
-    def send_data(self, frames: List[np.ndarray], annotations: List[List[Dict]]):
-        """
-        Sends a batch of frames & annotations to worker PCs.
-
-        :param frames: List of image frames (numpy arrays).
-        :param annotations: List of annotations corresponding to each frame.
-        """
+    def send_data(self, data_batch: List[AnnotatedFrame]):
         if not self.sockets:
             print("[PipelineDataSender] No workers connected!")
 
-        elif len(frames) != len(annotations):
-            print("[PipelineDataSender] Frame-annotation mismatch!")
-
         else:
-            for i in range(len(frames)):
-                frame, ann = frames[i], annotations[i]
-                for worker_ip in self.worker_ips:
-                    thread = threading.Thread(
-                        target=self._send_data,
-                        args=(worker_ip, {"frame": frame, "annotations": ann}),
-                    )
-                    thread.start()
+            thread = threading.Thread(
+                target=self._worker_thread,
+                args=(data_batch,)
+            )
+            thread.start()
 
-    def _send_data(self, worker_ip: str, data: Dict):
+    def _worker_thread(self, data_batch: List[AnnotatedFrame]):
+        for frame_annotation in data_batch:
+            for worker_ip in self.worker_ips:
+                if frame_annotation.annotations:
+                    self._send_data(worker_ip, frame_annotation)
+
+    def _send_data(self, worker_ip: str, data: AnnotatedFrame):
         """Send one frame + annotation to a worker."""
         try:
             packed_data = pickle.dumps(data)
             message = struct.pack(">L", len(packed_data)) + packed_data
             self.sockets[worker_ip].sendall(message)
+            print(f"Sent {len(packed_data)} bytes to {worker_ip}")
         except Exception as e:
             print(f"[PipelineDataSender] Error sending data to {worker_ip}: {e}")
 

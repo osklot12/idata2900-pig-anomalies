@@ -60,8 +60,8 @@ class CheapPipeline:
 
         self._virtual_dataset = VirtualDataset(
             splitter=ConsistentDatasetSplitter(),
-            max_sources=10,
-            max_frames_per_source=1000
+            max_sources=20,
+            max_frames_per_source=500
         )
 
         self._aggregated_streamer_factory = AggregatedStreamerFactory(
