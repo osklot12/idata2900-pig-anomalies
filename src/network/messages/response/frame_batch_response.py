@@ -17,5 +17,4 @@ class FrameBatchResponse(Response):
         self._batch = batch
 
     def execute(self, context: ClientContext):
-
-        pass
+        context.put_batch(self._batch)

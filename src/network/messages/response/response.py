@@ -7,7 +7,7 @@ class Response(ABC):
     """An interface for network responses."""
 
     @abstractmethod
-    def execute(self, context: ClientContext):
+    def execute(self, context: ClientContext) -> None:
         """
         Executes the response command.
 
