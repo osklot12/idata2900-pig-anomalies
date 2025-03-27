@@ -2,8 +2,7 @@ import socket
 import pickle
 import struct
 import threading
-import numpy as np
-from typing import List, Dict
+from typing import List
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.network.ddp_sender_interface import DDPSenderInterface
