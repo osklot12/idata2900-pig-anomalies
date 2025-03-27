@@ -4,7 +4,7 @@ from typing import Optional
 from src.data.dataclasses.dataset_instance import DatasetInstance
 
 
-class DatasetInstanceProvider(ABC):
+class DatasetManifest(ABC):
     """An interface for providers of DatasetInstance."""
 
     @abstractmethod

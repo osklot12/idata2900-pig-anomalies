@@ -1,9 +1,9 @@
 from typing import List
 
-from src.data.dataset.sources.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source_registry import SourceRegistry
 
 
-class DummyDatasetSource(DatasetSource):
+class DummyDatasetSource(SourceRegistry):
     """A dummy DatasetSource implementation for testing."""
 
     def __init__(self):

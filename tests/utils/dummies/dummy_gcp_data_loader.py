@@ -1,10 +1,10 @@
 from typing import List, Dict, Tuple
 
-from src.data.dataset.sources.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source_registry import SourceRegistry
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 
-class DummyGCPDataLoader(DatasetSource):
+class DummyGCPDataLoader(SourceRegistry):
     """A fake GCPDataLoader that returns dummy video data."""
 
     # default constants

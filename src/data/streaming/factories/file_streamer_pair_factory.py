@@ -3,7 +3,7 @@ from typing import Callable, Tuple, Optional
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.factories.dataset_entity_factory import DatasetEntityFactory
-from src.data.dataset.providers.dataset_instance_provider import DatasetInstanceProvider
+from src.data.dataset.providers.dataset_catalog import DatasetManifest
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_factory import FrameResizerFactory
@@ -19,13 +19,13 @@ from src.data.streaming.streamers.video_streamer import VideoStreamer
 class FileStreamerPairFactory(StreamerPairFactory):
     """A factory for creating pairs of video file and annotation file streamers."""
 
-    def __init__(self, instance_provider: DatasetInstanceProvider, entity_factory: DatasetEntityFactory,
+    def __init__(self, instance_provider: DatasetManifest, entity_factory: DatasetEntityFactory,
                  frame_resizer_factory: FrameResizerFactory, bbox_normalizer_factory: BBoxNormalizerFactory):
         """
         Initializes a FileStreamerPairFactory instance.
 
         Args:
-            instance_provider (DatasetInstanceProvider): a provider of dataset instances
+            instance_provider (DatasetManifest): a provider of dataset instances
             entity_factory (DatasetEntityFactory): a factory for creating the dataset entities
             frame_resizer_factory (FrameResizeStrategy): a factory for frame resizing strategies
             bbox_normalizer_factory (BBoxNormalizer): a factory for BBoxNormalization strategies

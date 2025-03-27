@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
+from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
@@ -59,6 +59,6 @@ def test_create_dataset_source(gcs_loader_factory, bucket_name):
     dataset_source = gcs_loader_factory.create_dataset_source()
 
     # assert
-    assert isinstance(dataset_source, GCSDatasetSource)
+    assert isinstance(dataset_source, GCSSourceRegistry)
     assert dataset_source.get_bucket_name() == bucket_name
     assert isinstance(dataset_source.get_auth_service(), DummyAuthService)

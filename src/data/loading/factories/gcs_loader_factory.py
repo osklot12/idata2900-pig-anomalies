@@ -1,6 +1,6 @@
 from src.auth.factories.auth_service_factory import AuthServiceFactory
-from src.data.dataset.sources.dataset_source import DatasetSource
-from src.data.dataset.sources.gcs_dataset_source import GCSDatasetSource
+from src.data.dataset.sources.dataset_source_registry import SourceRegistry
+from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
 from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
@@ -35,5 +35,5 @@ class GCSLoaderFactory(LoaderFactory):
             decoder=self._decoder_factory.create_decoder()
         )
 
-    def create_dataset_source(self) -> DatasetSource:
-        return GCSDatasetSource(self._bucket_name, self._auth_factory.create_auth_service())
+    def create_dataset_source(self) -> SourceRegistry:
+        return GCSSourceRegistry(self._bucket_name, self._auth_factory.create_auth_service())
