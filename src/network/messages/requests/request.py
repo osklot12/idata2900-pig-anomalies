@@ -12,6 +12,6 @@ class Request(ABC):
         Executes the request.
 
         Args:
-            context (ClientContext): The context of the request to operate on.
+            context (ServerContext): The context of the request to operate on.
         """
         raise NotImplementedError
