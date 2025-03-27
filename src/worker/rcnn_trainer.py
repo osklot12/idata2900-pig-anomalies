@@ -1,25 +1,23 @@
-# src/worker/rcnn_trainer.py
+import multiprocessing
 
 import torch
 import os
-import queue
-import torchvision
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.transform import GeneralizedRCNNTransform
-
-from src.worker.data_queue import data_queue
-
+from src.worker.ddp_utils import get_ddp_init_method
 
 class RCNNTrainer:
-    def __init__(self, rank, world_size):
+    def __init__(self, rank, world_size, queue: multiprocessing.Queue):
         self.rank = rank
         self.world_size = world_size
+        self.queue = queue
 
     def setup(self):
-        dist.init_process_group("gloo", rank=self.rank, world_size=self.world_size)
+        init_method = get_ddp_init_method()
+        dist.init_process_group("gloo", init_method=init_method, rank=self.rank, world_size=self.world_size)
         self.device = torch.device(f"cuda:{self.rank}" if torch.cuda.is_available() else "cpu")
 
     def cleanup(self):
@@ -40,47 +38,57 @@ class RCNNTrainer:
         return DDP(model, device_ids=[self.rank] if torch.cuda.is_available() else None)
 
     def train_loop(self, model):
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005)
-        model.train()
+        try:
+            optimizer = torch.optim.SGD(model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005)
+            model.train()
 
-        save_dir = "checkpoints"
-        os.makedirs(save_dir, exist_ok=True)
+            save_dir = "checkpoints"
+            os.makedirs(save_dir, exist_ok=True)
 
-        iteration = 0
+            iteration = 0
+            print(f"[Rank {self.rank}] 🚀 Trainer started, waiting for data...")
 
-        while True:
-            try:
-                # Wait max 15 seconds for new data
-                item = data_queue.get(timeout=15)
-            except queue.Empty:
-                print(f"[Rank {self.rank}] No data received for 15s — assuming done. Saving model and exiting.")
-                torch.save(model.module.state_dict(), os.path.join(save_dir, "model_final.pt"))
-                break
+            while True:
+                try:
+                    print('Trying to access queue')
+                    item = self.queue.get()
+                    print(f"[Rank {self.rank}] 🧠 Pulled frame from queue")
 
-            images, targets = item
-            images = [images.to(self.device)]
-            targets = [{k: v.to(self.device) for k, v in targets.items()}]
+                except self.queue.Empty:
+                    print(f"[Rank {self.rank}] No data received for 10m — assuming done. Saving model and exiting.")
+                    torch.save(model.module.state_dict(), os.path.join(save_dir, "model_final.pt"))
+                    break
 
-            loss_dict = model(images, targets)
-            losses = sum(loss for loss in loss_dict.values())
+                try:
+                    images, targets = item
+                    images = [images.to(self.device)]
+                    targets = [{k: v.to(self.device) for k, v in targets.items()}]
 
-            optimizer.zero_grad()
-            losses.backward()
-            optimizer.step()
+                    loss_dict = model(images, targets)
+                    losses = torch.stack(list(loss_dict.values())).sum()
 
-            print(f"[Rank {self.rank}] Iter {iteration}, Loss: {losses.item():.4f}")
+                    optimizer.zero_grad()
+                    losses.backward()
+                    optimizer.step()
 
-            if iteration % 100 == 0:
-                ckpt_path = os.path.join(save_dir, f"model_checkpoint_{iteration}.pt")
-                torch.save(model.module.state_dict(), ckpt_path)
-                print(f"[Rank {self.rank}] Saved checkpoint at iter {iteration}")
+                    print(f"[Rank {self.rank}] Iter {iteration}, Loss: {losses.item():.4f}")
 
-            iteration += 1
+                    if iteration % 100 == 0:
+                        ckpt_path = os.path.join(save_dir, f"model_checkpoint_{iteration}.pt")
+                        torch.save(model.module.state_dict(), ckpt_path)
+                        print(f"[Rank {self.rank}] Saved checkpoint at iter {iteration}")
+
+                    iteration += 1
+                except Exception as e:
+                    print(f"[Rank {self.rank}] ❌ Error during training step: {e}")
+        except Exception as e:
+            print(f"[Rank {self.rank}] ❌ Trainer failed to start: {e}")
 
 
-def ddp_worker(rank, world_size):
-    trainer = RCNNTrainer(rank, world_size)
+def ddp_worker(rank, world_size, queue):
+    trainer = RCNNTrainer(rank, world_size, queue)
     trainer.setup()
+
     model = trainer.create_model()
 
     try:
@@ -89,5 +97,5 @@ def ddp_worker(rank, world_size):
         trainer.cleanup()
 
 
-def launch_training(world_size):
-    mp.spawn(ddp_worker, args=(world_size,), nprocs=world_size, join=True)
+def launch_training(world_size, queue):
+    mp.spawn(ddp_worker, args=(world_size, queue), nprocs=world_size, join=True)

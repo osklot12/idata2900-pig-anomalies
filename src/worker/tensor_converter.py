@@ -1,12 +1,21 @@
 import torch
 import numpy as np
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 
-def convert_to_tensor_format(frame: np.ndarray, annotations: list):
-    """Converts raw frame + annotations to Faster R-CNN input format."""
+def convert_to_tensor_format(annotated: AnnotatedFrame):
+    """Converts AnnotatedFrame to Faster R-CNN compatible tensors."""
+    frame = annotated.frame
+    annotations = annotated.annotations
+
     image_tensor = torch.tensor(frame, dtype=torch.float32).permute(2, 0, 1) / 255.0
 
-    boxes = [ann["bbox"] for ann in annotations]
-    labels = [ann["label"] for ann in annotations]
+    # Extract bbox and label from AnnotatedBBox objects
+    boxes = [
+        [ann.bbox.x, ann.bbox.y, ann.bbox.x + ann.bbox.width, ann.bbox.y + ann.bbox.height]
+        for ann in annotations
+    ]
+
+    labels = [ann.cls.value for ann in annotations]  # assumes cls is Enum or castable to int
 
     target = {
         "boxes": torch.tensor(boxes, dtype=torch.float32),
