@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 
-from src.network.server.server_context import ServerContext
+from src.network.client.client_context import ClientContext
 
 
 class Response(ABC):
     """An interface for network responses."""
 
     @abstractmethod
-    def execute(self, context: ServerContext):
+    def execute(self, context: ClientContext):
         """
         Executes the response command.
 
         Args:
-            context (ServerContext): the server context to operate on
+            context (ClientContext): the server context to operate on
         """
         raise NotImplementedError
