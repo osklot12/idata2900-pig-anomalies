@@ -1,10 +1,10 @@
 from typing import List
 
-from src.data.dataset.sources.dataset_source import DatasetSource
+from src.data.dataset.sources.dataset_source_registry import SourceRegistry
 from src.data.gcs_bucket_client import GCSBucketClient
 
 
-class GCSDatasetSource(GCSBucketClient, DatasetSource):
+class GCSSourceRegistry(GCSBucketClient, SourceRegistry):
     """Handles file listing in a Google Cloud Storage bucket."""
 
     def get_source_ids(self) -> set[str]:

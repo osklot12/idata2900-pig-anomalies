@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-class DatasetSource(ABC):
-    """An interface for dataset sources."""
+class SourceRegistry(ABC):
+    """An interface for dataset source registries."""
 
     @abstractmethod
     def get_source_ids(self) -> set[str]:
