@@ -9,7 +9,7 @@ from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
-from tests.utils.annotation_label import AnnotationLabel
+from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 
 class DummyAnnotationStreamer(AnnotationStreamer):
@@ -37,7 +37,7 @@ class DummyAnnotationStreamer(AnnotationStreamer):
             time.sleep(.005)
             annotations_list = [
                 AnnotatedBBox(
-                    cls=AnnotationLabel.CODING,
+                    cls=DummyAnnotationLabel.CODING,
                     bbox=BBox(
                         x=1240.6,
                         y=980.04,

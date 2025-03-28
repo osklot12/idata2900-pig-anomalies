@@ -11,7 +11,7 @@ from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.virtual_dataset import VirtualDataset
 from src.data.dataset_split import DatasetSplit
-from tests.utils.annotation_label import AnnotationLabel
+from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 
 @pytest.fixture
@@ -76,7 +76,7 @@ def _gen_dummy_annotated_frames(n: int, source_id: str):
                 frame=np.random.randint(0, 256, size=(240, 320, 3), dtype=np.uint8),
                 annotations=[
                     AnnotatedBBox(
-                        cls=AnnotationLabel.CODING,
+                        cls=DummyAnnotationLabel.CODING,
                         bbox=BBox(0.6346, 0.4726, 0.1262, 0.0983)
                     )
                 ],

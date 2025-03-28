@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class AnnotationLabel(Enum):
+class DummyAnnotationLabel(Enum):
     """An enumeration used for testing."""
 
     CODING = auto()

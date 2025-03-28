@@ -1,6 +1,6 @@
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.network.client.client_context import ClientContext
-from src.network.messages.response.response import Response, T
+from src.network.messages.responses.response import Response, T
 
 
 class FrameInstanceResponse(Response):

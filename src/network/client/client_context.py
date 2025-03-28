@@ -19,7 +19,7 @@ class ClientContext(ABC):
     @abstractmethod
     def get_batch(self) -> List[AnnotatedFrame]:
         """
-        Returns a batch of frames from the response.
+        Returns a batch of frames from the responses.
 
         Returns:
             List[AnnotatedFrame]: The batch of frames.
