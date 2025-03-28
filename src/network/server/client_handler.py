@@ -1,40 +1,45 @@
-import pickle
-import struct
 from socket import socket
 
+from src.network.messages.readers.message_reader import MessageReader
+from src.network.messages.readers.stream_message_reader import StreamMessageReader
 from src.network.messages.requests.request import Request
-from src.network.network_config import NETWORK_MSG_LEN_FIELD_BYTES, NETWORK_MSG_LEN_FORMAT
+from src.network.messages.serialization.message_deserializer import MessageDeserializer
+from src.network.messages.serialization.message_serializer import MessageSerializer
+from src.network.messages.writers.stream_message_writer import StreamMessageWriter
+from src.network.network_config import NETWORK_MSG_LEN_FORMAT
+from src.network.server.server_context import ServerContext
 
 
 class ClientHandler:
     """Handles incoming client requests."""
 
-    def __init__(self, client_socket: socket):
+    def __init__(self, client_socket: socket,
+                 serializer: MessageSerializer,
+                 deserializer: MessageDeserializer[Request],
+                 context: ServerContext):
         """
         Initializes a ClientHandler instance.
 
         Args:
             client_socket (socket.socket): the client socket
+            serializer (MessageSerializer): the message serializer
+            deserializer (MessageDeserializer): the message deserializer
         """
-        self._client_socket = client_socket
+        self._socket = client_socket
+        self._msg_reader = StreamMessageReader(self._socket.makefile('rb'), NETWORK_MSG_LEN_FORMAT)
+        self._msg_writer = StreamMessageWriter(self._socket.makefile('wb'), NETWORK_MSG_LEN_FORMAT)
+
+        self._serializer = serializer
+        self._deserializer = deserializer
+
+        self._context = context
 
     def handle(self) -> None:
         """Handles the client request."""
-        pass
+        recv_raw_msg = self._msg_reader.read()
+        while recv_raw_msg:
+            recv_msg = self._deserializer.deserialize(recv_raw_msg)
+            resp_msg = self._serializer.serialize(recv_msg.execute(self._context))
+            self._msg_writer.write(resp_msg)
 
-    def _receive_msg(self) -> Request:
-        msg_len = self._extract_len()
-        return self._extract_data(msg_len)
-
-    def _read_bytes(self, n_bytes: int) -> bytes:
-        """Read exactly `n_bytes` bytes from the socket."""
-        buffer = b''
-
-        closed = False
-        while len(buffer) < n_bytes and not closed:
-            chunk = self._client_socket.recv(n_bytes - len(buffer))
-            if not chunk:
-                closed = True
-            buffer += chunk
-
-        return buffer
+            recv_raw_msg = self._msg_reader.read()

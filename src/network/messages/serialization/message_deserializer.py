@@ -9,12 +9,12 @@ class MessageDeserializer(ABC, Generic[T]):
     """An interface for message deserialization."""
 
     @abstractmethod
-    def deserialize(self, data: bytes) -> T:
+    def deserialize(self, message: bytes) -> T:
         """
         Deserializes a message from bytes.
 
         Args:
-            data (bytes): the serialized message
+            message (bytes): the serialized message
 
         Returns:
             T: the deserialized message
