@@ -35,7 +35,7 @@ class GCSBucketClient:
             stream (bool): whether to enable streaming (for large files)
 
         Returns:
-            requests.Response: the HTTP response
+            requests.Response: the HTTP responses
         """
         headers = self._get_headers()
         url = url

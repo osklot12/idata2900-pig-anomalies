@@ -5,7 +5,7 @@ from typing import TypeVar
 from src.network.messages.readers.message_reader import MessageReader
 from src.network.messages.readers.stream_message_reader import StreamMessageReader
 from src.network.messages.requests.request import Request
-from src.network.messages.response.response import Response
+from src.network.messages.responses.response import Response
 from src.network.messages.serialization.message_deserializer import MessageDeserializer
 from src.network.messages.serialization.message_serializer import MessageSerializer
 from src.network.network_config import NETWORK_MSG_LEN_FORMAT, NETWORK_SERVER_PORT
@@ -45,13 +45,13 @@ class NetworkClient:
 
     def send_request(self, request: Request) -> T:
         """
-        Sends a request over the open socket and returns the response.
+        Sends a request over the open socket and returns the responses.
 
         Args:
             request (Request): The request to send.
 
         Returns:
-            T: The deserialized response from the server.
+            T: The deserialized responses from the server.
         """
         if self._socket is None:
             raise RuntimeError("Not connected")

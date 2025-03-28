@@ -3,8 +3,8 @@ from typing import List
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset_split import DatasetSplit
 from src.network.messages.requests.request import Request, T
-from src.network.messages.response.frame_instance_response import FrameInstanceResponse
-from src.network.messages.response.response import Response
+from src.network.messages.responses.frame_instance_response import FrameInstanceResponse
+from src.network.messages.responses.response import Response
 from src.network.server.server_context import ServerContext
 
 

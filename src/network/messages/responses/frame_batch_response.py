@@ -1,11 +1,11 @@
 from typing import List
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.network.messages.response.response import Response, R
+from src.network.messages.responses.response import Response, R
 
 
 class FrameBatchResponse(Response[List[AnnotatedFrame]]):
-    """A response for getting a batch of annotated frames."""
+    """A responses for getting a batch of annotated frames."""
 
     def __init__(self, batch: List[AnnotatedFrame]):
         """

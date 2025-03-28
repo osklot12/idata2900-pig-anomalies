@@ -2,12 +2,12 @@ from abc import abstractmethod
 from typing import TypeVar, Generic
 
 from src.network.messages.message import Message
-from src.network.messages.response.response import Response
+from src.network.messages.responses.response import Response
 
 # server-side context
 S = TypeVar('S')
 
-# return-type of response
+# return-type of responses
 R = TypeVar('R')
 
 class Request(Message, Generic[S, R]):
@@ -16,7 +16,7 @@ class Request(Message, Generic[S, R]):
 
     Type Parameters:
         S (ServerContext): context used on the server side to execute the request
-        R (ReturnType): the final result produced when the response is executed
+        R (ReturnType): the final result produced when the responses is executed
     """
 
     @abstractmethod
@@ -28,6 +28,6 @@ class Request(Message, Generic[S, R]):
             context (C): A context object.
 
         Returns:
-            Response: A response message.
+            Response: A responses message.
         """
         raise NotImplementedError
