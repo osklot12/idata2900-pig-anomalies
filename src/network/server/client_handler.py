@@ -1,13 +1,12 @@
 from socket import socket
 
-from src.network.messages.readers.message_reader import MessageReader
 from src.network.messages.readers.stream_message_reader import StreamMessageReader
 from src.network.messages.requests.request import Request
 from src.network.messages.serialization.message_deserializer import MessageDeserializer
 from src.network.messages.serialization.message_serializer import MessageSerializer
 from src.network.messages.writers.stream_message_writer import StreamMessageWriter
 from src.network.network_config import NETWORK_MSG_LEN_FORMAT
-from src.network.server.server_context import ServerContext
+from src.network.server.context.server_context import ServerContext
 
 
 class ClientHandler:

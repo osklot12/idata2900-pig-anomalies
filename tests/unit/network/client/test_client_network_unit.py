@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, create_autospec, patch
 
 from src.network.client.client_network import NetworkClient
 from src.network.messages.requests.request import Request
-from src.network.messages.response.response import Response
+from src.network.messages.responses.response import Response
 from src.network.messages.serialization.message_serializer import MessageSerializer
 from src.network.messages.serialization.message_deserializer import MessageDeserializer
 from src.network.network_config import NETWORK_MSG_LEN_FORMAT
@@ -49,7 +49,7 @@ def test_send_request_sends_and_receives(mock_reader_class, mock_socket_class, c
     mock_socket_class.return_value = mock_sock
 
     mock_reader = MagicMock()
-    mock_reader.read.return_value = b"response-bytes"
+    mock_reader.read.return_value = b"responses-bytes"
     mock_reader_class.return_value = mock_reader
 
     # Fake connection
@@ -68,7 +68,7 @@ def test_send_request_sends_and_receives(mock_reader_class, mock_socket_class, c
     # Assert send + receive
     mock_sock.sendall.assert_called_once_with(expected_length + b"request-bytes")
     mock_reader.read.assert_called_once()
-    deserializer.deserialize.assert_called_once_with(b"response-bytes")
+    deserializer.deserialize.assert_called_once_with(b"responses-bytes")
     assert result == response
 
 @pytest.mark.unit
