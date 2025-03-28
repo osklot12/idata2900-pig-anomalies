@@ -14,8 +14,9 @@ class NetworkServer:
 
     def run(self) -> None:
         """Runs the server."""
-        if self._running:
+        if self._is_running():
             raise RuntimeError("Server already running")
+
 
         self._listen_thread = threading.Thread(target=self._listen)
         self._listen_thread.start()
