@@ -1,13 +1,16 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import TypeVar, Generic
 
 from src.network.client.client_context import ClientContext
+from src.network.messages.message import Message
 
+T = TypeVar('T')
 
-class Response(ABC):
+class Response(Message, Generic[T]):
     """An interface for network responses."""
 
     @abstractmethod
-    def execute(self, context: ClientContext) -> None:
+    def execute(self, context: ClientContext) -> T:
         """
         Executes the response command.
 
