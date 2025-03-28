@@ -5,17 +5,21 @@ from src.network.messages.message import Message
 from src.network.messages.response.response import Response
 from src.network.server.context.server_context import ServerContext
 
-T = TypeVar('T')
+C = TypeVar('C')
+R = TypeVar('R')
 
-class Request(Message, Generic[T]):
+class Request(Message, Generic[C, R]):
     """An interface for requests."""
 
     @abstractmethod
-    def execute(self, context: ServerContext) -> Response[T]:
+    def execute(self, context: C) -> Response[?, R]:
         """
         Executes the request.
 
         Args:
-            context (ClientContext): The context of the request to operate on.
+            context (C): A context object.
+
+        Returns:
+            Response: A response message.
         """
         raise NotImplementedError
