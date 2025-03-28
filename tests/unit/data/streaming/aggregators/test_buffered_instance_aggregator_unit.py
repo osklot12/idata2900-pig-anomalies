@@ -10,7 +10,7 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
-from tests.utils.annotation_label import AnnotationLabel
+from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def matching_annotations(matching_source_id):
         index=34,
         annotations=[
             AnnotatedBBox(
-                cls=AnnotationLabel.CODING,
+                cls=DummyAnnotationLabel.CODING,
                 bbox=BBox(0.743, 0.3491, 0.12, 0.14325)
             )
         ],
@@ -54,7 +54,7 @@ def single_annotations():
         index=35,
         annotations=[
             AnnotatedBBox(
-                cls=AnnotationLabel.CODING,
+                cls=DummyAnnotationLabel.CODING,
                 bbox=BBox(0.743, 0.3491, 0.12, 0.14325)
             )
         ],

@@ -4,7 +4,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset_split import DatasetSplit
 from src.data.frame_instance_provider import FrameInstanceProvider
 from src.network.messages.requests.request import Request, S
-from src.network.messages.response.frame_batch_response import FrameBatchResponse
+from src.network.messages.responses.frame_batch_response import FrameBatchResponse
 
 
 class GetFrameBatchRequest(Request[FrameInstanceProvider, List[AnnotatedFrame]]):
