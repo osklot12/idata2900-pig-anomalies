@@ -26,20 +26,6 @@ class ClientHandler:
         msg_len = self._extract_len()
         return self._extract_data(msg_len)
 
-    def _extract_len(self):
-        """Extracts the message length."""
-        raw_msg_len = self._read_bytes(NETWORK_MSG_LEN_FIELD_BYTES)
-        if not raw_msg_len:
-            raise RuntimeError("Could not read length field for request")
-        msg_len = struct.unpack(NETWORK_MSG_LEN_FORMAT, raw_msg_len)[0]
-        return msg_len
-
-    def _extract_data(self, msg_len):
-        raw_data = self._read_bytes(msg_len)
-        if not raw_data:
-            raise RuntimeError("Could not read data payload for request")
-        return pickle.loads(raw_data)
-
     def _read_bytes(self, n_bytes: int) -> bytes:
         """Read exactly `n_bytes` bytes from the socket."""
         buffer = b''

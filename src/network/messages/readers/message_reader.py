@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from socket import socket
 
-class MessageExtractor(ABC):
-    """An interface for message extractors."""
+class MessageReader(ABC):
+    """An interface for message readers."""
 
     @abstractmethod
-    def extract(self, sock: socket) -> bytes:
+    def read(self) -> bytes:
         """
         Reads a single complete message from the socket.
 
