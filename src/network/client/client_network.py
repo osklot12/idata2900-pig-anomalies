@@ -19,7 +19,7 @@ class NetworkClient:
         Initialize a network client
 
         Args:
-            message_reader (MessageReader): Message reader
+            ip (str): IP address of the client
             message_serializer (MessageSerializer): Message serializer
             message_deserializer (MessageDeserializer): Message deserializer
         """
