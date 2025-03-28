@@ -31,6 +31,14 @@ def instance_provider(batch):
 
 
 @pytest.mark.unit
+def test_initialize_with_invalid_batch_size():
+    """Tests that passing a negative batch_size upon construction will raise."""
+    # act & assert
+    with pytest.raises(ValueError, match="batch_size must be greater than 0"):
+        GetFrameBatchRequest(DatasetSplit.TRAIN, 0)
+
+
+@pytest.mark.unit
 def test_execution_returns_frame_batch_response(instance_provider, batch):
     """Tests that execution of the request successfully returns a valid FrameBatchResponse."""
     # arrange
