@@ -3,7 +3,7 @@ from typing import TypeVar, Generic
 
 from src.network.messages.message import Message
 from src.network.messages.response.response import Response
-from src.network.server.server_context import ServerContext
+from src.network.server.context.server_context import ServerContext
 
 T = TypeVar('T')
 
