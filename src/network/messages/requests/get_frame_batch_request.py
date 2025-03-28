@@ -21,7 +21,7 @@ class GetFrameBatchRequest(Request[List[AnnotatedFrame]]):
         self._batch_size = batch_size
 
 
-    def execute(self, context: ServerContext) -> Response[T]:
+    def execute(self, context: object ) -> Response[T]:
         provider = context.get_frame_instance_provider()
         batch = provider.get_batch(self._split, self._batch_size)
         return FrameBatchResponse(batch)
