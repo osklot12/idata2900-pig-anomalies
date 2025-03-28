@@ -1,24 +1,25 @@
 from abc import abstractmethod
 from typing import TypeVar, Generic
 
-from src.network.client.client_context import ClientContext
 from src.network.messages.message import Message
 
-C = TypeVar('C')
+# return type of response
 R = TypeVar('R')
 
-class Response(Message, Generic[C, R]):
-    """An interface for network responses."""
+class Response(Message, Generic[R]):
+    """
+    An interface for network responses.
+
+    Type Parameters:
+        R (ReturnType): the final result produced when the response is executed
+    """
 
     @abstractmethod
-    def execute(self, context: C) -> R:
+    def execute(self) -> R:
         """
         Executes the response command.
 
-        Args:
-            context (C): A context object.
-
         Returns:
-            R: The response message.
+            R: the response result.
         """
         raise NotImplementedError
