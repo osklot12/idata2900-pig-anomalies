@@ -2,15 +2,17 @@ import os
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from src.models.model_trainer import ModelTrainer
-from src.network.client.client_network import NetworkClient
-from src.network.client.client_context import ClientContext
+from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
 from src.data.dataset_split import DatasetSplit
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class RCNNTrainer(ModelTrainer):
-    def __init__(self, client: NetworkClient, context: ClientContext):
+    def __init__(self, client: NetworkClient):
         self.client = client
-        self.context = context
         self.model = None
 
     def setup(self):
@@ -22,6 +24,8 @@ class RCNNTrainer(ModelTrainer):
 
     def train(self) -> str:
         self.client.connect()
+        logger.info("Connected to server.")
+
         self.setup()
 
         model = self.model
@@ -31,11 +35,13 @@ class RCNNTrainer(ModelTrainer):
         save_dir = "checkpoints"
         os.makedirs(save_dir, exist_ok=True)
 
+        loss_accumulator = []
+
         try:
             for iteration in range(1000):
                 request = GetFrameBatchRequest(DatasetSplit.TRAIN, batch_size=8)
                 response = self.client.send_request(request)
-                batch = response.execute(self.context)
+                batch = response.execute()
 
                 images, targets = self._convert_to_tensors(batch)
 
@@ -46,7 +52,16 @@ class RCNNTrainer(ModelTrainer):
                 total_loss.backward()
                 optimizer.step()
 
-                if iteration % 100 == 0:
+                # Log each individual loss component
+                loss_strings = [f"{k}: {v.item():.4f}" for k, v in loss_dict.items()]
+                logger.info(f"Iteration {iteration} losses: {', '.join(loss_strings)}")
+
+                loss_accumulator.append(total_loss.item())
+
+                if iteration % 100 == 0 and iteration > 0:
+                    avg_loss = sum(loss_accumulator[-100:]) / 100
+                    logger.info(f"Iteration {iteration}: Average loss over last 100 iters: {avg_loss:.4f}")
+
                     checkpoint_path = os.path.join(save_dir, f"model_checkpoint_{iteration}.pt")
                     torch.save(model.state_dict(), checkpoint_path)
 

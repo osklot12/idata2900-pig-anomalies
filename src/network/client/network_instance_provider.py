@@ -4,7 +4,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset_split import DatasetSplit
 from src.data.frame_instance_provider import FrameInstanceProvider
 from src.network.client.client_context import ClientContext
-from src.network.client.client_network import NetworkClient
+from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
 
 
