@@ -3,7 +3,7 @@ from typing import List
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset_split import DatasetSplit
 from src.data.frame_instance_provider import FrameInstanceProvider
-from src.network.messages.requests.request import Request, S
+from src.network.messages.requests.request import Request
 from src.network.messages.responses.frame_batch_response import FrameBatchResponse
 
 
@@ -18,6 +18,8 @@ class GetFrameBatchRequest(Request[FrameInstanceProvider, List[AnnotatedFrame]])
             split (DatasetSplit): the dataset split to sample from
             batch_size (int): the batch size
         """
+        if batch_size < 1:
+            raise ValueError("batch_size must be greater than 0")
         self._split = split
         self._batch_size = batch_size
 
