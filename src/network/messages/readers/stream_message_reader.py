@@ -1,6 +1,7 @@
 import struct
 from io import BufferedReader
 
+from src.network.messages.readers.stream_read_error import StreamReadError
 from src.network.messages.readers.message_reader import MessageReader
 
 class StreamMessageReader(MessageReader):
@@ -26,7 +27,9 @@ class StreamMessageReader(MessageReader):
     def _read_bytes(self, n: int) -> bytes:
         """Read exactly `n_bytes` bytes from the socket."""
         data = self._stream.read(n)
-        if data is None or len(data) > n:
-            raise ConnectionError(f"Expected {n} bytes, got {len(data)}")
+        if data is None:
+            raise StreamReadError(f"Expected {n} bytes, got None")
+        if len(data) != n:
+            raise StreamReadError(f"Expected {n} bytes, got {len(data)}")
 
         return data
