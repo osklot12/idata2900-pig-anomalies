@@ -1,8 +1,10 @@
 import random
 import numpy as np
-from src.data.augment.image_augmentor import ImageAugmentor
-from src.data.augment.annotation_augmentor import AnnotationAugmentor
-from src.data.augment.augmentor_interface import AugmentorBase
+
+from src.data.preprocessing.augmentation.annotation_augmentor import AnnotationAugmentor
+from src.data.preprocessing.augmentation.augmentor_interface import AugmentorBase
+from src.data.preprocessing.augmentation.image_augmentor import ImageAugmentor
+
 
 class CombinedAugmentation(AugmentorBase):
     """Applies multiple augmentation passes per frame based on config."""

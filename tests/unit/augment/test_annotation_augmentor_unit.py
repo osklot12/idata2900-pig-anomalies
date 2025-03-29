@@ -1,5 +1,5 @@
+from src.data.preprocessing.augmentation.annotation_augmentor import AnnotationAugmentor
 
-from src.data.augment.annotation_augmentor import AnnotationAugmentor
 
 def test_annotation_augmentation():
     """Test flipping and rotation operations on annotations."""

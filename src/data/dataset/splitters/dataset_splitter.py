@@ -18,12 +18,15 @@ class DatasetSplitter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_instance(self, instance: str) -> None:
+    def add_instance(self, instance: str) -> DatasetSplit:
         """
         Adds an instance to the dataset.
 
         Args:
             instance (str): the id of the instance to add
+
+        Returns:
+            DatasetSplit: the split the instance was assigned to
         """
         raise NotImplementedError
 

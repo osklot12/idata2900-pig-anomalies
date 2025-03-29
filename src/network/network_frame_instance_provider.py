@@ -3,13 +3,13 @@ from typing import List
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.data_retrieval_error import DataRetrievalError
-from src.data.providers.frame_instance_provider import FrameInstanceProvider
+from src.data.providers.instance_provider import InstanceProvider
 from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
 from src.network.messages.responses.frame_batch_response import FrameBatchResponse
 
 
-class NetworkFrameInstanceProvider(FrameInstanceProvider):
+class NetworkFrameInstanceProvider(InstanceProvider):
     """Provides annotated frame instances from a network server."""
 
     def __init__(self, network_client: NetworkClient):
