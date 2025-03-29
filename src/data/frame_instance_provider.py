@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 
 
 class FrameInstanceProvider(ABC):
@@ -19,18 +19,5 @@ class FrameInstanceProvider(ABC):
 
         Returns:
             List[AnnotatedFrame]: the batch of annotated frame instances
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_instance(self, split: DatasetSplit) -> AnnotatedFrame:
-        """
-        Returns an annotated frame instance.
-
-        Args:
-            split (DatasetSplit): the split to sample from
-
-        Returns:
-            AnnotatedFrame: the annotated frame instance
         """
         raise NotImplementedError

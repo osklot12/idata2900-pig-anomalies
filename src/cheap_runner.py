@@ -1,30 +1,32 @@
 import time
 
-from src.data.dataset_split import DatasetSplit
 from src.data.pipeline.cheap_pipeline import CheapPipeline
-from src.network.pipeline_ddp_sender import PipelineDataSender
+from src.network.messages.serialization.factories.pickle_deserializer_factory import PickleDeserializerFactory
+from src.network.messages.serialization.factories.pickle_serializer_factory import PickleSerializerFactory
+from src.network.server.network_server import NetworkServer
 
 
 def run():
     pipeline = CheapPipeline()
-    server = PipelineDataSender(["10.0.0.2"])
-    server.connect_to_workers()
+    serializer_factory = PickleSerializerFactory()
+    deserializer_factory = PickleDeserializerFactory()
+    server = NetworkServer(
+        serializer_factory=serializer_factory,
+        deserializer_factory=deserializer_factory,
+        context=pipeline
+    )
+    server.run()
+
     try:
         print("Pipeline is running.")
         pipeline.run()
         while True:
             time.sleep(1)
-            batch_size = 10
-            split_size = pipeline._virtual_dataset.get_frame_count(DatasetSplit.TEST)
-            while split_size < batch_size:
-                time.sleep(1)
-            server.send_data(
-                pipeline.get_batch(DatasetSplit.TEST, batch_size)
-            )
     except KeyboardInterrupt:
         print("Stopping pipeline...")
         pipeline.stop()
         print("Pipeline stopped.")
+        server.stop()
 
 
 if __name__ == "__main__":

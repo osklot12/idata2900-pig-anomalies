@@ -5,7 +5,7 @@ from typing import Callable, Any
 import pytest
 
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 
 
 @pytest.fixture

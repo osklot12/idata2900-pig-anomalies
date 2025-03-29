@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 
 
 class DatasetSplitter(ABC):

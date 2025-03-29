@@ -8,7 +8,7 @@ from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDa
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual_dataset import VirtualDataset
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
