@@ -5,18 +5,17 @@ from src.network.messages.serialization.factories.deserializer_factory import De
 from src.network.messages.serialization.factories.serializer_factory import SerializerFactory
 from src.network.network_config import NETWORK_SERVER_PORT
 from src.network.server.client_handler import ClientHandler
-from src.network.server.context.server_context import ServerContext
 
 
 class NetworkServer:
     """A network server listening for incoming requests."""
 
-    def __init__(self, context: ServerContext, serializer_factory: SerializerFactory,
-                 deserializer_factory: DeserializerFactory):
+    def __init__(self, serializer_factory: SerializerFactory, deserializer_factory: DeserializerFactory,
+                 context):
         """Initializes a NetworkServer instance."""
-        self._context = context
         self._serializer_factory = serializer_factory
         self._deserializer_factory = deserializer_factory
+        self._context = context
 
         self._running = False
         self._listen_thread = None

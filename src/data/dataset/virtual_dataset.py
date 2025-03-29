@@ -8,7 +8,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.dataset import Dataset
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 from src.data.loading.feed_status import FeedStatus
 
 

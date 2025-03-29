@@ -2,7 +2,6 @@ from unittest.mock import Mock
 
 import numpy as np
 import pytest
-from _pytest._code import source
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
@@ -10,7 +9,7 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.virtual_dataset import VirtualDataset
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 

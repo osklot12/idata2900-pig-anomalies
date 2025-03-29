@@ -2,7 +2,7 @@ import hashlib
 from typing import Dict, Iterable, Optional
 
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 
 
 class ConsistentDatasetSplitter(DatasetSplitter):

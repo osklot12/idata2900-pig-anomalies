@@ -1,6 +1,6 @@
 import numpy as np
 from src.data.virtual_dataset import VirtualDataset
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 from src.data.augment.combined_augmentor import CombinedAugmentation
 
 

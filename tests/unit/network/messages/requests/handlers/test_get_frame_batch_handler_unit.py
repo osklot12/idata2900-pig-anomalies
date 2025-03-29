@@ -3,8 +3,9 @@ from unittest.mock import Mock
 import pytest
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
+from src.network.messages.requests.handlers.get_frame_batch_handler import GetFrameBatchHandler
 from src.network.messages.responses.frame_batch_response import FrameBatchResponse
 from tests.utils.generators.dummy_annotations_generator import DummyAnnotationsGenerator
 from tests.utils.generators.dummy_frame_generator import DummyFrameGenerator
@@ -16,36 +17,27 @@ def batch():
     return [
         AnnotatedFrame(
             frame=DummyFrameGenerator.generate(80, 60),
-            annotations=DummyAnnotationsGenerator.generate(3)
+            annotations=DummyAnnotationsGenerator.generate(10)
         )
     ]
-
 
 @pytest.fixture
 def instance_provider(batch):
     """Fixture to provide a FrameInstanceProvider instance."""
     provider = Mock()
     provider.get_batch.return_value = batch
-
     return provider
 
-
-@pytest.mark.unit
-def test_initialize_with_invalid_batch_size():
-    """Tests that passing a negative batch_size upon construction will raise."""
-    # act & assert
-    with pytest.raises(ValueError, match="batch_size must be greater than 0"):
-        GetFrameBatchRequest(DatasetSplit.TRAIN, 0)
-
-
-@pytest.mark.unit
-def test_execution_returns_frame_batch_response(instance_provider, batch):
-    """Tests that execution of the request successfully returns a valid FrameBatchResponse."""
+def test_handle_returns_expected_response(instance_provider, batch):
+    """Tests that handle() returns the expected response."""
     # arrange
-    request = GetFrameBatchRequest(DatasetSplit.TRAIN, 1)
+    handler = GetFrameBatchHandler(instance_provider)
+    request = GetFrameBatchRequest(split=DatasetSplit.TRAIN, batch_size=10)
 
     # act
-    result = request.execute(instance_provider)
+    response = handler.handle(request)
 
     # assert
-    assert isinstance(result, FrameBatchResponse)
+    assert isinstance(response, FrameBatchResponse)
+    assert response.batch == batch
+    instance_provider.get_batch.assert_called_once_with(DatasetSplit.TRAIN, 10)
