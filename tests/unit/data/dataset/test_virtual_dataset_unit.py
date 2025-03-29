@@ -7,7 +7,7 @@ from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
-from src.data.dataset.virtual_dataset import VirtualDataset, O, I
+from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
 
 
 class FakeFood(Identifiable):

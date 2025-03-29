@@ -15,7 +15,7 @@ def test_hash_buffer_add():
     buffer.add(3, 300)
 
     # assert
-    assert buffer.size() == 3
+    assert len(buffer) == 3
     assert buffer.has(1)
     assert buffer.has(2)
     assert buffer.has(3)
@@ -43,7 +43,7 @@ def test_hash_buffer_pop():
     assert second_popped_element == second_added_element
     assert third_popped_element == third_added_element
 
-    assert buffer.size() == 0
+    assert len(buffer) == 0
     assert buffer.pop(0) is None
 
 
@@ -88,7 +88,7 @@ def test_hash_buffer_thread_safety():
         thread.join()
 
     # assert
-    assert buffer.size() == 5
+    assert len(buffer) == 5
     for i in range(5, 10):
         assert buffer.has(i)
 

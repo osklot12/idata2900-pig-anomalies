@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.data.dataset.virtual_dataset import VirtualDataset
+from src.data.dataset.virtual.virtual_dataset import VirtualDataset
 from src.data.preprocessing.augmentation.combined_augmentor import CombinedAugmentation
 
 
