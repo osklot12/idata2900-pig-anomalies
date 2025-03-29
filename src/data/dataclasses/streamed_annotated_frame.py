@@ -4,11 +4,12 @@ from typing import List
 import numpy as np
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
+from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataclasses.source_metadata import SourceMetadata
 
 
 @dataclass(frozen=True)
-class StreamedAnnotatedFrame:
+class StreamedAnnotatedFrame(Identifiable):
     """
     Represents a single video frame along with its associated annotations and metadata.
 
@@ -19,8 +20,12 @@ class StreamedAnnotatedFrame:
         annotations (List[AnnotatedBBox]): the annotations associated with the frame
         end_of_stream (bool): whether the frame is at the end of the stream
     """
+
     source: SourceMetadata
     index: int
     frame: np.ndarray
     annotations: List[AnnotatedBBox]
     end_of_stream: bool
+
+    def get_id(self) -> str:
+        return self.source.source_id

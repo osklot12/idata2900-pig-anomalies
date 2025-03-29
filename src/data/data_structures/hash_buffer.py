@@ -1,5 +1,6 @@
 import threading
 from collections import deque
+from collections.abc import Sequence
 from typing import Dict, Generic, TypeVar, Optional, Hashable, List
 
 # generic type for stored data
@@ -7,7 +8,7 @@ K = TypeVar('K', bound=Hashable)
 T = TypeVar('T')
 
 
-class HashBuffer(Generic[K, T]):
+class HashBuffer(Generic[K, T], Sequence):
     """Thread-safe buffer that stores mapped data with automatic eviction."""
 
     def __init__(self, max_size: int = 1000):
@@ -36,7 +37,9 @@ class HashBuffer(Generic[K, T]):
         evicted_keys = []
 
         with self._lock:
-            if key not in self._data:
+            if key in self._data:
+                self._data[key] = value
+            else:
                 self._data[key] = value
                 self._order.append(key)
 
@@ -99,12 +102,25 @@ class HashBuffer(Generic[K, T]):
         with self._lock:
             return list(self._data.keys())
 
-    def size(self) -> int:
-        """
-        Returns the current number of stored items.
+    def __contains__(self, key: K) -> bool:
+        with self._lock:
+            return key in self._data
 
-        Returns:
-            int: the current number of stored items
-        """
+    def __getitem__(self, index: int) -> T:
+        with self._lock:
+            key = list(self._order)[index]
+            return self._data[key]
+
+    def __len__(self) -> int:
         with self._lock:
             return len(self._data)
+
+    def __iter__(self):
+        with self._lock:
+            for key in list(self._order):
+                yield key, self._data[key]
+
+    def __repr__(self) -> str:
+        with self._lock:
+            items = [(key, self._data[key]) for key in self._order]
+            return f"{self.__class__.__name__}({items})"

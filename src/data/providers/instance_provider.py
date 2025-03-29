@@ -1,23 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, TypeVar, Generic
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 
+T = TypeVar('T')
 
-class FrameInstanceProvider(ABC):
-    """An interface for providers of annotated frame instances."""
+class InstanceProvider(ABC, Generic[T]):
+    """Interface for data instance providers."""
 
     @abstractmethod
-    def get_batch(self, split: DatasetSplit, batch_size: int) -> List[AnnotatedFrame]:
+    def get_batch(self, split: DatasetSplit, batch_size: int) -> List[T]:
         """
-        Returns a batch of annotated frame instances.
+        Returns a batch of data instances.
 
         Args:
             split (DatasetSplit): the split to sample from
             batch_size (int): the batch size
 
         Returns:
-            List[AnnotatedFrame]: the batch of annotated frame instances
+            List[T]: the batch of data instances
         """
         raise NotImplementedError
