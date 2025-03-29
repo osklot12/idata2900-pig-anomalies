@@ -2,7 +2,7 @@ from typing import List
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.errors.data_retrieval_error import DataRetrievalError
+from src.data.providers.data_retrieval_error import DataRetrievalError
 from src.data.providers.frame_instance_provider import FrameInstanceProvider
 from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest

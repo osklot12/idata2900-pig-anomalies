@@ -4,7 +4,7 @@ import pytest
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.errors.data_retrieval_error import DataRetrievalError
+from src.data.providers.data_retrieval_error import DataRetrievalError
 from src.network.client.network_client import NetworkClient
 from src.network.messages.responses.frame_batch_response import FrameBatchResponse
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
@@ -59,6 +59,7 @@ def test_get_batch_raises_data_retrieval_error_on_send_exception():
         provider.get_batch(split=DatasetSplit.TRAIN, batch_size=10)
 
 
+@pytest.mark.unit
 def test_get_batch_raises_runtime_error_on_unexpected_response():
     """Tests that get_batch() raises DataRetrievalError if the response is of unexpected type."""
     # arrange
