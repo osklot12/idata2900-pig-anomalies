@@ -21,6 +21,7 @@ def batch():
         )
     ]
 
+
 @pytest.fixture
 def instance_provider(batch):
     """Fixture to provide a FrameInstanceProvider instance."""
@@ -28,6 +29,8 @@ def instance_provider(batch):
     provider.get_batch.return_value = batch
     return provider
 
+
+@pytest.mark.unit
 def test_handle_returns_expected_response(instance_provider, batch):
     """Tests that handle() returns the expected response."""
     # arrange

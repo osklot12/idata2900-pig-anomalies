@@ -1,3 +1,5 @@
+import pytest
+
 from src.network.messages.requests.handlers.request_handler import RequestHandler
 from src.network.messages.requests.handlers.registry.simple_request_handler_registry import SimpleRequestHandlerRegistry
 from src.network.messages.requests.request import Request
@@ -19,6 +21,7 @@ class DummyHandler(RequestHandler):
         return DummyResponse()
 
 
+@pytest.mark.unit
 def test_register():
     """Tests that register() successfully registers and maps a request type to a RequestHandler."""
     # arrange
