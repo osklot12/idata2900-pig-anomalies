@@ -1,4 +1,4 @@
-from src.data.frame_instance_provider import FrameInstanceProvider
+from src.data.providers.frame_instance_provider import FrameInstanceProvider
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
 from src.network.messages.requests.handlers.request_handler import RequestHandler
 from src.network.messages.responses.frame_batch_response import FrameBatchResponse

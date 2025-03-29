@@ -7,16 +7,6 @@ class NetworkClient(ABC):
     """A network client for sending requests to servers."""
 
     @abstractmethod
-    def connect(self, server_ip: str) -> None:
-        """
-        Connects to the server.
-
-        Args:
-            server_ip (str): the IP address of the network server
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def send_request(self, request: Request) -> Response:
         """
         Sends a request to the server.
@@ -27,9 +17,4 @@ class NetworkClient(ABC):
         Returns:
             Response: the server response
         """
-        raise NotImplementedError
-
-    @abstractmethod
-    def disconnect(self) -> None:
-        """Disconnects from the server."""
         raise NotImplementedError
