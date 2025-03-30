@@ -10,8 +10,8 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.instance_provider import InstanceProvider
-from src.observer.component.component_event_broker import ComponentEventBroker
-from src.observer.component.schema.pressure_schema import PressureSchema
+from src.schemas.observer.signed_schema_broker import SignedSchemaBroker
+from src.schemas.pressure_schema import PressureSchema
 
 I = TypeVar("I", bound=Identifiable)
 O = TypeVar("O")
@@ -21,14 +21,14 @@ class VirtualDataset(Generic[I, O], InstanceProvider[O]):
     """A thread-safe, split-aware buffer system for managing annotated video frames in memory."""
 
     def __init__(self, splitter: DatasetSplitter, max_size: int,
-                 event_broker: ComponentEventBroker[PressureSchema] = None):
+                 event_broker: SignedSchemaBroker[PressureSchema] = None):
         """
         Initializes a VirtualDataset instance.
 
         Args:
             splitter (DatasetSplitter): object responsible for managing dataset splits
             max_size (int): the maximum number of simultaneous instances stored
-            event_broker (ComponentEventBroker[PressureSchema]): component event broker for notifying about pressure
+            event_broker (SignedSchemaBroker[PressureSchema]): component event broker for notifying about pressure
         """
         self._splitter = splitter
 
