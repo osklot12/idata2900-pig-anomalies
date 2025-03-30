@@ -8,7 +8,7 @@ from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class ThreadedStreamer(Streamer):
+class ConcurrentStreamer(Streamer):
     """A threaded streamer, providing base functionality for streaming asynchronously."""
 
     def __init__(self):
