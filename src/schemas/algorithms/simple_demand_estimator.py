@@ -35,6 +35,4 @@ class SimpleDemandEstimator(DemandEstimator):
         else:
             result = numerator / denominator
 
-        print(f"result: {result}")
-
         return result

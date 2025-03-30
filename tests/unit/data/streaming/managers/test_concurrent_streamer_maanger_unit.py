@@ -6,7 +6,7 @@ from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentSt
 from src.data.streaming.streamers.streamer import Streamer
 
 
-class TestableConcurrentStreamerManager(ConcurrentStreamerManager):
+class ConcreteConcurrentStreamerManager(ConcurrentStreamerManager):
     """A concrete implementation of ConcurrentStreamerManager for testing."""
 
     def _setup(self) -> None:
@@ -25,7 +25,7 @@ class TestableConcurrentStreamerManager(ConcurrentStreamerManager):
 @pytest.fixture
 def manager():
     """Fixture to provide a ConcurrentStreamerManager instance."""
-    return TestableConcurrentStreamerManager(max_streamers=2)
+    return ConcreteConcurrentStreamerManager(max_streamers=2)
 
 
 @pytest.mark.unit
