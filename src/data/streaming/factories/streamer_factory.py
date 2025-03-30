@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.data.streaming.streamers.streamer import Streamer
-from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
+from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 
 
 class StreamerFactory(ABC):

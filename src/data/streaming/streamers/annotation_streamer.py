@@ -6,11 +6,11 @@ from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
-from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
+from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class AnnotationStreamer(ThreadedStreamer):
+class AnnotationStreamer(ConcurrentStreamer):
     """A streamer for streaming annotation data."""
 
     def __init__(self, callback: Callable[[FrameAnnotations], FeedStatus], normalizer: Optional[BBoxNormalizer]):
