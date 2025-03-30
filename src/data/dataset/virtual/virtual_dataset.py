@@ -1,14 +1,17 @@
 import math
 import threading
+import random
+import time
 from abc import abstractmethod
 from typing import List, TypeVar, Generic, Tuple
 
 from src.data.data_structures.hash_buffer import HashBuffer
 from src.data.dataclasses.identifiable import Identifiable
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.instance_provider import InstanceProvider
+from src.observer.component.component_event_broker import ComponentEventBroker
+from src.observer.component.schema.pressure_schema import PressureSchema
 
 I = TypeVar("I", bound=Identifiable)
 O = TypeVar("O")
@@ -17,17 +20,21 @@ O = TypeVar("O")
 class VirtualDataset(Generic[I, O], InstanceProvider[O]):
     """A thread-safe, split-aware buffer system for managing annotated video frames in memory."""
 
-    def __init__(self, splitter: DatasetSplitter, max_size: int):
+    def __init__(self, splitter: DatasetSplitter, max_size: int,
+                 event_broker: ComponentEventBroker[PressureSchema] = None):
         """
         Initializes a VirtualDataset instance.
 
         Args:
             splitter (DatasetSplitter): object responsible for managing dataset splits
             max_size (int): the maximum number of simultaneous instances stored
+            event_broker (ComponentEventBroker[PressureSchema]): component event broker for notifying about pressure
         """
         self._splitter = splitter
 
-        self.lock = threading.Lock()
+        self._lock = threading.Lock()
+
+        self._max_size = max_size
 
         # floor each max buffer size to never exceed the total max buffer size
         train_max_sources = math.floor(self._splitter.get_split_ratio(DatasetSplit.TRAIN) * max_size)
@@ -45,31 +52,31 @@ class VirtualDataset(Generic[I, O], InstanceProvider[O]):
             DatasetSplit.TEST: self._test_buffer
         }
 
+        self._event_broker = event_broker
+
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[O]:
-        with self.lock:
+        with self._lock:
             buffer = self._buffer_map.get(split)
             if len(buffer) < batch_size:
                 raise ValueError(f"Not enough available data in split {split.name} for batch size {batch_size}.")
 
-            batch = self._get_shuffled_batch(buffer, batch_size)
-            if len(batch) < batch_size:
-                raise ValueError(f"Expected batch of size {batch_size} but got {len(batch)}")
+            self._send_pressure_schema(0, batch_size)
 
-            return batch
+            return random.sample(buffer, batch_size)
 
-    @abstractmethod
-    def _get_shuffled_batch(self, sample_buffer: HashBuffer[str, O], batch_size: int) -> List[O]:
-        """
-        Returns a shuffled batch of instances.
+    def _send_pressure_schema(self, inputs: int, outputs: int):
+        """Sends a pressure schema."""
+        if self._event_broker:
+            self._event_broker.notify(self._create_pressure_schema(inputs, outputs))
 
-        Args:
-            sample_buffer (HashBuffer[str, T]): the buffer to sample from
-            batch_size (int): the batch size
-
-        Returns:
-            List[T]: the shuffled batch of instances
-        """
-        raise NotImplementedError
+    def _create_pressure_schema(self, inputs: int, outputs: int) -> PressureSchema:
+        """Creates a pressure schema."""
+        return PressureSchema(
+            inputs=inputs,
+            outputs=outputs,
+            occupied=len(self) / self._max_size,
+            timestamp=time.time()
+        )
 
     def feed(self, food: I) -> None:
         """
@@ -80,13 +87,15 @@ class VirtualDataset(Generic[I, O], InstanceProvider[O]):
         """
         id_ = food.get_id()
 
-        with self.lock:
+        with self._lock:
             split_buffer = self._get_split_buffer_for_source(id_)
             evicted = split_buffer.add(*self._get_identified_instance(food))
 
             # remove evicted instances from the splitter
             for id_ in evicted:
                 self._splitter.remove_instance(id_)
+
+            self._send_pressure_schema(1, 0)
 
     @abstractmethod
     def _get_identified_instance(self, food: I) -> Tuple[str, O]:
@@ -102,11 +111,7 @@ class VirtualDataset(Generic[I, O], InstanceProvider[O]):
         raise NotImplementedError
 
     def __len__(self) -> int:
-        count = 0
-        for buffer in self._buffer_map.values():
-            for instance in buffer:
-                count += self._frame_in_instance(instance)
-        return count
+        return sum(len(buf) for buf in self._buffer_map.values())
 
     @abstractmethod
     def _frame_in_instance(self, instance: O) -> int:
