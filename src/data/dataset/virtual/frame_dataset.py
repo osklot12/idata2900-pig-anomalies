@@ -10,9 +10,6 @@ from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
 class FrameDataset(VirtualDataset[StreamedAnnotatedFrame, AnnotatedFrame]):
     """A virtual dataset storing single annotated frames."""
 
-    def _get_shuffled_batch(self, sample_buffer: HashBuffer[str, O], batch_size: int) -> List[O]:
-        return random.sample(sample_buffer, batch_size)
-
     def _get_identified_instance(self, food: StreamedAnnotatedFrame) -> Tuple[str, AnnotatedFrame]:
         return food.get_id() + str(food.index), AnnotatedFrame(frame=food.frame, annotations=food.annotations)
 

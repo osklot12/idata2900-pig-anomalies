@@ -8,6 +8,9 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
+from src.observer.component.component_event_broker import ComponentEventBroker
+from src.observer.component.component_listener import ComponentListener, T
+from src.observer.component.schema.pressure_schema import PressureSchema
 
 
 class FakeFood(Identifiable):
@@ -27,15 +30,22 @@ class FakeFood(Identifiable):
 class DummyDataset(VirtualDataset[FakeFood, FakeFood]):
     """A concrete VirtualDataset for testing with simple FakeFood instances."""
 
-    def _get_shuffled_batch(self, sample_buffer: HashBuffer[str, O], batch_size: int) -> List[O]:
-        random.seed(None)
-        return random.sample(sample_buffer, batch_size)
-
     def _get_identified_instance(self, food: I) -> Tuple[str, O]:
         return food.get_id(), food.get_value()
 
     def _frame_in_instance(self, instance: O) -> int:
         return 1
+
+
+class DummyComponentListener(ComponentListener[PressureSchema]):
+    """A concrete component listener for pressure schemas."""
+
+    def __init__(self):
+        self.schemas = []
+
+    def new_schema(self, component_id: str, schema: T) -> None:
+        print(f"Got schema {schema} from {component_id}")
+        self.schemas.append(schema)
 
 
 @pytest.fixture
@@ -160,3 +170,34 @@ def test_get_batch_raises_on_too_large_request(dataset):
     dataset.feed(FakeFood("x", 1))
     with pytest.raises(ValueError):
         dataset.get_batch(DatasetSplit.TRAIN, 2)
+
+
+@pytest.mark.unit
+def test_pressure_reporting(splitter):
+    """Tests that pressure is reported correctly when a ComponentEventBroker is provided."""
+    # arrange
+    broker = ComponentEventBroker[PressureSchema]("test-dataset")
+    listener = DummyComponentListener()
+    broker.subscribe(listener)
+    dataset = DummyDataset(splitter, max_size=10, event_broker=broker)
+
+    # act
+    for i in range(3):
+        dataset.feed(FakeFood(f"id_{i}", i))
+
+    dataset.get_batch(DatasetSplit.TRAIN, 3)
+
+    # assert
+    schemas = listener.schemas
+    assert len(schemas) == 4
+
+    last_size = 0
+    for i in range(3):
+        assert schemas[i].inputs == 1
+        assert schemas[i].outputs == 0
+        assert schemas[i].occupied > last_size
+        last_size = schemas[i].occupied
+
+    assert schemas[3].inputs == 0
+    assert schemas[3].outputs == 3
+    assert schemas[3].occupied == last_size
