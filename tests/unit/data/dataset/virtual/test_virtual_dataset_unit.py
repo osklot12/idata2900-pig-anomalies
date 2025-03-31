@@ -179,7 +179,7 @@ def test_pressure_reporting(splitter):
     broker = SignedSchemaBroker[PressureSchema]("test-dataset")
     listener = DummyComponentListener()
     broker.get_schema_broker().subscribe(listener)
-    dataset = DummyDataset(splitter, max_size=10, event_broker=broker)
+    dataset = DummyDataset(splitter, max_size=10, pressure_broker=broker)
 
     # act
     for i in range(3):
