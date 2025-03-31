@@ -1,6 +1,7 @@
 from socket import socket
 
 from src.network.messages.readers.stream_message_reader import StreamMessageReader
+from src.network.messages.requests.handlers.registry.request_handler_registry import RequestHandlerRegistry
 from src.network.messages.requests.handlers.registry.simple_request_handler_registry import SimpleRequestHandlerRegistry
 from src.network.messages.requests.request import Request
 from src.network.messages.serialization.message_deserializer import MessageDeserializer
@@ -15,7 +16,7 @@ class ClientHandler:
     def __init__(self, client_socket: socket,
                  serializer: MessageSerializer,
                  deserializer: MessageDeserializer[Request],
-                 handler_registry: SimpleRequestHandlerRegistry):
+                 handler_registry: RequestHandlerRegistry):
         """
         Initializes a ClientHandler instance.
 
@@ -23,7 +24,7 @@ class ClientHandler:
             client_socket (socket.socket): the client socket
             serializer (MessageSerializer): the message serializer
             deserializer (MessageDeserializer): the message deserializer
-            handler_registry (SimpleRequestHandlerRegistry): the request handler registry
+            handler_registry (RequestHandlerRegistry): the request handler registry
         """
         self._socket = client_socket
         self._msg_reader = StreamMessageReader(self._socket.makefile('rb'), NETWORK_MSG_LEN_FORMAT)

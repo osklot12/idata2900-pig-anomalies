@@ -17,6 +17,7 @@ from src.data.parsing.factories.FileBaseNameParserFactory import FileBaseNamePar
 from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
+from src.data.providers.instance_provider import InstanceProvider
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
@@ -27,7 +28,7 @@ from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 
 
-class CheapPipeline:
+class CheapPipeline(InstanceProvider):
     """A cheap pipeline facade for quick training."""
 
     def __init__(self):
@@ -95,14 +96,4 @@ class CheapPipeline:
         self._streamer_manager.stop()
 
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[AnnotatedFrame]:
-        """
-        Returns a batch of data.
-
-        Args:
-            split (DatasetSplit): the split to get from
-            batch_size (int): the batch size
-
-        Returns:
-            List[AnnotatedFrame]: the batch
-        """
         return self._virtual_dataset.get_batch(split, batch_size)

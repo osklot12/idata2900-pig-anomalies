@@ -26,18 +26,29 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
 
         self._executor = concurrent.futures.ThreadPoolExecutor(self._max_streamers)
         self._run_lock = threading.Lock()
+        self._running_lock = threading.Lock()
 
     def run(self) -> None:
         with self._run_lock:
-            if self._running:
+            if self._is_running():
                 raise RuntimeError("StreamerManager already running")
-            self._running = True
+            self._set_running(True)
         self._setup()
 
     @abstractmethod
     def _setup(self) -> None:
         """Sets up for running. Cannot stop the manager while setup is executing."""
         raise NotImplementedError
+
+    def _is_running(self) -> bool:
+        """Indicates whether the manager is running."""
+        with self._running_lock:
+            return self._running
+
+    def _set_running(self, running: bool) -> None:
+        """Sets the running status for the manager."""
+        with self._running_lock:
+            self._running = running
 
     def _launch_streamer(self, streamer: Streamer) -> None:
         """
@@ -47,7 +58,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
             streamer (Streamer): the streamer to launch
         """
 
-        if not self._running:
+        if not self._is_running():
             raise RuntimeError("Cannot launch streamer when manager is not running.")
 
         if streamer is None:
@@ -78,7 +89,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
             future (concurrent.futures.Future): the future returned from the background task running `_manage_streamer`
         """
         with self._run_lock:
-            if self._running:
+            if self._is_running():
                 try:
                     future.result()
                     self._handle_done_streamer(streamer_id)
@@ -110,8 +121,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
         return len(self._get_streamers())
 
     def stop(self) -> None:
-        with self._run_lock:
-            self._running = False
+        self._set_running(False)
 
         self._executor.shutdown(wait=True)
         self._executor = None

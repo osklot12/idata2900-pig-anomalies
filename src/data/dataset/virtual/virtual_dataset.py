@@ -5,7 +5,7 @@ import time
 from abc import abstractmethod
 from typing import List, TypeVar, Generic, Tuple
 
-from src.data.data_structures.hash_buffer import HashBuffer
+from src.data.structures.hash_buffer import HashBuffer
 from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset.dataset_split import DatasetSplit

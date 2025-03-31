@@ -1,7 +1,7 @@
 import pytest
 import threading
 
-from src.data.data_structures.concurrent_dict import ConcurrentDict
+from src.data.structures.concurrent_dict import ConcurrentDict
 
 
 @pytest.fixture
