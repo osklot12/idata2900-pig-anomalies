@@ -17,7 +17,7 @@ class Prefetcher(ABC, Generic[T]):
         raise NotImplementedError
 
     @abstractmethod
-    def get_next_prefetched(self) -> T:
+    def get(self) -> T:
         """
         Returns the next prefetched data.
 
