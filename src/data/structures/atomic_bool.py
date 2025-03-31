@@ -1,6 +1,7 @@
-import threading
+from src.data.structures.atomic_var import AtomicVar
 
-class AtomicBool:
+
+class AtomicBool(AtomicVar[bool]):
     """Thread-safe boolean flag."""
 
     def __init__(self, initial: bool = False):
@@ -8,30 +9,9 @@ class AtomicBool:
         Initializes an AtomicBool instance.
 
         Args:
-            initial (bool): the initial value of the bool
+            initial (T): the initial value
         """
-        self._value = initial
-        self._lock = threading.Lock()
-
-    def get(self) -> bool:
-        """
-        Returns the current value.
-
-        Returns:
-            bool: the current value
-        """
-        with self._lock:
-            return self._value
-
-    def set(self, value: bool) -> None:
-        """
-        Sets the current value.
-
-        Args:
-             value (bool): the new value
-        """
-        with self._lock:
-            self._value = value
+        super().__init__(initial)
 
     def toggle(self) -> bool:
         """

@@ -112,6 +112,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
     def stop(self) -> None:
         with self._lock:
             self._running.set(False)
+            self._stop()
 
             try:
                 if self._executor is not None:
@@ -123,3 +124,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
                     if streamer:
                         streamer.stop_streaming()
                     self._remove_streamer(streamer_id)
+
+    def _stop(self) -> None:
+        """Custom stop logic to run before shutting down executor and stopping and removing streamers."""
+        pass
