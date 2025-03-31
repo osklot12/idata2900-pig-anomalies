@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List, TypeVar, Generic
 
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 
 T = TypeVar('T')
 
-class InstanceProvider(ABC, Generic[T]):
-    """Interface for data instance providers."""
+class BatchProvider(ABC, Generic[T]):
+    """Interface for data batch providers."""
 
     @abstractmethod
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[T]:
