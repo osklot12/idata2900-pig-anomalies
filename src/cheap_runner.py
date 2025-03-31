@@ -10,12 +10,6 @@ def run():
     pipeline = CheapPipeline()
     serializer_factory = PickleSerializerFactory()
     deserializer_factory = PickleDeserializerFactory()
-    server = NetworkServer(
-        serializer_factory=serializer_factory,
-        deserializer_factory=deserializer_factory,
-        context=pipeline
-    )
-    server.run()
 
     try:
         print("Pipeline is running.")
@@ -26,7 +20,6 @@ def run():
         print("Stopping pipeline...")
         pipeline.stop()
         print("Pipeline stopped.")
-        server.stop()
 
 
 if __name__ == "__main__":
