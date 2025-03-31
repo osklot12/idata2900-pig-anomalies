@@ -46,17 +46,20 @@ class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureS
         self._manage_streamers()
 
     def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:
+        print(f"[DynamicStreamerManager] Active streamers: {self.n_active_streamers()}")
         streamer.wait_for_completion()
         streamer.stop_streaming()
 
     def _handle_done_streamer(self, streamer_id: str) -> None:
         self._remove_streamer(streamer_id)
-        self._executor.submit(self._manage_streamers)
+        if self._is_running():
+            self._executor.submit(self._manage_streamers)
 
     def _handle_crashed_streamer(self, streamer_id: str, e: Exception) -> None:
         print(f"Streamer {streamer_id} crashed with exception {e}")
         self._remove_streamer(streamer_id)
-        self._executor.submit(self._manage_streamers)
+        if self._is_running():
+            self._executor.submit(self._manage_streamers)
 
     def __set_optimal_n_streamers(self, n: float) -> None:
         """Sets the optimal number of concurrent streamers."""
@@ -73,7 +76,8 @@ class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureS
         with self.__schema_lock:
             self.__pressure_schemas.append(schema)
             self.__set_optimal_n_streamers(self.__compute_optimal_n_streamers())
-        self._executor.submit(self._manage_streamers)
+        if self._is_running():
+            self._executor.submit(self._manage_streamers)
 
     def __compute_optimal_n_streamers(self) -> float:
         """Computes the optimal number of concurrent streamers."""

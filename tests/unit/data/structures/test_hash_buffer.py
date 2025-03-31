@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from src.data.data_structures.hash_buffer import HashBuffer
+from src.data.structures.hash_buffer import HashBuffer
 
 
 @pytest.mark.unit

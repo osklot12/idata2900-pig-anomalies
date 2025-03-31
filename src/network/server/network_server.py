@@ -1,6 +1,7 @@
 import threading
 import socket
 
+from src.network.messages.requests.handlers.registry.request_handler_registry import RequestHandlerRegistry
 from src.network.messages.serialization.factories.deserializer_factory import DeserializerFactory
 from src.network.messages.serialization.factories.serializer_factory import SerializerFactory
 from src.network.network_config import NETWORK_SERVER_PORT
@@ -11,11 +12,11 @@ class NetworkServer:
     """A network server listening for incoming requests."""
 
     def __init__(self, serializer_factory: SerializerFactory, deserializer_factory: DeserializerFactory,
-                 context):
+                 handler_registry: RequestHandlerRegistry):
         """Initializes a NetworkServer instance."""
         self._serializer_factory = serializer_factory
         self._deserializer_factory = deserializer_factory
-        self._context = context
+        self._handler_registry = handler_registry
 
         self._running = False
         self._listen_thread = None
@@ -60,7 +61,7 @@ class NetworkServer:
             client_socket=client_sock,
             serializer=self._serializer_factory.create_serializer(),
             deserializer=self._deserializer_factory.create_deserializer(),
-            context=self._context
+            handler_registry=self._handler_registry
         )
         threading.Thread(target=handler.handle, daemon=True).start()
 
