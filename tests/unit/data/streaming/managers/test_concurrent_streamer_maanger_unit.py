@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, create_autospec
+from unittest.mock import create_autospec
 import concurrent.futures
 
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
@@ -35,7 +35,7 @@ def test_run_sets_running_and_calls_setup(manager):
     manager.run()
 
     # assert
-    assert manager._running is True
+    assert manager._running
     assert manager.setup_called == True
 
 
@@ -138,5 +138,19 @@ def test_stop_shuts_down_all_streamers(manager):
     # assert
     s1.stop_streaming.assert_called_once()
     s2.stop_streaming.assert_called_once()
-    assert manager._running is False
+    assert not manager._running
     assert manager._executor is None
+
+
+@pytest.mark.unit
+def test_double_stop_does_not_raise(manager):
+    """Tests that calling stop when not running does not raise."""
+    # arrange
+    manager.run()
+
+    # act
+    manager.stop()
+    manager.stop()
+
+    # assert
+    assert not manager._running

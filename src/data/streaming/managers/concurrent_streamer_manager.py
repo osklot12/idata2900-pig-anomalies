@@ -6,6 +6,7 @@ from functools import partial
 from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.streamer import Streamer
+from src.data.structures.atomic_bool import AtomicBool
 
 
 class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
@@ -22,33 +23,22 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
 
         self._max_streamers = max_streamers
 
-        self._running = False
+        self._running = AtomicBool(False)
 
         self._executor = concurrent.futures.ThreadPoolExecutor(self._max_streamers)
-        self._run_lock = threading.Lock()
-        self._running_lock = threading.Lock()
+        self._lock = threading.Lock()
 
     def run(self) -> None:
-        with self._run_lock:
-            if self._is_running():
+        with self._lock:
+            if self._running:
                 raise RuntimeError("StreamerManager already running")
-            self._set_running(True)
-        self._setup()
+            self._running.set(True)
+            self._setup()
 
     @abstractmethod
     def _setup(self) -> None:
         """Sets up for running. Cannot stop the manager while setup is executing."""
         raise NotImplementedError
-
-    def _is_running(self) -> bool:
-        """Indicates whether the manager is running."""
-        with self._running_lock:
-            return self._running
-
-    def _set_running(self, running: bool) -> None:
-        """Sets the running status for the manager."""
-        with self._running_lock:
-            self._running = running
 
     def _launch_streamer(self, streamer: Streamer) -> None:
         """
@@ -58,7 +48,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
             streamer (Streamer): the streamer to launch
         """
 
-        if not self._is_running():
+        if not self._running:
             raise RuntimeError("Cannot launch streamer when manager is not running.")
 
         if streamer is None:
@@ -88,13 +78,12 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
             streamer_id (str): the streamer id
             future (concurrent.futures.Future): the future returned from the background task running `_manage_streamer`
         """
-        with self._run_lock:
-            if self._is_running():
-                try:
-                    future.result()
-                    self._handle_done_streamer(streamer_id)
-                except Exception as e:
-                    self._handle_crashed_streamer(streamer_id, e)
+        if self._running:
+            try:
+                future.result()
+                self._handle_done_streamer(streamer_id)
+            except Exception as e:
+                self._handle_crashed_streamer(streamer_id, e)
 
     @abstractmethod
     def _handle_done_streamer(self, streamer_id: str) -> None:
@@ -121,13 +110,16 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
         return len(self._get_streamers())
 
     def stop(self) -> None:
-        self._set_running(False)
+        with self._lock:
+            self._running.set(False)
 
-        self._executor.shutdown(wait=True)
-        self._executor = None
-
-        for streamer_id in self.get_streamer_ids():
-            streamer = self.get_streamer(streamer_id)
-            if streamer:
-                streamer.stop_streaming()
-            self._remove_streamer(streamer_id)
+            try:
+                if self._executor is not None:
+                    self._executor.shutdown(wait=True)
+                    self._executor = None
+            finally:
+                for streamer_id in self.get_streamer_ids():
+                    streamer = self.get_streamer(streamer_id)
+                    if streamer:
+                        streamer.stop_streaming()
+                    self._remove_streamer(streamer_id)
