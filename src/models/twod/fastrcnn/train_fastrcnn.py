@@ -4,7 +4,7 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from src.models.model_trainer import ModelTrainer
 from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.get_frame_batch_request import GetFrameBatchRequest
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 import logging
 
 logging.basicConfig(level=logging.INFO)
