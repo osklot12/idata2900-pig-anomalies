@@ -1,7 +1,7 @@
 import numpy as np
 from unittest.mock import MagicMock
 
-from src.data.augment.combined_augmentor import CombinedAugmentation
+from src.data.preprocessing.augmentation.combined_augmentor import CombinedAugmentation
 from src.network.pipeline_ddp_sender import PipelineDataSender
 
 

@@ -2,11 +2,11 @@ import threading
 
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.streamer import Streamer
-from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
+from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class EnsembleStreamer(StreamerManager, ThreadedStreamer):
+class EnsembleStreamer(StreamerManager, ConcurrentStreamer):
     """A streamer consisting of other streamers, abstracting them as one single streamer."""
 
     def __init__(self, *streamers: Streamer):
@@ -16,7 +16,7 @@ class EnsembleStreamer(StreamerManager, ThreadedStreamer):
         Args:
             streamers (Tuple[Streamer, ...]): The streamers belonging to the group.
         """
-        ThreadedStreamer.__init__(self)
+        ConcurrentStreamer.__init__(self)
         StreamerManager.__init__(self)
         self._lock = threading.Lock()
         self._init(streamers)

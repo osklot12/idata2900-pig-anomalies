@@ -7,8 +7,9 @@ from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchi
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
-from src.data.dataset.virtual_dataset import VirtualDataset
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.virtual.frame_dataset import FrameDataset
+from src.data.dataset.virtual.virtual_dataset import VirtualDataset
+from src.data.dataset.dataset_split import DatasetSplit
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
@@ -16,14 +17,18 @@ from src.data.parsing.factories.FileBaseNameParserFactory import FileBaseNamePar
 from src.data.parsing.file_base_name_parser import FileBaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
+from src.data.providers.batch_provider import BatchProvider
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
+from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
+from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
+from src.schemas.observer.schema_broker import SchemaBroker
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 
 
-class CheapPipeline:
+class CheapPipeline(BatchProvider):
     """A cheap pipeline facade for quick training."""
 
     def __init__(self):
@@ -58,10 +63,12 @@ class CheapPipeline:
             bbox_normalizer_factory=bbox_normalizer_factory
         )
 
-        self._virtual_dataset = VirtualDataset(
+        pressure_broker = SchemaBroker()
+
+        self._virtual_dataset = FrameDataset(
             splitter=ConsistentDatasetSplitter(),
-            max_sources=20,
-            max_frames_per_source=500
+            max_size=20,
+            pressure_broker=pressure_broker
         )
 
         self._aggregated_streamer_factory = AggregatedStreamerFactory(
@@ -71,10 +78,14 @@ class CheapPipeline:
         )
 
         # streamer manager setup
-        self._streamer_manager = DockingStreamerManager(
-            streamer_provider=self._aggregated_streamer_factory,
-            n_streamers=4
+        self._streamer_manager = DynamicStreamerManager(
+            streamer_factory=self._aggregated_streamer_factory,
+            min_streamers=0,
+            max_streamers=10,
+            demand_estimator=SimpleDemandEstimator()
         )
+
+        pressure_broker.subscribe(self._streamer_manager)
 
     def run(self) -> None:
         """Runs the pipeline."""
@@ -85,14 +96,4 @@ class CheapPipeline:
         self._streamer_manager.stop()
 
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[AnnotatedFrame]:
-        """
-        Returns a batch of data.
-
-        Args:
-            split (DatasetSplit): the split to get from
-            batch_size (int): the batch size
-
-        Returns:
-            List[AnnotatedFrame]: the batch
-        """
-        return self._virtual_dataset.get_shuffled_batch(split, batch_size)
+        return self._virtual_dataset.get_batch(split, batch_size)

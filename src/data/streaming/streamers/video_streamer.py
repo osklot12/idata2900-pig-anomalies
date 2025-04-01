@@ -4,11 +4,11 @@ from typing import Callable, Optional
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
-from src.data.streaming.streamers.threaded_streamer import ThreadedStreamer
+from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 
-class VideoStreamer(ThreadedStreamer):
+class VideoStreamer(ConcurrentStreamer):
     """A streamer for streaming video data."""
 
     def __init__(self, callback: Callable[[Frame], FeedStatus], resize_strategy: Optional[FrameResizeStrategy]):
