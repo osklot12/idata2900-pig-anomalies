@@ -74,7 +74,7 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
         return PressureSchema(
             inputs=inputs,
             outputs=outputs,
-            occupied=len(self) / self._max_size,
+            usage=len(self) / self._max_size,
             timestamp=time.time()
         )
 
