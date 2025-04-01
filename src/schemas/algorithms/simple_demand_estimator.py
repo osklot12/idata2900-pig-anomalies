@@ -11,7 +11,7 @@ class SimpleDemandEstimator(DemandEstimator):
         if not schemas:
             raise ValueError("schemas cannot be empty or None")
 
-        if schemas[-1].occupied < 1:
+        if schemas[-1].usage < 1:
             result = 2
         else:
             result = pow(2, -self._get_avg_balance(schemas))

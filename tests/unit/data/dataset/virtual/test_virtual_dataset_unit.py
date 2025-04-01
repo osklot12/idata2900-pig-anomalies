@@ -195,9 +195,9 @@ def test_pressure_reporting(splitter):
     for i in range(3):
         assert schemas[i].schema.inputs == 1
         assert schemas[i].schema.outputs == 0
-        assert schemas[i].schema.occupied > last_size
-        last_size = schemas[i].schema.occupied
+        assert schemas[i].schema.usage > last_size
+        last_size = schemas[i].schema.usage
 
     assert schemas[3].schema.inputs == 0
     assert schemas[3].schema.outputs == 3
-    assert schemas[3].schema.occupied == last_size
+    assert schemas[3].schema.usage == last_size

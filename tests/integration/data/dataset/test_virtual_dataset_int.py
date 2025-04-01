@@ -6,6 +6,7 @@ from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchi
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
+from src.data.dataset.virtual.frame_dataset import FrameDataset
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
@@ -97,10 +98,9 @@ def dataset_splitter():
 @pytest.fixture
 def virtual_dataset(dataset_splitter):
     """Fixture to provide a VirtualDataset instance."""
-    return VirtualDataset(
+    return FrameDataset(
         splitter=dataset_splitter,
-        max_sources=10,
-        max_frames_per_source=200
+        max_sources=10
     )
 
 
