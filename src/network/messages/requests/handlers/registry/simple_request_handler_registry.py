@@ -6,7 +6,7 @@ from src.network.messages.requests.request import Request
 
 
 class SimpleRequestHandlerRegistry(RequestHandlerRegistry):
-    """A registry for request handlers."""
+    """A registry for request extractors."""
 
     def __init__(self):
         """Initializes a RequestHandlerRegistry."""

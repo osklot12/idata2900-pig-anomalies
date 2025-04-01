@@ -8,7 +8,7 @@ from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDat
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
 from src.schemas.observer.schema_broker import SchemaBroker
 from src.schemas.observer.schema_listener import SchemaListener, T
-from src.schemas.observer.signed_schema_broker import SignedSchemaBroker
+from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
 from src.schemas.pressure_schema import PressureSchema
 from src.schemas.signed_schema import SignedSchema
 
@@ -176,7 +176,7 @@ def test_get_batch_raises_on_too_large_request(dataset):
 def test_pressure_reporting(splitter):
     """Tests that pressure is reported correctly when a ComponentEventBroker is provided."""
     # arrange
-    broker = SignedSchemaBroker[PressureSchema]("test-dataset")
+    broker = SchemaSignerBroker[PressureSchema]("test-dataset")
     listener = DummyComponentListener()
     broker.get_schema_broker().subscribe(listener)
     dataset = DummyDataset(splitter, max_size=10, pressure_broker=broker)
