@@ -7,8 +7,8 @@ from src.schemas.signed_schema import SignedSchema
 
 T = TypeVar("T", bound=Schema)
 
-class SignedSchemaBroker(Generic[T], Broker[T]):
-    """Publisher of signed schema objects in the observer pattern."""
+class SchemaSignerBroker(Generic[T], Broker[T]):
+    """SchemaBroker that signs schemas."""
 
     def __init__(self, issuer_id: str):
         """

@@ -1,25 +1,21 @@
 import time
 import random
 
-from src.schemas.metric_schema import MetricSchema
+from src.schemas.converters.pressure_metric_schema_converter import PressureMetricSchemaConverter
+from src.schemas.pressure_schema import PressureSchema
 from src.schemas.signed_schema import SignedSchema
 from src.ui.telemetry.rich_dashboard import RichDashboard
 
 
 def run():
     dashboard = RichDashboard()
+    dashboard.register(PressureSchema, PressureMetricSchemaConverter())
     dashboard.start()
     while True:
         schema = SignedSchema(
-            issuer_id="test-component",
-            schema=MetricSchema(
-                metrics={
-                    "inputs": random.random() * 20,
-                    "outputs": random.random() * 20,
-                    "usage": random.random()
-                },
-                timestamp=time.time()
-            )
+            issuer_id="test-id",
+            timestamp=time.time(),
+            schema=PressureSchema(inputs=int(random.random() * 20), outputs=int(random.random() * 20), usage=random.random())
         )
         dashboard.new_schema(schema)
         time.sleep(.5)

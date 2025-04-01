@@ -12,9 +12,7 @@ class PressureSchema(Schema):
         inputs (int): the number of inputs
         outputs (int): the number of outputs
         usage (float): the usage percentage (0 - 1 range)
-        timestamp (float): the time of the measured pressure (unix)
     """
     inputs: int
     outputs: int
     usage: float
-    timestamp: float

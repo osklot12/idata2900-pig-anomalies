@@ -4,7 +4,7 @@ from src.network.messages.requests.request import Request
 from src.network.messages.responses.response import Response
 
 class RequestHandler(ABC):
-    """An interface for request handlers."""
+    """An interface for request extractors."""
 
     @abstractmethod
     def handle(self, request: Request) -> Response:
