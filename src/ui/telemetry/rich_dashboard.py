@@ -12,10 +12,10 @@ from typing_extensions import TypeVar
 
 from src.data.structures.atomic_bool import AtomicBool
 from src.schemas.converters.schema_converter import SchemaConverter
-from src.schemas.technical.metric_schema import MetricSchema
-from src.schemas.schema_listener import SchemaListener
-from src.schemas.schema import Schema
-from src.schemas.signed_schema import SignedSchema
+from src.schemas.schemas.metric_schema import MetricSchema
+from src.schemas.schemas.schema_listener import SchemaListener
+from src.schemas.schemas.schema import Schema
+from src.schemas.schemas.signed_schema import SignedSchema
 
 S = TypeVar("S", bound=Schema)
 

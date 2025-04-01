@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import TypeVar, Generic
 
-from src.schemas.schema import Schema
-from src.schemas.signed_schema import SignedSchema
+from src.schemas.schemas.schema import Schema
+from src.schemas.schemas.signed_schema import SignedSchema
 
 T = TypeVar("T", bound=Schema)
 
-class SchemaSigner(ABC):
-    """Interface for schema signers."""
+class SchemaSigner(Generic[T], ABC):
+    """Interface for schema signing."""
 
     @abstractmethod
     def sign(self, schema: T) -> SignedSchema[T]:

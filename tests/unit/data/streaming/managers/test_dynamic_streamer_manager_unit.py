@@ -4,7 +4,7 @@ import pytest
 import time
 
 from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
-from src.schemas.technical.pressure_schema import PressureSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
 
 
 @pytest.fixture

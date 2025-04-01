@@ -2,7 +2,7 @@ import pytest
 import time
 
 from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
-from src.schemas.technical.pressure_schema import PressureSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
 
 
 @pytest.fixture

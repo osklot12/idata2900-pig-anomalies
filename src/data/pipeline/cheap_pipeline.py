@@ -23,7 +23,7 @@ from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamer
 from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
 from src.schemas.converters.pressure_metric_schema_converter import PressureMetricSchemaConverter
 from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
-from src.schemas.technical.pressure_schema import PressureSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
 from src.ui.telemetry.rich_dashboard import RichDashboard
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket

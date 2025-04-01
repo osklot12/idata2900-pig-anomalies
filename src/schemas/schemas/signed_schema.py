@@ -1,8 +1,7 @@
-import time
 from dataclasses import dataclass
 from typing import TypeVar, Generic
 
-from src.schemas.schema import Schema
+from src.schemas.schemas.schema import Schema
 
 T = TypeVar("T", bound=Schema)
 
@@ -13,9 +12,7 @@ class SignedSchema(Schema, Generic[T]):
 
     Attributes:
         signature (str): the signature
-        timestamp (float): a timestamp for when the schema was created
         schema (T): the schema
     """
     signature: str
-    timestamp: float
     schema: T
