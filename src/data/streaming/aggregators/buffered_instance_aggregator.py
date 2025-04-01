@@ -4,7 +4,7 @@ from threading import Lock
 
 from src.data.parsing.string_parser import StringParser
 from src.data.streaming.aggregators.instance_aggregator import InstanceAggregator
-from src.data.data_structures.hash_buffer import HashBuffer
+from src.data.structures.hash_buffer import HashBuffer
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame

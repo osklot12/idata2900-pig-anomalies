@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 import random
-from src.data.augment.augmentor_interface import AugmentorBase
+
+from src.data.preprocessing.augmentation.augmentor_interface import AugmentorBase
+
 
 class ImageAugmentor(AugmentorBase):
     """

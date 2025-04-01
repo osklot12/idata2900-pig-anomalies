@@ -2,7 +2,7 @@ import hashlib
 from typing import Dict, Iterable, Optional
 
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
-from src.data.dataset_split import DatasetSplit
+from src.data.dataset.dataset_split import DatasetSplit
 
 
 class ConsistentDatasetSplitter(DatasetSplitter):
@@ -47,8 +47,8 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         for id_ in self._dataset:
             self._add_id(id_)
 
-    def add_instance(self, instance: str) -> None:
-        self._add_id(instance)
+    def add_instance(self, instance: str) -> DatasetSplit:
+        return self._add_id(instance)
 
     def remove_instance(self, instance: str) -> None:
         split_set = self._split_map.get(self.get_split_for_id(instance), None)
@@ -92,17 +92,21 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         self._val_split.clear()
         self._test_split.clear()
 
-    def _add_id(self, id_: str) -> None:
+    def _add_id(self, id_: str) -> DatasetSplit:
         """Adds an ID to the appropriate split."""
         self._dataset.add(id_)
-
         p = self._normalized_hash(id_)
         if p < self._train_threshold:
             self._train_split.add(id_)
+            result = DatasetSplit.TRAIN
         elif p < self._train_threshold + self._val_threshold:
             self._val_split.add(id_)
+            result = DatasetSplit.VAL
         else:
             self._test_split.add(id_)
+            result = DatasetSplit.TEST
+
+        return result
 
     def _stable_hash(self, s: str) -> int:
         """Gives a stable hash for a given string."""

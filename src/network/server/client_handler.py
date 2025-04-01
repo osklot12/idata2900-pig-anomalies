@@ -1,12 +1,13 @@
 from socket import socket
 
 from src.network.messages.readers.stream_message_reader import StreamMessageReader
+from src.network.messages.requests.handlers.registry.request_handler_registry import RequestHandlerRegistry
+from src.network.messages.requests.handlers.registry.simple_request_handler_registry import SimpleRequestHandlerRegistry
 from src.network.messages.requests.request import Request
 from src.network.messages.serialization.message_deserializer import MessageDeserializer
 from src.network.messages.serialization.message_serializer import MessageSerializer
 from src.network.messages.writers.stream_message_writer import StreamMessageWriter
 from src.network.network_config import NETWORK_MSG_LEN_FORMAT
-from src.network.server.context.server_context import ServerContext
 
 
 class ClientHandler:
@@ -15,7 +16,7 @@ class ClientHandler:
     def __init__(self, client_socket: socket,
                  serializer: MessageSerializer,
                  deserializer: MessageDeserializer[Request],
-                 context: ServerContext):
+                 handler_registry: RequestHandlerRegistry):
         """
         Initializes a ClientHandler instance.
 
@@ -23,6 +24,7 @@ class ClientHandler:
             client_socket (socket.socket): the client socket
             serializer (MessageSerializer): the message serializer
             deserializer (MessageDeserializer): the message deserializer
+            handler_registry (RequestHandlerRegistry): the request handler registry
         """
         self._socket = client_socket
         self._msg_reader = StreamMessageReader(self._socket.makefile('rb'), NETWORK_MSG_LEN_FORMAT)
@@ -31,14 +33,18 @@ class ClientHandler:
         self._serializer = serializer
         self._deserializer = deserializer
 
-        self._context = context
+        self._handler_registry = handler_registry
 
     def handle(self) -> None:
         """Handles the client request."""
         recv_raw_msg = self._msg_reader.read()
         while recv_raw_msg:
             recv_msg = self._deserializer.deserialize(recv_raw_msg)
-            resp_msg = self._serializer.serialize(recv_msg.execute(self._context))
-            self._msg_writer.write(resp_msg)
+            handler = self._handler_registry.get_handler(recv_msg)
+            if not handler:
+                raise RuntimeError(f"No handler registered for {recv_msg}")
+
+            response = handler.handle(recv_msg)
+            self._msg_writer.write(self._serializer.serialize(response))
 
             recv_raw_msg = self._msg_reader.read()
