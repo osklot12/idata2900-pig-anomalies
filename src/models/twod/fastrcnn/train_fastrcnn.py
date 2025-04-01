@@ -1,4 +1,6 @@
 import os
+import time
+
 import torch
 import logging
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
@@ -57,7 +59,8 @@ class RCNNTrainer(ModelTrainer):
             predictions = model(images)
             schema = SignedSchema(
                 issuer_id=issuer_id,
-                schema=formatter.format(predictions, targets)
+                schema=formatter.format(predictions, targets),
+                timestamp=time.time()
             )
             metrics_broker.notify(schema)
 
