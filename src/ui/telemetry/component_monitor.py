@@ -1,7 +1,7 @@
 from abc import ABC
 
-from src.schemas.metric_schema import MetricSchema
-from src.schemas.observer.schema_listener import SchemaListener, T
+from src.schemas.technical.metric_schema import MetricSchema
+from src.schemas.schema_listener import SchemaListener
 from src.schemas.signed_schema import SignedSchema
 
 

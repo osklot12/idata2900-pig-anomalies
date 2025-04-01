@@ -1,11 +1,10 @@
-from unittest.mock import MagicMock, create_autospec
+from unittest.mock import MagicMock
 
 import pytest
 import time
 
-from src.data.streaming.factories.streamer_factory import StreamerFactory
 from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
-from src.schemas.pressure_schema import PressureSchema
+from src.schemas.technical.pressure_schema import PressureSchema
 
 
 @pytest.fixture

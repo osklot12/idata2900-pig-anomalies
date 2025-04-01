@@ -12,8 +12,8 @@ from typing_extensions import TypeVar
 
 from src.data.structures.atomic_bool import AtomicBool
 from src.schemas.converters.schema_converter import SchemaConverter
-from src.schemas.metric_schema import MetricSchema
-from src.schemas.observer.schema_listener import SchemaListener
+from src.schemas.technical.metric_schema import MetricSchema
+from src.schemas.schema_listener import SchemaListener
 from src.schemas.schema import Schema
 from src.schemas.signed_schema import SignedSchema
 
@@ -35,24 +35,24 @@ class RichDashboard(SchemaListener[SignedSchema[Schema]]):
         self._running = AtomicBool(False)
         self.console = Console()
 
-        self._registry: Dict[Type[Schema], SchemaConverter[Schema, MetricSchema]] = {}
+        self._converter_registry: Dict[Type[Schema], SchemaConverter[Schema, MetricSchema]] = {}
+        self._max_logs = 30
 
         self._render_thread = None
 
     def new_schema(self, schema: SignedSchema) -> None:
         schema_type = type(schema.schema)
-        converter = self._registry.get(schema_type)
+        converter = self._converter_registry.get(schema_type)
 
         if converter is None:
             raise KeyError(f"Schema type {schema_type} is not registered with any converter")
 
         metric_schema = converter.convert(schema.schema)
-        self._schemas[schema.issuer_id] = SignedSchema(
-            issuer_id=schema.issuer_id,
+        self._schemas[schema.signature] = SignedSchema(
+            signature=schema.signature,
             timestamp=schema.timestamp,
             schema=metric_schema
         )
-
 
     def register(self, input_type: Type[S], converter: SchemaConverter[S, MetricSchema]) -> None:
         """
@@ -62,7 +62,7 @@ class RichDashboard(SchemaListener[SignedSchema[Schema]]):
             input_type (Type[Schema]): the type of schema to use the converter for
             converter (SchemaConverter[Schema, SignedSchema[MetricSchema]]): the converter instance
         """
-        self._registry[input_type] = converter
+        self._converter_registry[input_type] = converter
 
     def get_converter(self, input_type: Type[Schema]) -> SchemaConverter[Schema, MetricSchema]:
         """
@@ -74,7 +74,7 @@ class RichDashboard(SchemaListener[SignedSchema[Schema]]):
         Returns:
             SchemaConverter[Schema, SignedSchema[MetricSchema]]: the converter instance
         """
-        return self._registry.get(input_type, None)
+        return self._converter_registry.get(input_type, None)
 
     def _render_tables(self) -> Columns:
         """Renders the tables."""
@@ -92,7 +92,7 @@ class RichDashboard(SchemaListener[SignedSchema[Schema]]):
             table.add_column(key, justify="right", width=10, no_wrap=True)
         table.add_column("Last updated")
 
-        for schema in sorted(group, key=lambda sch: sch.issuer_id):
+        for schema in sorted(group, key=lambda sch: sch.signature):
             table.add_row(*RichDashboard._build_row(schema, metric_keys))
 
         return table
@@ -100,7 +100,7 @@ class RichDashboard(SchemaListener[SignedSchema[Schema]]):
     @staticmethod
     def _build_row(schema: SignedSchema[MetricSchema], metric_keys: Tuple[str, ...]) -> List[str]:
         """Builds a row for a set of metric keys from a metric schema."""
-        row = [Text(schema.issuer_id, style="italic yellow")]
+        row = [Text(schema.signature, style="italic yellow")]
 
         for key in metric_keys:
             value = schema.schema.metrics.get(key, "-")

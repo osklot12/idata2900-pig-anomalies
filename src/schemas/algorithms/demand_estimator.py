@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.schemas.pressure_schema import PressureSchema
+from src.schemas.technical.pressure_schema import PressureSchema
 
 
 class DemandEstimator(ABC):
