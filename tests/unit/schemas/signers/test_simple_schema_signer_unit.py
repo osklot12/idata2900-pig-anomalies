@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 import time
 
-from src.schemas.schema import Schema
-from src.schemas.signers.simple_schema_signer import SimpleSchemaSigner
+from src.schemas.schemas.schema import Schema
+from src.schemas.signing.simple_schema_signer import SimpleSchemaSigner
 
 
 @pytest.fixture
@@ -34,17 +34,3 @@ def test_schema_gets_signed_successfully(signature, signer, schema):
     # assert
     assert signed_schema.signature == signature
     assert signed_schema.schema == schema
-
-
-@pytest.mark.unit
-def test_schemas_signed_later_gets_bigger_timestamp(signature, signer, schema):
-    """Tests that schemas that gets signed later gets timestamps for later times."""
-    # act
-    signed_schema_one = signer.sign(schema)
-
-    time.sleep(.1)
-
-    signed_schema_two = signer.sign(schema)
-
-    # assert
-    assert signed_schema_one.timestamp < signed_schema_two.timestamp

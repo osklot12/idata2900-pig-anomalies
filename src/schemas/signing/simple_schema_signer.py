@@ -1,10 +1,10 @@
-import time
+from typing import Generic
 
-from src.schemas.signed_schema import SignedSchema
-from src.schemas.signers.schema_signer import SchemaSigner, T
+from src.schemas.schemas.signed_schema import SignedSchema
+from src.schemas.signing.schema_signer import SchemaSigner, T
 
 
-class SimpleSchemaSigner(SchemaSigner):
+class SimpleSchemaSigner(Generic[T], SchemaSigner[T]):
     """A simple schema signer."""
 
     def __init__(self, signature: str):
@@ -17,4 +17,4 @@ class SimpleSchemaSigner(SchemaSigner):
         self._signature = signature
 
     def sign(self, schema: T) -> SignedSchema[T]:
-        return SignedSchema(signature=self._signature, timestamp=time.time(), schema=schema)
+        return SignedSchema(signature=self._signature, schema=schema)

@@ -1,7 +1,7 @@
 from typing import TypeVar, Generic, List
 
-from src.schemas.schema_listener import SchemaListener
-from src.schemas.schema import Schema
+from src.schemas.schemas.schema_listener import SchemaListener
+from src.schemas.schemas.schema import Schema
 
 T = TypeVar('T', bound=Schema)
 

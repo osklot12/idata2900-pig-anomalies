@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from src.schemas.schema import Schema
+from src.schemas.schemas.schema import Schema
 
 
 @dataclass(frozen=True)

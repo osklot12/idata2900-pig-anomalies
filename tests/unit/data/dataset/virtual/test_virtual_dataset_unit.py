@@ -6,10 +6,10 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
-from src.schemas.schema_listener import SchemaListener
+from src.schemas.schemas.schema_listener import SchemaListener
 from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
-from src.schemas.technical.pressure_schema import PressureSchema
-from src.schemas.signed_schema import SignedSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
+from src.schemas.schemas.signed_schema import SignedSchema
 
 
 class FakeFood(Identifiable):
