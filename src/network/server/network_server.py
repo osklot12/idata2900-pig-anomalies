@@ -41,8 +41,6 @@ class NetworkServer:
             sock.listen()
             self._server_sock = sock
 
-            print(f"[NetworkServer] Listening on port {NETWORK_SERVER_PORT}...")
-
             self._accept_clients()
 
     def _accept_clients(self) -> None:

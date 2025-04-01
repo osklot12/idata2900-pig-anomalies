@@ -8,7 +8,6 @@ from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDa
 from src.data.dataset.selection.random_file_selector import RandomFileSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.frame_dataset import FrameDataset
-from src.data.dataset.virtual.virtual_dataset import VirtualDataset
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
@@ -20,10 +19,12 @@ from src.data.preprocessing.resizing.factories.static_frame_resizer_factory impo
 from src.data.providers.batch_provider import BatchProvider
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
-from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
 from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
 from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
-from src.schemas.observer.schema_broker import SchemaBroker
+from src.schemas.converters.pressure_metric_schema_converter import PressureMetricSchemaConverter
+from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
+from src.schemas.technical.pressure_schema import PressureSchema
+from src.ui.telemetry.rich_dashboard import RichDashboard
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 
@@ -63,13 +64,18 @@ class CheapPipeline(BatchProvider):
             bbox_normalizer_factory=bbox_normalizer_factory
         )
 
-        pressure_broker = SchemaBroker()
+        pressure_broker = SchemaSignerBroker("vdataset")
 
         self._virtual_dataset = FrameDataset(
             splitter=ConsistentDatasetSplitter(),
-            max_size=20,
+            max_size=5000,
             pressure_broker=pressure_broker
         )
+
+        self._dashboard = RichDashboard()
+        self._dashboard.register(PressureSchema, PressureMetricSchemaConverter())
+
+        pressure_broker.get_schema_broker().subscribe(self._dashboard)
 
         self._aggregated_streamer_factory = AggregatedStreamerFactory(
             streamer_pair_factory=streamer_pair_provider,
@@ -85,15 +91,18 @@ class CheapPipeline(BatchProvider):
             demand_estimator=SimpleDemandEstimator()
         )
 
-        pressure_broker.subscribe(self._streamer_manager)
+        pressure_broker.get_schema_broker().subscribe(self._streamer_manager)
 
     def run(self) -> None:
         """Runs the pipeline."""
+        self._dashboard.console.log("Running pipeline...")
+        self._dashboard.start()
         self._streamer_manager.run()
 
     def stop(self) -> None:
         """Stops the pipeline."""
         self._streamer_manager.stop()
+        self._dashboard.stop()
 
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[AnnotatedFrame]:
         return self._virtual_dataset.get_batch(split, batch_size)

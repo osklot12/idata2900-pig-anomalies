@@ -22,15 +22,12 @@ def run():
     server.run()
 
     try:
-        print("Pipeline is running.")
         pipeline.run()
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("Stopping pipeline...")
         pipeline.stop()
         server.stop()
-        print("Pipeline stopped.")
 
 
 if __name__ == "__main__":

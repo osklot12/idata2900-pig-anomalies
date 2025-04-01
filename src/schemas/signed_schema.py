@@ -12,14 +12,10 @@ class SignedSchema(Schema, Generic[T]):
     A schema with the issuer ID attached.
 
     Attributes:
-        issuer_id (str): The issuer ID
+        signature (str): the signature
         timestamp (float): a timestamp for when the schema was created
         schema (T): the schema
     """
-    issuer_id: str
+    signature: str
     timestamp: float
     schema: T
-
-    @staticmethod
-    def sign(issuer_id: str, schema: T) -> "SignedSchema[T]":
-        return SignedSchema(issuer_id=issuer_id, timestamp=time.time(), schema=schema)
