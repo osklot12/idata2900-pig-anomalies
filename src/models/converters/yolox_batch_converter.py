@@ -5,6 +5,7 @@ import torch
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.models.converters.bbox_to_corners import BBoxToCorners
+from src.models.converters.static_bbox_scaler import StaticBBoxScaler
 
 
 class YOLOXBatchConverter:
@@ -38,14 +39,19 @@ class YOLOXBatchConverter:
         labels = []
 
         for annotated_frame in batch:
-            images.append(annotated_frame.frame)
+            img = annotated_frame.frame
+            height, width = img.shape[:2]
+            images.append(img)
 
             frame_boxes = []
             frame_labels = []
 
             for ann in annotated_frame.annotations:
+                bbox_scaler = StaticBBoxScaler(height, width)
+                scaled_bbox = bbox_scaler.scale(ann.bbox)
+
                 bbox_converter = BBoxToCorners()
-                frame_boxes.append(bbox_converter.convert(ann.bbox))
+                frame_boxes.append(bbox_converter.convert(scaled_bbox))
                 frame_labels.append(ann.cls.value)
 
             boxes.append(torch.tensor(frame_boxes, dtype=torch.float32))
