@@ -11,7 +11,7 @@ class Exp(BaseExp):
 
         Args:
             train_set (YOLOXDataset): the dataset to use for training
-            eval_set (YOLOXDataset): the dataset to use for evaluation
+            val_set (YOLOXDataset): the dataset to use for evaluation
         """
         super().__init__()
         self._train_set = train_set
@@ -25,6 +25,7 @@ class Exp(BaseExp):
         self.max_epoch = 300
         self.eval_interval = 10
         self.data_num_workers = 0
+        self.tensorboard_writer = True
 
         self.exp_name = "streaming_yolox"
 
