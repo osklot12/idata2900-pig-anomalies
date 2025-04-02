@@ -4,7 +4,14 @@ from torchmetrics.detection.mean_ap import MeanAveragePrecision
 
 
 class TrainingMetricsCalculator:
+    """
+    Calculates IoU, mAP, mAP with IoU more than 50, recall on the last 100 objects and F-1 Score.
+    """
+
     def __init__(self):
+        """
+        Initializes the training metrics calculator.
+        """
         self._map_metric = MeanAveragePrecision(iou_type="bbox")
 
     def calculate(self, predictions: List[Dict], targets: List[Dict]) -> Dict[str, float]:
