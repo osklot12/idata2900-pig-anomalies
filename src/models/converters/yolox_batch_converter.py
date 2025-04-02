@@ -47,7 +47,7 @@ class YOLOXBatchConverter:
             frame_labels = []
 
             for ann in annotated_frame.annotations:
-                bbox_scaler = StaticBBoxScaler(height, width)
+                bbox_scaler = StaticBBoxScaler(width, height)
                 scaled_bbox = bbox_scaler.scale(ann.bbox)
 
                 bbox_converter = BBoxToCorners()
