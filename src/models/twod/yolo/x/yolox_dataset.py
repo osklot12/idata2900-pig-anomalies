@@ -1,12 +1,7 @@
-from typing import List, Dict
-
-import numpy as np
-import torch
 from torch.utils.data import IterableDataset
 
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
-from src.models.converters.bbox_to_corners import BBoxToCorners
+from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 
 
 class YOLOXDataset(IterableDataset):
@@ -25,3 +20,4 @@ class YOLOXDataset(IterableDataset):
     def __iter__(self):
         while True:
             batch = self._prefetcher.get()
+            yield YOLOXBatchConverter.convert(batch)
