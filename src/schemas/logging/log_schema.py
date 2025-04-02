@@ -2,18 +2,17 @@ from dataclasses import dataclass
 
 from src.schemas.logging.log_level import LogLevel
 from src.schemas.schemas.schema import Schema
+from src.schemas.schemas.timestamped_schema import TimestampedSchema
 
 
 @dataclass(frozen=True)
-class LogSchema(Schema):
+class LogSchema(TimestampedSchema):
     """
     A schema for logging.
 
     Attributes:
         level (LogLevel): the log level
         message (str): the log message
-        timestamp (float): the unix timestamp for the event
     """
-    level = LogLevel
+    level: LogLevel
     message: str
-    timestamp: float
