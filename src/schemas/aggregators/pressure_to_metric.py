@@ -1,4 +1,4 @@
-import queue
+import time
 from collections import deque
 from typing import Deque, Tuple
 
@@ -36,7 +36,8 @@ class PressureToMetric(SchemaListener[PressureSchema]):
                 "inputs/s": inputs,
                 "outputs/s": outputs,
                 "usage": self._queue[-1].usage
-            }
+            },
+            timestamp = time.time()
         )
 
     def _compute_avg_in_out(self) -> Tuple[float, float]:

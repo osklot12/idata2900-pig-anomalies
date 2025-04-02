@@ -20,10 +20,11 @@ from src.data.providers.batch_provider import BatchProvider
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
+from src.schemas.aggregators.pressure_to_metric import PressureToMetric
 from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
-from src.schemas.converters.pressure_metric_schema_converter import PressureMetricSchemaConverter
-from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
-from src.schemas.schemas.pressure_schema import PressureSchema
+from src.schemas.brokers.schema_broker import SchemaBroker
+from src.schemas.signing.sign import Sign
+from src.schemas.signing.simple_schema_signer import SimpleSchemaSigner
 from src.ui.telemetry.rich_dashboard import RichDashboard
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
@@ -64,7 +65,7 @@ class CheapPipeline(BatchProvider):
             bbox_normalizer_factory=bbox_normalizer_factory
         )
 
-        pressure_broker = SchemaSignerBroker("vdataset")
+        pressure_broker = SchemaBroker()
 
         self._virtual_dataset = FrameDataset(
             splitter=ConsistentDatasetSplitter(),
@@ -73,9 +74,7 @@ class CheapPipeline(BatchProvider):
         )
 
         self._dashboard = RichDashboard()
-        self._dashboard.register(PressureSchema, PressureMetricSchemaConverter())
-
-        pressure_broker.get_schema_broker().subscribe(self._dashboard)
+        pressure_broker.subscribe(PressureToMetric(Sign(self._dashboard, SimpleSchemaSigner("vdataset"))))
 
         self._aggregated_streamer_factory = AggregatedStreamerFactory(
             streamer_pair_factory=streamer_pair_provider,
@@ -91,7 +90,7 @@ class CheapPipeline(BatchProvider):
             demand_estimator=SimpleDemandEstimator()
         )
 
-        pressure_broker.get_schema_broker().subscribe(self._streamer_manager)
+        pressure_broker.subscribe(self._streamer_manager)
 
     def run(self) -> None:
         """Runs the pipeline."""

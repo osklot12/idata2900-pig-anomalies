@@ -1,6 +1,7 @@
 import math
 import threading
 import random
+import time
 from abc import abstractmethod
 from typing import List, TypeVar, Generic, Tuple
 
@@ -9,7 +10,7 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.batch_provider import BatchProvider
-from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
+from src.schemas.brokers.schema_broker import SchemaBroker
 from src.schemas.schemas.pressure_schema import PressureSchema
 
 I = TypeVar("I", bound=Identifiable)
@@ -20,14 +21,14 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
     """A thread-safe, split-aware buffer system for managing annotated video frames in memory."""
 
     def __init__(self, splitter: DatasetSplitter, max_size: int,
-                 pressure_broker: SchemaSignerBroker[PressureSchema] = None):
+                 pressure_broker: SchemaBroker[PressureSchema] = None):
         """
         Initializes a VirtualDataset instance.
 
         Args:
             splitter (DatasetSplitter): object responsible for managing dataset splits
             max_size (int): the maximum number of simultaneous instances stored
-            pressure_broker (SchemaSignerBroker[PressureSchema]): broker for notifying about pressure
+            pressure_broker (SchemaBroker[PressureSchema]): broker for notifying about pressure
         """
         self._splitter = splitter
 
@@ -73,7 +74,8 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
         return PressureSchema(
             inputs=inputs,
             outputs=outputs,
-            usage=len(self) / self._max_size
+            usage=len(self) / self._max_size,
+            timestamp=time.time()
         )
 
     def feed(self, food: I) -> None:
