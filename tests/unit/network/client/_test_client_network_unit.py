@@ -2,7 +2,7 @@ import struct
 import pytest
 from unittest.mock import MagicMock, create_autospec, patch
 
-from src.network.client.client_network import NetworkClient
+from src.network.client.network_client import NetworkClient
 from src.network.messages.requests.request import Request
 from src.network.messages.responses.response import Response
 from src.network.messages.serialization.message_serializer import MessageSerializer
@@ -27,7 +27,7 @@ def client(serializer, deserializer):
 
 @pytest.mark.unit
 @patch("socket.socket")
-@patch("src.network.client.client_network.StreamMessageReader")
+@patch("src.network.client.network_client.StreamMessageReader")
 def test_connect_initializes_socket_and_reader(mock_reader_class, mock_socket_class, client):
     mock_socket = MagicMock()
     mock_socket.makefile.return_value = MagicMock()
@@ -41,7 +41,7 @@ def test_connect_initializes_socket_and_reader(mock_reader_class, mock_socket_cl
 
 @pytest.mark.unit
 @patch("socket.socket")
-@patch("src.network.client.client_network.StreamMessageReader")
+@patch("src.network.client.network_client.StreamMessageReader")
 def test_send_request_sends_and_receives(mock_reader_class, mock_socket_class, client, serializer, deserializer):
     # Setup socket + reader
     mock_sock = MagicMock()
