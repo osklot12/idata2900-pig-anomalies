@@ -5,6 +5,7 @@ from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
 from src.data.dataset.dataset_split import DatasetSplit
+from src.ui.telemetry.rich_dashboard import RichDashboard
 
 
 class TrainingPipelineCoordinator:
@@ -14,8 +15,12 @@ class TrainingPipelineCoordinator:
             deserializer=PickleMessageDeserializer()
         )
         self.server_ip = server_ip
+        self.dashboard = RichDashboard()
 
     def start(self):
+        print("[Coordinator] Launching dashboard...")
+        self.dashboard.start()
+
         print("[Coordinator] Connecting to server...")
         self.client.connect(self.server_ip)
 

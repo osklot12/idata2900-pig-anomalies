@@ -22,20 +22,17 @@ issuer_id = "rcnn-trainer"
 
 
 class RCNNTrainer(ModelTrainer):
-    """
-    RCNN Trainer
-    """
-
     def __init__(self, prefetcher: BatchPrefetcher):
         self.prefetcher = prefetcher
         self.model = None
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def setup(self):
         self.model = self.create_model()
 
     def create_model(self):
         model = fasterrcnn_resnet50_fpn(weights=None, num_classes=2)
-        return model.cuda()
+        return model.to(self.device)
 
     def train(self) -> str:
         self.setup()
@@ -55,7 +52,6 @@ class RCNNTrainer(ModelTrainer):
             total_loss.backward()
             optimizer.step()
 
-            # Send metrics every iteration
             predictions = model(images)
             schema = SignedSchema(
                 issuer_id=issuer_id,
@@ -64,12 +60,10 @@ class RCNNTrainer(ModelTrainer):
             )
             metrics_broker.notify(schema)
 
-            # Save checkpoint every 100 iterations
             if iteration % 100 == 0 and iteration > 0:
                 checkpoint_path = os.path.join("checkpoints", f"model_checkpoint_{iteration}.pt")
                 torch.save(model.state_dict(), checkpoint_path)
 
-        # Final model save
         torch.save(model.state_dict(), os.path.join("checkpoints", "model_final.pt"))
         return "Training completed."
 
@@ -80,11 +74,17 @@ class RCNNTrainer(ModelTrainer):
         images = []
         targets = []
         for frame in batch:
-            images.append(torch.tensor(frame.image, dtype=torch.float32, device="cuda").permute(2, 0, 1) / 255.0)
+            images.append(
+                torch.tensor(frame.frame, dtype=torch.float32, device=self.device).permute(2, 0, 1) / 255.0
+            )
             boxes = torch.tensor([
                 [ann.bbox[0], ann.bbox[1], ann.bbox[0] + ann.bbox[2], ann.bbox[1] + ann.bbox[3]]
                 for ann in frame.annotations
-            ], dtype=torch.float32, device="cuda")
-            labels = torch.tensor([ann.category_id for ann in frame.annotations], dtype=torch.int64, device="cuda")
+            ], dtype=torch.float32, device=self.device)
+            labels = torch.tensor(
+                [ann.category_id for ann in frame.annotations],
+                dtype=torch.int64,
+                device=self.device
+            )
             targets.append({"boxes": boxes, "labels": labels})
         return images, targets
