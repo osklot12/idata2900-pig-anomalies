@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from pathlib import Path
 from PIL import Image
 
@@ -57,6 +58,7 @@ def main():
     # Start pulling batches and saving
     image_idx = 0
     for _ in range(NUM_BATCHES):
+        time.sleep(.2)
         batch = prefetcher.get()
         for frame in batch:
             save_yolo_obb_format(
