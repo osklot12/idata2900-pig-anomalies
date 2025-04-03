@@ -34,9 +34,16 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # Begin training
+        # Wrap your dataset in the expected dict format
+        data_config = {
+            "train": self.dataset,
+            "val": self.dataset,  # use a separate val dataset if available
+            "nc": 4,
+            "names": ["tail-biting", "belly-nosing", "ear-biting", "tail-down"]
+        }
+
         results = self.model.train(
-            data=self.dataset,
+            data=data_config,
             epochs=self.epochs,
             imgsz=self.imgsz,
             project=self.log_dir,
