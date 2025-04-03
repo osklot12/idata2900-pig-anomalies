@@ -49,7 +49,8 @@ def main():
         fp16=False,
         fuse=False,
         cache=False,
-        occupy=False
+        occupy=False,
+        logger="tensorboard"
     )
 
     print(f"Using exp of type {type(exp)}")
