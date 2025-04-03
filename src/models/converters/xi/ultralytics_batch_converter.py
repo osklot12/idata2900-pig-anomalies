@@ -45,7 +45,7 @@ class UltralyticsBatchConverter:
                 continue
 
             result.append({
-                "img": torch.tensor(img, dtype=torch.uint8),
+                "img": torch.tensor(img.transpose(2, 0, 1), dtype=torch.uint8),
                 "instances": {
                     "bboxes": torch.tensor(boxes, dtype=torch.float32),
                     "cls": torch.tensor(classes, dtype=torch.int64),
