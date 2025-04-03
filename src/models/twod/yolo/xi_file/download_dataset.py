@@ -1,6 +1,7 @@
 import os
 import shutil
 import time
+import queue
 from pathlib import Path
 from PIL import Image
 
@@ -20,6 +21,7 @@ SPLIT = DatasetSplit.TRAIN
 SERVER_IP = "10.0.0.1"
 # ==========================
 
+
 def save_yolo_obb_format(frame: AnnotatedFrame, out_img_dir: Path, out_label_dir: Path, image_idx: int):
     img = Image.fromarray(frame.frame)
     img_filename = f"{image_idx:06d}.jpg"
@@ -34,11 +36,24 @@ def save_yolo_obb_format(frame: AnnotatedFrame, out_img_dir: Path, out_label_dir
         cy = (ann.bbox.y + ann.bbox.height / 2) / h
         bw = ann.bbox.width / w
         bh = ann.bbox.height / h
-        angle = 0
+        angle = 0  # Replace with actual angle if needed
         label_lines.append(f"{ann.cls.value} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f} {angle:.6f}")
 
     with open(out_label_dir / label_filename, "w") as f:
         f.write("\n".join(label_lines))
+
+
+def save_data_yaml(image_dir: Path, label_dir: Path):
+    yaml_path = OUT_DIR / "data.yaml"
+    with open(yaml_path, "w") as f:
+        f.write(f"""\
+train: {image_dir}
+val: {image_dir}  # Using same for now
+nc: 4
+names: ['tail-biting', 'belly-nosing', 'ear-biting', 'tail-down']
+obb: True
+""")
+    print(f"✅ Wrote data.yaml to {yaml_path}")
 
 
 def main():
@@ -52,34 +67,39 @@ def main():
     client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     client.connect(SERVER_IP)
     batch_provider = NetworkFrameInstanceProvider(client)
-    prefetcher = BatchPrefetcher(batch_provider, SPLIT, BATCH_SIZE)
+    prefetcher = BatchPrefetcher(batch_provider, SPLIT, BATCH_SIZE, fetch_timeout=30)
     prefetcher.run()
 
-    # Start pulling batches and saving
     image_idx = 0
-    for _ in range(NUM_BATCHES):
-        time.sleep(.2)
-        batch = prefetcher.get()
-        for frame in batch:
-            save_yolo_obb_format(
-                frame,
-                OUT_DIR / "images" / "train",
-                OUT_DIR / "labels" / "train",
-                image_idx
-            )
-            image_idx += 1
 
-    # Save YOLO data.yaml
-    with open(OUT_DIR / "data.yaml", "w") as f:
-        f.write(f"""\
-train: {OUT_DIR / 'images' / 'train'}
-val: {OUT_DIR / 'images' / 'train'}  # Using same for now
-nc: 4
-names: ['tail-biting', 'belly-nosing', 'ear-biting', 'tail-down']
-obb: True
-""")
+    try:
+        for batch_num in range(NUM_BATCHES):
+            try:
+                time.sleep(0.2)
+                batch = prefetcher.get()
+            except queue.Empty:
+                print(f"[Batch {batch_num}] ⚠️ Timed out waiting for batch. Stopping early.")
+                break
+            except Exception as e:
+                print(f"[Batch {batch_num}] ❌ Unexpected error: {e}")
+                break
 
-    print(f"✅ Download complete: {image_idx} images saved to {OUT_DIR}")
+            for frame in batch:
+                try:
+                    save_yolo_obb_format(
+                        frame,
+                        OUT_DIR / "images" / "train",
+                        OUT_DIR / "labels" / "train",
+                        image_idx
+                    )
+                    image_idx += 1
+                except Exception as e:
+                    print(f"[Image {image_idx}] ❌ Failed to save: {e}")
+
+    finally:
+        prefetcher.stop()
+        save_data_yaml(OUT_DIR / "images" / "train", OUT_DIR / "labels" / "train")
+        print(f"✅ Download complete. {image_idx} images saved in {OUT_DIR}")
 
 
 if __name__ == "__main__":
