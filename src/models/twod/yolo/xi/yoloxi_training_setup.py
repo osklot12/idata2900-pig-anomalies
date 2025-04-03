@@ -29,18 +29,26 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # Create minimal dummy YAML file (YOLO just needs it to exist)
+        # Create temp folder and dummy train/val subfolders that YOLO expects
+        dummy_root = tempfile.mkdtemp(prefix="yolo_dummy_")
+        train_path = os.path.join(dummy_root, "train", "images")
+        val_path = os.path.join(dummy_root, "val", "images")
+        os.makedirs(train_path, exist_ok=True)
+        os.makedirs(val_path, exist_ok=True)
+
+        # Create dummy YAML pointing to those folders
         dummy_yaml = {
-            "train": "unused/train",
-            "val": "unused/val",
+            "train": os.path.dirname(train_path),  # .../train
+            "val": os.path.dirname(val_path),  # .../val
             "nc": 4,
             "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
         }
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        dummy_yaml_path = os.path.join(dummy_root, "data.yaml")
+        with open(dummy_yaml_path, "w") as f:
             yaml.safe_dump(dummy_yaml, f)
-            dummy_yaml_path = f.name
 
+        # Override YOLO settings
         overrides = {
             "model": self.model_path,
             "data": dummy_yaml_path,
@@ -52,7 +60,7 @@ class TrainingSetup:
             "verbose": True,
         }
 
-        # Now create trainer AFTER dummy file exists
+        # Create trainer AFTER dummy file is ready
         trainer = OBBTrainer(overrides=overrides)
         trainer.trainset = self.dataset
         trainer.testset = self.dataset  # optional
