@@ -11,26 +11,38 @@ class UltralyticsBatchConverter:
     @staticmethod
     def convert(batch: List[AnnotatedFrame]) -> List[Dict]:
         result = []
+
         for annotated_frame in batch:
             img = annotated_frame.frame  # HWC uint8
-            h, w = img.shape[:2]
 
+            # Skip invalid or empty images
+            if img is None or img.size == 0:
+                continue
+
+            h, w = img.shape[:2]
             boxes = []
             classes = []
 
             for ann in annotated_frame.annotations:
-                # Convert (x, y, w, h) → (cx, cy, w, h, angle)
                 x = ann.bbox.x
                 y = ann.bbox.y
                 bw = ann.bbox.width
                 bh = ann.bbox.height
 
+                # Skip malformed boxes
+                if bw <= 0 or bh <= 0:
+                    continue
+
                 cx = x + bw / 2
                 cy = y + bh / 2
-                angle = 0.0  # fixed for all boxes
+                angle = 0.0  # fixed angle for now
 
                 boxes.append([cx, cy, bw, bh, angle])
-                classes.append(ann.cls.value)  # should be int
+                classes.append(ann.cls.value)
+
+            # Skip frame if no valid annotations
+            if len(boxes) == 0 or len(classes) == 0:
+                continue
 
             result.append({
                 "img": torch.tensor(img, dtype=torch.uint8),
