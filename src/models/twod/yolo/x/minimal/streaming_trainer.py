@@ -7,15 +7,28 @@ from src.models.twod.yolo.x.minimal.dummy_streaming_dataset import DummyStreamin
 from src.models.twod.yolo.x.minimal.exp import Exp
 
 class StreamingTrainer(Trainer):
-    def get_train_loader(self, batch_size):
-        dataset = DummyStreamingDataset(num_batches=1000)
-        loader = torch.utils.data.DataLoader(
-            dataset,
-            batch_size=batch_size,
-            num_workers=self.exp.data_num_workers,
-            pin_memory=True
-        )
-        return loader
+    class StreamingTrainer(Trainer):
+        def get_train_loader(self, batch_size):
+            dataset = DummyStreamingDataset(num_batches=1000)
+
+            def collate_fn(batch):
+                # batch is a list of dicts, but we only use batch_size=1 here so batch[0]
+                images = torch.stack([sample["img"] for sample in batch])
+                targets = [torch.cat([
+                    sample["gt_bboxes"],
+                    sample["gt_classes"].unsqueeze(1).float()  # convert to float like YOLOX expects
+                ], dim=1) for sample in batch]
+                img_info = torch.stack([sample["img_info"] for sample in batch])
+                img_id = torch.stack([sample["img_id"] for sample in batch])
+                return images, targets, img_info, img_id
+
+            return torch.utils.data.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                num_workers=self.exp.data_num_workers,
+                pin_memory=True,
+                collate_fn=collate_fn,
+            )
 
     def get_eval_loader(self, batch_size, is_distributed, testdev=False, legacy=False):
         # Dummy eval loader, could be same as train
