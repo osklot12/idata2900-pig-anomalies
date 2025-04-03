@@ -11,6 +11,7 @@ class TrainingSetup:
             "val": dataset,
             "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
         }
+        self.dataset = dataset
         self.model_path = model_path
         self.epochs = epochs
         self.imgsz = imgsz
