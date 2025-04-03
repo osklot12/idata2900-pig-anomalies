@@ -15,13 +15,3 @@ class ModelTrainer(ABC):
             str: A summary or final result message.
         """
         raise NotImplementedError
-
-    @abstractmethod
-    def evaluate(self) -> str:
-        """
-        Executes evaluation loop of model.
-
-        Returns:
-            str: A summary or final result message.
-        """
-        raise NotImplementedError
