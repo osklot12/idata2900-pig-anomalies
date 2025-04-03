@@ -34,16 +34,16 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # Wrap your dataset in the expected dict format
         data_config = {
-            "train": self.dataset,
-            "val": self.dataset,  # use a separate val dataset if available
+            "train": self.dataset,  # pass custom Dataset here
+            "val": self.dataset,  # use same or separate for val
             "nc": 4,
             "names": ["tail-biting", "belly-nosing", "ear-biting", "tail-down"]
         }
 
+        # 🔥 Do NOT store data_config in any instance variables — YOLO will try to YAML dump them!
         results = self.model.train(
-            data=data_config,
+            data=data_config,  # this is allowed at runtime
             epochs=self.epochs,
             imgsz=self.imgsz,
             project=self.log_dir,
@@ -52,7 +52,6 @@ class TrainingSetup:
             verbose=True
         )
 
-        # Log final metrics
         metrics = results.results_dict if hasattr(results, "results_dict") else {}
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
