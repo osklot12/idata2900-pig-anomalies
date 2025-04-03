@@ -39,6 +39,7 @@ def main():
     )
 
     trainer = Trainer(exp, args)
+    print("TRAINING!")
     trainer.train()
 
 
