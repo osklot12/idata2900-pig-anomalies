@@ -7,7 +7,6 @@ from src.network.messages.serialization.pickle_message_serializer import PickleM
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.models.twod.yolo.x.exp import Exp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-from yolox.core.trainer import Trainer
 import argparse
 
 
