@@ -7,6 +7,7 @@ from src.network.network_frame_instance_provider import NetworkFrameInstanceProv
 from src.models.twod.yolo.x.exp import Exp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
 from yolox.core.trainer import Trainer
+import argparse
 
 
 def main():
@@ -23,7 +24,21 @@ def main():
 
     exp = Exp(train_set=train_set, val_set=val_set)
 
-    trainer = Trainer(exp)
+    args = argparse.Namespace(
+        batch_size=8,
+        devices=1,
+        resume=False,
+        start_epoch=0,
+        num_machines=1,
+        machine_rank=0,
+        dist_url="auto",
+        experiment_name=exp.exp_name,
+        ckpt=None,
+        fp16=False,
+        fuse=False
+    )
+
+    trainer = Trainer(exp, args)
     trainer.train()
 
 
