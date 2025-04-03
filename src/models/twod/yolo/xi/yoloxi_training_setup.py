@@ -1,6 +1,7 @@
 import tempfile
 
 import yaml
+from torch.utils.data import DataLoader
 from ultralytics.models.yolo.obb import OBBTrainer
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
@@ -29,17 +30,14 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # Create temp folder and dummy train/val subfolders that YOLO expects
+        # Step 1: Create dummy YAML + folders
         dummy_root = tempfile.mkdtemp(prefix="yolo_dummy_")
-        train_path = os.path.join(dummy_root, "train", "images")
-        val_path = os.path.join(dummy_root, "val", "images")
-        os.makedirs(train_path, exist_ok=True)
-        os.makedirs(val_path, exist_ok=True)
+        os.makedirs(os.path.join(dummy_root, "train", "images"), exist_ok=True)
+        os.makedirs(os.path.join(dummy_root, "val", "images"), exist_ok=True)
 
-        # Create dummy YAML pointing to those folders
         dummy_yaml = {
-            "train": os.path.dirname(train_path),  # .../train
-            "val": os.path.dirname(val_path),  # .../val
+            "train": os.path.join(dummy_root, "train"),
+            "val": os.path.join(dummy_root, "val"),
             "nc": 4,
             "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
         }
@@ -48,7 +46,7 @@ class TrainingSetup:
         with open(dummy_yaml_path, "w") as f:
             yaml.safe_dump(dummy_yaml, f)
 
-        # Override YOLO settings
+        # Step 2: Setup overrides
         overrides = {
             "model": self.model_path,
             "data": dummy_yaml_path,
@@ -60,16 +58,28 @@ class TrainingSetup:
             "verbose": True,
         }
 
-        # Create trainer AFTER dummy file is ready
+        # Step 3: Create trainer
         trainer = OBBTrainer(overrides=overrides)
-        trainer.trainset = self.dataset
-        trainer.testset = self.dataset  # optional
+
+        # Step 4: Patch dataloader logic
+        def patched_get_dataloader(_, dataset_path, batch_size, rank=0, mode="train"):
+            return DataLoader(
+                self.dataset,
+                batch_size=batch_size,
+                shuffle=mode == "train",
+                num_workers=0,
+                drop_last=False
+            )
+
+        trainer.get_dataloader = patched_get_dataloader.__get__(trainer)
+
+        # Step 5: Logging
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
 
-        # Train
+        # Step 6: Start training
         trainer.train()
 
-        # Final metrics logging
+        # Final metrics
         metrics = getattr(trainer, "metrics", {})
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
