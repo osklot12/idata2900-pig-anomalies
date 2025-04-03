@@ -10,8 +10,8 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.splitters.dataset_splitter import DatasetSplitter
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.batch_provider import BatchProvider
-from src.schemas.observer.schema_broker import SchemaBroker
-from src.schemas.pressure_schema import PressureSchema
+from src.schemas.brokers.schema_broker import SchemaBroker
+from src.schemas.schemas.pressure_schema import PressureSchema
 
 I = TypeVar("I", bound=Identifiable)
 O = TypeVar("O")

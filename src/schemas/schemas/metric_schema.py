@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from src.schemas.schema import Schema
+from src.schemas.schemas.schema import Schema
+from src.schemas.schemas.timestamped_schema import TimestampedSchema
 
 
 @dataclass(frozen=True)
-class MetricSchema(Schema):
+class MetricSchema(TimestampedSchema):
     """
     A schema for metrics.
 
