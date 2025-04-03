@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.models.twod.yolo.train_yolo_eleven import YOLOv11Trainer
+from src.models.twod.yolo.xi.train_yolo_eleven import YOLOv11Trainer
 from src.schemas.metric_schema import MetricSchema
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.providers.batch_provider import BatchProvider
