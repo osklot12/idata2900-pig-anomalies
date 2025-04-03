@@ -6,7 +6,11 @@ import os
 
 class TrainingSetup:
     def __init__(self, dataset, model_path="yolo11m-obb.pt", log_dir="runs", epochs=300, imgsz=640):
-        self.dataset = dataset
+        self.data = {
+            "train": dataset,
+            "val": dataset,
+            "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+        }
         self.model_path = model_path
         self.epochs = epochs
         self.imgsz = imgsz
@@ -34,24 +38,26 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # This dictionary overrides internal YOLOTrainer args
+        # Correctly formatted override dictionary for in-memory datasets
         overrides = {
             "model": self.model_path,
-            "data": None,  # Bypass file-based dataset
+            "data": {
+                "train": self.dataset,  # Your custom in-memory training dataset
+                "val": self.dataset,  # You can use a separate val set if needed
+                "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+            },
             "epochs": self.epochs,
             "imgsz": self.imgsz,
-            "train": self.dataset,  # In-memory dataset
-            "val": self.dataset,
             "project": self.log_dir,
             "name": "train",
             "save": True,
             "verbose": True,
         }
 
-        # NOTE: Passing `trainer=YourCustomTrainer` won't work if it's not exposed internally
+        # Run training using Ultralytics engine
         results = self.model.train(**overrides)
 
-        # Final metrics logging
+        # Log final metrics to TensorBoard
         metrics = results.results_dict if hasattr(results, "results_dict") else {}
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
@@ -59,3 +65,4 @@ class TrainingSetup:
 
         self.writer.flush()
         self.writer.close()
+
