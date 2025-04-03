@@ -12,15 +12,21 @@ class StreamingTrainer(Trainer):
             dataset = DummyStreamingDataset(num_batches=1000)
 
             def collate_fn(batch):
-                # batch is a list of dicts, but we only use batch_size=1 here so batch[0]
                 images = torch.stack([sample["img"] for sample in batch])
-                targets = [torch.cat([
-                    sample["gt_bboxes"],
-                    sample["gt_classes"].unsqueeze(1).float()  # convert to float like YOLOX expects
-                ], dim=1) for sample in batch]
                 img_info = torch.stack([sample["img_info"] for sample in batch])
-                img_id = torch.stack([sample["img_id"] for sample in batch])
-                return images, targets, img_info, img_id
+                img_ids = torch.stack([sample["img_id"] for sample in batch])
+
+                all_targets = []
+                for i, sample in enumerate(batch):
+                    bboxes = sample["gt_bboxes"]
+                    classes = sample["gt_classes"].unsqueeze(1).float()
+                    img_idx = torch.full((bboxes.size(0), 1), i, dtype=torch.float32)
+                    target = torch.cat([bboxes, classes, img_idx], dim=1)  # shape: [N, 6]
+                    all_targets.append(target)
+
+                targets = torch.cat(all_targets, dim=0) if all_targets else torch.zeros((0, 6), dtype=torch.float32)
+
+                return images, targets, img_info, img_ids
 
             return torch.utils.data.DataLoader(
                 dataset,
