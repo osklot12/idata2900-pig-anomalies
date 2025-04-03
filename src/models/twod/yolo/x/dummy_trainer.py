@@ -35,6 +35,7 @@ class DummyExp(BaseExp):
         self.basic_lr_per_img = 0.00015625
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img=None):
+        self.dataset = DummyDataset()
         return DataLoader(
             dataset=DummyDataset(),
             batch_size=batch_size,
