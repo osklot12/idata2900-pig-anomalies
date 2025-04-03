@@ -1,3 +1,6 @@
+import tempfile
+
+import yaml
 from ultralytics.models.yolo.obb import OBBTrainer
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
@@ -26,10 +29,21 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        # Basic config for OBBTrainer (we don't use train/val file paths)
+        # Create minimal dummy YAML file (YOLO just needs it to exist)
+        dummy_yaml = {
+            "train": "unused/train",
+            "val": "unused/val",
+            "nc": 4,
+            "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+        }
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.safe_dump(dummy_yaml, f)
+            dummy_yaml_path = f.name
+
         overrides = {
             "model": self.model_path,
-            "data": "dummy.yaml",  # satisfies config requirement, but unused
+            "data": dummy_yaml_path,
             "epochs": self.epochs,
             "imgsz": self.imgsz,
             "project": self.log_dir,
@@ -38,16 +52,16 @@ class TrainingSetup:
             "verbose": True,
         }
 
-        # Setup trainer
+        # Now create trainer AFTER dummy file exists
         trainer = OBBTrainer(overrides=overrides)
         trainer.trainset = self.dataset
-        trainer.testset = self.dataset  # use same if no separate val set
+        trainer.testset = self.dataset  # optional
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
 
-        # Train!
+        # Train
         trainer.train()
 
-        # Log final metrics if available
+        # Final metrics logging
         metrics = getattr(trainer, "metrics", {})
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
