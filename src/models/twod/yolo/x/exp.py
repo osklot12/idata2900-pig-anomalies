@@ -30,6 +30,7 @@ class Exp(BaseExp):
         self.exp_name = "streaming_yolox"
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
+        print("✅ get_data_loader() called")
         return DataLoader(
             dataset=self._train_set,
             batch_size=None,
