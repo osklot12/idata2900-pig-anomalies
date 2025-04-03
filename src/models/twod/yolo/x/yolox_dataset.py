@@ -22,3 +22,6 @@ class YOLOXDataset(IterableDataset):
             batch = self._prefetcher.get()
             print("YOLOXDataset: yielded batch")
             yield YOLOXBatchConverter.convert(batch)
+
+    def __len__(self):
+        return 1000
