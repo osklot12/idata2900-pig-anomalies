@@ -66,7 +66,7 @@ class TrainingSetup:
             return DataLoader(
                 self.dataset,
                 batch_size=batch_size,
-                shuffle=mode == "train",
+                shuffle=False,
                 num_workers=0,
                 drop_last=False
             )
