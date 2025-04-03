@@ -1,3 +1,5 @@
+import traceback
+
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
@@ -51,7 +53,11 @@ def main():
     print(f"Using exp of type {type(exp)}")
     trainer = StreamingTrainer(exp, args)
     print("TRAINING!")
-    trainer.train()
+    try:
+        trainer.train()
+    except Exception as e:
+        print("\n❌ Exception caught during training:")
+        traceback.print_exc()
 
 
 if __name__ == '__main__':
