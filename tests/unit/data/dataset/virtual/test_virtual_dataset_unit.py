@@ -6,11 +6,10 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
-from src.schemas.observer.schema_broker import SchemaBroker
-from src.schemas.observer.schema_listener import SchemaListener, T
+from src.schemas.schemas.schema_listener import SchemaListener
 from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
-from src.schemas.pressure_schema import PressureSchema
-from src.schemas.signed_schema import SignedSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
+from src.schemas.schemas.signed_schema import SignedSchema
 
 
 class FakeFood(Identifiable):
@@ -44,7 +43,7 @@ class DummyComponentListener(SchemaListener[SignedSchema[PressureSchema]]):
         self.schemas = []
 
     def new_schema(self, schema: SignedSchema[PressureSchema]) -> None:
-        print(f"Got schema {schema} from {schema.issuer_id}")
+        print(f"Got schema {schema} from {schema.signature}")
         self.schemas.append(schema)
 
 

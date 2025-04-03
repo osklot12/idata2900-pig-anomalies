@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
-from src.schemas.schema import Schema
+from src.schemas.schemas.schema import Schema
 
 T = TypeVar('T', bound=Schema)
 

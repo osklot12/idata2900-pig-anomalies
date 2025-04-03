@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from src.schemas.schema import Schema
+from src.schemas.schemas.timestamped_schema import TimestampedSchema
 
 
 @dataclass(frozen=True)
-class PressureSchema(Schema):
+class PressureSchema(TimestampedSchema):
     """
     A schema for component pressure information.
 

@@ -11,8 +11,8 @@ from src.data.streaming.streamers.streamer import Streamer
 from src.data.structures.atomic_bool import AtomicBool
 from src.data.structures.atomic_var import AtomicVar
 from src.schemas.algorithms.demand_estimator import DemandEstimator
-from src.schemas.observer.schema_listener import SchemaListener
-from src.schemas.pressure_schema import PressureSchema
+from src.schemas.schemas.schema_listener import SchemaListener
+from src.schemas.schemas.pressure_schema import PressureSchema
 
 
 class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureSchema]):

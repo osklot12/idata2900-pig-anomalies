@@ -1,7 +1,7 @@
 from typing import List
 
 from src.schemas.algorithms.demand_estimator import DemandEstimator
-from src.schemas.pressure_schema import PressureSchema
+from src.schemas.schemas.pressure_schema import PressureSchema
 
 
 class SimpleDemandEstimator(DemandEstimator):
