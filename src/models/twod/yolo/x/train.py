@@ -1,5 +1,6 @@
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
 from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
@@ -48,7 +49,7 @@ def main():
     )
 
     print(f"Using exp of type {type(exp)}")
-    trainer = Trainer(exp, args)
+    trainer = StreamingTrainer(exp, args)
     print("TRAINING!")
     trainer.train()
 
