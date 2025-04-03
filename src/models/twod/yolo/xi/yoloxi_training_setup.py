@@ -1,11 +1,10 @@
 import tempfile
-
 import yaml
-from torch.utils.data import DataLoader
-from ultralytics.models.yolo.obb import OBBTrainer
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
 import os
+from datetime import datetime
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+from ultralytics.models.yolo.obb import OBBTrainer
 
 
 class TrainingSetup:
@@ -66,17 +65,21 @@ class TrainingSetup:
             return DataLoader(
                 self.dataset,
                 batch_size=batch_size,
-                shuffle=False,
+                shuffle=False,  # shuffle must be False for IterableDataset
                 num_workers=0,
                 drop_last=False
             )
-
         trainer.get_dataloader = patched_get_dataloader.__get__(trainer)
 
-        # Step 5: Logging
+        # ✅ Step 5: Patch label plotting (fix AttributeError)
+        def skip_plot_labels(self):
+            print("⚠️ Skipping plot_training_labels() — in-memory dataset has no .labels.")
+        trainer.plot_training_labels = skip_plot_labels.__get__(trainer)
+
+        # Step 6: Logging
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
 
-        # Step 6: Start training
+        # Step 7: Train
         trainer.train()
 
         # Final metrics
