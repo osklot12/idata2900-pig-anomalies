@@ -48,7 +48,8 @@ def main():
         ckpt=None,
         fp16=False,
         fuse=False,
-        cache=False
+        cache=False,
+        occupy=False
     )
 
     print(f"Using exp of type {type(exp)}")
