@@ -13,7 +13,7 @@ from src.network.network_frame_instance_provider import NetworkFrameInstanceProv
 
 # ========= CONFIG =========
 OUT_DIR = Path("tmp_dataset")
-NUM_BATCHES = 100
+NUM_BATCHES = 5000
 BATCH_SIZE = 8
 SPLIT = DatasetSplit.TRAIN
 SERVER_IP = "10.0.0.1"
