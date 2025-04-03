@@ -11,13 +11,20 @@ import argparse
 
 
 def main():
-    client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
-    client.connect("10.0.0.1")
+    server_ip = "10.0.0.1"
 
-    batch_provider = NetworkFrameInstanceProvider(client)
+    train_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
+    train_client.connect(server_ip)
 
-    train_prefetcher = BatchPrefetcher(batch_provider, DatasetSplit.TRAIN, 8)
-    val_prefetcher = BatchPrefetcher(batch_provider, DatasetSplit.VAL, 8)
+    val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
+    val_client.connect(server_ip)
+
+    train_provider = NetworkFrameInstanceProvider(train_client)
+    val_provider = NetworkFrameInstanceProvider(val_client)
+
+    train_prefetcher = BatchPrefetcher(train_provider, DatasetSplit.TRAIN, 8)
+    val_prefetcher = BatchPrefetcher(val_provider, DatasetSplit.VAL, 8)
+
     train_prefetcher.run()
     val_prefetcher.run()
 

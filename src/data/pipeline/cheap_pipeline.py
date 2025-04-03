@@ -68,7 +68,7 @@ class CheapPipeline(BatchProvider):
         pressure_broker = SchemaBroker()
 
         self._virtual_dataset = FrameDataset(
-            splitter=ConsistentDatasetSplitter(),
+            splitter=ConsistentDatasetSplitter(train_ratio=0.6, val_ratio=0.2),
             max_size=5000,
             pressure_broker=pressure_broker
         )
