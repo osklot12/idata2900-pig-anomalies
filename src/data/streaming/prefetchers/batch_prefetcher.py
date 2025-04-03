@@ -55,7 +55,7 @@ class BatchPrefetcher(Generic[T], Prefetcher[List[T]]):
         while self._running:
             try:
                 batch = self._provider.get_batch(self._split, self._batch_size)
-                self._queue.put(batch, timeout=.1)
+                self._queue.put(batch, timeout=10)
             except queue.Full:
                 pass
 
