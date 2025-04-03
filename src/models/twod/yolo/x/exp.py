@@ -27,6 +27,7 @@ class Exp(BaseExp):
         self.eval_interval = 10
         self.data_num_workers = 0
         self.tensorboard_writer = True
+        self.save_history_ckpt = True
 
         self.exp_name = "streaming_yolox"
 
