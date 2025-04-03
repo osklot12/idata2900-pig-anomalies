@@ -39,6 +39,7 @@ def main():
         fuse=False
     )
 
+    print(f"Using exp of type {type(exp)}")
     trainer = StreamingTrainer(exp, args)
     print("TRAINING!")
     trainer.train()
