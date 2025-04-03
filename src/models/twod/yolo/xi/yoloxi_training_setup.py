@@ -34,24 +34,24 @@ class TrainingSetup:
                 self.writer.add_scalar(f"metrics/{key}", value, epoch)
 
     def train(self):
-        data_config = {
-            "train": self.dataset,  # pass custom Dataset here
-            "val": self.dataset,  # use same or separate for val
-            "nc": 4,
-            "names": ["tail-biting", "belly-nosing", "ear-biting", "tail-down"]
+        # This dictionary overrides internal YOLOTrainer args
+        overrides = {
+            "model": self.model_path,
+            "data": None,  # Bypass file-based dataset
+            "epochs": self.epochs,
+            "imgsz": self.imgsz,
+            "train": self.dataset,  # In-memory dataset
+            "val": self.dataset,
+            "project": self.log_dir,
+            "name": "train",
+            "save": True,
+            "verbose": True,
         }
 
-        # 🔥 Do NOT store data_config in any instance variables — YOLO will try to YAML dump them!
-        results = self.model.train(
-            data=data_config,  # this is allowed at runtime
-            epochs=self.epochs,
-            imgsz=self.imgsz,
-            project=self.log_dir,
-            name="train",
-            save=True,
-            verbose=True
-        )
+        # NOTE: Passing `trainer=YourCustomTrainer` won't work if it's not exposed internally
+        results = self.model.train(**overrides)
 
+        # Final metrics logging
         metrics = results.results_dict if hasattr(results, "results_dict") else {}
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
