@@ -47,7 +47,8 @@ def main():
         experiment_name=exp.exp_name,
         ckpt=None,
         fp16=False,
-        fuse=False
+        fuse=False,
+        cache=False
     )
 
     print(f"Using exp of type {type(exp)}")
