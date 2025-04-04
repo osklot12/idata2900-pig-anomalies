@@ -85,11 +85,10 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
         Args:
             food (I): the data instance to feed
         """
-        id_ = food.get_id()
-
         with self._lock:
+            id_, instance = self._get_identified_instance(food)
             split_buffer = self._get_split_buffer_for_source(id_)
-            evicted = split_buffer.add(*self._get_identified_instance(food))
+            evicted = split_buffer.add(id_, instance)
 
             # remove evicted instances from the splitter
             for id_ in evicted:

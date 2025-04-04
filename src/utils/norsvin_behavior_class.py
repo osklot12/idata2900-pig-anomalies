@@ -4,16 +4,16 @@ from enum import Enum, auto
 class NorsvinBehaviorClass(Enum):
     """An enumeration of Norsvin's behavioral classes."""
 
-    TAIL_BITING = auto()
+    TAIL_BITING = 0
     """Behavior where pig bites tail."""
 
-    EAR_BITING = auto()
+    EAR_BITING = 1
     """Behavior where pig bites other pig's ear."""
 
-    BELLY_NOSING = auto()
+    BELLY_NOSING = 2
     """Behavior where pig rubs their nose on other pigs' bellies."""
 
-    TAIL_DOWN = auto()
+    TAIL_DOWN = 3
     """Behavior where pigs puts their tail down."""
 
     _LABEL_MAP = {

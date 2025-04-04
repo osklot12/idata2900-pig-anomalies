@@ -1,10 +1,9 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import torch
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.models.converters.bbox_to_corners import BBoxToCorners
 from src.models.converters.static_bbox_scaler import StaticBBoxScaler
 
 
@@ -12,49 +11,60 @@ class YOLOXBatchConverter:
     """Converts batches into the expected format for YOLOX.s"""
 
     @staticmethod
-    def convert(batch: List[AnnotatedFrame]) -> Dict[str, object]:
-        """
-        Converts a batch of annotated frames into an expected format for YOLOX.
-
-        Args:
-            batch (List[AnnotatedFrame]): the batch to convert
-
-        Returns:
-            Dict[str, object]: the converted batch
-        """
-        boxes, images, labels = YOLOXBatchConverter._get_images_boxes_labels(batch)
-
-        return {
-            "img": torch.tensor(np.stack(images), dtype=torch.uint8),
-            "gt_boxes": boxes,
-            "gt_classes": labels,
-            "gt_num": [len(l) for l in labels]
-        }
-
-    @staticmethod
-    def _get_images_boxes_labels(batch: List[AnnotatedFrame]) -> Tuple[List, List, List]:
-        """Gets lists of converted images, bounding boxes and labels for the batch."""
+    def convert(batch: List[AnnotatedFrame]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         images = []
-        boxes = []
-        labels = []
+        targets = []
+        img_info = []
+        img_ids = []
 
-        for annotated_frame in batch:
+        for idx, annotated_frame in enumerate(batch):
             img = annotated_frame.frame
             height, width = img.shape[:2]
-            images.append(img)
 
-            frame_boxes = []
-            frame_labels = []
+            img = img.astype(np.float32) / 255.0
+            img = np.transpose(img, (2, 0, 1))
+            images.append(torch.tensor(img, dtype=torch.float32))
 
+            bbox_scaler = StaticBBoxScaler(width, height)
+
+            frame_targets = []
             for ann in annotated_frame.annotations:
-                bbox_scaler = StaticBBoxScaler(width, height)
-                scaled_bbox = bbox_scaler.scale(ann.bbox)
+                scaled = bbox_scaler.scale(ann.bbox)
 
-                bbox_converter = BBoxToCorners()
-                frame_boxes.append(bbox_converter.convert(scaled_bbox))
-                frame_labels.append(ann.cls.value)
+                cx = scaled.x + scaled.width / 2
+                cy = scaled.y + scaled.height / 2
+                w = scaled.width
+                h = scaled.height
+                cls = ann.cls.value
 
-            boxes.append(torch.tensor(frame_boxes, dtype=torch.float32))
-            labels.append(torch.tensor(frame_labels, dtype=torch.int64))
+                frame_targets.append([cls, cx, cy, w, h])
 
-        return boxes, images, labels
+            if frame_targets:
+                targets.append(torch.tensor(frame_targets, dtype=torch.float32))
+            else:
+                targets.append(torch.zeros((0, 5), dtype=torch.float32))
+
+            img_info.append(torch.tensor([height, width, 1.0], dtype=torch.float32))
+            img_ids.append(torch.tensor(idx, dtype=torch.int64))
+
+        return (
+            torch.stack(images, dim=0),
+            YOLOXBatchConverter.pad_targets(targets),
+            torch.stack(img_info, dim=0),
+            torch.stack(img_ids, dim=0)
+        )
+
+    @staticmethod
+    def pad_targets(targets: List[torch.Tensor]) -> torch.Tensor:
+        """
+        Pads variable-length targets into a single tensor of shape (B, max_boxes, 5)
+        """
+        batch_size = len(targets)
+        max_boxes = max(t.shape[0] for t in targets)
+
+        padded = torch.zeros((batch_size, max_boxes, 5), dtype=torch.float32)
+        for i, t in enumerate(targets):
+            if t.shape[0] > 0:
+                padded[i, :t.shape[0], :] = t
+
+        return padded
