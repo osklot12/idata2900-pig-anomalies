@@ -16,8 +16,7 @@ class UltralyticsBatchConverter:
             img = annotated_frame.frame  # shape [H, W, C], dtype=uint8
             h, w = img.shape[:2]
 
-            # 👇 Convert to [C, H, W] and normalize to [0.0, 1.0] float32
-            img_tensor = torch.tensor(img, dtype=torch.uint8).permute(2, 0, 1).float() / 255.0
+            print(f"🖼️  Converting image {i} — shape: {img.shape}, dtype: {img.dtype}")
 
             bboxes = []
             classes = []
@@ -25,9 +24,14 @@ class UltralyticsBatchConverter:
             for ann in annotated_frame.annotations:
                 x, y, bw, bh = ann.bbox.x, ann.bbox.y, ann.bbox.width, ann.bbox.height
                 cx, cy = x + bw / 2, y + bh / 2
-                angle = 0.0  # YOLO OBB expects 5-element box
+                angle = 0.0
                 bboxes.append([cx, cy, bw, bh, angle])
                 classes.append(ann.cls.value)
+
+            print(f"  ↳ {len(bboxes)} annotations for image {i}")
+
+            # 👇 Convert image
+            img_tensor = torch.tensor(img, dtype=torch.uint8).permute(2, 0, 1).float() / 255.0
 
             sample = {
                 "img": img_tensor,
@@ -39,5 +43,7 @@ class UltralyticsBatchConverter:
             }
 
             converted.append(sample)
+
+        print(f"✅ Converted batch with {len(converted)} samples total\n")
 
         return converted

@@ -5,7 +5,7 @@ from src.models.twod.yolo.xi.yoloxi_training_setup import TrainingSetup
 
 def main():
     # 🧪 Fake prefetcher instead of real server
-    prefetcher = FakeBatchPrefetcher(batch_size=8)
+    prefetcher = FakeBatchPrefetcher(batch_size=4)
     prefetcher.run()
 
     # 🧠 Streamed dataset from fake frames
