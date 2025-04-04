@@ -17,6 +17,9 @@ class YOLOXDataset(IterableDataset):
         super().__init__()
         self._prefetcher = prefetcher
 
+        self.class_ids = [0, 1, 2, 3]
+        self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
+
     def __iter__(self):
         while True:
             batch = self._prefetcher.get()
