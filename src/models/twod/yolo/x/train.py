@@ -24,8 +24,8 @@ def main():
     train_provider = NetworkFrameInstanceProvider(train_client)
     val_provider = NetworkFrameInstanceProvider(val_client)
 
-    train_prefetcher = BatchPrefetcher(train_provider, DatasetSplit.TRAIN, 8)
-    val_prefetcher = BatchPrefetcher(val_provider, DatasetSplit.VAL, 8)
+    train_prefetcher = BatchPrefetcher(train_provider, DatasetSplit.TRAIN, 8, fetch_timeout=60)
+    val_prefetcher = BatchPrefetcher(val_provider, DatasetSplit.VAL, 8, fetch_timeout=60)
 
     train_prefetcher.run()
     val_prefetcher.run()
