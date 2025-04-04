@@ -1,15 +1,18 @@
 import os
+import time
 
+from google.auth.exceptions import TransportError
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 
 from src.auth.auth_service import AuthService
+from src.auth.timeout_session import TimeoutSession
 
 
 class GCPAuthService(AuthService):
     """Handles authentication and token management for Google Cloud Platform."""
 
-    def __init__(self, credentials_path: str):
+    def __init__(self, credentials_path: str, max_retries: int = 5, timeout: int = 30):
         """
         Initializes the authentication service.
 
@@ -18,6 +21,8 @@ class GCPAuthService(AuthService):
         self.credentials_path = credentials_path
         self.token = None
         self.creds = None
+        self.max_retries = max_retries
+        self.timeout = timeout
         self.authenticate()
 
     def authenticate(self) -> None:
@@ -33,7 +38,29 @@ class GCPAuthService(AuthService):
     def refresh_token(self) -> None:
         """Refreshes the token if needed."""
         if not self.creds or not self.creds.valid:
-            self.creds.refresh(Request())
+
+            session = TimeoutSession(timeout=self.timeout)
+            request = Request(session=session)
+
+            attempt = 1
+            success = False
+
+            while attempt <= self.max_retries and not success:
+                try:
+                    print(f"[GCPAuthService] Refreshing GCP token (attempt {attempt})...")
+                    self.creds.refresh(request)
+                    self.token = self.creds.token
+                    print(f"[GCPAuthService] Token refreshed successfully.")
+                    success = True
+                except TransportError as e:
+                    print(f"[GCPAuthService] Failed to refresh token: {e}")
+                    if attempt < self.max_retries:
+                        time.sleep(2 ** attempt)
+                    attempt += 1
+
+            if not success:
+                raise RuntimeError(f"[GCPAuthService] Failed to refresh token after {self.max_retries} attempts.")
+
         self.token = self.creds.token
 
     def get_access_token(self) -> str:
