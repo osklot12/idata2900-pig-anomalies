@@ -69,7 +69,7 @@ class CheapPipeline(BatchProvider):
 
         self._virtual_dataset = FrameDataset(
             splitter=ConsistentDatasetSplitter(),
-            max_size=5000,
+            max_size=50,
             pressure_broker=pressure_broker
         )
 
@@ -86,7 +86,7 @@ class CheapPipeline(BatchProvider):
         self._streamer_manager = DynamicStreamerManager(
             streamer_factory=self._aggregated_streamer_factory,
             min_streamers=0,
-            max_streamers=10,
+            max_streamers=2,
             demand_estimator=SimpleDemandEstimator()
         )
 
