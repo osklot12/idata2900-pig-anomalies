@@ -34,6 +34,7 @@ def main():
         exp = Exp(train_set=None, val_set=None)
         model = exp.get_model()
         model.eval()
+        model.to("cuda")
 
         ckpt = torch.load(ckpt_path, map_location="cpu")
         model.load_state_dict(ckpt["model"])
@@ -44,7 +45,7 @@ def main():
             confthre=exp.test_conf,
             nmsthre=exp.nmsthre,
             num_classes=exp.num_classes,
-            testdev=False
+            testdev=False,
         )
 
         ap50_95, ap50, summary = evaluator.evaluate(model, distributed=False, half=False, return_outputs=False)
