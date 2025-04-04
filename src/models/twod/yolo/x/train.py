@@ -39,6 +39,7 @@ def main():
         batch_size=8,
         devices=1,
         resume=True,
+        start_epoch=None,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
