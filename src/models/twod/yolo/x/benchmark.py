@@ -28,7 +28,7 @@ def main():
     prefetcher.run()
 
     test_set = YOLOXDataset(prefetcher)
-    test_loader = DataLoader(test_set, batch_size=None, num_workers=0, pin_memory=True, drop_last=False)
+    test_loader = DataLoader(test_set, batch_size=1, num_workers=0, pin_memory=True, drop_last=False)
 
     try:
         exp = Exp(train_set=None, val_set=None)
