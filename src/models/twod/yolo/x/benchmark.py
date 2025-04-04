@@ -1,9 +1,9 @@
 import traceback
 import torch
 
-from ext.yolox.yolox.evaluators import COCOEvaluator
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.models.twod.yolo.x.streaming_coco_evaluator import StreamingCOCOEvaluator
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
@@ -28,7 +28,7 @@ def main():
     prefetcher.run()
 
     test_set = YOLOXDataset(prefetcher)
-    test_loader = DataLoader(test_set, batch_size=1, num_workers=0, pin_memory=True, drop_last=False)
+    test_loader = DataLoader(test_set, batch_size=None, num_workers=0, pin_memory=True, drop_last=False)
 
     try:
         exp = Exp(train_set=None, val_set=None)
@@ -39,7 +39,7 @@ def main():
         ckpt = torch.load(ckpt_path, map_location="cpu")
         model.load_state_dict(ckpt["model"])
 
-        evaluator = COCOEvaluator(
+        evaluator = StreamingCOCOEvaluator(
             dataloader=test_loader,
             img_size=exp.test_size,
             confthre=exp.test_conf,
