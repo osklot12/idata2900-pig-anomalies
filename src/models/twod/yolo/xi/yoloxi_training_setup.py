@@ -93,7 +93,12 @@ class TrainingSetup:
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
 
         # Step 7: Train
-        trainer.train()
+        try:
+            trainer.train()
+        except Exception as e:
+            print("\n💥 Training crashed with an exception:")
+            import traceback
+            traceback.print_exc()
 
         # Final metrics
         metrics = getattr(trainer, "metrics", {})
