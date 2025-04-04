@@ -25,11 +25,10 @@ class StreamMessageReader(MessageReader):
         return self._read_bytes(msg_len)
 
     def _read_bytes(self, n: int) -> bytes:
-        """Read exactly `n_bytes` bytes from the socket."""
-        data = self._stream.read(n)
-        if data is None:
-            raise StreamReadError(f"Expected {n} bytes, got None")
-        if len(data) != n:
-            raise StreamReadError(f"Expected {n} bytes, got {len(data)}")
-
-        return data
+        data = bytearray()
+        while len(data) < n:
+            chunk = self._stream.read(n - len(data))
+            if not chunk:
+                raise StreamReadError(f"Expected {n} bytes, got {len(data)} before stream closed")
+            data.extend(chunk)
+        return bytes(data)

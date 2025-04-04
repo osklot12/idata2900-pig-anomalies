@@ -13,7 +13,8 @@ def main():
     client.connect("10.0.0.1")
 
     batch_provider = NetworkFrameInstanceProvider(client)
-    prefetcher = BatchPrefetcher(batch_provider, DatasetSplit.TRAIN, 8)
+    prefetcher = BatchPrefetcher(batch_provider, DatasetSplit.TRAIN, 1, fetch_timeout=60, buffer_size=1)
+    prefetcher.run()
     dataset = UltralyticsDataset(prefetcher)
 
     setup = TrainingSetup(dataset=dataset)

@@ -1,6 +1,7 @@
 from torch.utils.data import IterableDataset
 from src.models.converters.xi.ultralytics_batch_converter import UltralyticsBatchConverter
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+import time
 
 
 class UltralyticsDataset(IterableDataset):
@@ -16,5 +17,10 @@ class UltralyticsDataset(IterableDataset):
 
     def __iter__(self):
         while True:
+            time.sleep(.1)
             batch = self._prefetcher.get()
             yield from UltralyticsBatchConverter.convert(batch)
+
+    def __len__(self):
+        # Return a dummy large number to keep YOLO happy
+        return 1_000_000
