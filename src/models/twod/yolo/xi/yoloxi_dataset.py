@@ -17,9 +17,8 @@ class UltralyticsDataset(IterableDataset):
 
     def __iter__(self):
         while True:
-            time.sleep(.1)
             batch = self._prefetcher.get()
-            yield from UltralyticsBatchConverter.convert(batch)
+            yield UltralyticsBatchConverter.convert(batch)  # no `from`
 
     def __len__(self):
         # Return a dummy large number to keep YOLO happy
