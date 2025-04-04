@@ -5,6 +5,7 @@ from datetime import datetime
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.obb import OBBTrainer
+import torch
 
 
 class TrainingSetup:
@@ -60,6 +61,17 @@ class TrainingSetup:
         # Step 3: Create trainer
         trainer = OBBTrainer(overrides=overrides)
 
+        # ✅ Custom collate_fn for variable-length annotations
+        def variable_length_collate(batch):
+            return {
+                "img": torch.stack([item["img"] for item in batch], dim=0),
+                "instances": {
+                    "bboxes": torch.cat([item["instances"]["bboxes"] for item in batch], dim=0),
+                    "cls": torch.cat([item["instances"]["cls"] for item in batch], dim=0),
+                },
+                "batch_idx": torch.cat([item["batch_idx"] for item in batch], dim=0),
+            }
+
         # Step 4: Patch dataloader logic
         def patched_get_dataloader(_, dataset_path, batch_size, rank=0, mode="train"):
             return DataLoader(
@@ -67,7 +79,8 @@ class TrainingSetup:
                 batch_size=batch_size,
                 shuffle=False,  # shuffle must be False for IterableDataset
                 num_workers=0,
-                drop_last=False
+                drop_last=False,
+                collate_fn=variable_length_collate  # 👈 this is the fix
             )
         trainer.get_dataloader = patched_get_dataloader.__get__(trainer)
 
