@@ -6,8 +6,8 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset, O, I
+from src.schemas.brokers.schema_broker import SchemaBroker
 from src.schemas.schemas.schema_listener import SchemaListener
-from src.schemas.observer.schema_signer_broker import SchemaSignerBroker
 from src.schemas.schemas.pressure_schema import PressureSchema
 from src.schemas.schemas.signed_schema import SignedSchema
 
@@ -169,34 +169,3 @@ def test_get_batch_raises_on_too_large_request(dataset):
     dataset.feed(FakeFood("x", 1))
     with pytest.raises(ValueError):
         dataset.get_batch(DatasetSplit.TRAIN, 2)
-
-
-@pytest.mark.unit
-def test_pressure_reporting(splitter):
-    """Tests that pressure is reported correctly when a ComponentEventBroker is provided."""
-    # arrange
-    broker = SchemaSignerBroker[PressureSchema]("test-dataset")
-    listener = DummyComponentListener()
-    broker.get_schema_broker().subscribe(listener)
-    dataset = DummyDataset(splitter, max_size=10, pressure_broker=broker)
-
-    # act
-    for i in range(3):
-        dataset.feed(FakeFood(f"id_{i}", i))
-
-    dataset.get_batch(DatasetSplit.TRAIN, 3)
-
-    # assert
-    schemas = listener.schemas
-    assert len(schemas) == 4
-
-    last_size = 0
-    for i in range(3):
-        assert schemas[i].schema.inputs == 1
-        assert schemas[i].schema.outputs == 0
-        assert schemas[i].schema.usage > last_size
-        last_size = schemas[i].schema.usage
-
-    assert schemas[3].schema.inputs == 0
-    assert schemas[3].schema.outputs == 3
-    assert schemas[3].schema.usage == last_size

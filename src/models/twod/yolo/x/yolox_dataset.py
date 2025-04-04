@@ -22,7 +22,7 @@ class YOLOXDataset(IterableDataset):
 
     def __iter__(self):
         count = 0
-        while count < 1000:
+        while count < len(self):
             batch = self._prefetcher.get()
             yield YOLOXBatchConverter.convert(batch)
             count += 1
