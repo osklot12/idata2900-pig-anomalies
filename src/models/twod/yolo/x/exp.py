@@ -1,6 +1,7 @@
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
 from yolox.exp import Exp as BaseExp
 from torch.utils.data import DataLoader
+import logging
 
 class Exp(BaseExp):
     """Experimental configurations for YOLOX."""
@@ -26,10 +27,12 @@ class Exp(BaseExp):
         self.eval_interval = 10
         self.data_num_workers = 0
         self.tensorboard_writer = True
+        self.save_history_ckpt = True
 
         self.exp_name = "streaming_yolox"
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
+        logging.getLogger().info("✅ get_data_loader() called")
         return DataLoader(
             dataset=self._train_set,
             batch_size=None,

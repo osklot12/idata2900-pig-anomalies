@@ -96,6 +96,7 @@ class ConsistentDatasetSplitter(DatasetSplitter):
         """Adds an ID to the appropriate split."""
         self._dataset.add(id_)
         p = self._normalized_hash(id_)
+
         if p < self._train_threshold:
             self._train_split.add(id_)
             result = DatasetSplit.TRAIN

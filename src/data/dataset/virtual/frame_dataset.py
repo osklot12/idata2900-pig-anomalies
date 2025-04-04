@@ -10,7 +10,7 @@ class FrameDataset(VirtualDataset[StreamedAnnotatedFrame, AnnotatedFrame]):
     """A virtual dataset storing single annotated frames."""
 
     def _get_identified_instance(self, food: StreamedAnnotatedFrame) -> Tuple[str, AnnotatedFrame]:
-        return food.get_id() + str(food.index), AnnotatedFrame(frame=food.frame, annotations=food.annotations)
+        return f"{food.get_id()}_f{str(food.index)}", AnnotatedFrame(frame=food.frame, annotations=food.annotations)
 
     def _frame_in_instance(self, instance: O) -> int:
         return 1

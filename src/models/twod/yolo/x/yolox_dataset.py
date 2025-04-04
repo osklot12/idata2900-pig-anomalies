@@ -17,7 +17,15 @@ class YOLOXDataset(IterableDataset):
         super().__init__()
         self._prefetcher = prefetcher
 
+        self.class_ids = [0, 1, 2, 3]
+        self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
+
     def __iter__(self):
-        while True:
+        count = 0
+        while count < 1000:
             batch = self._prefetcher.get()
             yield YOLOXBatchConverter.convert(batch)
+            count += 1
+
+    def __len__(self):
+        return 1000
