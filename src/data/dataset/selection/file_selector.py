@@ -2,16 +2,13 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 
-class FileSelectionStrategy(ABC):
+class FileSelector(ABC):
     """Strategy for selecting a file from a dataset."""
 
     @abstractmethod
-    def select_file(self, candidates: List[str]) -> Optional[str]:
+    def select_file(self) -> Optional[str]:
         """
-        Selects a file from the list of candidates.
-
-        Args:
-            candidates (List[str]): list of available files
+        Selects a file from the dataset.
 
         Returns:
             Optional[str]: the selected file, or None if no valid file is found

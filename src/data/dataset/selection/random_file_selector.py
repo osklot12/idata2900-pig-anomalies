@@ -1,10 +1,10 @@
 import random
 from typing import List, Optional
 
-from src.data.dataset.selection.file_selection_strategy import FileSelectionStrategy
+from src.data.dataset.selection.file_selector import FileSelector
 
 
-class RandomFileSelector(FileSelectionStrategy):
+class RandomFileSelector(FileSelector):
     """Randomly selects a file with a valid suffix from the available list."""
 
     def __init__(self, suffixes: List[str]):
