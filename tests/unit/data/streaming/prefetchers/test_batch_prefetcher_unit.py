@@ -77,3 +77,24 @@ def test_stop_works_cleanly(batch_provider):
     # assert
     assert prefetcher._thread is None
     assert not prefetcher._running.get()
+
+
+@pytest.mark.unit
+def test_prefetching_halts_when_full_queue(batch_provider):
+    """Tests that prefetching temporarily halts whenever the internal queue is full."""
+    # arrange
+    prefetcher = BatchPrefetcher[str](
+        batch_provider=batch_provider,
+        split=DatasetSplit.TRAIN,
+        batch_size=2,
+        buffer_size=2
+    )
+
+    # act
+    prefetcher.run()
+    time.sleep(.1)
+
+    # assert
+    batch_provider.get_batch.call_count == 2
+
+    prefetcher.stop()
