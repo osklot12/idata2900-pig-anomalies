@@ -8,7 +8,7 @@ from src.network.messages.writers.stream_message_writer import StreamMessageWrit
 
 @pytest.fixture
 def stream():
-    """Fixture to provide a stream."""
+    """Fixture to provide a streams."""
     return Mock()
 
 

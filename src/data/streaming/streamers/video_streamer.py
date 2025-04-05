@@ -4,6 +4,7 @@ from typing import Callable, Optional
 from src.data.dataclasses.frame import Frame
 from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
@@ -11,16 +12,16 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class VideoStreamer(ConcurrentStreamer):
     """A streamer for streaming video data."""
 
-    def __init__(self, callback: Callable[[Frame], FeedStatus], resize_strategy: Optional[FrameResizeStrategy]):
+    def __init__(self, consumer: Feedable[Frame], resize_strategy: Optional[FrameResizeStrategy]):
         """
         Initializes a VideoStreamer instance.
 
         Args:
-            callback (Callable[[str, int, np.ndarray, bool], FeedStatus]): the callback to feed data
+            consumer (Feedable[Frame]): the consumer of the streaming data
             resize_strategy (Optional[FrameResizeStrategy]): the frame resize strategy to use
         """
         super().__init__()
-        self._callback = callback
+        self._consumer = consumer
         self._resize_strategy = resize_strategy
 
     def _stream(self) -> StreamerStatus:
@@ -32,8 +33,11 @@ class VideoStreamer(ConcurrentStreamer):
                 frame_data = self._resize_strategy.resize_frame(frame.data)
                 frame = Frame(frame.source, frame.index, frame_data, frame.end_of_stream)
 
-            self._callback(frame)
+            self._consumer.feed(frame)
             frame = self._get_next_frame()
+
+        # indicating end of stream
+        self._consumer.feed(None)
 
         if frame and self._is_requested_to_stop():
             result = StreamerStatus.STOPPED
@@ -43,9 +47,9 @@ class VideoStreamer(ConcurrentStreamer):
     @abstractmethod
     def _get_next_frame(self) -> Optional[Frame]:
         """
-        Returns the next frame for the stream.
+        Returns the next frame for the streams.
 
         Returns:
-            Optional[Frame]: next Frame, or None if end of stream
+            Optional[Frame]: next Frame, or None if end of streams
         """
         raise NotImplementedError

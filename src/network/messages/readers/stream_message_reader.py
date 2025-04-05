@@ -5,14 +5,14 @@ from src.network.messages.readers.stream_read_error import StreamReadError
 from src.network.messages.readers.message_reader import MessageReader
 
 class StreamMessageReader(MessageReader):
-    """A message reader reading from a stream."""
+    """A message reader reading from a streams."""
 
     def __init__(self, stream: BufferedReader, len_format: str):
         """
         Initializes a SocketMessageReader instance.
 
         Args:
-            stream (BufferedReader): the stream to read from
+            stream (BufferedReader): the streams to read from
             len_format (str): the length-prefixed framing format
         """
         self._stream = stream

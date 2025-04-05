@@ -18,7 +18,7 @@ class DummyVideoStreamer(VideoStreamer):
         Initializes a DummyVideoStreamer instance.
 
         Args:
-            n_frames (int): the number of frames in the stream
+            n_frames (int): the number of frames in the streams
             callback (Callable[[Frame], FeedStatus]): callback function that is fed with frames
             resize_strategy (FrameResizeStrategy): the frame resize strategy
         """

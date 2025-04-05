@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class RunnableStreamerManager(ABC):
-    """An interface for stream managers that can be run automatically."""
+    """An interface for streams managers that can be run automatically."""
 
     @abstractmethod
     def run(self) -> None:
-        """Starts the stream manager, managing its streamers automatically."""
+        """Starts the streams manager, managing its streamers automatically."""
         raise NotImplementedError
 
     @abstractmethod

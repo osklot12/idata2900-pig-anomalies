@@ -10,7 +10,7 @@ from src.data.streaming.streamers.streamer import Streamer
 
 class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
     """
-    A stream manager effective for large sets of finite streams, maintaining a constant number of streams at all time.
+    A streams manager effective for large sets of finite streams, maintaining a constant number of streams at all time.
     The Streamers "dock" the manager, before leaving and making space for the next streamer.
     """
 

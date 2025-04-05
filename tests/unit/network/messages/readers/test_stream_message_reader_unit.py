@@ -9,13 +9,13 @@ from src.network.messages.readers.stream_read_error import StreamReadError
 
 @pytest.fixture
 def stream():
-    """Fixture to provide a stream."""
+    """Fixture to provide a streams."""
     return Mock()
 
 
 @pytest.mark.unit
 def test_successful_read(stream):
-    """Tests that read() successfully reads a valid stream."""
+    """Tests that read() successfully reads a valid streams."""
     # arrange
     stream.read.side_effect = [
         struct.pack(">I", 5),
@@ -34,7 +34,7 @@ def test_successful_read(stream):
 
 @pytest.mark.unit
 def test_raises_when_stream_returns_none(stream):
-    """Tests that read() raises when the stream returns None."""
+    """Tests that read() raises when the streams returns None."""
     # arrange
     stream.read.return_value = None
 
@@ -47,7 +47,7 @@ def test_raises_when_stream_returns_none(stream):
 
 @pytest.mark.unit
 def test_raises_when_stream_returns_too_few_bytes(stream):
-    """Tests that read() raises when the stream returns too few bytes."""
+    """Tests that read() raises when the streams returns too few bytes."""
     # arrange
     stream.read.side_effect = [
         struct.pack(">I", 5),
