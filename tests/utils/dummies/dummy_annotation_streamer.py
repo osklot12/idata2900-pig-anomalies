@@ -21,7 +21,7 @@ class DummyAnnotationStreamer(AnnotationStreamer):
         Initializes a DummyAnnotationStreamer.
 
         Args:
-            n_annotations (int): number of annotations in the stream
+            n_annotations (int): number of annotations in the streams
             callback (Callable[[FrameAnnotation], FeedStatus]): the callback to feed streaming annotations
             normalizer (BBoxNormalizer): the normalization strategy for normalizing bounding boxes
         """

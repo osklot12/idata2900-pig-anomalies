@@ -9,7 +9,7 @@ from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.parsing.file_base_name_parser import FileBaseNameParser
-from src.data.streaming.aggregators.buffered_instance_aggregator import BufferedInstanceAggregator
+from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 
@@ -71,7 +71,7 @@ def callback():
 @pytest.fixture
 def aggregator(callback):
     """Fixture to provide a BufferedInstanceAggregator instance."""
-    return BufferedInstanceAggregator(callback)
+    return BufferedAggregator(callback)
 
 
 @pytest.mark.unit
@@ -147,7 +147,7 @@ def test_feeding_non_matching_data_between_matches_still_causes_matching(aggrega
 def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annotations, single_annotations, callback):
     """Tests that feeding more than the capacity can hold results in data being evicted."""
     # arrange
-    buffer_aggregator = BufferedInstanceAggregator(callback=callback, buffer_size=1)
+    buffer_aggregator = BufferedAggregator(callback=callback, buffer_size=1)
 
     # act
     buffer_aggregator.feed_annotations(matching_annotations)

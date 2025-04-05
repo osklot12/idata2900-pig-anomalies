@@ -34,7 +34,7 @@ def manual_visualize_annotations():
 
     aggregated_streamer_factory = _get_aggregated_streamer(streamer_pair_factory, virtual_dataset)
 
-    # stream
+    # streams
     _stream_frames(aggregated_streamer_factory)
 
     # get batch
