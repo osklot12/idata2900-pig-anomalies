@@ -29,7 +29,7 @@ class FakeFood(Identifiable):
 class DummyDataset(VirtualDataset[FakeFood, FakeFood]):
     """A concrete VirtualDataset for testing with simple FakeFood instances."""
 
-    def _get_identified_instance(self, food: I) -> Tuple[str, O]:
+    def _get_instance_id(self, food: I) -> Tuple[str, O]:
         return food.get_id(), food.get_value()
 
     def _frame_in_instance(self, instance: O) -> int:
