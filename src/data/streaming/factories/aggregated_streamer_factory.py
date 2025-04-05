@@ -9,7 +9,6 @@ from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.streamers.aggregated_streamer import AggregatedStreamer
 from src.data.streaming.streamers.streamer import Streamer
 
-
 class AggregatedStreamerFactory(StreamerFactory):
     """A factory for creating AggregatedStreamer instances."""
 
@@ -22,5 +21,5 @@ class AggregatedStreamerFactory(StreamerFactory):
         """
         self._streamer_pair_factory = streamer_pair_factory
 
-    def create_streamer(self, consumer: Feedable[T]) -> Optional[Streamer]:
+    def create_streamer(self, consumer: Feedable[StreamedAnnotatedFrame]) -> Optional[Streamer]:
         return AggregatedStreamer(self._streamer_pair_factory, consumer)

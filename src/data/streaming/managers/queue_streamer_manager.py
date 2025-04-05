@@ -1,14 +1,12 @@
 import queue
 import threading
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional
 
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.feedables.feedable_queue import FeedableQueue
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
-from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
-from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.streamer import Streamer
-from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
 
@@ -28,7 +26,7 @@ class QueueStreamerManager(Generic[T], ConcurrentStreamerManager):
         """
         super().__init__(max_streamers)
         self._streamer_factory = streamer_factory
-        self._queue_stream: queue.Queue[queue.Queue[T]] = queue_stream
+        self._queue_stream: queue.Queue[Optional[queue.Queue[T]]] = queue_stream
 
         self._worker = None
 
@@ -36,10 +34,15 @@ class QueueStreamerManager(Generic[T], ConcurrentStreamerManager):
         """Worker thread function."""
         while self._running:
             try:
-                q = self._queue_stream.get(timeout=0.1)
-                streamer = self._streamer_factory.create_streamer(FeedableQueue(q))
-                self._launch_streamer(streamer)
-            except queue.Empty:
+                q = queue.Queue()
+                self._queue_stream.put(q, timeout=0.1)
+
+                streamer = self._streamer_factory.create_streamer(FeedableQueue[StreamedAnnotatedFrame](q))
+                if streamer:
+                    self._launch_streamer(streamer)
+                else:
+                    self._queue_stream.put(None)
+            except queue.Full:
                 pass
 
     def _setup(self) -> None:

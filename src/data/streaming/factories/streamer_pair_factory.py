@@ -12,8 +12,8 @@ class StreamerPairFactory(ABC):
     """A factory for creating pairs of video and annotation streamers."""
 
     @abstractmethod
-    def create_streamer_pair(self, frame_cb: Callable[[Frame], FeedStatus],
-                             annotation_cb: Callable[[FrameAnnotations], FeedStatus]
+    def create_streamer_pair(self, frame_cb: Callable[[Frame], None],
+                             annotation_cb: Callable[[FrameAnnotations], None]
                              ) -> Optional[Tuple[VideoStreamer, AnnotationStreamer]]:
         """
         Creates a pair of video and annotation streamers.

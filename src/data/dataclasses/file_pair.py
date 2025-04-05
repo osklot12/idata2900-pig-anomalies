@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class DatasetInstance:
+class FilePair:
     """
-    Represents a single labeled video data instance in a dataset.
+    Represents a pair of associated video file and annotations file paths.
 
     Attributes:
         video_file (str): the path to the video file
