@@ -95,6 +95,6 @@ def test_prefetching_halts_when_full_queue(batch_provider):
     time.sleep(.1)
 
     # assert
-    batch_provider.get_batch.call_count == 2
+    assert batch_provider.get_batch.call_count == 3
 
     prefetcher.stop()
