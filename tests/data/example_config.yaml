@@ -8,7 +8,7 @@ server:
   gRPC_path: "" # Path to the local gRPC server
 
 memory_management:
-  max_sources_in_memory: 2  # Maximum number of video sources/streams loaded at a time
+  max_sources_in_memory: 2  # Maximum number of video registries/streams loaded at a time
   max_frames_per_source: 500  # Maximum frames per video source loaded in memory at a time
   split_ratio: [0.7, 0.2, 0.1]  # Training, validation, testing split (sum must be 1.0)
   max_loading_threads: 4  # Maximum number of threads handling video/frame loading

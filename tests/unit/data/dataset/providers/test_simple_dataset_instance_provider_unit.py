@@ -57,7 +57,7 @@ def test_get_random_returns_file_pair(dataset_source, video_selector, annotation
     file_pair_provider = SimpleDatasetInstanceProvider(dataset_source, video_selector, annotation_matcher)
 
     # act
-    result = file_pair_provider.get_dataset_instance()
+    result = file_pair_provider.get_next()
 
     # assert
     assert result is not None
@@ -81,7 +81,7 @@ def test_get_random_called_consecutively_gives_file_pairs(dataset_source, video_
 
     # act
     for _ in range(10):
-        result.append(file_pair_provider.get_dataset_instance())
+        result.append(file_pair_provider.get_next())
 
     # assert
     print(f"{result}")
@@ -103,7 +103,7 @@ def test_get_random_returns_none_on_no_match(dataset_source, video_selector, ann
     file_pair_provider = SimpleDatasetInstanceProvider(dataset_source, video_selector, annotation_matcher)
 
     # act
-    result = file_pair_provider.get_dataset_instance()
+    result = file_pair_provider.get_next()
 
     # assert
     assert result is None

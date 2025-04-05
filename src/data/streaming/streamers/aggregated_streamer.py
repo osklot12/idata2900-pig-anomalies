@@ -1,30 +1,30 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, TypeVar
 
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.loading.feed_status import FeedStatus
 from src.data.parsing.string_parser import StringParser
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
+from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
+T = TypeVar("T")
 
 class AggregatedStreamer(Streamer):
-    """A streamer consisting of a video and annotation streamer, aggregating the streams data."""
+    """A streamer consisting of a video and annotation streamer, aggregating the streamed data."""
 
-    def __init__(self, streamers_factory: StreamerPairFactory, callback: Callable[[StreamedAnnotatedFrame], FeedStatus],
-                 source_parser: Optional[StringParser] = None):
+    def __init__(self, streamer_factory: StreamerPairFactory, consumer: Feedable[StreamedAnnotatedFrame]):
         """
         Initializes an AggregatedStreamer instance.
 
         Args:
-            streamers_factory (StreamerPairFactory): the factory used to create the streamers
-            callback (Callable[[Instance], FeedStatus]): the callback function that will be fed with aggregated data
-            source_parser (StringParser):
+            streamer_factory (StreamerPairFactory): the factory used to create the streamers
+            consumer (Feedable[StreamedAnnotatedFrame]): the consumer of the streaming data
         """
-        self._aggregator = BufferedAggregator(callback)
-        streamer_pair = streamers_factory.create_streamer_pair(
+        self._aggregator = BufferedAggregator(consumer)
+        streamer_pair = streamer_factory.create_streamer_pair(
             self._aggregator.feed_frame,
             self._aggregator.feed_annotations
         )

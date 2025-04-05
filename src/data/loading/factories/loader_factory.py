@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.data.dataset.sources.dataset_source_registry import SourceRegistry
+from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
 from src.data.loading.loaders.video_file_loader import VideoFileLoader
 
@@ -29,11 +29,11 @@ class LoaderFactory(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_dataset_source(self) -> SourceRegistry:
+    def create_dataset_source(self) -> FileRegistry:
         """
         Creates a dataset source instance.
 
         Returns:
-            SourceRegistry: the dataset source instance
+            FileRegistry: the dataset source instance
         """
         raise NotImplementedError

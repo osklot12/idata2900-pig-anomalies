@@ -1,10 +1,10 @@
 from typing import List, Dict, Tuple
 
-from src.data.dataset.sources.dataset_source_registry import SourceRegistry
+from src.data.dataset.registries.file_registry import FileRegistry
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 
-class DummyGCPDataLoader(SourceRegistry):
+class DummyGCPDataLoader(FileRegistry):
     """A fake GCPDataLoader that returns dummy video data."""
 
     # default constants
@@ -32,7 +32,7 @@ class DummyGCPDataLoader(SourceRegistry):
         ],
     }
 
-    def get_source_ids(self) -> List[str]:
+    def get_file_paths(self) -> List[str]:
         return self.fetch_all_files()
 
     def __init__(self, bucket_name: str = "test-bucket", credentials_path: str = "test_credentials.json"):

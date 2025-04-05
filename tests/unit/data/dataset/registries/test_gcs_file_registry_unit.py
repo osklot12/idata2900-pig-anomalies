@@ -3,18 +3,18 @@ from unittest.mock import patch, MagicMock
 import pytest
 from requests.exceptions import HTTPError
 
-from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
+from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from tests.utils.dummies.dummy_auth_service import DummyAuthService
 
 
 @pytest.fixture
 def gcs_file_manager():
     """Fixture to provide a GCSFileManager instance."""
-    return GCSSourceRegistry("test-bucket", DummyAuthService())
+    return GCSFileRegistry("test-bucket", DummyAuthService())
 
 
 @pytest.mark.unit
-@patch.object(GCSSourceRegistry, "_make_request")
+@patch.object(GCSFileRegistry, "_make_request")
 def test_list_files_success(mock_make_request, gcs_file_manager):
     """Tests successful listing of files in the GCS bucket."""
     # arrange
@@ -31,7 +31,7 @@ def test_list_files_success(mock_make_request, gcs_file_manager):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_file_manager.get_source_ids()
+    result = gcs_file_manager.get_file_paths()
 
     # assert
     mock_make_request.assert_called_once_with(
@@ -42,7 +42,7 @@ def test_list_files_success(mock_make_request, gcs_file_manager):
 
 
 @pytest.mark.unit
-@patch.object(GCSSourceRegistry, "_make_request")
+@patch.object(GCSFileRegistry, "_make_request")
 def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
     """Tests listing files when the GCS bucket is empty."""
     # arrange
@@ -51,7 +51,7 @@ def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
     mock_make_request.return_value = mock_response
 
     # act
-    result = gcs_file_manager.get_source_ids()
+    result = gcs_file_manager.get_file_paths()
 
     # assert
     mock_make_request.assert_called_once()
@@ -60,7 +60,7 @@ def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
 
 
 @pytest.mark.unit
-@patch.object(GCSSourceRegistry, "_make_request")
+@patch.object(GCSFileRegistry, "_make_request")
 def test_list_files_not_found(mock_make_request, gcs_file_manager):
     """Tests handling when the requested bucket is not found."""
     # arrange
@@ -69,6 +69,6 @@ def test_list_files_not_found(mock_make_request, gcs_file_manager):
 
     # act & assert
     with pytest.raises(HTTPError, match=error_msg):
-        gcs_file_manager.get_source_ids()
+        gcs_file_manager.get_file_paths()
 
     mock_make_request.assert_called_once()

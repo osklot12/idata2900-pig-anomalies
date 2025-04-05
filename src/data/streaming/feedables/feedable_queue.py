@@ -1,9 +1,12 @@
 import queue
+from typing import Generic, TypeVar
 
-from src.data.streaming.feedables.feedable import Feedable, T
+from src.data.streaming.feedables.feedable import Feedable
+
+T = TypeVar("T")
 
 
-class FeedableQueue(Feedable):
+class FeedableQueue(Generic[T], Feedable):
     """Feedable queue."""
 
     def __init__(self, q: queue.Queue):
