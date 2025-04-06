@@ -8,85 +8,92 @@ from src.data.dataset.splitters.determ_splitter import DetermSplitter
 @pytest.fixture
 def strings():
     """Fixture to provide a list of strings."""
-    return [
-        "string1", "string2", "string3",
-        "string4", "string5", "string6",
-        "string7", "string8", "string9"
+    return [f"string_{i}" for i in range(1000)]
+
+
+@pytest.mark.unit
+def test_strings_provided_on_construction(strings):
+    """Tests that passing the strings on construction makes valid splits."""
+    # arrange
+    splitter = DetermSplitter(strings)
+
+    # act
+    splits = splitter.splits
+
+    # assert
+    assert sum(len(split) for split in splits) == len(strings)
+
+    flat_splits = [item for split in splits for item in split]
+    for string in strings:
+        assert string in flat_splits
+
+
+@pytest.mark.unit
+def test_giving_n_weights_produces_n_splits(strings):
+    """Tests that giving n valid weights will produce n valid splits."""
+    # arrange
+    splitter = DetermSplitter(strings=strings, weights=[0.2 for _ in range(5)])
+
+    # act
+    splits = splitter.splits
+
+    # assert
+    assert len(splits) == 5
+    for split in splits:
+        assert len(split) > 0  # this could statistically fail, but the chances are astronomically low
+
+
+@pytest.mark.unit
+def test_adding_incrementally_gives_the_same_splits(strings):
+    """Tests that adding strings incrementally instead of giving all in the constructor produces the same splits."""
+    # arrange
+    splitter = DetermSplitter()
+    prefilled_splitter = DetermSplitter(strings=strings)
+
+    # act
+    for s in strings:
+        splitter.add(s)
+
+    # assert
+    assert splitter.splits == prefilled_splitter.splits
+
+
+@pytest.mark.unit
+def test_giving_less_than_two_weights_raises():
+    """Tests that giving less than two weights on construction causes a raise."""
+    # act & assert
+    with pytest.raises(ValueError):
+        DetermSplitter(weights=[1])
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "weights",
+    [
+        [0.2, 0.2, 0.2],
+        [0.1, 0.5, 0.5],
+        [1.0, 20.0, 200.0, 300.0]
     ]
-
-
-def _get_splits(splitters: List[DetermSplitter]) -> Tuple[List[List[str]], List[List[str]]]:
-    """Returns the first and seconds splits for a list of splitters."""
-    first_splits = []
-    second_splits = []
-    for splitter in splitters:
-        first_splits.append(splitter.first_split)
-        second_splits.append(splitter.second_split)
-
-    return first_splits, second_splits
+)
+def test_weights_not_summing_to_one_raises(weights):
+    """Tests that giving weights that does not sum to one on construction causes a raise."""
+    # act & assert
+    with pytest.raises(ValueError):
+        DetermSplitter(weights=weights)
 
 
 @pytest.mark.unit
-def test_split_all_into_first_split(strings):
-    """Tests that setting the threshold to 1 will put every string into the first split."""
+@pytest.mark.parametrize(
+    "seed", [42, 35, 69, 140]
+)
+def test_seed_gives_determinism_in_splits(strings, seed):
+    """Tests that the seed gives determinism in the splitting."""
     # act
-    splitter = DetermSplitter(strings, threshold=1)
+    splitters = [DetermSplitter(strings=strings, seed=seed) for _ in range(10)]
 
     # assert
-    assert len(splitter.first_split) == len(strings)
-    assert len(splitter.second_split) == 0
-
-
-@pytest.mark.unit
-def test_split_all_into_second_split(strings):
-    """Tests that setting the threshold to 0 will put every string into the second split."""
-    # act
-    splitter = DetermSplitter(strings, threshold=0)
-
-    # assert
-    assert len(splitter.first_split) == 0
-    assert len(splitter.second_split) == len(strings)
-
-
-@pytest.mark.unit
-def test_split_determinism(strings):
-    """Tests that the splits are created deterministically."""
-    # arrange
-    splitters = []
-
-    # act
-    for _ in range(100):
-        splitters.append(DetermSplitter(strings))
-
-    # assert
-    first_splits, second_splits = _get_splits(splitters)
-
-    assert (
-            len(set(tuple(s) for s in first_splits)) ==
-            len(set(tuple(s) for s in second_splits)) ==
-            1
-    )
-
-
-@pytest.mark.unit
-def test_add_string(strings):
-    """Tests that adding a string to the splitter will assign it to a split deterministically."""
-    # arrange
-    str_to_add = "string10"
-    splitters = []
-
-    # act
-    for _ in range(100):
-        splitter = DetermSplitter(strings)
-        splitter.add(str_to_add)
-        splitters.append(splitter)
-
-    # assert
-    first_splits, second_splits = _get_splits(splitters)
-
-    first_splits_set = set(tuple(s) for s in first_splits)
-    second_splits_set = set(tuple(s) for s in second_splits)
-
-    assert len(first_splits_set) == len(second_splits_set) == 1
-    assert str_to_add in first_splits_set or str_to_add not in second_splits_set
-    print(second_splits_set)
+    split_structures = {
+        tuple(tuple(split) for split in splitter.splits)
+        for splitter in splitters
+    }
+    assert len(split_structures) == 1
