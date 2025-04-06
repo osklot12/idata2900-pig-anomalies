@@ -1,12 +1,12 @@
 import pytest
 
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 
 
 @pytest.fixture
 def parser():
     """Fixture to provide a FileBaseNameParser instance."""
-    return FileBaseNameParser()
+    return BaseNameParser()
 
 @pytest.mark.unit
 @pytest.mark.parametrize("input_path,expected", [

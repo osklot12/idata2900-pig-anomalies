@@ -2,7 +2,7 @@ import os
 from typing import List, Optional
 
 from src.data.dataset.matching.matching_strategy import MatchingStrategy
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 
 
 class BaseNameMatcher(MatchingStrategy):
@@ -10,7 +10,7 @@ class BaseNameMatcher(MatchingStrategy):
 
     def __init__(self):
         """Initializes a BaseNameMatcher instance."""
-        self._parser = FileBaseNameParser()
+        self._parser = BaseNameParser()
 
     def match(self, reference: str, candidates: List[str]) -> Optional[str]:
         if reference is None:

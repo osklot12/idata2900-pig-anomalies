@@ -70,7 +70,7 @@ def manifest(video_registry, annotations_registry, matcher, identifier):
 def test_list_all_ids(manifest, instance_id):
     """Tests that list_all_ids returns the expected IDs."""
     # act
-    ids = manifest.list_all_ids()
+    ids = manifest.ids
 
     # assert
     assert len(ids) == 1

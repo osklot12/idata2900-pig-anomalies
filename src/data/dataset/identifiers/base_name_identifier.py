@@ -1,5 +1,5 @@
 from src.data.dataset.identifiers.identifier import Identifier
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 
 
 class BaseNameIdentifier(Identifier):
@@ -7,7 +7,7 @@ class BaseNameIdentifier(Identifier):
 
     def __init__(self):
         """Initializes a BaseNameIdentifier instance."""
-        self._parser = FileBaseNameParser()
+        self._parser = BaseNameParser()
 
     def identify(self, video: str, annotations: str) -> str:
         video_base_name = self._parser.parse_string(video)

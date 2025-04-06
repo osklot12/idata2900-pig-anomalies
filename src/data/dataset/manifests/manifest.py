@@ -7,8 +7,9 @@ from src.data.dataclasses.dataset_instance import DatasetInstance
 class Manifest(ABC):
     """Interface for dataset manifests."""
 
+    @property
     @abstractmethod
-    def list_all_ids(self) -> List[str]:
+    def ids(self) -> List[str]:
         """
         Returns a list of all instance IDs.
 

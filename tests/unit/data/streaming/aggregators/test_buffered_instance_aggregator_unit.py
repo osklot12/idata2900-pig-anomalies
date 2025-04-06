@@ -8,7 +8,7 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
