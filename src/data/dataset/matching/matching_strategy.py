@@ -6,12 +6,12 @@ class MatchingStrategy(ABC):
     """Interface for different file matching strategies."""
 
     @abstractmethod
-    def find_match(self, file_name: str, candidates: List[str]) -> Optional[str]:
+    def match(self, reference: str, candidates: List[str]) -> Optional[str]:
         """
         Finds a matching file for the given file_name from a list of candidates.
 
         Args:
-            file_name (str): the file to find a match for
+            reference (str): the reference to find a match for
             candidates (List[str]): the list potential matches
 
         Returns:
