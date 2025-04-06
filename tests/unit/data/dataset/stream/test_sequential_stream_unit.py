@@ -10,7 +10,7 @@ from src.data.dataset.streams.sequential_stream import SequentialStream
 def data1():
     """Fixture to provide test streaming data."""
     return [
-        "data1", "data2", "data3", "data4", "data5", "data6"
+        "data1", "data2", "data3", "data4", "data5", "data6", None
     ]
 
 
@@ -18,46 +18,48 @@ def data1():
 def data2():
     """Fixture to provide test streaming data."""
     return [
-        "data7", "data8", "data9", "data10", "data11", "data12"
+        "data7", "data8", "data9", "data10", "data11", "data12", None
     ]
 
 
-def _create_queue(items: List[str]) -> queue.Queue[Optional[str]]:
-    """Creates a queue from a list of strings."""
-    q = queue.Queue()
-    for item in items:
-        q.put(item)
-    q.put(None)
-    return q
+@pytest.mark.unit
+def test_input_data_is_read_sequentially(data1, data2):
+    """Tests that the input data is read sequentially in the expected order."""
+    # arrange
+    stream = SequentialStream[str]()
+
+    # act
+    feedable1 = stream.open_feedable_stream()
+    for s in data1:
+        feedable1.feed(s)
+
+    feedable2 = stream.open_feedable_stream()
+    for s in data2:
+        feedable2.feed(s)
+
+    # assert
+    for i in range(len(data1) - 1):
+        assert stream.read() == data1[i]
+
+    for i in range(len(data2) - 1):
+        assert stream.read() == data2[i]
 
 
 @pytest.mark.unit
-def test_stream_is_sequential(data1, data2):
-    """Tests that the SequentialStream reads the stream in a sequential manner."""
+def test_close_closes_stream(data1):
+    """Tests that calling close closes the stream."""
     # arrange
     stream = SequentialStream[str]()
-    stream.queue.put(_create_queue(data1))
-    stream.queue.put(_create_queue(data2))
-    stream.queue.put(None)
-    read_items = []
+
+    feedable = stream.open_feedable_stream()
+    for s in data1:
+        feedable.feed(s)
 
     # act
-    item = stream.read()
-    while item is not None:
-        read_items.append(item)
-        item = stream.read()
+    stream.close()
 
     # assert
-    for i in range(len(data1)):
-        assert read_items[i] == data1[i]
+    for i in range(len(data1) - 1):
+        assert stream.read() is not None
 
-    for i in range(len(data2)):
-        assert read_items[i + len(data1)] == data2[i]
-
-
-def test_consecutive_reads_after_eos_returns_none():
-    """Tests that consecutive calls to read returns None after eos."""
-    # arrange
-    stream = SequentialStream[str]()
-    stream.queue.put(None)
-
+    assert stream.read() is None

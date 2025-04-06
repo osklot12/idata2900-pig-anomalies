@@ -6,7 +6,7 @@ from src.data.streaming.feedables.feedable import Feedable
 T = TypeVar("T")
 
 
-class FeedableQueue(Generic[T], Feedable):
+class FeedableQueue(Generic[T], Feedable[T]):
     """Feedable queue."""
 
     def __init__(self, q: queue.Queue):
