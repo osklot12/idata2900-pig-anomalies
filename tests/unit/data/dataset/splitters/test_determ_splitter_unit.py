@@ -1,5 +1,3 @@
-from typing import Tuple, List
-
 import pytest
 
 from src.data.dataset.splitters.determ_splitter import DetermSplitter
