@@ -1,31 +1,48 @@
 import hashlib
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 
 class DetermSplitter:
-    """Splits string collections into two subsets deterministically."""
+    """
+    Splits string collections into two subsets deterministically.
+    """
 
-    def __init__(self, strings: Iterable[str] = None, threshold: float = 0.5, seed: int = 42):
+    def __init__(self, strings: Optional[Iterable[str]] = None, weights: List[float] = None, seed: int = 42):
         """
         Initializes a StringSetSplitter.
 
         Args:
             strings (Iterable[str]): the collection of strings to split
-            threshold (float): the threshold at which to split
-            seed (int): the random seed
+            weights (List[float]): list of weights for each split (must sum to 1), defaults to [0.5, 0.5]
+            seed (int): the random seed for hashing
         """
-        if not 0 <= threshold <= 1:
-            raise ValueError("threshold must be between 0 and 1")
+        if weights is None:
+            weights = [0.5, 0.5]
 
-        self._strings = list(strings)
-        self._threshold = threshold
+        if len(weights) < 2:
+            raise ValueError("At least two weights must be provided")
+
+        if not abs(sum(weights) - 1.0) < 1e-6:
+            raise ValueError("Weights must sum to 1.0")
+
+        self._strings = list(strings) if strings else []
+        self._weights = weights
         self._seed = seed
+        self._thresholds = self._compute_thresholds(weights)
+        self._splits = [[] for _ in weights]
 
-        self._splits = [[], []]
+        for s in self._strings:
+            self.add(s)
 
-        if strings:
-            for string in strings:
-                self.add(string)
+    @staticmethod
+    def _compute_thresholds(weights: List[float]) -> List[float]:
+        """Compute the cumulative threshold from weights."""
+        thresholds = []
+        cumulative = 0.0
+        for w in weights:
+            cumulative += w
+            thresholds.append(cumulative)
+        return thresholds
 
     def add(self, s: str) -> None:
         """
@@ -51,14 +68,25 @@ class DetermSplitter:
 
         self._get_split_for_str(s).remove(s)
 
+    def _get_split_index(self, s: str) -> int:
+        """Determine the split index based on normalized hash and thresholds."""
+        index = -1
+
+        h = self._normalized_hash(s)
+        i = 0
+        while i < len(self._thresholds) and index == -1:
+            if h < self._thresholds[i]:
+                index = i
+            i += 1
+
+        if index == -1:
+            index = len(self._thresholds) - 1
+
+        return index
+
     def _get_split_for_str(self, s: str) -> List[str]:
         """Returns the appropriate split for the given string."""
-        if self._normalized_hash(s) < self._threshold:
-            split = self._splits[0]
-        else:
-            split = self._splits[1]
-
-        return split
+        return self._splits[self._get_split_index(s)]
 
     def _normalized_hash(self, s: str) -> float:
         """Gives a normalized hash for a given string."""
@@ -70,24 +98,14 @@ class DetermSplitter:
         return int(hashlib.md5(key).hexdigest(), 16)
 
     @property
-    def first_split(self) -> List[str]:
+    def splits(self) -> List[List[str]]:
         """
-        Returns the first split.
+        Returns the splits.
 
         Returns:
-            List[str]: the first split
+            List[List[str]]: the splits
         """
-        return self._splits[0]
-
-    @property
-    def second_split(self) -> List[str]:
-        """
-        Returns the second split.
-
-        Returns:
-            List[str]: the second split
-        """
-        return self._splits[1]
+        return list(self._splits)
 
     def __getitem__(self, item):
         return self._splits[item]
