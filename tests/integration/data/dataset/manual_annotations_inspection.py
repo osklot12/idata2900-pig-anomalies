@@ -5,7 +5,7 @@ from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
-from src.data.dataset.selection.random_file_selector import RandomFileSelector
+from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset
 from src.data.dataset.dataset_split import DatasetSplit
@@ -140,7 +140,7 @@ def _get_streamer_pair_factory(instance_provider, loader_factory):
 def _get_instance_provider(loader_factory):
     instance_provider = SimpleDatasetInstanceProvider(
         source=loader_factory.create_dataset_source(),
-        video_selector=RandomFileSelector(["mp4"]),
+        video_selector=RandomStringSelector(["mp4"]),
         annotation_matcher=BaseNameMatcher(["json"])
     )
     return instance_provider

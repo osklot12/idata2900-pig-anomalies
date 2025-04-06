@@ -5,11 +5,11 @@ class FileRegistry(ABC):
     """An interface for dataset file registries."""
 
     @abstractmethod
-    def get_file_paths(self) -> set[str]:
+    def get_file_paths(self) -> List[str]:
         """
         Returns a set of file paths.
 
         Returns:
-            set[str]: set of file paths.
+            List[str]: set of file paths.
         """
         raise NotImplementedError
