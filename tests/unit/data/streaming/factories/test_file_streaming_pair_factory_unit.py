@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.data.dataclasses.file_pair import FilePair
+from src.data.dataclasses.dataset_instance import DatasetInstance
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
@@ -11,7 +11,7 @@ from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 @pytest.fixture
 def dataset_instance():
     """Fixture to provide a DatasetInstance instance."""
-    return FilePair(video_file="video.mp4", annotation_file="annotations.json")
+    return DatasetInstance(video_file="video.mp4", annotation_file="annotations.json")
 
 
 @pytest.fixture
