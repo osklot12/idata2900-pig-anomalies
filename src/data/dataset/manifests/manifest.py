@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from src.data.dataclasses.dataset_instance import DatasetInstance
 
@@ -18,7 +18,7 @@ class Manifest(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_instance(self, instance_id: str) -> DatasetInstance:
+    def get_instance(self, instance_id: str) -> Optional[DatasetInstance]:
         """
         Returns a dataset instance corresponding to the given instance ID.
 
@@ -26,6 +26,6 @@ class Manifest(ABC):
             instance_id (str): the ID of the instance
 
         Returns:
-            DatasetInstance: the dataset instance
+            DatasetInstance: the dataset instance, or None if no such ID exists
         """
         raise NotImplementedError
