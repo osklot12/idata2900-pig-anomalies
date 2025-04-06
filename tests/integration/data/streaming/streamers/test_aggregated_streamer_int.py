@@ -7,7 +7,7 @@ from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
-from src.data.dataset.selection.random_file_selector import RandomFileSelector
+from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
@@ -47,7 +47,7 @@ def loader_factory(auth_factory, decoder_factory):
 @pytest.fixture
 def video_selector():
     """Fixture to provide a FileSelectionStrategy."""
-    return RandomFileSelector(["mp4"])
+    return RandomStringSelector(["mp4"])
 
 
 @pytest.fixture

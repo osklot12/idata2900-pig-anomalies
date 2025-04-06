@@ -17,5 +17,5 @@ class SuffixFileRegistry(FileRegistry):
         self._source = source
         self._suffixes = suffixes
 
-    def get_file_paths(self) -> set[str]:
-        return {path for path in self._source.get_file_paths() if path.endswith(self._suffixes)}
+    def get_file_paths(self) -> List[str]:
+        return [path for path in self._source.get_file_paths() if path.endswith(self._suffixes)]

@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.dataset.selection.deterministic_file_selector import DeterministicFileSelector
+from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
 
 
 @pytest.fixture
@@ -18,14 +18,14 @@ def files():
 def test_select_file_returns_none_on_full_cycle(files):
     """Tests that select_file returns None when all files have been selected."""
     # arrange
-    selector = DeterministicFileSelector(files)
+    selector = DetermStringSelector(files)
     initial_selections = []
 
     # act
     for _ in range(4):
-        initial_selections.append(selector.select_file())
+        initial_selections.append(selector.next())
 
-    last_selection = selector.select_file()
+    last_selection = selector.next()
 
     # assert
     for file in initial_selections:
@@ -38,12 +38,12 @@ def test_select_file_returns_none_on_full_cycle(files):
 def test_files_are_selected_once(files):
     """Tests that each files is only selected once."""
     # arrange
-    selector = DeterministicFileSelector(files)
+    selector = DetermStringSelector(files)
     selections = []
 
     # act
     for _ in range(4):
-        selections.append(selector.select_file())
+        selections.append(selector.next())
 
     # assert
     assert len(set(selections)) == len(selections)
@@ -51,17 +51,17 @@ def test_files_are_selected_once(files):
 
 @pytest.mark.unit
 def test_seed_ensures_reproducibility(files):
-    """Tests that setting the seed ensures reproducibility in the order of selection."""
+    """Tests that setting the seed ensures reproducibility in the order of selectors."""
     # arrange
-    selector_one = DeterministicFileSelector(files, seed=1)
-    selector_two = DeterministicFileSelector(files, seed=1)
+    selector_one = DetermStringSelector(files, seed=1)
+    selector_two = DetermStringSelector(files, seed=1)
     first_selections = []
     second_selections = []
 
     # act
     for _ in range(4):
-        first_selections.append(selector_one.select_file())
-        second_selections.append(selector_two.select_file())
+        first_selections.append(selector_one.next())
+        second_selections.append(selector_two.next())
 
     # assert
     assert first_selections == second_selections
