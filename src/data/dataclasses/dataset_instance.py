@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class FilePair:
+class DatasetInstance:
     """
     Represents a pair of associated video file and annotations file paths.
 
