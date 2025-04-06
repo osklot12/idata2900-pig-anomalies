@@ -13,7 +13,7 @@ from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFact
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.factories.FileBaseNameParserFactory import FileBaseNameParserFactory
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.providers.batch_provider import BatchProvider
@@ -52,7 +52,7 @@ class CheapPipeline(BatchProvider):
             annotation_matcher=BaseNameMatcher(["json"])
         )
 
-        entity_factory = LazyEntityFactory(self._loader_factory, FileBaseNameParser())
+        entity_factory = LazyEntityFactory(self._loader_factory, BaseNameParser())
 
         frame_resizer_factory = StaticFrameResizerFactory((640, 640))
 

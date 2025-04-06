@@ -3,7 +3,7 @@ import os
 from src.data.parsing.string_parser import StringParser
 
 
-class FileBaseNameParser(StringParser):
+class BaseNameParser(StringParser):
     """Strips file directories down to the file base name."""
 
     def parse_string(self, string: str) -> str:

@@ -32,7 +32,8 @@ class MatchingManifest(Manifest):
 
         self._instances: Dict[str, DatasetInstance] = {}
 
-    def list_all_ids(self) -> List[str]:
+    @property
+    def ids(self) -> List[str]:
         if not self._instances:
             self.update()
         return list(self._instances.keys())
@@ -44,7 +45,10 @@ class MatchingManifest(Manifest):
 
     def update(self) -> None:
         """Matches video and annotation files and creates dataset instances."""
-        for video in self._video_registry.get_file_paths():
-            annotations_path = self._matcher.match(video, list(self._annotations_registry.get_file_paths()))
+        video_files = self._video_registry.get_file_paths()
+        annotations_files = self._annotations_registry.get_file_paths()
+        for video in video_files:
+            annotations_path = self._matcher.match(video, list(annotations_files))
             if annotations_path:
-                self._instances[self._identifier.identify(video, annotations_path)] = DatasetInstance(video, annotations_path)
+                self._instances[self._identifier.identify(video, annotations_path)] = DatasetInstance(video,
+                                                                                                      annotations_path)
