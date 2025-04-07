@@ -15,7 +15,6 @@ from src.data.parsing.factories.FileBaseNameParserFactory import FileBaseNamePar
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
-from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
@@ -112,7 +111,7 @@ def source_parser_factory():
 @pytest.fixture
 def aggregated_streamer_factory(streamer_pair_factory, virtual_dataset, source_parser_factory):
     """Fixture to provide an AggregatedStreamerFactory instance."""
-    return AggregatedStreamerFactory(
+    return OldAggregatedStreamerFactory(
         streamer_pair_factory=streamer_pair_factory,
         callback=virtual_dataset.feed,
         source_parser_factory=source_parser_factory

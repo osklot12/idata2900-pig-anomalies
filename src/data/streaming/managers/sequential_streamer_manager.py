@@ -1,8 +1,10 @@
 import threading
+import traceback
 from typing import TypeVar, Generic
 
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.streams.sequential_stream import SequentialStream
-from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
+from src.data.streaming.factories.streamer_factory import StreamerFactory
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.streamer import Streamer
 
@@ -12,12 +14,13 @@ T = TypeVar("T")
 class SequentialStreamerManager(Generic[T], ConcurrentStreamerManager):
     """A streamer manager for directing streamers to a SequentialStream."""
 
-    def __init__(self, streamer_factory: AggregatedStreamerFactory, stream: SequentialStream, max_streamers: int = 10):
+    def __init__(self, streamer_factory: StreamerFactory[StreamedAnnotatedFrame], stream: SequentialStream,
+                 max_streamers: int = 10):
         """
         Initializes a RoutingStreamerManager instance.
 
         Args:
-            streamer_factory (AggregatedStreamerFactory): the factory for creating aggregated streamers
+            streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
             stream (SequentialStream): the sequential streams to feed
             max_streamers (int): the maximum number of concurrent streamers
         """
@@ -30,17 +33,23 @@ class SequentialStreamerManager(Generic[T], ConcurrentStreamerManager):
     def _worker_loop(self) -> None:
         """Worker thread function."""
         print(f"[SequentialStreamerManager] Ran worker")
-        while self._running:
+        stream_open = True
+        while self._running and stream_open:
             try:
                 feedable = self._stream.open_feedable_stream(timeout=0.1)
-                streamer = self._streamer_factory.create_streamer(feedable)
-                if streamer:
-                    print(f"[SequentialStreamerManager] Launched streamer...")
-                    self._launch_streamer(streamer)
+                if feedable:
+                    streamer = self._streamer_factory.create_streamer(feedable)
+                    if streamer:
+                        print(f"[SequentialStreamerManager] Launched streamer...")
+                        self._launch_streamer(streamer)
+                    else:
+                        print(f"[SequentialStreamerManager] End of stream")
+                        feedable.feed(None)
+                        self._stream.close()
                 else:
-                    self._stream.close()
-            except RuntimeError:
-                pass
+                    stream_open = False
+            except Exception as e:
+                traceback.print_exc()
 
     def _setup(self) -> None:
         print(f"[SequentialStreamerManager] Setting up...")

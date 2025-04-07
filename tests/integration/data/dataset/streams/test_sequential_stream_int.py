@@ -1,6 +1,7 @@
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
@@ -83,7 +84,7 @@ def streamer_pair_factory(instance_provider, entity_factory):
     return FileStreamerPairFactory(
         instance_provider=instance_provider,
         entity_factory=entity_factory,
-        frame_resizer_factory=StaticFrameResizerFactory((1920, 1080)),
+        frame_resizer_factory=StaticFrameResizerFactory((300, 300)),
         bbox_normalizer_factory=SimpleBBoxNormalizerFactory((0, 1))
     )
 
@@ -106,7 +107,9 @@ def test_streaming_test_set(stream, manager):
     manager.run()
 
     instance = stream.read()
-    print(instance)
-
+    while instance:
+        assert isinstance(instance, StreamedAnnotatedFrame)
+        instance = stream.read()
+    print(f"Finished reading!")
     manager.stop()
 

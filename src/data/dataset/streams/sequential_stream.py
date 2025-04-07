@@ -4,6 +4,7 @@ from typing import TypeVar, Generic, Optional
 from src.data.dataset.streams.stream import Stream
 from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.feedables.feedable_queue import FeedableQueue
+from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
 
@@ -23,9 +24,10 @@ class SequentialStream(Generic[T], Stream[T]):
 
         self._current_stream = None
         self._eos = False
+        self._closed = AtomicBool(False)
 
     def read(self) -> Optional[T]:
-        print(f"[SequentialStreamerManager] Reading...")
+        print(f"[SequentialStream] Reading...")
         result = None
 
         if not self._eos:
@@ -33,30 +35,42 @@ class SequentialStream(Generic[T], Stream[T]):
                 self._current_stream = self._queue_stream.get()
 
             while self._current_stream and result is None:
+                print(f"[SequentialStream] Fetching next instance")
                 instance = self._current_stream.get()
-                if not instance is None:
+                if instance:
+                    print(f"[SequentialStream] Got instance")
                     result = instance
+
                 else:
                     self._current_stream = self._queue_stream.get()
+                    print(f"[SequentialStream] Fetching next stream")
                     if self._current_stream is None:
+                        print("[SequentialStream] End of stream")
                         self._eos = True
 
         return result
 
-    def open_feedable_stream(self, timeout: float = None) -> Feedable[T]:
+    def open_feedable_stream(self, timeout: float = None) -> Optional[Feedable[T]]:
         """
         Returns the next input to streams to.
 
         Returns:
-            Feedable[T]: the next input
+            Optional[Feedable[T]]: the opened feedable stream, or None if stream is closed
 
         Raises:
             queue.Full: raised when the internal queue is full after the timeout period
         """
-        q = queue.Queue()
-        self._queue_stream.put(q, timeout=timeout)
-        return FeedableQueue[T](q)
+        feedable = None
+
+        if not self._closed:
+            q = queue.Queue()
+            self._queue_stream.put(q, timeout=timeout)
+            feedable = FeedableQueue[T](q)
+
+        return feedable
 
     def close(self) -> None:
         """Closes the streams."""
-        self._queue_stream.put(None)
+        if not self._closed:
+            self._queue_stream.put(None)
+            self._closed.set(True)

@@ -29,4 +29,6 @@ class ManifestInstanceProvider(InstanceProvider):
             if instance is None:
                 raise RuntimeError(f"Manifest does not have an instance for id {id_}")
 
+        if instance is None:
+            print(f"[ManifestInstanceProvider] End of stream")
         return instance

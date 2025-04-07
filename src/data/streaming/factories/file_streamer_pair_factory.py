@@ -42,7 +42,7 @@ class FileStreamerPairFactory(StreamerPairFactory):
         streamer_pair = None
 
         instance = self._instance_provider.next()
-        if instance is not None:
+        if instance:
             video = self._entity_factory.create_video_file(instance.video_file)
             annotations = self._entity_factory.create_video_annotations(instance.annotation_file)
             if video and annotations:
@@ -51,4 +51,6 @@ class FileStreamerPairFactory(StreamerPairFactory):
                                                                self._bbox_normalizer_factory.create_bbox_normalizer())
                 streamer_pair = (video_streamer, annotation_streamer)
 
+        if streamer_pair is None:
+            print(f"[FileStreamerPairFactory] End of stream")
         return streamer_pair
