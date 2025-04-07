@@ -18,7 +18,7 @@ def dataset_instance():
 def instance_provider(dataset_instance):
     """Fixture to provide a mock DatasetInstanceProvider instance."""
     provider = Mock()
-    provider.get_dataset_instance.return_value = dataset_instance
+    provider.next.return_value = dataset_instance
     return provider
 
 
@@ -62,11 +62,11 @@ def streamer_pair_factory(instance_provider, entity_factory, frame_resizer_facto
 def test_create_streamer_pair_success(streamer_pair_factory):
     """Tests that calling create_streamer_pair() successfully creates a pair of video and annotation streamers."""
     # arrange
-    frame_cb = Mock()
-    anno_cb = Mock()
+    frame_consumer = Mock()
+    annotations_consumer = Mock()
 
     # act
-    streamers = streamer_pair_factory.create_streamer_pair(frame_cb, anno_cb)
+    streamers = streamer_pair_factory.create_streamer_pair(frame_consumer, annotations_consumer)
 
     # assert
     assert streamers is not None
@@ -80,7 +80,7 @@ def test_create_streamer_pair_no_instance(entity_factory, frame_resizer_factory,
     """Tests that calling create_streamer_pair() returns None when no available instance is provided."""
     # arrange
     empty_provider = Mock()
-    empty_provider.get_dataset_instance.return_value = None
+    empty_provider.next.return_value = None
     factory = FileStreamerPairFactory(
         instance_provider=empty_provider,
         entity_factory=entity_factory,
