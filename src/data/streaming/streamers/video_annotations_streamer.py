@@ -1,9 +1,8 @@
 import queue
-from typing import Optional, Callable
+from typing import Optional
 
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.entities.video_annotations import VideoAnnotations
-from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer

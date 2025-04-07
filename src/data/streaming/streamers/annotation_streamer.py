@@ -27,7 +27,6 @@ class AnnotationStreamer(ConcurrentStreamer):
 
     def _stream(self) -> StreamerStatus:
         result = StreamerStatus.COMPLETED
-
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
             normalized_annotation = self._normalize_frame_annotations(annotation)
@@ -54,8 +53,7 @@ class AnnotationStreamer(ConcurrentStreamer):
             annotations = FrameAnnotations(
                 source=annotations.source,
                 index=annotations.index,
-                annotations=normalized_bboxes,
-                end_of_stream=annotations.end_of_stream,
+                annotations=normalized_bboxes
             )
 
         return annotations
