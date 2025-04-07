@@ -1,10 +1,9 @@
-from typing import Callable, Tuple, Optional
+from typing import Tuple, Optional
 
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.factories.dataset_entity_factory import DatasetEntityFactory
 from src.data.dataset.providers.instance_provider import InstanceProvider
-from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_factory import FrameResizerFactory
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy

@@ -6,7 +6,6 @@ from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
-from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
