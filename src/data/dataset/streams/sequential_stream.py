@@ -25,6 +25,7 @@ class SequentialStream(Generic[T], Stream[T]):
         self._eos = False
 
     def read(self) -> Optional[T]:
+        print(f"[SequentialStreamerManager] Reading...")
         result = None
 
         if not self._eos:

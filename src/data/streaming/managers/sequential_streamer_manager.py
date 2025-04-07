@@ -27,13 +27,15 @@ class SequentialStreamerManager(Generic[T], ConcurrentStreamerManager):
 
         self._worker = None
 
-    def _worker(self) -> None:
+    def _worker_loop(self) -> None:
         """Worker thread function."""
+        print(f"[SequentialStreamerManager] Ran worker")
         while self._running:
             try:
                 feedable = self._stream.open_feedable_stream(timeout=0.1)
                 streamer = self._streamer_factory.create_streamer(feedable)
                 if streamer:
+                    print(f"[SequentialStreamerManager] Launched streamer...")
                     self._launch_streamer(streamer)
                 else:
                     self._stream.close()
@@ -41,7 +43,8 @@ class SequentialStreamerManager(Generic[T], ConcurrentStreamerManager):
                 pass
 
     def _setup(self) -> None:
-        self._worker = threading.Thread(target=self._worker)
+        print(f"[SequentialStreamerManager] Setting up...")
+        self._worker = threading.Thread(target=self._worker_loop)
         self._worker.start()
 
     def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:

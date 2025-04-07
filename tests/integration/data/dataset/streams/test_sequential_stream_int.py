@@ -1,6 +1,7 @@
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
+from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
@@ -10,9 +11,11 @@ from src.data.dataset.streams.sequential_stream import SequentialStream
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
+from src.data.parsing.base_name_parser import BaseNameParser
+from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
+from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
-from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
 from src.data.streaming.managers.sequential_streamer_manager import SequentialStreamerManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
@@ -70,18 +73,40 @@ def stream():
     return SequentialStream()
 
 @pytest.fixture
-def streamer_pair_factory():
+def entity_factory(loader_factory):
+    """Fixture to provide a EntityFactory instance."""
+    return LazyEntityFactory(loader_factory, BaseNameParser())
+
+@pytest.fixture
+def streamer_pair_factory(instance_provider, entity_factory):
     """Fixture to provide a StreamerPairFactory instance."""
     return FileStreamerPairFactory(
-
+        instance_provider=instance_provider,
+        entity_factory=entity_factory,
+        frame_resizer_factory=StaticFrameResizerFactory((1920, 1080)),
+        bbox_normalizer_factory=SimpleBBoxNormalizerFactory((0, 1))
     )
 
 @pytest.fixture
-def streamer_factory():
+def streamer_factory(streamer_pair_factory):
     """Fixture to provide an AggregatedStreamerFactory instance."""
-    return AggregatedStreamerFactory()
+    return AggregatedStreamerFactory(streamer_pair_factory)
 
 @pytest.fixture
-def manager():
+def manager(streamer_factory, stream):
     """Fixture to provide a SequentialStreamerManager instance."""
-    return SequentialStreamerManager()
+    return SequentialStreamerManager(
+        streamer_factory=streamer_factory,
+        stream=stream
+    )
+
+def test_streaming_test_set(stream, manager):
+    """Tests that the test set stream gives instances deterministically."""
+    # arrange
+    manager.run()
+
+    instance = stream.read()
+    print(instance)
+
+    manager.stop()
+
