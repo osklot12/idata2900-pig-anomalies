@@ -37,8 +37,8 @@ def test_list_files_success(mock_make_request, gcs_file_manager):
     mock_make_request.assert_called_once_with(
         f"https://www.googleapis.com/storage/v1/b/{gcs_file_manager._bucket_name}/o"
     )
-    assert isinstance(result, set)
-    assert result == {"video_1.mp4", "video_2.mp4", "annotation_1.json"}
+    assert isinstance(result, list)
+    assert result == ["video_1.mp4", "video_2.mp4", "annotation_1.json"]
 
 
 @pytest.mark.unit
@@ -55,8 +55,8 @@ def test_list_files_empty_bucket(mock_make_request, gcs_file_manager):
 
     # assert
     mock_make_request.assert_called_once()
-    assert isinstance(result, set)
-    assert result == set()
+    assert isinstance(result, list)
+    assert result == []
 
 
 @pytest.mark.unit
