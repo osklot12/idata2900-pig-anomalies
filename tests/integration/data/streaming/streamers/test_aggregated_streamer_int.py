@@ -60,7 +60,7 @@ def annotation_matcher():
 def instance_provider(loader_factory, video_selector, annotation_matcher):
     """Fixture to provide a DatasetInstanceProvider instance."""
     return SimpleDatasetInstanceProvider(
-        source=loader_factory.create_dataset_source(),
+        source=loader_factory.create_file_registry(),
         video_selector=video_selector,
         annotation_matcher=annotation_matcher,
     )

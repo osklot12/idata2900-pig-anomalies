@@ -35,7 +35,7 @@ class AnnotationStreamer(ConcurrentStreamer):
 
             annotation = self._get_next_annotation()
 
-        # indicating end of stream
+        # indicating end of streams
         self._consumer.feed(None)
 
         if annotation and self._is_requested_to_stop():

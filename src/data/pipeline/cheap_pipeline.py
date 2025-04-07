@@ -47,7 +47,7 @@ class CheapPipeline(BatchProvider):
 
         # streamer factory setup
         instance_provider = SimpleDatasetInstanceProvider(
-            source=self._loader_factory.create_dataset_source(),
+            source=self._loader_factory.create_file_registry(),
             video_selector=RandomStringSelector(["mp4"]),
             annotation_matcher=BaseNameMatcher(["json"])
         )

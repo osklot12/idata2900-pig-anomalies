@@ -1,6 +1,5 @@
-import queue
 import threading
-from typing import TypeVar, Generic, Optional
+from typing import TypeVar, Generic
 
 from src.data.dataset.streams.sequential_stream import SequentialStream
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
@@ -19,7 +18,7 @@ class SequentialStreamerManager(Generic[T], ConcurrentStreamerManager):
 
         Args:
             streamer_factory (AggregatedStreamerFactory): the factory for creating aggregated streamers
-            stream (SequentialStream): the sequential stream to feed
+            stream (SequentialStream): the sequential streams to feed
             max_streamers (int): the maximum number of concurrent streamers
         """
         super().__init__(max_streamers)

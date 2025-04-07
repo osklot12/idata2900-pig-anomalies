@@ -9,7 +9,7 @@ T = TypeVar("T")
 
 
 class SequentialStream(Generic[T], Stream[T]):
-    """Sequential stream of data, where input streams are ordered sequentially."""
+    """Sequential streams of data, where input streams are ordered sequentially."""
 
     def __init__(self, buffer_size: int = 3):
         """
@@ -44,7 +44,7 @@ class SequentialStream(Generic[T], Stream[T]):
 
     def open_feedable_stream(self, timeout: float = None) -> Feedable[T]:
         """
-        Returns the next input to stream to.
+        Returns the next input to streams to.
 
         Returns:
             Feedable[T]: the next input
@@ -57,5 +57,5 @@ class SequentialStream(Generic[T], Stream[T]):
         return FeedableQueue[T](q)
 
     def close(self) -> None:
-        """Closes the stream."""
+        """Closes the streams."""
         self._queue_stream.put(None)

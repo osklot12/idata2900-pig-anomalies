@@ -35,5 +35,5 @@ class GCSLoaderFactory(LoaderFactory):
             decoder=self._decoder_factory.create_decoder()
         )
 
-    def create_dataset_source(self) -> FileRegistry:
+    def create_file_registry(self) -> FileRegistry:
         return GCSFileRegistry(self._bucket_name, self._auth_factory.create_auth_service())
