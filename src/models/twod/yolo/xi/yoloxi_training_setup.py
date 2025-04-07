@@ -65,11 +65,10 @@ class TrainingSetup:
         def variable_length_collate(batch):
             return {
                 "img": torch.stack([item["img"] for item in batch], dim=0),
-                "instances": {
-                    "bboxes": torch.cat([item["instances"]["bboxes"] for item in batch], dim=0),
-                    "cls": torch.cat([item["instances"]["cls"] for item in batch], dim=0),
-                },
+                "cls": torch.cat([item["instances"]["cls"] for item in batch], dim=0),
+                "bboxes": torch.cat([item["instances"]["bboxes"] for item in batch], dim=0),
                 "batch_idx": torch.cat([item["batch_idx"] for item in batch], dim=0),
+                "ori_shape": [item["ori_shape"] for item in batch],  # ✅ keep as list for indexing
             }
 
         # Step 4: Patch dataloader logic
@@ -88,6 +87,17 @@ class TrainingSetup:
         def skip_plot_labels(self):
             print("⚠️ Skipping plot_training_labels() — in-memory dataset has no .labels.")
         trainer.plot_training_labels = skip_plot_labels.__get__(trainer)
+
+        def patched_plot_training_samples(self, batch, ni):
+            print("⚠️ Skipping plot_training_samples() — missing im_file in in-memory batches.")
+            # Return valid dummy values to avoid unpack errors
+            im = batch["img"]
+            cls = batch["cls"].view(-1, 1).float()
+            bboxes = batch["bboxes"].float()
+            targets = torch.cat([cls, bboxes], dim=1)
+            return im, targets
+
+        trainer.plot_training_samples = patched_plot_training_samples.__get__(trainer)
 
         # Step 6: Logging
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
