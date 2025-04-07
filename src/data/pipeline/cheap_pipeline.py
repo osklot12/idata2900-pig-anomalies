@@ -17,7 +17,7 @@ from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.providers.batch_provider import BatchProvider
-from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
+from src.data.streaming.factories.old_aggregated_streamer_factory import OldAggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.dynamic_streamer_manager import DynamicStreamerManager
 from src.schemas.aggregators.pressure_to_metric import PressureToMetric
@@ -76,7 +76,7 @@ class CheapPipeline(BatchProvider):
         self._dashboard = RichDashboard()
         pressure_broker.subscribe(PressureToMetric(Sign(self._dashboard, SimpleSchemaSigner("vdataset"))))
 
-        self._aggregated_streamer_factory = AggregatedStreamerFactory(
+        self._aggregated_streamer_factory = OldAggregatedStreamerFactory(
             streamer_pair_factory=streamer_pair_provider,
             callback=self._virtual_dataset.feed,
             source_parser_factory=FileBaseNameParserFactory()

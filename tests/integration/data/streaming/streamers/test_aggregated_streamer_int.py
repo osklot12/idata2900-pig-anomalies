@@ -14,7 +14,6 @@ from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
-from src.data.streaming.streamers.aggregated_streamer import AggregatedStreamer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 

@@ -1,16 +1,20 @@
+from enum import Enum
 from typing import Tuple
 
 import cv2
+import numpy as np
+from matplotlib import pyplot as plt
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.bbox import BBox
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 
 
-class AnnotatedFrameVisualizer:
+class StreamedAnnotatedFrameVisualizer:
     """Visualizer for AnnotatedFrame instances."""
 
     @staticmethod
-    def visualize(instance: AnnotatedFrame) -> None:
+    def visualize(instance: StreamedAnnotatedFrame) -> None:
         """
         Visualizes an AnnotatedFrame instance.
 
@@ -18,14 +22,21 @@ class AnnotatedFrameVisualizer:
             instance (AnnotatedFrame): the annotated frame to visualize
         """
         for annotation in instance.annotations:
-            AnnotatedFrameVisualizer._draw_bbox(
-                annotation.cls, *AnnotatedFrameVisualizer._get_absolute_coordinates(
-                    annotation.bbox, instance.
-                )
+            x_min, y_min, x_max, y_max = StreamedAnnotatedFrameVisualizer._get_absolute_coordinates(
+                annotation.bbox, instance.frame.shape[1], instance.frame.shape[0]
             )
+            StreamedAnnotatedFrameVisualizer._draw_bbox(instance.frame, annotation.cls, x_min, y_min, x_max, y_max)
+
+        StreamedAnnotatedFrameVisualizer._show_plot(
+            frame=instance.frame,
+            frame_index=instance.index,
+            source=instance.source.source_id,
+            annotated=len(instance.annotations) > 0
+        )
 
     @staticmethod
     def _get_absolute_coordinates(bbox: BBox, frame_width: int, frame_height: int) -> Tuple[int, int, int, int]:
+        """Computes the absolute coordinates for a normalized bounding box based on original width and height."""
         x = bbox.x
         y = bbox.y
         w = bbox.width
@@ -39,7 +50,8 @@ class AnnotatedFrameVisualizer:
         return x_min, y_min, x_max, y_max
 
     @staticmethod
-    def _draw_bbox(behavior, frame, x_max, x_min, y_max, y_min):
+    def _draw_bbox(frame: np.ndarray, behavior: Enum, x_min: int, y_min: int, x_max: int, y_max: int) -> None:
+        """Draws a bounding box."""
         cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
         cv2.putText(
             frame, behavior.name.replace("_", " "), (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
@@ -47,9 +59,16 @@ class AnnotatedFrameVisualizer:
         )
 
     @staticmethod
-    def _show_plot(frame, frame_index):
+    def _show_plot(frame: np.ndarray, frame_index: int, source: str, annotated: bool) -> None:
+        """Displays the plot."""
         plt.figure(figsize=(6, 6))
         plt.imshow(frame)
-        plt.title(f"Frame {frame_index}")
+
+        if annotated:
+            title = f"{source} ({frame_index}) [Annotated]"
+        else:
+            title = f"{source} ({frame_index})"
+        plt.title(title)
+
         plt.axis("off")
         plt.show()
