@@ -174,8 +174,7 @@ class DarwinDecoder(AnnotationDecoder):
             FrameAnnotations(
                 source=source,
                 index=frame_index,
-                annotations=data.get(frame_index, []),
-                end_of_stream=False
+                annotations=data.get(frame_index, [])
             )
             for frame_index in range(frame_count)
         ]

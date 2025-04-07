@@ -19,19 +19,19 @@ def streamer_pair_factory():
 
 
 @pytest.fixture
-def callback():
-    """Fixture to provide a mock callback."""
+def consumer():
+    """Fixture to provide a mock Feedable instance."""
     return Mock()
 
 
 @pytest.mark.unit
-def test_aggregated_streamer_factory_returns_aggregated_streamer(streamer_pair_factory, callback):
-    """Tests that get_next_streamer() returns an AggregatedStreamer instance."""
+def test_aggregated_streamer_factory_returns_aggregated_streamer(streamer_pair_factory, consumer):
+    """Tests that create_streamer() returns an AggregatedStreamer instance."""
     # arrange
-    factory = AggregatedStreamerFactory(streamer_pair_factory, callback)
+    factory = AggregatedStreamerFactory(streamer_pair_factory)
 
     # act
-    streamer = factory.create_streamer()
+    streamer = factory.create_streamer(consumer)
 
     # assert
     assert isinstance(streamer, AggregatedStreamer)
