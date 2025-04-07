@@ -5,7 +5,7 @@ from src.data.streaming.feedables.feedable import Feedable
 T = TypeVar("T")
 
 
-class FeedableFunc(Generic[T], Feedable[Callable[[T], None]]):
+class FeedableFunc(Generic[T], Feedable[T]):
     """Feedable adapter for callback functions."""
 
     def __init__(self, callback: Callable[[T], None]):
