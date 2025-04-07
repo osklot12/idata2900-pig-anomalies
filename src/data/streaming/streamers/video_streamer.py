@@ -33,6 +33,7 @@ class VideoStreamer(ConcurrentStreamer):
                 frame_data = self._resize_strategy.resize_frame(frame.data)
                 frame = Frame(frame.source, frame.index, frame_data)
 
+            print(f"[VideoStreamer] Streaming frame {frame.index} for {frame.source.source_id}")
             self._consumer.feed(frame)
             frame = self._get_next_frame()
 

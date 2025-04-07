@@ -26,9 +26,11 @@ class GCSLoaderFactory(LoaderFactory):
         self._decoder_factory = decoder_factory
 
     def create_video_loader(self) -> VideoFileLoader:
+        print(f"[GCSLoaderFactory] Created video loader")
         return GCSVideoLoader(self._bucket_name, self._auth_factory.create_auth_service())
 
     def create_annotation_loader(self) -> VideoAnnotationsLoader:
+        print(f"[GCSLoaderFactory] Created annotation loader")
         return GCSAnnotationLoader(
             bucket_name=self._bucket_name,
             auth_service=self._auth_factory.create_auth_service(),
@@ -36,4 +38,5 @@ class GCSLoaderFactory(LoaderFactory):
         )
 
     def create_file_registry(self) -> FileRegistry:
+        print(f"[GCSLoaderFactory] Created file registry")
         return GCSFileRegistry(self._bucket_name, self._auth_factory.create_auth_service())

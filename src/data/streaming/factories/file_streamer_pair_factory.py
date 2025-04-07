@@ -38,6 +38,7 @@ class FileStreamerPairFactory(StreamerPairFactory):
     def create_streamer_pair(self, frame_consumer: Feedable[Frame], annotations_consumer: Feedable[FrameAnnotations]
                              ) -> Optional[Tuple[
         VideoStreamer, AnnotationStreamer]]:
+        print(f"[FileStreamerPairFactory] Requested to create streamer pair")
         streamer_pair = None
 
         instance = self._instance_provider.next()
