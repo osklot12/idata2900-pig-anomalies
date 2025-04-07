@@ -44,7 +44,7 @@ class VideoFileStreamer(VideoStreamer):
             np_data = np_data.reshape((height, width, channels))
 
             source_meta = SourceMetadata(self._video.get_instance_id(), (width, height))
-            frame = Frame(source_meta, self._frame_index, np_data, False)
+            frame = Frame(source_meta, self._frame_index, np_data)
 
             self._frame_index += 1
 

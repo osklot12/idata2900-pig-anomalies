@@ -1,11 +1,12 @@
 from typing import Callable, Optional, TypeVar
 
+from src.data.dataclasses.frame import Frame
+from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.loading.feed_status import FeedStatus
-from src.data.parsing.string_parser import StringParser
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
 from src.data.streaming.feedables.feedable import Feedable
+from src.data.streaming.feedables.feedable_func import FeedableFunc
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
@@ -25,8 +26,8 @@ class AggregatedStreamer(Streamer):
         """
         self._aggregator = BufferedAggregator(consumer)
         streamer_pair = streamer_factory.create_streamer_pair(
-            self._aggregator.feed_frame,
-            self._aggregator.feed_annotations
+            FeedableFunc[Frame](self._aggregator.feed_frame),
+            FeedableFunc[FrameAnnotations](self._aggregator.feed_annotations)
         )
 
         if streamer_pair is None:
@@ -35,6 +36,7 @@ class AggregatedStreamer(Streamer):
         self._ensemble_streamer = EnsembleStreamer(*streamer_pair)
 
     def start_streaming(self) -> None:
+        print(f"[AggregatedStreamer] Started streaming...")
         self._ensemble_streamer.start_streaming()
 
     def stop_streaming(self) -> None:
