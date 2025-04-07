@@ -54,7 +54,7 @@ def loader_factory(auth_factory, decoder_factory):
 def instance_provider(loader_factory):
     """Fixture to provide a DatasetInstanceProvider instance."""
     return SimpleDatasetInstanceProvider(
-        source=loader_factory.create_dataset_source(),
+        source=loader_factory.create_file_registry(),
         video_selector=RandomStringSelector(["mp4"]),
         annotation_matcher=BaseNameMatcher(["json"])
     )

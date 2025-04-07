@@ -7,14 +7,14 @@ from src.data.dataset.selectors.string_selector import StringSelector
 class DetermStringSelector(StringSelector):
     """Selects strings in a particular order deterministically, returning each string only once."""
 
-    def __init__(self, files: List[str], seed: int = 42):
+    def __init__(self, strings: List[str], seed: int = 42):
         """
         Initializes a DetermStringSelector instance.
 
         Args:
-            files (List[str]): the list of strings to select from
+            strings (List[str]): the list of strings to select from
         """
-        self._all_files = list(files)
+        self._all_files = list(strings)
         self._seed = seed
         self._index = 0
         self._shuffled_files = self._shuffle_files()

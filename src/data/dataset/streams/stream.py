@@ -10,7 +10,7 @@ class Stream(Generic[T], ABC):
     @abstractmethod
     def read(self) -> Optional[T]:
         """
-        Returns the next item in the stream, blocking if no such item is available.
+        Returns the next item in the streams, blocking if no such item is available.
 
         Returns:
             T: the item, or None if end of streams is reached

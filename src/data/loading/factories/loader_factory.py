@@ -29,11 +29,11 @@ class LoaderFactory(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_dataset_source(self) -> FileRegistry:
+    def create_file_registry(self) -> FileRegistry:
         """
-        Creates a dataset source instance.
+        Creates a dataset file registry.
 
         Returns:
-            FileRegistry: the dataset source instance
+            FileRegistry: the file registry instance
         """
         raise NotImplementedError

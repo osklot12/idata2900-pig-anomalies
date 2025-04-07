@@ -47,7 +47,7 @@ def test_input_data_is_read_sequentially(data1, data2):
 
 @pytest.mark.unit
 def test_close_closes_stream(data1):
-    """Tests that calling close closes the stream."""
+    """Tests that calling close closes the streams."""
     # arrange
     stream = SequentialStream[str]()
 

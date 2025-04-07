@@ -56,7 +56,7 @@ def test_create_annotation_loader(gcs_loader_factory, bucket_name):
 def test_create_dataset_source(gcs_loader_factory, bucket_name):
     """Tests that create_dataset_source() correctly instantiates GCSDatasetSource."""
     # act
-    dataset_source = gcs_loader_factory.create_dataset_source()
+    dataset_source = gcs_loader_factory.create_file_registry()
 
     # assert
     assert isinstance(dataset_source, GCSFileRegistry)

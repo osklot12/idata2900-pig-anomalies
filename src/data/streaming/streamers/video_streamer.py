@@ -36,7 +36,7 @@ class VideoStreamer(ConcurrentStreamer):
             self._consumer.feed(frame)
             frame = self._get_next_frame()
 
-        # indicating end of stream
+        # indicating end of streams
         self._consumer.feed(None)
 
         if frame and self._is_requested_to_stop():

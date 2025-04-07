@@ -139,7 +139,7 @@ def _get_streamer_pair_factory(instance_provider, loader_factory):
 
 def _get_instance_provider(loader_factory):
     instance_provider = SimpleDatasetInstanceProvider(
-        source=loader_factory.create_dataset_source(),
+        source=loader_factory.create_file_registry(),
         video_selector=RandomStringSelector(["mp4"]),
         annotation_matcher=BaseNameMatcher(["json"])
     )
