@@ -31,7 +31,7 @@ class VideoStreamer(ConcurrentStreamer):
         while frame is not None and not self._is_requested_to_stop():
             if self._resize_strategy:
                 frame_data = self._resize_strategy.resize_frame(frame.data)
-                frame = Frame(frame.source, frame.index, frame_data, frame.end_of_stream)
+                frame = Frame(frame.source, frame.index, frame_data)
 
             self._consumer.feed(frame)
             frame = self._get_next_frame()
