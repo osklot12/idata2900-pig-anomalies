@@ -3,7 +3,6 @@ import pytest
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
-from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.frame_dataset import FrameDataset
