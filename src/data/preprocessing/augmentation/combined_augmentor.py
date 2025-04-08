@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-from src.data.preprocessing.augmentation.annotation_augmentor import AnnotationAugmentor
+from src.data.preprocessing.augmentation._annotation_augmentor import AnnotationAugmentor
 from src.data.preprocessing.augmentation.augmentor_interface import AugmentorBase
 from src.data.preprocessing.augmentation.image_augmentor import ImageAugmentor
 
