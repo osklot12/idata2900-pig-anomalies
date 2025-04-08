@@ -1,14 +1,14 @@
 import pytest
 import time
 
-from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
+from src.data.streaming.managers.old_docking_streamer_manager import OldDockingStreamerManager
 from tests.utils.dummies.dummy_streamer_provider import DummyStreamerProvider
 
 
 @pytest.fixture
 def manager():
     """Fixture to provide a DockingStreamerManager instance."""
-    return DockingStreamerManager(DummyStreamerProvider(), 4)
+    return OldDockingStreamerManager(DummyStreamerProvider(), 4)
 
 
 @pytest.mark.unit
@@ -19,7 +19,7 @@ def test_initialization_with_valid_arguments():
     provider = DummyStreamerProvider()
 
     # act
-    manager = DockingStreamerManager(provider, n_streamers)
+    manager = OldDockingStreamerManager(provider, n_streamers)
 
     # assert
     assert manager._streamer_provider == provider
@@ -36,7 +36,7 @@ def test_initialization_with_invalid_n_streamers():
 
     # act
     with pytest.raises(ValueError) as exc_info:
-        DockingStreamerManager(provider, n_streamers)
+        OldDockingStreamerManager(provider, n_streamers)
 
     # assert
     assert str(exc_info.value) == "n_streamers must be greater than 0"
@@ -59,7 +59,7 @@ def test_streamers_are_replaced_after_completion(manager):
     """Tests that streamers are replaced after the complete."""
     # arrange
     provider = DummyStreamerProvider(n_streamers=5, streamer_wait_time=.1)
-    manager = DockingStreamerManager(provider, 2)
+    manager = OldDockingStreamerManager(provider, 2)
 
     # act
     manager.run()
@@ -76,7 +76,7 @@ def test_no_more_streamers_should_be_handled_correctly():
     """Tests that running of out streamers in StreamerProvider is handled gracefully."""
     # arrange
     provider = DummyStreamerProvider(n_streamers=5, streamer_wait_time=.1)
-    manager = DockingStreamerManager(provider, 4)
+    manager = OldDockingStreamerManager(provider, 4)
 
     # act
     manager.run()
@@ -93,7 +93,7 @@ def test_stop_should_prevent_new_streamers():
     """Tests that stopping the manager prevents new streamers from starting."""
     # arrange
     provider = DummyStreamerProvider(n_streamers=10, streamer_wait_time=.2)
-    manager = DockingStreamerManager(provider, 3)
+    manager = OldDockingStreamerManager(provider, 3)
 
     # act
     manager.run()

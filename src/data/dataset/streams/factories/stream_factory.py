@@ -9,31 +9,11 @@ class StreamFactory(Generic[T], ABC):
     """Interface for streams factories."""
 
     @abstractmethod
-    def create_training_stream(self) -> Stream[T]:
+    def create__stream(self) -> Stream[T]:
         """
-        Creates a data streams for the training set.
+        Creates a data stream.
 
         Returns:
-            Stream: the training set data streams
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_validation_stream(self) -> Stream[T]:
-        """
-        Creates a data streams for the validation set.
-
-        Returns:
-            Stream: the validation set data streams
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_test_stream(self) -> Stream[T]:
-        """
-        Creates a data streams for the test set.
-
-        Returns:
-            Stream: the test set data streams
+            Stream: the created data stream
         """
         raise NotImplementedError

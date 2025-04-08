@@ -8,7 +8,7 @@ from src.data.dataset.providers.manifest_instance_provider import ManifestInstan
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
 from src.data.dataset.splitters.determ_splitter import DetermSplitter
-from src.data.dataset.streams.sequential_stream import SequentialStream
+from src.data.dataset.streams.dock_stream import DockStream
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
@@ -17,9 +17,10 @@ from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_facto
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
-from src.data.streaming.managers.sequential_streamer_manager import SequentialStreamerManager
+from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
+from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
 
 
 @pytest.fixture
@@ -71,7 +72,7 @@ def instance_provider(manifest, splitter):
 @pytest.fixture
 def stream():
     """Fixture to provide a SequentialStream instance."""
-    return SequentialStream()
+    return DockStream()
 
 @pytest.fixture
 def entity_factory(loader_factory):
@@ -96,7 +97,7 @@ def streamer_factory(streamer_pair_factory):
 @pytest.fixture
 def manager(streamer_factory, stream):
     """Fixture to provide a SequentialStreamerManager instance."""
-    return SequentialStreamerManager(
+    return DockingStreamerManager(
         streamer_factory=streamer_factory,
         stream=stream
     )
@@ -110,6 +111,7 @@ def test_streaming_test_set(stream, manager):
     while instance:
         assert isinstance(instance, StreamedAnnotatedFrame)
         instance = stream.read()
+        StreamedAnnotatedFrameVisualizer.visualize(instance)
     print(f"Finished reading!")
     manager.stop()
 
