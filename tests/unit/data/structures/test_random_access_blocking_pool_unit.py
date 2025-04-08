@@ -4,7 +4,7 @@ import threading
 import pytest
 import time
 
-from src.data.structures.random_access_blocking_pool import RandomAccessBlockingPool
+from src.data.structures.rab_pool import RABPool
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def data():
 def test_get_returns_none_when_empty(data):
     """Tests that get() returns None when pool is empty."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=0)
+    pool = RABPool[str](maxsize=1000, min_ready=0)
 
     # act
     instance = pool.get()
@@ -30,7 +30,7 @@ def test_get_returns_none_when_empty(data):
 def test_get_blocks_when_min_ready_is_not_met(data):
     """Tests that the pool blocks on get() if there are not at least min_ready instances in the pool."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1001, min_ready=1001)
+    pool = RABPool[str](maxsize=1001, min_ready=1001)
     for s in data:
         pool.put(s)
     timeout = 0.1
@@ -49,7 +49,7 @@ def test_get_blocks_when_min_ready_is_not_met(data):
 def test_get_does_not_block_when_min_ready_is_met(data):
     """Tests that the pool does not block on get() if there are at least min_ready instances in the pool."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=999)
+    pool = RABPool[str](maxsize=1000, min_ready=999)
     for s in data:
         pool.put(s)
     timeout = 1
@@ -69,7 +69,7 @@ def test_get_does_not_block_when_min_ready_is_met(data):
 def test_put_blocks_on_full_pool(data):
     """Tests that the put() blocks if the pool is full."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=0)
+    pool = RABPool[str](maxsize=1000, min_ready=0)
     for s in data:
         pool.put(s)
     timeout = 0.1
@@ -88,7 +88,7 @@ def test_put_blocks_on_full_pool(data):
 def test_get_removes_instance(data):
     """Tests that get() removes the returned instance from the pool."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=0)
+    pool = RABPool[str](maxsize=1000, min_ready=0)
     for s in data:
         pool.put(s)
     instances = []
@@ -110,7 +110,7 @@ def test_get_returns_random_instance(data):
     """Tests that get() returns random instances in different orders."""
     # arrange
     n_trials = 10
-    pools = [RandomAccessBlockingPool[str](maxsize=1000, min_ready=0) for _ in range(n_trials)]
+    pools = [RABPool[str](maxsize=1000, min_ready=0) for _ in range(n_trials)]
     for pool in pools:
         for s in data:
             pool.put(s)
@@ -132,7 +132,7 @@ def test_get_returns_random_instance(data):
 def test_thread_safety(data):
     """Tests that put() and get() are thread-safe."""
     # arrange
-    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=0)
+    pool = RABPool[str](maxsize=1000, min_ready=0)
     instances = queue.Queue()
 
     def put_worker(start, end):
