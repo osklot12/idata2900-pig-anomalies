@@ -6,9 +6,9 @@ from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
-from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
+from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.splitters.determ_splitter import DetermSplitter
-from src.data.dataset.streams.dock_stream import DockStream
+from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
@@ -17,7 +17,7 @@ from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_facto
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
-from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
+from src.data.streaming.managers.static_streamer_manager import StaticStreamerManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
@@ -66,18 +66,15 @@ def instance_provider(manifest, splitter):
     """Fixture to provide an InstanceProvider instance."""
     return ManifestInstanceProvider(
         manifest=manifest,
-        selector=DetermStringSelector(strings=splitter.splits[2])
+        selector=RandomStringSelector(strings=splitter.splits[0])
     )
 
-@pytest.fixture
-def stream():
-    """Fixture to provide a SequentialStream instance."""
-    return DockStream()
 
 @pytest.fixture
 def entity_factory(loader_factory):
-    """Fixture to provide a EntityFactory instance."""
+    """Fixture to provide an EntityFactory instance."""
     return LazyEntityFactory(loader_factory, BaseNameParser())
+
 
 @pytest.fixture
 def streamer_pair_factory(instance_provider, entity_factory):
@@ -85,33 +82,43 @@ def streamer_pair_factory(instance_provider, entity_factory):
     return FileStreamerPairFactory(
         instance_provider=instance_provider,
         entity_factory=entity_factory,
-        frame_resizer_factory=StaticFrameResizerFactory((300, 300)),
+        frame_resizer_factory=StaticFrameResizerFactory((320, 320)),
         bbox_normalizer_factory=SimpleBBoxNormalizerFactory((0, 1))
     )
+
 
 @pytest.fixture
 def streamer_factory(streamer_pair_factory):
     """Fixture to provide an AggregatedStreamerFactory instance."""
     return AggregatedStreamerFactory(streamer_pair_factory)
 
+
+@pytest.fixture
+def stream():
+    """Fixture to provide a PoolStream instance."""
+    return PoolStream[StreamedAnnotatedFrame]()
+
+
 @pytest.fixture
 def manager(streamer_factory, stream):
-    """Fixture to provide a SequentialStreamerManager instance."""
-    return DockingStreamerManager(
+    """Fixture to provide a StaticStreamerManager instance."""
+    return StaticStreamerManager[StreamedAnnotatedFrame](
         streamer_factory=streamer_factory,
-        stream=stream
+        consumer=stream
     )
 
-def test_streaming_test_set(stream, manager):
-    """Tests that the test set stream gives instances deterministically."""
+def test_streaming_train_set(stream, manager):
+    """Tests that the train set stream gives random training instances."""
     # arrange
     manager.run()
 
+    # act
     instance = stream.read()
-    while instance:
+    i = 0
+    while instance and i < 10000:
         assert isinstance(instance, StreamedAnnotatedFrame)
         instance = stream.read()
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        i += 1
     print(f"Finished reading!")
     manager.stop()
-
