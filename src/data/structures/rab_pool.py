@@ -5,8 +5,8 @@ from typing import TypeVar, Generic, Optional
 
 T = TypeVar("T")
 
-class RandomAccessBlockingPool(Generic[T]):
-    """Thread-safe random access pool with blocking put and get methods."""
+class RABPool(Generic[T]):
+    """Thread-safe random access pool with blocking put and get methods (Random Access Blocking Pool)."""
 
     def __init__(self, maxsize: int = 3000, min_ready: int = 0):
         """
