@@ -1,3 +1,6 @@
+import queue
+import threading
+
 import pytest
 import time
 
@@ -123,3 +126,45 @@ def test_get_returns_random_instance(data):
     # assert
     unique_sequences = set(tuple(seq) for seq in all_sequences)
     assert len(unique_sequences) > 1
+
+
+@pytest.mark.unit
+def test_thread_safety(data):
+    """Tests that put() and get() are thread-safe."""
+    # arrange
+    pool = RandomAccessBlockingPool[str](maxsize=1000, min_ready=0)
+    instances = queue.Queue()
+
+    def put_worker(start, end):
+        for i in range(start, end):
+            pool.put(data[i])
+
+    def get_worker(n):
+        for i in range(n):
+            instances.put(pool.get())
+
+    n_threads = 10
+    put_threads = [
+        threading.Thread(target=put_worker(int((len(data) / n_threads) * i), int((len(data) / n_threads) * (i + 1))))
+        for i in range(n_threads)
+    ]
+    get_threads = [
+        threading.Thread(target=get_worker(int(len(data) / n_threads))) for i in range(n_threads)
+    ]
+
+    # act
+    for t in put_threads:
+        t.start()
+
+    for t in get_threads:
+        t.start()
+
+    for t in put_threads:
+        t.join()
+
+    for t in get_threads:
+        t.join()
+
+    # assert
+    assert instances.qsize() == len(data)
+    assert sorted(list(instances.queue)) == sorted(data)
