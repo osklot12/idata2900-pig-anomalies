@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import pytest
 
-from src.data.dataset.streams.sequential_stream import SequentialStream
+from src.data.dataset.streams.dock_stream import DockStream
 
 
 @pytest.fixture
@@ -26,14 +26,14 @@ def data2():
 def test_input_data_is_read_sequentially(data1, data2):
     """Tests that the input data is read sequentially in the expected order."""
     # arrange
-    stream = SequentialStream[str]()
+    stream = DockStream[str]()
 
     # act
-    feedable1 = stream.open_feedable_stream()
+    feedable1 = stream.dock()
     for s in data1:
         feedable1.feed(s)
 
-    feedable2 = stream.open_feedable_stream()
+    feedable2 = stream.dock()
     for s in data2:
         feedable2.feed(s)
 
@@ -49,9 +49,9 @@ def test_input_data_is_read_sequentially(data1, data2):
 def test_close_closes_stream(data1):
     """Tests that calling close closes the streams."""
     # arrange
-    stream = SequentialStream[str]()
+    stream = DockStream[str]()
 
-    feedable = stream.open_feedable_stream()
+    feedable = stream.dock()
     for s in data1:
         feedable.feed(s)
 
