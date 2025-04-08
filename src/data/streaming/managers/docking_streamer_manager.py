@@ -14,7 +14,7 @@ T = TypeVar("T")
 class DockingStreamerManager(Generic[T], ConcurrentStreamerManager):
     """A streamer manager for directing streamers to a SequentialStream."""
 
-    def __init__(self, streamer_factory: StreamerFactory[StreamedAnnotatedFrame], stream: DockStream,
+    def __init__(self, streamer_factory: StreamerFactory[T], stream: DockStream[T],
                  max_streamers: int = 10):
         """
         Initializes a RoutingStreamerManager instance.
