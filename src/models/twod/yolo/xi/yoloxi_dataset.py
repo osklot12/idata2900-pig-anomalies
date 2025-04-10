@@ -19,6 +19,7 @@ class UltralyticsDataset(IterableDataset):
     def __iter__(self):
         for _ in range(self._num_batches):
             batch = self._prefetcher.get()
+            print(f"📦 Yielding batch {i + 1}/{self._num_batches} with {len(batch)} frames")
             for sample in UltralyticsBatchConverter.convert(batch):
                 yield sample
 
