@@ -1,9 +1,5 @@
-import traceback
-import torch
-
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
-from src.models.twod.yolo.x.streaming_coco_evaluator import StreamingCOCOEvaluator
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
@@ -11,7 +7,6 @@ from src.network.messages.serialization.pickle_message_serializer import PickleM
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.models.twod.yolo.x.exp import Exp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-from torch.utils.data import DataLoader
 import argparse
 
 
