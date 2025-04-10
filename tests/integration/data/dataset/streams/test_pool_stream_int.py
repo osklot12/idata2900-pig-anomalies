@@ -231,41 +231,68 @@ def test_converted_batches_after_streaming(stream, manager):
         manager.stop()
 
 
-def test_rcnn_tensor_output_visualization(prefetcher):
+def test_rcnn_converted_tensors_after_streaming(stream, manager):
     """
-    Visualizes images and bounding boxes after RCNN tensor conversion (what is passed to the model).
+    Visualizes the format of converted tensors from streamed AnnotatedFrames (Faster R-CNN format), and saves 20 annotated images.
     """
     save_dir = "/mnt/c/Users/chris/Pictures/rcnn_tensor_debug"
     os.makedirs(save_dir, exist_ok=True)
 
-    trainer = RCNNTrainer(prefetcher)
-    batch = prefetcher.get()
+    trainer = RCNNTrainer(prefetcher=None)  # We don't use its prefetcher here
+    saved_count = 0
+    max_images = 20
 
-    images, targets = trainer._convert_to_tensors(batch)
+    manager.run()
 
-    for i, (image_tensor, target) in enumerate(zip(images, targets)):
-        img_np = (image_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8).copy()
-        height, width = img_np.shape[:2]
+    try:
+        for i in range(10):  # attempt up to 10 batches
+            frames = []
+            for _ in range(4):  # simulate batch size
+                frame = stream.read()
+                if frame is None:
+                    break
+                frames.append(frame)
 
-        print(f"[Tensor Image {i}] Boxes: {len(target['boxes'])}, Labels: {target['labels'].tolist()}")
+            if not frames or all(len(f.annotations) == 0 for f in frames):
+                print(f"[Batch {i}] Skipping empty or unannotated batch")
+                continue
 
-        for j, box in enumerate(target["boxes"]):
-            x_min, y_min, x_max, y_max = box.tolist()
-            x_min, y_min = int(x_min * width), int(y_min * height)
-            x_max, y_max = int(x_max * width), int(y_max * height)
-            cls_id = target["labels"][j].item()
+            images, targets = trainer._convert_to_tensors(frames)
 
-            print(f" - Box {j}: ({x_min}, {y_min}, {x_max}, {y_max}), Class: {cls_id}")
+            for j, (img_tensor, target) in enumerate(zip(images, targets)):
+                if saved_count >= max_images:
+                    break
 
-            cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
-            cv2.putText(
-                img_np, f"cls {cls_id}", (x_min, max(10, y_min - 5)),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
-            )
+                img_np = (img_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8).copy()
+                height, width = img_np.shape[:2]
+                boxes = target["boxes"]
+                labels = target["labels"]
 
-        path = os.path.join(save_dir, f"tensor_frame_{i}.jpg")
-        cv2.imwrite(path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
-        print(f"✅ Saved: {path}")
+                print(f"[Image {saved_count}] Detected {len(boxes)} boxes, labels: {labels.tolist()}")
 
-        if i >= 19:
-            break
+                for k, box in enumerate(boxes):
+                    x_min, y_min, x_max, y_max = map(int, box.tolist())
+                    cls_id = labels[k].item()
+
+                    print(f"Drawing box {k}: [{x_min}, {y_min}, {x_max}, {y_max}] for class {cls_id}")
+
+                    if x_max > x_min and y_max > y_min:
+                        cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+                        cv2.putText(
+                            img_np, f"cls {cls_id}", (x_min, max(10, y_min - 5)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
+                        )
+                    else:
+                        print(f"⚠️ Skipping invalid box for class {cls_id}")
+
+                filename = f"rcnn_tensor_frame_{saved_count}.jpg"
+                full_path = os.path.join(save_dir, filename)
+                cv2.imwrite(full_path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
+                print(f"✅ Saved annotated image to: {full_path}")
+                saved_count += 1
+
+            if saved_count >= max_images:
+                break
+
+    finally:
+        manager.stop()
