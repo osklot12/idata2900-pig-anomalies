@@ -135,16 +135,24 @@ class RCNNTrainer(ModelTrainer):
     def _convert_to_tensors(self, batch):
         images = []
         targets = []
-        for frame in batch:
+        for idx, frame in enumerate(batch):
+            print(f"[Pre-Convert] Frame {idx} shape: {frame.frame.shape} — {len(frame.annotations)} annotations")
+
             images.append(
                 torch.tensor(frame.frame, dtype=torch.float32, device=self.device).permute(2, 0, 1) / 255.0
             )
 
             if frame.annotations:
-                boxes = torch.tensor([
-                    [ann.bbox.x, ann.bbox.y, ann.bbox.x + ann.bbox.width, ann.bbox.y + ann.bbox.height]
-                    for ann in frame.annotations
-                ], dtype=torch.float32, device=self.device)
+                for a_i, ann in enumerate(frame.annotations):
+                    print(f" - Annotation {a_i}: class={ann.cls.value}, box={ann.bbox}")
+
+                boxes = torch.tensor([[
+                    ann.bbox.x * frame.frame.shape[1],
+                    ann.bbox.y * frame.frame.shape[0],
+                    (ann.bbox.x + ann.bbox.width) * frame.frame.shape[1],
+                    (ann.bbox.y + ann.bbox.height) * frame.frame.shape[0]
+                ] for ann in frame.annotations], dtype=torch.float32, device=self.device)
+
                 labels = torch.tensor(
                     [ann.cls.value for ann in frame.annotations],
                     dtype=torch.int64,
