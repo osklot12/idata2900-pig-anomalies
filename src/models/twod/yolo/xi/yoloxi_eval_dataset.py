@@ -1,16 +1,16 @@
 from torch.utils.data import IterableDataset
 from src.models.converters.xi.ultralytics_batch_converter import UltralyticsBatchConverter
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
-import time
 
 
-class UltralyticsDataset(IterableDataset):
-    """An iterable dataset for Ultralytics OBB training."""
+class EvalUltralyticsDataset(IterableDataset):
+    """A finite iterable dataset for Ultralytics OBB evaluation."""
 
-    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 2):
+    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 8):
         """
         Args:
             prefetcher (BatchPrefetcher): the prefetcher that streams AnnotatedFrames
+            num_batches (int): number of batches to yield before stopping
         """
         super().__init__()
         self._prefetcher = prefetcher
@@ -23,4 +23,6 @@ class UltralyticsDataset(IterableDataset):
                 yield sample
 
     def __len__(self):
-        return self._num_batches * getattr(self._prefetcher, "batch_size", 4)
+        # Technically this is not meaningful for IterableDataset,
+        # but it's good practice to return the intended size.
+        return self._num_batches

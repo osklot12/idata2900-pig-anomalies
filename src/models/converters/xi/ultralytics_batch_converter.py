@@ -9,41 +9,45 @@ class UltralyticsBatchConverter:
     """Converts a batch into Ultralytics OBB training format."""
 
     @staticmethod
-    def convert(batch: List[AnnotatedFrame]) -> List[Dict[str, object]]:
-        converted = []
+    def convert(batch: List[AnnotatedFrame]) -> List[dict]:
+        """
+        Converts a list of AnnotatedFrame objects into the dictionary format expected by Ultralytics.
 
-        for i, annotated_frame in enumerate(batch):
-            img = annotated_frame.frame  # shape [H, W, C], dtype=uint8
-            h, w = img.shape[:2]
+        Each sample will include:
+        - img: torch.Tensor of shape (3, H, W)
+        - instances: dict with 'cls' and 'bboxes'
+        - batch_idx, im_file, ori_shape, ratio_pad
+        """
+        results = []
+        for i, frame in enumerate(batch):
+            img = torch.from_numpy(frame.frame).permute(2, 0, 1).float() / 255.0  # HWC -> CHW
+            cls = torch.tensor([ann.cls.value for ann in frame.annotations], dtype=torch.long)
+            bboxes = torch.tensor([
+                [
+                    (ann.bbox.x + ann.bbox.width / 2) / frame.frame.shape[1],
+                    (ann.bbox.y + ann.bbox.height / 2) / frame.frame.shape[0],
+                    ann.bbox.width / frame.frame.shape[1],
+                    ann.bbox.height / frame.frame.shape[0],
+                    0.0  # angle = 0.0 for now
+                ]
+                for ann in frame.annotations
+            ], dtype=torch.float32)
 
-            print(f"🖼️  Converting image {i} — shape: {img.shape}, dtype: {img.dtype}")
+            if len(cls) == 0:
+                cls = torch.empty((0,), dtype=torch.long)
+                bboxes = torch.empty((0, 5), dtype=torch.float32)
 
-            bboxes = []
-            classes = []
-
-            for ann in annotated_frame.annotations:
-                x, y, bw, bh = ann.bbox.x, ann.bbox.y, ann.bbox.width, ann.bbox.height
-                cx, cy = x + bw / 2, y + bh / 2
-                angle = 0.0
-                bboxes.append([cx, cy, bw, bh, angle])
-                classes.append(ann.cls.value)
-
-            print(f"  ↳ {len(bboxes)} annotations for image {i}")
-
-            # 👇 Convert image
-            img_tensor = torch.tensor(img, dtype=torch.uint8).permute(2, 0, 1).float() / 255.0
-
-            sample = {
-                "img": img_tensor,
+            results.append({
+                "img": img,
                 "instances": {
-                    "bboxes": torch.tensor(bboxes, dtype=torch.float32) if bboxes else torch.empty((0, 5)),
-                    "cls": torch.tensor(classes, dtype=torch.int64) if classes else torch.empty((0,), dtype=torch.int64),
+                    "cls": cls,
+                    "bboxes": bboxes,
                 },
-                "batch_idx": torch.full((len(bboxes),), i, dtype=torch.int64) if bboxes else torch.empty((0,), dtype=torch.int64),
-            }
+                "batch_idx": torch.full((len(cls),), i, dtype=torch.long),
+                "im_file": [f"frame_{i}.jpg"],
+                "ori_shape": [torch.tensor([frame.frame.shape[0], frame.frame.shape[1]])],
+                "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],
+            })
 
-            converted.append(sample)
+        return results
 
-        print(f"✅ Converted batch with {len(converted)} samples total\n")
-
-        return converted

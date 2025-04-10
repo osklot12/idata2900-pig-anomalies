@@ -43,3 +43,7 @@ class FakeBatchPrefetcher(Prefetcher[List[AnnotatedFrame]]):
             batch.append(AnnotatedFrame(frame=frame, annotations=annotations))
 
         return batch
+
+    def reset(self):
+        """Override reset to avoid resetting the data for streaming dataset."""
+        pass  # This prevents the reset logic from doing anything.
