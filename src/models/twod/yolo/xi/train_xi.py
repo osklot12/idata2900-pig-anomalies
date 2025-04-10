@@ -15,6 +15,7 @@ def main():
 
     train_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     train_client.connect(server_ip)
+    print("")
 
     val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     val_client.connect(server_ip)
@@ -29,6 +30,9 @@ def main():
     train_prefetcher.run()
     val_prefetcher.run()
 
+    print("🚀 Streaming started: Train and Val prefetchers are now running")
+
+    print("🧠 Building datasets from prefetchers...")
     train_dataset = UltralyticsDataset(train_prefetcher, 6495)
     val_dataset = EvalUltralyticsDataset(val_prefetcher, 6495)
 

@@ -44,6 +44,7 @@ class TrainingSetup:
     def _log_epoch_metrics(self, trainer):
         epoch = trainer.epoch
         metrics = getattr(trainer, "metrics", {})
+        print(f"📊 Epoch {epoch} metrics: {metrics}")
         if not metrics:
             return
         for key, value in metrics.items():
@@ -94,6 +95,7 @@ class TrainingSetup:
 
         def patched_get_dataloader(_, dataset_path, batch_size, rank=0, mode="train"):
             dataset = self.dataset if mode == "train" else self.eval_dataset
+            print(f"📥 Creating DataLoader for mode={mode}, batch_size={batch_size}")
             loader = DataLoader(
                 dataset,
                 batch_size=batch_size,
