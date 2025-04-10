@@ -34,7 +34,7 @@ class AnnotationAugmentor(AugmentorBase):
 
         def rotate_bbox(x, y, w, h):
             corners = np.array([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
-            rotated_corners = np.dot(rotation_matrix, (corners - [cx, cy]).T).O + [cx, cy]
+            rotated_corners = np.dot(rotation_matrix, (corners - [cx, cy]).T).T + [cx, cy]
             x_min, y_min = np.min(rotated_corners, axis=0)
             x_max, y_max = np.max(rotated_corners, axis=0)
             return x_min, y_min, x_max - x_min, y_max - y_min

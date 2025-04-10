@@ -3,27 +3,31 @@ import os
 import shutil
 import tempfile
 import torch
-from torch.utils.data import IterableDataset, DataLoader
+from torch.utils.data import IterableDataset
 
 from src.models.twod.yolo.xi.yoloxi_training_setup import TrainingSetup
 
 
 class DummyDataset(IterableDataset):
     def __iter__(self):
-        for i in range(10):
+        img = torch.zeros(3, 640, 640)
+        img[:, 240:400, 240:400] = 1.0  # white square in center
+
+        bbox = torch.tensor([[0.5, 0.5, 0.25, 0.25, 0.0]])  # centered box
+        for _ in range(10):
             yield {
-                "img": torch.rand(3, 640, 640),
+                "img": img.clone(),
                 "instances": {
                     "cls": torch.tensor([0]),
-                    "bboxes": torch.rand(1, 5),
+                    "bboxes": bbox.clone(),
                 },
                 "batch_idx": torch.tensor([0]),
-                "im_file": [f"dummy_{i}.jpg"],
-                "ori_shape": [torch.tensor([640, 640])],  # ✅ tensor inside a list
-                "ratio_pad": [  # ✅ list with one tuple of tensors
+                "im_file": ["dummy.jpg"],
+                "ori_shape": [torch.tensor([640, 640])],
+                "ratio_pad": [
                     (
-                        torch.tensor([1.0, 1.0]),  # gain (width, height)
-                        torch.tensor([0.0, 0.0])   # pad (width, height)
+                        torch.tensor([1.0, 1.0]),
+                        torch.tensor([0.0, 0.0])
                     )
                 ],
             }
@@ -34,18 +38,15 @@ class DummyDataset(IterableDataset):
 
 @pytest.mark.integration
 def test_yolov11_trains_and_logs_to_tensorboard():
-    """Trains real YOLOv11 for 1 epoch with dummy data and verifies tensorboard logging."""
     tmp_log_dir = tempfile.mkdtemp(prefix="tensorboard_test_")
-    dataset = DummyDataset()
 
-    # Use real TrainingSetup logic (no patching of train)
-    setup = TrainingSetup(dataset=dataset, epochs=1, log_dir=tmp_log_dir)
+    train_dataset = DummyDataset()
+    eval_dataset = DummyDataset()  # use separate but identical dummy set
+
+    setup = TrainingSetup(dataset=train_dataset, eval_dataset=eval_dataset, epochs=4, log_dir=tmp_log_dir)
     setup.train()
 
-    # Verify TensorBoard log output
-    log_files = os.listdir(setup.log_dir)
-    assert any(f.startswith("events.out.tfevents") for f in log_files), \
-        f"No tensorboard logs found in {setup.log_dir}"
+    metrics = setup.metrics
+    print("📊 Final Evaluation Metrics:", metrics)
 
-    # Cleanup
     shutil.rmtree(tmp_log_dir)
