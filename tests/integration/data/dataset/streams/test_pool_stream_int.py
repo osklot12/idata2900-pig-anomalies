@@ -27,6 +27,7 @@ from src.data.streaming.factories.aggregated_streamer_factory import AggregatedS
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.static_streamer_manager import StaticStreamerManager
 from src.models.converters.xi.ultralytics_batch_converter import UltralyticsBatchConverter
+from src.models.twod.fastrcnn.train_fastrcnn import RCNNTrainer
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
@@ -228,3 +229,43 @@ def test_converted_batches_after_streaming(stream, manager):
 
     finally:
         manager.stop()
+
+
+def test_rcnn_tensor_output_visualization(prefetcher):
+    """
+    Visualizes images and bounding boxes after RCNN tensor conversion (what is passed to the model).
+    """
+    save_dir = "/mnt/c/Users/chris/Pictures/rcnn_tensor_debug"
+    os.makedirs(save_dir, exist_ok=True)
+
+    trainer = RCNNTrainer(prefetcher)
+    batch = prefetcher.get()
+
+    images, targets = trainer._convert_to_tensors(batch)
+
+    for i, (image_tensor, target) in enumerate(zip(images, targets)):
+        img_np = (image_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8).copy()
+        height, width = img_np.shape[:2]
+
+        print(f"[Tensor Image {i}] Boxes: {len(target['boxes'])}, Labels: {target['labels'].tolist()}")
+
+        for j, box in enumerate(target["boxes"]):
+            x_min, y_min, x_max, y_max = box.tolist()
+            x_min, y_min = int(x_min * width), int(y_min * height)
+            x_max, y_max = int(x_max * width), int(y_max * height)
+            cls_id = target["labels"][j].item()
+
+            print(f" - Box {j}: ({x_min}, {y_min}, {x_max}, {y_max}), Class: {cls_id}")
+
+            cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+            cv2.putText(
+                img_np, f"cls {cls_id}", (x_min, max(10, y_min - 5)),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
+            )
+
+        path = os.path.join(save_dir, f"tensor_frame_{i}.jpg")
+        cv2.imwrite(path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
+        print(f"✅ Saved: {path}")
+
+        if i >= 19:
+            break
