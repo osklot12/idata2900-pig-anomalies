@@ -7,7 +7,7 @@ from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 class YOLOXDataset(IterableDataset):
     """A dataset for YOLOX."""
 
-    def __init__(self, prefetcher: BatchPrefetcher):
+    def __init__(self, prefetcher: BatchPrefetcher, n_batches: int):
         """
         Initializes a YOLOXDataset instance.
 
@@ -16,6 +16,7 @@ class YOLOXDataset(IterableDataset):
         """
         super().__init__()
         self._prefetcher = prefetcher
+        self._n_batches = n_batches
 
         self.class_ids = [0, 1, 2, 3]
         self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
@@ -28,4 +29,4 @@ class YOLOXDataset(IterableDataset):
             count += 1
 
     def __len__(self):
-        return 1000
+        return self._n_batches
