@@ -12,7 +12,7 @@ def test_combined_augmentation(num_versions):
     sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 255  # White image
     sample_annotations = [(1, 50, 50, 100, 100)]  # Example bounding box
 
-    augmented_data = augmentor.augment(sample_image, sample_annotations)
+    augmented_data = augmentor.process(sample_image, sample_annotations)
 
     # Ensure correct number of augmented outputs
     assert len(augmented_data) == num_versions, f"Expected {num_versions} augmentations, got {len(augmented_data)}!"
@@ -32,7 +32,7 @@ def test_combined_augmentation_rotation(rotation_range):
     sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 255
     sample_annotations = [(1, 50, 50, 100, 100)]
 
-    augmented_data = augmentor.augment(sample_image, sample_annotations)
+    augmented_data = augmentor.process(sample_image, sample_annotations)
 
     assert len(augmented_data) == 2, "Expected 2 augmentations!"
 
@@ -50,6 +50,6 @@ def test_combined_augmentation_defaults():
     sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 255
     sample_annotations = [(1, 50, 50, 100, 100)]
 
-    augmented_data = augmentor.augment(sample_image, sample_annotations)
+    augmented_data = augmentor.process(sample_image, sample_annotations)
 
     assert len(augmented_data) == 1, "Default augmentation should return exactly 1 version!"
