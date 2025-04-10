@@ -24,6 +24,8 @@ class GetBatchHandler(RequestHandler):
                 batch.append(instance)
                 instance = stream.read()
 
+                i += 1
+
             response = GetBatchResponse(status=ResponseStatus.SUCCESS, batch=batch)
 
         except RuntimeError as e:

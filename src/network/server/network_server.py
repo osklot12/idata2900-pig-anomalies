@@ -8,6 +8,7 @@ from src.network.messages.requests.get_batch_request import GetBatchRequest
 from src.network.messages.requests.handlers.get_batch_handler import GetBatchHandler
 from src.network.messages.requests.handlers.open_stream_handler import OpenStreamHandler
 from src.network.messages.requests.handlers.registry.request_handler_registry import RequestHandlerRegistry
+from src.network.messages.requests.handlers.registry.simple_request_handler_registry import SimpleRequestHandlerRegistry
 from src.network.messages.requests.open_stream_request import OpenStreamRequest
 from src.network.messages.serialization.factories.deserializer_factory import DeserializerFactory
 from src.network.messages.serialization.factories.serializer_factory import SerializerFactory
@@ -82,7 +83,7 @@ class NetworkServer:
                 DatasetSplit.TEST: None
             }
         )
-        registry = RequestHandlerRegistry()
+        registry = SimpleRequestHandlerRegistry()
 
         stream_factories = {
             DatasetSplit.TRAIN: GCSTrainingStreamFactory(
@@ -100,7 +101,7 @@ class NetworkServer:
                 frame_size=(640, 640),
                 label_map=NorsvinBehaviorClass.get_label_map(),
                 split_ratios=NORSVIN_SPLIT_RATIOS,
-                buffer_size=3
+                buffer_size=2
             ),
             DatasetSplit.TEST: GCSEvalStreamFactory(
                 bucket_name=TestBucket.BUCKET_NAME,
@@ -109,7 +110,7 @@ class NetworkServer:
                 frame_size=(640, 640),
                 label_map=NorsvinBehaviorClass.get_label_map(),
                 split_ratios=NORSVIN_SPLIT_RATIOS,
-                buffer_size=3
+                buffer_size=2
             )
         }
 
