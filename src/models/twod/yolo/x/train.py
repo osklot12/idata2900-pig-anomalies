@@ -1,4 +1,7 @@
 import traceback
+import argparse
+
+import torch
 
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
@@ -9,7 +12,10 @@ from src.network.messages.serialization.pickle_message_serializer import PickleM
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.models.twod.yolo.x.exp import Exp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-import argparse
+
+# ✅ Custom evaluation import
+from src.models.training_metrics_calculator import TrainingMetricsCalculator
+from src.schemas.schemas.metric_schema import MetricSchema
 
 
 def main():
@@ -54,12 +60,32 @@ def main():
 
     print(f"Using exp of type {type(exp)}")
     trainer = StreamingTrainer(exp, args)
-    print("TRAINING!")
+
+    print("🚀 TRAINING...")
     try:
         trainer.train()
     except Exception as e:
         print("\n❌ Exception caught during training:")
         traceback.print_exc()
+
+    # ✅ Custom evaluation starts here
+    print("\n🔍 EVALUATING ON IN-MEMORY VALIDATION SET...")
+    evaluator = TrainingMetricsCalculator()
+    all_predictions = []
+    all_targets = []
+
+    trainer.model.eval()
+    with torch.no_grad():
+        for batch in val_set:
+            predictions = trainer.model(batch["img"])
+            all_predictions.append(predictions)
+            all_targets.append(batch)
+
+    metrics = evaluator.calculate(all_predictions, all_targets)
+
+    print("✅ Evaluation complete. Metrics:")
+    for k, v in metrics.metrics.items():
+        print(f"{k}: {v:.4f}")
 
 
 if __name__ == '__main__':
