@@ -13,6 +13,8 @@ from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFact
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
+from src.data.preprocessing.augmentation.augmentors.annotated_frame_augmentor import AnnotatedFrameAugmentor
+from src.data.preprocessing.augmentation.augmentors.cond_augmentor import CondMultiplier
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
@@ -82,7 +84,7 @@ def streamer_pair_factory(instance_provider, entity_factory):
     return FileStreamerPairFactory(
         instance_provider=instance_provider,
         entity_factory=entity_factory,
-        frame_resizer_factory=StaticFrameResizerFactory((320, 320)),
+        frame_resizer_factory=StaticFrameResizerFactory((1920, 1080)),
         bbox_normalizer_factory=SimpleBBoxNormalizerFactory((0, 1))
     )
 
@@ -94,9 +96,28 @@ def streamer_factory(streamer_pair_factory):
 
 
 @pytest.fixture
-def stream():
+def multiplier():
+    """Fixture to provide a CondMultiplier instance."""
+
+    def is_annotated(instance: StreamedAnnotatedFrame):
+        return len(instance.annotations) > 0
+
+    return CondMultiplier(50, is_annotated)
+
+
+@pytest.fixture
+def augmentor():
+    """Fixture to provide an Augmentor instance."""
+    return AnnotatedFrameAugmentor()
+
+
+@pytest.fixture
+def stream(multiplier, augmentor):
     """Fixture to provide a PoolStream instance."""
-    return PoolStream[StreamedAnnotatedFrame]()
+    return PoolStream[StreamedAnnotatedFrame](
+        pool_size=1000,
+        preprocessors=[multiplier, augmentor]
+    )
 
 
 @pytest.fixture
@@ -106,6 +127,7 @@ def manager(streamer_factory, stream):
         streamer_factory=streamer_factory,
         consumer=stream
     )
+
 
 def test_streaming_train_set(stream, manager):
     """Tests that the train set stream gives random training instances."""
@@ -118,7 +140,7 @@ def test_streaming_train_set(stream, manager):
     while instance and i < 10000:
         assert isinstance(instance, StreamedAnnotatedFrame)
         instance = stream.read()
-        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        StreamedAnnotatedFrameVisualizer.visualize(instance)
         i += 1
     print(f"Finished reading!")
     manager.stop()

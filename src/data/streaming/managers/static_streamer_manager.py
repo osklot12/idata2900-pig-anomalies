@@ -1,3 +1,4 @@
+import traceback
 from typing import TypeVar, Generic, Optional
 
 from src.data.streaming.factories.streamer_factory import StreamerFactory
@@ -45,6 +46,7 @@ class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
             self._launch_streamer(streamer)
 
     def _handle_crashed_streamer(self, streamer_id: str, e: Exception) -> None:
+        traceback.print_exc()
         self._remove_streamer(streamer_id)
         streamer = self._get_next_streamer()
         if streamer:
