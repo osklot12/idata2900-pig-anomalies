@@ -5,7 +5,7 @@ from typing import Deque
 import math
 import time
 
-from src.data.streaming.factories.streamer_factory import StreamerFactory
+from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.structures.atomic_bool import AtomicBool
@@ -18,13 +18,13 @@ from src.schemas.schemas.pressure_schema import PressureSchema
 class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureSchema]):
     """A streamer manager that adjust the number of concurrent streamers dynamically."""
 
-    def __init__(self, streamer_factory: StreamerFactory, min_streamers: int, max_streamers: int,
+    def __init__(self, streamer_factory: StreamerProvider, min_streamers: int, max_streamers: int,
                  demand_estimator: DemandEstimator, stability: int = 100):
         """
         Initializes a DynamicStreamerManager instance.
 
         Args:
-            streamer_factory (StreamerFactory): the factory used to create the streamers
+            streamer_factory (StreamerProvider): the factory used to create the streamers
             min_streamers (int): the minimum number of concurrent streamers
             max_streamers (int): the maximum number of concurrent streamers
             demand_estimator (DemandEstimator): the demand estimator used to estimate the streamer demand
@@ -80,7 +80,7 @@ class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureS
         with self._controller_lock:
             n_to_launch = max(0, round(self._optimal_n_streamers.get()) - self.n_active_streamers())
             for _ in range(n_to_launch):
-                self._launch_streamer(self._streamer_factory.create_streamer())
+                self._launch_streamer(self._streamer_factory.next_streamer())
 
     def new_schema(self, schema: PressureSchema) -> None:
         with self._schema_lock:

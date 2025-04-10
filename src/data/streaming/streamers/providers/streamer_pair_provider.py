@@ -9,7 +9,7 @@ from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 
 
-class StreamerPairFactory(ABC):
+class StreamerPairProvider(ABC):
     """A factory for creating pairs of video and annotation streamers."""
 
     @abstractmethod
