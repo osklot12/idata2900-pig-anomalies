@@ -36,7 +36,7 @@ from src.typevars.enum_type import T_Enum
 
 class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
 
-    def __init__(self, bucket_name: str, service_account_path: str, frame_size: Tuple[int, int],
+    def __init__(self, bucket_name: str, service_account_path: str, split: int, frame_size: Tuple[int, int],
                  label_map: Dict[str, T_Enum], split_ratios: DatasetSplitRatios, buffer_size: int):
         """
         Initializes a NorsvinTrainingStreamFactory.
@@ -46,6 +46,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         """
         self._bucket_name = bucket_name
         self._service_account_path = service_account_path
+        self._split = split
         self._frame_size = frame_size
         self._label_map = label_map
         self._split_ratios = split_ratios
@@ -59,7 +60,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
 
         manifest = self._create_manifest(loader_factory.create_file_registry())
         splitter = self._create_splitter(manifest.ids, self._split_ratios)
-        instance_provider = self._create_instance_provider(manifest, splitter)
+        instance_provider = self._create_instance_provider(manifest, splitter, self._split)
 
         entity_provider = self._create_entity_provider(loader_factory)
         streamer_pair_provider = self._create_streamer_pair_provider(instance_provider, entity_provider, self._frame_size)
@@ -117,11 +118,11 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         )
 
     @staticmethod
-    def _create_instance_provider(manifest: Manifest, splitter: DetermSplitter) -> InstanceProvider:
+    def _create_instance_provider(manifest: Manifest, splitter: DetermSplitter, split: int) -> InstanceProvider:
         """Creates a InstanceProvider instance."""
         return ManifestInstanceProvider(
             manifest=manifest,
-            selector=DetermStringSelector(strings=splitter.splits[0])
+            selector=DetermStringSelector(strings=splitter.splits[split])
         )
 
     @staticmethod

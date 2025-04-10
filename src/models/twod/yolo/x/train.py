@@ -6,6 +6,7 @@ from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
 from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
+from src.network.network_dataset_stream import NetworkDatasetStream
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.models.twod.yolo.x.exp import Exp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
@@ -21,11 +22,11 @@ def main():
     val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     val_client.connect(server_ip)
 
-    train_provider = NetworkFrameInstanceProvider(train_client)
-    val_provider = NetworkFrameInstanceProvider(val_client)
+    train_stream = NetworkDatasetStream(client=train_client, split=DatasetSplit.TRAIN)
+    val_stream = NetworkDatasetStream(client=val_client, split=DatasetSplit.VAL)
 
-    train_prefetcher = BatchPrefetcher(train_provider, DatasetSplit.TRAIN, 8, fetch_timeout=60)
-    val_prefetcher = BatchPrefetcher(val_provider, DatasetSplit.VAL, 8, fetch_timeout=60)
+    train_prefetcher = BatchPrefetcher(train_stream, 8, 8, fetch_timeout=200)
+    val_prefetcher = BatchPrefetcher(val_stream, DatasetSplit.VAL, 8, fetch_timeout=200)
 
     train_prefetcher.run()
     val_prefetcher.run()
