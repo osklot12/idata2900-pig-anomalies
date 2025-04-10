@@ -1,4 +1,4 @@
-from src.data.preprocessing.augmentation.annotation_augmentor import AnnotationAugmentor
+from src.data.preprocessing.augmentation._annotation_augmentor import AnnotationAugmentor
 
 
 def test_annotation_augmentation():

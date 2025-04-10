@@ -11,7 +11,7 @@ def test_image_augmentor(flip, rotation):
     augmentor = ImageAugmentor()
     sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 255  # White image
 
-    aug_image = augmentor.augment(sample_image, rotation=rotation, flip=flip)
+    aug_image = augmentor.process(sample_image, rotation=rotation, flip=flip)
 
     assert aug_image is not None, "Augment returned None!"
     assert aug_image.shape == sample_image.shape, "Augmentation altered image dimensions!"
@@ -23,7 +23,7 @@ def test_image_augmentor_brightness_contrast():
     augmentor = ImageAugmentor()
     sample_image = np.ones((224, 224, 3), dtype=np.uint8) * 127  # Mid-gray
 
-    aug_image = augmentor.augment(sample_image)
+    aug_image = augmentor.process(sample_image)
 
     assert aug_image is not None, "Brightness/contrast augmentation returned None!"
     assert aug_image.shape == sample_image.shape, "Brightness/contrast augmentation altered image dimensions!"

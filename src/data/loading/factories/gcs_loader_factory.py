@@ -1,6 +1,6 @@
 from src.auth.factories.auth_service_factory import AuthServiceFactory
-from src.data.dataset.sources.dataset_source_registry import SourceRegistry
-from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
+from src.data.dataset.registries.file_registry import FileRegistry
+from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
 from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
@@ -26,14 +26,17 @@ class GCSLoaderFactory(LoaderFactory):
         self._decoder_factory = decoder_factory
 
     def create_video_loader(self) -> VideoFileLoader:
+        print(f"[GCSLoaderFactory] Created video loader")
         return GCSVideoLoader(self._bucket_name, self._auth_factory.create_auth_service())
 
     def create_annotation_loader(self) -> VideoAnnotationsLoader:
+        print(f"[GCSLoaderFactory] Created annotation loader")
         return GCSAnnotationLoader(
             bucket_name=self._bucket_name,
             auth_service=self._auth_factory.create_auth_service(),
             decoder=self._decoder_factory.create_decoder()
         )
 
-    def create_dataset_source(self) -> SourceRegistry:
-        return GCSSourceRegistry(self._bucket_name, self._auth_factory.create_auth_service())
+    def create_file_registry(self) -> FileRegistry:
+        print(f"[GCSLoaderFactory] Created file registry")
+        return GCSFileRegistry(self._bucket_name, self._auth_factory.create_auth_service())

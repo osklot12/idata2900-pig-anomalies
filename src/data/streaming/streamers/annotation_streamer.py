@@ -1,11 +1,11 @@
 from abc import abstractmethod
 
-from typing import Callable, Optional, List, Tuple
+from typing import Optional, List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.data.loading.feed_status import FeedStatus
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
+from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
@@ -13,27 +13,29 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class AnnotationStreamer(ConcurrentStreamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, callback: Callable[[FrameAnnotations], FeedStatus], normalizer: Optional[BBoxNormalizer]):
+    def __init__(self, consumer: Feedable[FrameAnnotations], normalizer: Optional[BBoxNormalizer]):
         """
         Initializes a AnnotationStreamer instance.
 
         Args:
-            callback (Callable[[Annotation], FeedStatus]): the callback to feed data
+            consumer (Feedable[FrameAnnotations]): the consumer of the streaming data
             normalizer (BBoxNormalizer): the bounding box normalization strategy
         """
         super().__init__()
-        self._callback = callback
+        self._consumer = consumer
         self._normalizer = normalizer
 
     def _stream(self) -> StreamerStatus:
         result = StreamerStatus.COMPLETED
-
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
             normalized_annotation = self._normalize_frame_annotations(annotation)
-            self._callback(normalized_annotation)
+            self._consumer.feed(normalized_annotation)
 
             annotation = self._get_next_annotation()
+
+        # indicating end of streams
+        self._consumer.feed(None)
 
         if annotation and self._is_requested_to_stop():
             result = StreamerStatus.STOPPED
@@ -51,8 +53,7 @@ class AnnotationStreamer(ConcurrentStreamer):
             annotations = FrameAnnotations(
                 source=annotations.source,
                 index=annotations.index,
-                annotations=normalized_bboxes,
-                end_of_stream=annotations.end_of_stream,
+                annotations=normalized_bboxes
             )
 
         return annotations
@@ -74,9 +75,9 @@ class AnnotationStreamer(ConcurrentStreamer):
     @abstractmethod
     def _get_next_annotation(self) -> Optional[FrameAnnotations]:
         """
-        Returns the next annotation for the stream.
+        Returns the next annotation for the streams.
 
         Returns:
-            Optional[FrameAnnotations]: the next annotation, or None if end of stream
+            Optional[FrameAnnotations]: the next annotation, or None if end of streams
         """
         raise NotImplementedError

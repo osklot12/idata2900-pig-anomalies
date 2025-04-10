@@ -41,7 +41,7 @@ class ConcurrentStreamer(Streamer):
 
         except Exception as e:
             self._set_status(StreamerStatus.FAILED)
-            logging.error(f"Failed to stream data: {e}")
+            logging.error(f"Failed to streams data: {e}")
 
         finally:
             while not self._eos_commands.empty():
@@ -98,7 +98,7 @@ class ConcurrentStreamer(Streamer):
 
     def add_eos_command(self, command: Command) -> None:
         """
-        Adds a command that executes on end of stream.
+        Adds a command that executes on end of streams.
 
         Args:
             command (Command): The command to execute.

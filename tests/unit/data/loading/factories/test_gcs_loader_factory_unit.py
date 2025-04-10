@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
+from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
@@ -56,9 +56,9 @@ def test_create_annotation_loader(gcs_loader_factory, bucket_name):
 def test_create_dataset_source(gcs_loader_factory, bucket_name):
     """Tests that create_dataset_source() correctly instantiates GCSDatasetSource."""
     # act
-    dataset_source = gcs_loader_factory.create_dataset_source()
+    dataset_source = gcs_loader_factory.create_file_registry()
 
     # assert
-    assert isinstance(dataset_source, GCSSourceRegistry)
+    assert isinstance(dataset_source, GCSFileRegistry)
     assert dataset_source.get_bucket_name() == bucket_name
     assert isinstance(dataset_source.get_auth_service(), DummyAuthService)

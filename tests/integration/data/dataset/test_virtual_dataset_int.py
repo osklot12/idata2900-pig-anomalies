@@ -2,9 +2,8 @@ import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
-from src.data.dataset.matching.base_name_matching_strategy import BaseNameMatchingStrategy
-from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
-from src.data.dataset.selection.random_file_selector import RandomFileSelector
+from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
+from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
 from src.data.dataset.virtual.frame_dataset import FrameDataset
 from src.data.dataset.virtual.virtual_dataset import VirtualDataset
@@ -13,10 +12,9 @@ from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFact
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.factories.FileBaseNameParserFactory import FileBaseNameParserFactory
-from src.data.parsing.file_base_name_parser import FileBaseNameParser
+from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
-from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
@@ -54,16 +52,16 @@ def loader_factory(auth_factory, decoder_factory):
 def instance_provider(loader_factory):
     """Fixture to provide a DatasetInstanceProvider instance."""
     return SimpleDatasetInstanceProvider(
-        source=loader_factory.create_dataset_source(),
-        video_selector=RandomFileSelector(["mp4"]),
-        annotation_matcher=BaseNameMatchingStrategy(["json"])
+        source=loader_factory.create_file_registry(),
+        video_selector=RandomStringSelector(["mp4"]),
+        annotation_matcher=BaseNameMatcher(["json"])
     )
 
 
 @pytest.fixture
 def entity_factory(loader_factory):
     """Fixture to provide a DatasetEntityFactory instance."""
-    return LazyEntityFactory(loader_factory, FileBaseNameParser())
+    return LazyEntityFactory(loader_factory, BaseNameParser())
 
 
 @pytest.fixture
@@ -113,7 +111,7 @@ def source_parser_factory():
 @pytest.fixture
 def aggregated_streamer_factory(streamer_pair_factory, virtual_dataset, source_parser_factory):
     """Fixture to provide an AggregatedStreamerFactory instance."""
-    return AggregatedStreamerFactory(
+    return OldAggregatedStreamerFactory(
         streamer_pair_factory=streamer_pair_factory,
         callback=virtual_dataset.feed,
         source_parser_factory=source_parser_factory

@@ -18,14 +18,12 @@ class StreamedAnnotatedFrame(Identifiable):
         index (int): the frame index within its source
         frame (np.ndarray): the raw frame pixel data
         annotations (List[AnnotatedBBox]): the annotations associated with the frame
-        end_of_stream (bool): whether the frame is at the end of the stream
     """
 
     source: SourceMetadata
     index: int
     frame: np.ndarray
     annotations: List[AnnotatedBBox]
-    end_of_stream: bool
 
     def get_id(self) -> str:
         return self.source.source_id
