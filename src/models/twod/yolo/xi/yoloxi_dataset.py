@@ -7,7 +7,7 @@ import time
 class UltralyticsDataset(IterableDataset):
     """An iterable dataset for Ultralytics OBB training."""
 
-    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 2):
+    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 6495):
         """
         Args:
             prefetcher (BatchPrefetcher): the prefetcher that streams AnnotatedFrames
