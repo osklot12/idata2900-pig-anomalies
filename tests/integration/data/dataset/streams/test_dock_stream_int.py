@@ -130,10 +130,11 @@ def test_norsvin_test_stream():
     factory = GCSEvalStreamFactory(
         bucket_name=TestBucket.BUCKET_NAME,
         service_account_path=TestBucket.SERVICE_ACCOUNT_FILE,
+        split=2,
         frame_size=(1920, 1080),
         label_map=NorsvinBehaviorClass.get_label_map(),
         split_ratios=NORSVIN_SPLIT_RATIOS,
-        pool_size=3
+        buffer_size=3
     )
     managed_stream = factory.create_stream()
 
@@ -141,9 +142,12 @@ def test_norsvin_test_stream():
     managed_stream.start()
     stream = managed_stream.stream
     instance = stream.read()
+    count = 0
     while instance:
         assert isinstance(instance, StreamedAnnotatedFrame)
         instance = stream.read()
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        count += 1
 
+    print(f"COUNT: {count}")
     managed_stream.stop()
