@@ -7,18 +7,18 @@ from src.data.streaming.streamers.streamer import Streamer
 T = TypeVar("T")
 
 
-class StreamerFactory(Generic[T], ABC):
-    """Factory interface for creating streamers."""
+class StreamerProvider(Generic[T], ABC):
+    """Interface for streamer providers."""
 
     @abstractmethod
-    def create_streamer(self, consumer: Feedable[T]) -> Optional[Streamer]:
+    def next_streamer(self, consumer: Feedable[T]) -> Optional[Streamer]:
         """
-        Creates and returns the next available streamer.
+        Returns the next available streamer.
 
         Args:
             consumer (Feedable[T]): the consumer of the streaming data
 
         Returns:
-            Streamer: a new streamer instance, or None if no streamers are available
+            Streamer: the next streamer instance, or None if no streamers are available
         """
         raise NotImplementedError

@@ -2,27 +2,27 @@ from typing import Optional
 
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
-from src.data.streaming.factories.streamer_factory import StreamerFactory
-from src.data.streaming.factories.streamer_pair_factory import StreamerPairFactory
+from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_pair_provider import StreamerPairProvider
 from src.data.streaming.feedables.feedable import Feedable
 from src.data.streaming.feedables.feedable_func import FeedableFunc
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
 
 
-class AggregatedStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
-    """Streamer factory that creates pairs of video - annotations streamers and aggregates their output."""
+class AggregatedStreamerProvider(StreamerProvider[StreamedAnnotatedFrame]):
+    """Streamer provider that provides pairs of video - annotations streamers and aggregates their output."""
 
-    def __init__(self, streamer_pair_factory: StreamerPairFactory):
+    def __init__(self, streamer_pair_provider: StreamerPairProvider):
         """
         Initializes an AggregatedStreamerFactory instance.
 
         Args:
-            streamer_pair_factory (StreamerPairFactory): factory for creating streamer pairs
+            streamer_pair_provider (StreamerPairProvider): provider of streamer pairs
         """
-        self._pair_factory = streamer_pair_factory
+        self._pair_factory = streamer_pair_provider
 
-    def create_streamer(self, consumer: Feedable[StreamedAnnotatedFrame]) -> Optional[Streamer]:
+    def next_streamer(self, consumer: Feedable[StreamedAnnotatedFrame]) -> Optional[Streamer]:
         streamer = None
 
         aggregator = BufferedAggregator(consumer)

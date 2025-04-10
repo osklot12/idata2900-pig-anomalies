@@ -4,11 +4,11 @@ from src.data.dataset.entities.video_annotations import VideoAnnotations
 from src.data.dataset.entities.video_file import VideoFile
 
 
-class DatasetEntityFactory(ABC):
-    """Abstract factory for dataset entities."""
+class DatasetEntityProvider(ABC):
+    """Interface for dataset entity providers."""
 
     @abstractmethod
-    def create_video_file(self, source: str) -> VideoFile:
+    def get_video_file(self, source: str) -> VideoFile:
         """
         Creates a VideoFile instance.
 
@@ -21,7 +21,7 @@ class DatasetEntityFactory(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_video_annotations(self, source: str) -> VideoAnnotations:
+    def get_annotations_file(self, source: str) -> VideoAnnotations:
         """
         Creates a VideoAnnotations instance.
 

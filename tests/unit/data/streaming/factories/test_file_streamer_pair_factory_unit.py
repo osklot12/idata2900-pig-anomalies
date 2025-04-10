@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.data.dataclasses.dataset_instance import DatasetInstance
-from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
+from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 
@@ -50,7 +50,7 @@ def bbox_normalizer_factory():
 @pytest.fixture
 def streamer_pair_factory(instance_provider, entity_factory, frame_resizer_factory, bbox_normalizer_factory):
     """Fixture to provide a mock FileStreamerPairFactory instance."""
-    return FileStreamerPairFactory(
+    return FileStreamerPairProvider(
         instance_provider=instance_provider,
         entity_factory=entity_factory,
         frame_resizer_factory=frame_resizer_factory,
@@ -81,7 +81,7 @@ def test_create_streamer_pair_no_instance(entity_factory, frame_resizer_factory,
     # arrange
     empty_provider = Mock()
     empty_provider.next.return_value = None
-    factory = FileStreamerPairFactory(
+    factory = FileStreamerPairProvider(
         instance_provider=empty_provider,
         entity_factory=entity_factory,
         frame_resizer_factory=frame_resizer_factory,

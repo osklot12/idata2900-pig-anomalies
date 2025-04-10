@@ -3,13 +3,13 @@ import threading
 from abc import abstractmethod
 from functools import partial
 
-from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
+from src.data.streaming.managers.streamer_registry import StreamerRegistry
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.structures.atomic_bool import AtomicBool
 
 
-class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
+class ConcurrentStreamerManager(StreamerManager, StreamerRegistry):
     """A streamer manager that handles streamers asynchronously."""
 
     def __init__(self, max_streamers: int):
