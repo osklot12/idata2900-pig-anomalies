@@ -1,4 +1,6 @@
 import pytest
+import torch
+from torchvision.transforms.functional import to_pil_image
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
@@ -20,6 +22,7 @@ from src.data.preprocessing.resizing.factories.static_frame_resizer_factory impo
 from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
 from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
 from src.data.streaming.managers.static_streamer_manager import StaticStreamerManager
+from src.models.converters.xi.ultralytics_batch_converter import UltralyticsBatchConverter
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
@@ -144,3 +147,48 @@ def test_streaming_train_set(stream, manager):
         i += 1
     print(f"Finished reading!")
     manager.stop()
+
+
+
+def test_converted_batches_after_streaming(stream, manager):
+    """Tests the format of converted batches from streamed AnnotatedFrames (Ultralytics format), and saves one image."""
+    # arrange
+    manager.run()
+
+    # Path to save in Windows from WSL
+    save_path = "/mnt/c/Users/chris/Pictures/converted_sample.jpg"
+    image_saved = False
+
+    try:
+        for i in range(3):  # try 3 batches
+            frames = []
+            for _ in range(4):  # simulate batch of 4
+                frame = stream.read()
+                if frame is None:
+                    break
+                frames.append(frame)
+
+            if not frames:
+                break
+
+            converted = UltralyticsBatchConverter.convert(frames)
+
+            for j, sample in enumerate(converted):
+                assert isinstance(sample, dict)
+                assert "img" in sample and isinstance(sample["img"], torch.Tensor)
+
+                print(f"[Batch {i} - Sample {j}]")
+                print("  Image shape:", sample["img"].shape)
+                print("  Classes:", sample["instances"]["cls"].tolist())
+                print("  BBoxes:", sample["instances"]["bboxes"].shape)
+
+                # Save only the first image once
+                if not image_saved:
+                    img_tensor = sample["img"].cpu()
+                    img_pil = to_pil_image(img_tensor)
+                    img_pil.save(save_path)
+                    print(f"Saved image to: {save_path}")
+                    image_saved = True
+
+    finally:
+        manager.stop()
