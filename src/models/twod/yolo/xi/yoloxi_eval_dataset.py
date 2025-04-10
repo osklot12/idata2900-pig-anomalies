@@ -6,7 +6,7 @@ from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
 class EvalUltralyticsDataset(IterableDataset):
     """A finite iterable dataset for Ultralytics OBB evaluation."""
 
-    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 8):
+    def __init__(self, prefetcher: BatchPrefetcher, num_batches: int = 430):
         """
         Args:
             prefetcher (BatchPrefetcher): the prefetcher that streams AnnotatedFrames
