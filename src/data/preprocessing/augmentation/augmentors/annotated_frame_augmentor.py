@@ -14,6 +14,29 @@ class AnnotatedFrameAugmentor(Preprocessor[StreamedAnnotatedFrame]):
     """Augments annotated frames."""
 
     @staticmethod
+    def _adjust_brightness_contrast(frame: np.ndarray, brightness: float, contrast: float) -> np.ndarray:
+        """Adjusts the brightness and contrast of a frame."""
+        return cv2.convertScaleAbs(frame, alpha=contrast, beta=brightness)
+
+    @staticmethod
+    def _add_gaussian_noise(frame: np.ndarray, std: float = 10.0) -> np.ndarray:
+        """Adds gaussian noise to a frame."""
+        noise = np.random.normal(0, std, frame.shape).astype(np.float32)
+        noisy_frame = frame.astype(np.float32) + noise
+        return np.clip(noisy_frame, 0, 255).astype(np.uint8)
+
+    @staticmethod
+    def _jitter_color(frame: np.ndarray, saturation_scale: float = 1.0, hue_shift: int = 0) -> np.ndarray:
+        """Adds color jitter to the frame."""
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV).astype(np.float32)
+        hsv[..., 1] *= saturation_scale
+        hsv[..., 0] += hue_shift
+        hsv[..., 0] %= 180
+        hsv = np.clip(hsv, 0, 255)
+
+        return cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+
+    @staticmethod
     def _compute_shift_and_transform_matrix(t: np.ndarray, cx, cy) -> np.ndarray:
         """Computes a transformation matrix that shifts to the origin before transforming."""
         return (
@@ -21,6 +44,16 @@ class AnnotatedFrameAugmentor(Preprocessor[StreamedAnnotatedFrame]):
                 t @
                 AnnotatedFrameAugmentor._compute_translation_matrix(-cx, -cy)
         )
+
+    @staticmethod
+    def _compute_reflection_matrix() -> np.ndarray:
+        """Computes a reflection matrix."""
+        return np.array([
+            [-1, 0, 0],
+            [0, 1, 0,],
+            [0, 0, 1]
+        ], dtype=np.float32)
+
 
     @staticmethod
     def _compute_translation_matrix(dx: float, dy: float) -> np.ndarray:
@@ -178,15 +211,28 @@ class AnnotatedFrameAugmentor(Preprocessor[StreamedAnnotatedFrame]):
         dilate_factor = self._compute_dilation_factor(1.1)
         dilate_matrix = self._compute_dilation_matrix(dilate_factor)
 
-        rot_dia_matrix = dilate_matrix @ rot_matrix
+        if random.random() < 0.5:
+            reflect_matrix = self._compute_reflection_matrix()
+            t_matrix = dilate_matrix @ rot_matrix @ reflect_matrix
+        else:
+            t_matrix = dilate_matrix @ rot_matrix
 
         frame = instance.frame
         frame_width, frame_height = (frame.shape[1], frame.shape[0])
         frame_center = (frame_width / 2, frame_height / 2)
-        affine_matrix = self._compute_shift_and_transform_matrix(rot_dia_matrix, *frame_center)
+        affine_matrix = self._compute_shift_and_transform_matrix(t_matrix, *frame_center)
 
         aug_frame = self._augment_frame(frame, affine_matrix)
         aug_anno = self._augment_annotations(instance.annotations, affine_matrix, (frame_width, frame_height))
+
+        if random.random() < 0.5:
+            aug_frame = self._adjust_brightness_contrast(aug_frame, brightness=random.uniform(-30, 30), contrast=random.uniform(0.8, 1.2))
+
+        if random.random() < 0.3:
+            aug_frame = self._add_gaussian_noise(aug_frame, std=random.uniform(5, 15))
+
+        if random.random() < 0.3:
+            aug_frame = self._jitter_color(aug_frame, saturation_scale=random.uniform(0.8, 1.2), hue_shift=random.randint(-10, 10))
 
         return [
             StreamedAnnotatedFrame(
