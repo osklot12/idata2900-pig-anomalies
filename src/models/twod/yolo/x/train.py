@@ -45,7 +45,7 @@ def main():
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        # ckpt="YOLOX_outputs/streaming_yolox/latest_ckpt.pth",
+        ckpt=None, # "YOLOX_outputs/streaming_yolox/latest_ckpt.pth",
         fp16=False,
         fuse=False,
         cache=False,
