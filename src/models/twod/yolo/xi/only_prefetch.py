@@ -24,8 +24,8 @@ def main():
     val_stream = NetworkDatasetStream(client=val_client, split=DatasetSplit.VAL)
 
     batch_size = 8
-    train_prefetcher = BatchPrefetcher(train_stream, batch_size=batch_size, fetch_timeout=5)
-    val_prefetcher = BatchPrefetcher(val_stream, batch_size=batch_size, fetch_timeout=5)
+    train_prefetcher = BatchPrefetcher(train_stream, batch_size=batch_size, fetch_timeout=300)
+    val_prefetcher = BatchPrefetcher(val_stream, batch_size=batch_size, fetch_timeout=300)
 
     train_prefetcher.run()
     val_prefetcher.run()
