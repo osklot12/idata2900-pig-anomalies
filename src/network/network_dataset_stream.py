@@ -23,6 +23,8 @@ class NetworkDatasetStream:
         if not response.status == ResponseStatus.SUCCESS:
             raise RuntimeError("Could not open stream")
 
+        print("[NetworkDataStream] Created datasetStream")
+
     def get_batch(self, batch_size: int) -> List[StreamedAnnotatedFrame]:
         response = self._client.send_request(GetBatchRequest(split=self._split, batch_size=batch_size))
         if not isinstance(response, GetBatchResponse):
