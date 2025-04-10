@@ -3,7 +3,7 @@ from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.parsing.string_parser import StringParser
 
 
-class FileBaseNameParserFactory(StringParserFactory):
+class BaseNameParserFactory(StringParserFactory):
     """A factory for creating FileBaseNameParser instances."""
 
     def create_string_parser(self) -> StringParser:

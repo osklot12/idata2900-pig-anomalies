@@ -2,23 +2,25 @@ import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.dataset.factories.lazy_entity_factory import LazyEntityFactory
+from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
 from src.data.dataset.splitters.determ_splitter import DetermSplitter
 from src.data.dataset.streams.dock_stream import DockStream
+from src.data.dataset.streams.factories.gcs_eval_stream_factory import GCSEvalStreamFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
-from src.data.streaming.factories.aggregated_streamer_factory import AggregatedStreamerFactory
-from src.data.streaming.factories.file_streamer_pair_factory import FileStreamerPairFactory
+from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
+from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
 from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
+from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
 from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
 
@@ -73,13 +75,13 @@ def instance_provider(manifest, splitter):
 @pytest.fixture
 def entity_factory(loader_factory):
     """Fixture to provide an EntityFactory instance."""
-    return LazyEntityFactory(loader_factory, BaseNameParser())
+    return LazyEntityProvider(loader_factory, BaseNameParser())
 
 
 @pytest.fixture
 def streamer_pair_factory(instance_provider, entity_factory):
     """Fixture to provide a StreamerPairFactory instance."""
-    return FileStreamerPairFactory(
+    return FileStreamerPairProvider(
         instance_provider=instance_provider,
         entity_factory=entity_factory,
         frame_resizer_factory=StaticFrameResizerFactory((300, 300)),
@@ -90,7 +92,7 @@ def streamer_pair_factory(instance_provider, entity_factory):
 @pytest.fixture
 def streamer_factory(streamer_pair_factory):
     """Fixture to provide an AggregatedStreamerFactory instance."""
-    return AggregatedStreamerFactory(streamer_pair_factory)
+    return AggregatedStreamerProvider(streamer_pair_factory)
 
 
 @pytest.fixture
@@ -121,3 +123,31 @@ def test_streaming_test_set(stream, manager):
         StreamedAnnotatedFrameVisualizer.visualize(instance)
     print(f"Finished reading!")
     manager.stop()
+
+def test_norsvin_test_stream():
+    """Tests Norsvin test set stream."""
+    # arrange
+    factory = GCSEvalStreamFactory(
+        bucket_name=TestBucket.BUCKET_NAME,
+        service_account_path=TestBucket.SERVICE_ACCOUNT_FILE,
+        split=2,
+        frame_size=(1920, 1080),
+        label_map=NorsvinBehaviorClass.get_label_map(),
+        split_ratios=NORSVIN_SPLIT_RATIOS,
+        buffer_size=3
+    )
+    managed_stream = factory.create_stream()
+
+    # act
+    managed_stream.start()
+    stream = managed_stream.stream
+    instance = stream.read()
+    count = 0
+    while instance:
+        assert isinstance(instance, StreamedAnnotatedFrame)
+        instance = stream.read()
+        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        count += 1
+
+    print(f"COUNT: {count}")
+    managed_stream.stop()
