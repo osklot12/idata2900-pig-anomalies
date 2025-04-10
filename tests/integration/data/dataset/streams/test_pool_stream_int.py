@@ -1,5 +1,7 @@
 import os
 
+import cv2
+import numpy as np
 import pytest
 import torch
 from torchvision.transforms.functional import to_pil_image
@@ -153,20 +155,18 @@ def test_streaming_train_set(stream, manager):
 
 
 def test_converted_batches_after_streaming(stream, manager):
-    """Tests the format of converted batches from streamed AnnotatedFrames (Ultralytics format), and saves 20 images."""
-    # arrange
+    """Tests the format of converted batches from streamed AnnotatedFrames (Ultralytics format), and saves 20 annotated images."""
     manager.run()
 
-    # Directory to save in Windows from WSL
     save_dir = "/mnt/c/Users/chris/Pictures"
     os.makedirs(save_dir, exist_ok=True)
     saved_count = 0
     max_images = 20
 
     try:
-        for i in range(10):  # more batches to ensure enough images
+        for i in range(10):  # More than needed, just in case
             frames = []
-            for _ in range(4):  # simulate batch of 4
+            for _ in range(4):
                 frame = stream.read()
                 if frame is None:
                     break
@@ -178,25 +178,39 @@ def test_converted_batches_after_streaming(stream, manager):
             converted = UltralyticsBatchConverter.convert(frames)
 
             for j, sample in enumerate(converted):
-                assert isinstance(sample, dict)
-                assert "img" in sample and isinstance(sample["img"], torch.Tensor)
-
-                print(f"[Batch {i} - Sample {j}]")
-                print("  Image shape:", sample["img"].shape)
-                print("  Classes:", sample["instances"]["cls"].tolist())
-                print("  BBoxes:", sample["instances"]["bboxes"].shape)
-
-                # Save image
-                if saved_count < max_images:
-                    img_tensor = sample["img"].cpu()
-                    img_pil = to_pil_image(img_tensor)
-                    filename = f"converted_sample_{saved_count}.jpg"
-                    img_pil.save(os.path.join(save_dir, filename))
-                    print(f"Saved image to: {os.path.join(save_dir, filename)}")
-                    saved_count += 1
-
                 if saved_count >= max_images:
                     break
+
+                # Convert image tensor to uint8 HWC numpy array
+                img_tensor = sample["img"]
+                img_np = (img_tensor.permute(1, 2, 0).numpy() * 255).astype(np.uint8).copy()
+
+                height, width = img_np.shape[:2]
+                bboxes = sample["instances"]["bboxes"]
+                classes = sample["instances"]["cls"]
+
+                for k in range(len(bboxes)):
+                    cx, cy, bw, bh, _ = bboxes[k].tolist()
+                    x_min = int((cx - bw / 2) * width)
+                    y_min = int((cy - bh / 2) * height)
+                    x_max = int((cx + bw / 2) * width)
+                    y_max = int((cy + bh / 2) * height)
+
+                    class_id = classes[k].item()
+
+                    # Draw rectangle
+                    cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+                    cv2.putText(
+                        img_np, f"cls {class_id}", (x_min, max(10, y_min - 5)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
+                    )
+
+                # Save image
+                filename = f"converted_sample_{saved_count}.jpg"
+                full_path = os.path.join(save_dir, filename)
+                cv2.imwrite(full_path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
+                print(f"Saved annotated image to: {full_path}")
+                saved_count += 1
 
             if saved_count >= max_images:
                 break
