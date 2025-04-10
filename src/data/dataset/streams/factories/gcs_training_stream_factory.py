@@ -75,28 +75,33 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         stream = self._create_stream(self._pool_size, [instance_multiplier, augmentor])
         streamer_manager = self._create_streamer_manager(streamer_factory, stream)
 
+        print(f"[GCSTrainingStreamFactory] Returned ManagedStream")
         return ManagedStream(stream, streamer_manager)
 
 
     @staticmethod
     def _create_auth_service_factory(service_account_path: str) -> AuthServiceFactory:
         """Creates an AuthServiceFactory instance."""
+        print(f"[GCSTrainingStreamFactory] Created auth service")
         return GCPAuthServiceFactory(service_account_path)
 
     @staticmethod
     def _create_label_parser_factory(label_map: Dict[str, T_Enum]) -> LabelParserFactory:
         """Creates a LabelParserFactory instance."""
+        print(f"[GCSTrainingStreamFactory] Created SimpleLabelParserFactory")
         return SimpleLabelParserFactory(label_map)
 
     @staticmethod
     def _create_decoder_factory(label_parser_factory: LabelParserFactory) -> AnnotationDecoderFactory:
         """Creates an AnnotationDecoderFactory instance."""
+        print(f"[GCSTrainingStreamFactory] Created DarwinDecoderFactory")
         return DarwinDecoderFactory(label_parser_factory)
 
     @staticmethod
     def _create_loader_factory(bucket_name: str, auth_service_factory: AuthServiceFactory,
                                decoder_factory: AnnotationDecoderFactory) -> LoaderFactory:
         """Creates a LoaderFactory instance."""
+        print(f"[GCSTrainingStreamFactory] Created LoaderFactory")
         return GCSLoaderFactory(
             bucket_name=bucket_name,
             auth_factory=auth_service_factory,
@@ -106,6 +111,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_manifest(source: FileRegistry) -> Manifest:
         """Creates a dataset manifest."""
+        print(f"[GCSTrainingStreamFactory] Created MatchinManifest")
         return MatchingManifest(
             video_registry=SuffixFileRegistry(source=source, suffixes=("mp4",)),
             annotations_registry=SuffixFileRegistry(source=source, suffixes=("json",)),
@@ -114,6 +120,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_splitter(ids: List[str], split_ratios: DatasetSplitRatios) -> DetermSplitter:
         """Creates a DetermSplitter instance."""
+        print(f"[GCSTrainingStreamFactory] Created Splitter")
         return DetermSplitter(
             strings=ids,
             weights=[
@@ -126,6 +133,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_instance_provider(manifest: Manifest, splitter: DetermSplitter) -> InstanceProvider:
         """Creates a InstanceProvider instance."""
+        print(f"[GCSTrainingStreamFactory] Created InstanceProvider")
         return ManifestInstanceProvider(
             manifest=manifest,
             selector=RandomStringSelector(strings=splitter.splits[0])
@@ -134,6 +142,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_entity_provider(loader_factory: LoaderFactory) -> DatasetEntityProvider:
         """Creates a DatasetEntityProvider instance."""
+        print(f"[GCSTrainingStreamFactory] Created EntityProvider")
         return LazyEntityProvider(
             loader_factory=loader_factory,
             id_parser=BaseNameParser()
@@ -142,6 +151,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_streamer_pair_provider(instance_provider, entity_factory, frame_size: Tuple[int, int]) -> StreamerPairProvider:
         """Creates a StreamerPairProvider instance."""
+        print(f"[GCSTrainingStreamFactory] Created StreamerPairProvider")
         return FileStreamerPairProvider(
             instance_provider=instance_provider,
             entity_factory=entity_factory,
@@ -152,6 +162,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_streamer_factory(streamer_pair_provider: StreamerPairProvider) -> StreamerProvider:
         """Creates an AggregatedStreamerFactory instance."""
+        print(f"[GCSTrainingStreamFactory] Created StreamerFactory")
         return AggregatedStreamerProvider(streamer_pair_provider=streamer_pair_provider)
 
     @staticmethod
@@ -170,6 +181,7 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     @staticmethod
     def _create_stream(pool_size: int, preprocessors: Iterable[Preprocessor]) -> PoolStream[StreamedAnnotatedFrame]:
         """Creates a PoolStream instance."""
+        print(f"[GCSTrainingStreamFactory] Created Stream")
         return PoolStream[StreamedAnnotatedFrame](
             pool_size=pool_size,
             preprocessors=[preprocessor for preprocessor in preprocessors]
@@ -179,7 +191,9 @@ class GCSTrainingStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     def _create_streamer_manager(streamer_factory: StreamerProvider[StreamedAnnotatedFrame],
                                  stream: PoolStream[StreamedAnnotatedFrame]) -> StreamerManager:
         """Creates a StaticStreamerManager instance."""
+        print(f"[GCSTrainingStreamFactory] Created StreamManager")
         return StaticStreamerManager[StreamedAnnotatedFrame](
             streamer_factory=streamer_factory,
-            consumer=stream
+            consumer=stream,
+            n_streamers=2
         )

@@ -12,7 +12,7 @@ T = TypeVar("T")
 class DockStream(Generic[T], Stream[T]):
     """Sequential streams of data, where input streams are ordered sequentially."""
 
-    def __init__(self, buffer_size: int = 3):
+    def __init__(self, buffer_size: int = 3, dock_size: int = 100):
         """
         Initializes a SequentialStream instance.
 
@@ -21,6 +21,7 @@ class DockStream(Generic[T], Stream[T]):
         """
         self._dock_queue: queue.Queue[Optional[queue.Queue[T]]] = queue.Queue(maxsize=buffer_size)
         self._buffer_size = buffer_size
+        self._dock_size = dock_size
 
         self._current_dock = None
         self._eos = False
@@ -63,7 +64,7 @@ class DockStream(Generic[T], Stream[T]):
         dock_input = None
 
         if not self._closed:
-            q = queue.Queue()
+            q = queue.Queue(maxsize=self._dock_size)
             self._dock_queue.put(q, timeout=timeout)
             dock_input = FeedableQueue[T](q)
 

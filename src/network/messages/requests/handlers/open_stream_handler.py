@@ -22,6 +22,8 @@ class OpenStreamHandler(RequestHandler):
         response = OpenStreamResponse(ResponseStatus.ERROR)
 
         try:
+            print(f"Split: {request.split}")
+            print(f"Stream factories: {self._stream_factories}")
             stream = self._stream_factories[request.split].create_stream()
             stream.start()
             self._session.streams[request.split] = stream

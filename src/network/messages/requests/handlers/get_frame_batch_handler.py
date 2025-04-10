@@ -18,4 +18,5 @@ class GetFrameBatchHandler(RequestHandler):
 
     def handle(self, request: GetFrameBatchRequest) -> FrameBatchResponse:
         batch = self._provider.get_batch(request.split, request.batch_size)
+        print(f"[GetFrameBatchHandler] Creating batch...")
         return FrameBatchResponse(batch)
