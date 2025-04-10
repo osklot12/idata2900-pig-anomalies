@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import torch
 from torchvision.transforms.functional import to_pil_image
@@ -151,16 +153,18 @@ def test_streaming_train_set(stream, manager):
 
 
 def test_converted_batches_after_streaming(stream, manager):
-    """Tests the format of converted batches from streamed AnnotatedFrames (Ultralytics format), and saves one image."""
+    """Tests the format of converted batches from streamed AnnotatedFrames (Ultralytics format), and saves 20 images."""
     # arrange
     manager.run()
 
-    # Path to save in Windows from WSL
-    save_path = "/mnt/c/Users/chris/Pictures/converted_sample.jpg"
-    image_saved = False
+    # Directory to save in Windows from WSL
+    save_dir = "/mnt/c/Users/chris/Pictures"
+    os.makedirs(save_dir, exist_ok=True)
+    saved_count = 0
+    max_images = 20
 
     try:
-        for i in range(3):  # try 3 batches
+        for i in range(10):  # more batches to ensure enough images
             frames = []
             for _ in range(4):  # simulate batch of 4
                 frame = stream.read()
@@ -182,13 +186,20 @@ def test_converted_batches_after_streaming(stream, manager):
                 print("  Classes:", sample["instances"]["cls"].tolist())
                 print("  BBoxes:", sample["instances"]["bboxes"].shape)
 
-                # Save only the first image once
-                if not image_saved:
+                # Save image
+                if saved_count < max_images:
                     img_tensor = sample["img"].cpu()
                     img_pil = to_pil_image(img_tensor)
-                    img_pil.save(save_path)
-                    print(f"Saved image to: {save_path}")
-                    image_saved = True
+                    filename = f"converted_sample_{saved_count}.jpg"
+                    img_pil.save(os.path.join(save_dir, filename))
+                    print(f"Saved image to: {os.path.join(save_dir, filename)}")
+                    saved_count += 1
+
+                if saved_count >= max_images:
+                    break
+
+            if saved_count >= max_images:
+                break
 
     finally:
         manager.stop()
