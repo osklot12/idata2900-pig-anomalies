@@ -14,27 +14,27 @@ def main():
     server_ip = "10.0.0.1"
 
     print("🔌 Connecting to train and val dataset streams...")
-    train_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
-    train_client.connect(server_ip)
+    ## train_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
+    ## train_client.connect(server_ip)
 
     val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     val_client.connect(server_ip)
 
-    train_stream = NetworkDatasetStream(client=train_client, split=DatasetSplit.TRAIN)
+    ## train_stream = NetworkDatasetStream(client=train_client, split=DatasetSplit.TRAIN)
     val_stream = NetworkDatasetStream(client=val_client, split=DatasetSplit.VAL)
 
     batch_size = 8
-    train_prefetcher = BatchPrefetcher(train_stream, batch_size=batch_size, fetch_timeout=300)
+    ## train_prefetcher = BatchPrefetcher(train_stream, batch_size=batch_size, fetch_timeout=300)
     val_prefetcher = BatchPrefetcher(val_stream, batch_size=batch_size, fetch_timeout=300)
 
-    train_prefetcher.run()
+    ## train_prefetcher.run()
     val_prefetcher.run()
 
     print("🚀 Streaming started: Train and Val prefetchers are now running")
 
 
     while(True):
-        print(train_prefetcher.get())
+        ## print(train_prefetcher.get())
         print(val_prefetcher.get())
 
 
