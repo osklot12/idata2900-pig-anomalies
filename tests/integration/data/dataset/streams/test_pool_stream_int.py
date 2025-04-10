@@ -164,16 +164,18 @@ def test_converted_batches_after_streaming(stream, manager):
     max_images = 20
 
     try:
-        for i in range(10):  # More than needed, just in case
+        for i in range(10):  # Pull up to 10 batches
             frames = []
-            for _ in range(4):
+            for _ in range(4):  # Simulate batch of 4
                 frame = stream.read()
                 if frame is None:
                     break
                 frames.append(frame)
 
-            if not frames:
-                break
+            # Skip empty batch or batch with no annotations
+            if not frames or all(len(f.annotations) == 0 for f in frames):
+                print(f"[Batch {i}] Skipping due to no annotated frames.")
+                continue
 
             converted = UltralyticsBatchConverter.convert(frames)
 
@@ -181,13 +183,14 @@ def test_converted_batches_after_streaming(stream, manager):
                 if saved_count >= max_images:
                     break
 
-                # Convert image tensor to uint8 HWC numpy array
                 img_tensor = sample["img"]
                 img_np = (img_tensor.permute(1, 2, 0).numpy() * 255).astype(np.uint8).copy()
 
                 height, width = img_np.shape[:2]
                 bboxes = sample["instances"]["bboxes"]
                 classes = sample["instances"]["cls"]
+
+                print(f"[Image {saved_count}] Detected {len(bboxes)} bboxes, classes: {classes.tolist()}")
 
                 for k in range(len(bboxes)):
                     cx, cy, bw, bh, _ = bboxes[k].tolist()
@@ -198,14 +201,12 @@ def test_converted_batches_after_streaming(stream, manager):
 
                     class_id = classes[k].item()
 
-                    # Draw rectangle
                     cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
                     cv2.putText(
                         img_np, f"cls {class_id}", (x_min, max(10, y_min - 5)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
                     )
 
-                # Save image
                 filename = f"converted_sample_{saved_count}.jpg"
                 full_path = os.path.join(save_dir, filename)
                 cv2.imwrite(full_path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
