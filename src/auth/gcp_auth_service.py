@@ -34,6 +34,7 @@ class GCPAuthService(AuthService):
             self.credentials_path, scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
         self.refresh_token()
+        print("[GCPAuthService] Authenticated successfully")
 
     def refresh_token(self) -> None:
         """Refreshes the token if needed."""
@@ -47,13 +48,10 @@ class GCPAuthService(AuthService):
 
             while attempt <= self.max_retries and not success:
                 try:
-                    print(f"[GCPAuthService] Refreshing GCP token (attempt {attempt})...")
                     self.creds.refresh(request)
                     self.token = self.creds.token
-                    print(f"[GCPAuthService] Token refreshed successfully.")
                     success = True
                 except TransportError as e:
-                    print(f"[GCPAuthService] Failed to refresh token: {e}")
                     if attempt < self.max_retries:
                         time.sleep(2 ** attempt)
                     attempt += 1

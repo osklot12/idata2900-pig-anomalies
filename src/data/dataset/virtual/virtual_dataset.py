@@ -60,8 +60,6 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
             if len(buffer) < batch_size:
                 raise ValueError(f"Not enough available data in split {split.name} for batch size {batch_size}.")
 
-            self._send_pressure_schema(0, batch_size)
-
             return random.sample(buffer, batch_size)
 
     def _send_pressure_schema(self, inputs: int, outputs: int):
@@ -86,26 +84,24 @@ class VirtualDataset(Generic[I, O], BatchProvider[O]):
             food (I): the data instance to feed
         """
         with self._lock:
-            id_, instance = self._get_identified_instance(food)
-            split_buffer = self._get_split_buffer_for_source(id_)
-            evicted = split_buffer.add(id_, instance)
+            instance_id = self._get_instance_id(food)
+            split_buffer = self._get_split_buffer_for_source(instance_id)
+            evicted = split_buffer.add(instance_id, food)
 
             # remove evicted instances from the splitter
             for id_ in evicted:
                 self._splitter.remove_instance(id_)
 
-            self._send_pressure_schema(1, 0)
-
     @abstractmethod
-    def _get_identified_instance(self, food: I) -> Tuple[str, O]:
+    def _get_instance_id(self, food: I) -> str:
         """
-        Returns the instance with an identifier.
+        Returns the instance ID.
 
         Args:
-            food (I): the fed data
+            food (I): the instance to get ID for
 
         Returns:
-            Tuple[str, T]: a tuple (str, T) containing the ID and instance
+            str: the instance ID
         """
         raise NotImplementedError
 

@@ -1,3 +1,3 @@
 class StreamReadError(OSError):
-    """Raised when stream read does not return expected bytes."""
+    """Raised when streams read does not return expected bytes."""
     pass

@@ -29,6 +29,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
         self._lock = threading.Lock()
 
     def run(self) -> None:
+        print(f"[ConcurrentStreamerManager] Running...")
         with self._lock:
             if self._running:
                 raise RuntimeError("StreamerManager already running")
@@ -56,6 +57,7 @@ class ConcurrentStreamerManager(RunnableStreamerManager, StreamerManager):
 
         streamer_id = self._add_streamer(streamer)
         streamer.start_streaming()
+        print(f"[ConcurrentStreamerManager] Launched streamer...")
         future = self._executor.submit(self._run_streamer, streamer, streamer_id)
         future.add_done_callback(partial(self._on_streamer_done, streamer_id=streamer_id))
 

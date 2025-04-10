@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.gcp_auth_service import GCPAuthService
-from src.data.dataset.sources.gcs_source_registry import GCSSourceRegistry
+from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from tests.utils.gcs.test_bucket import TestBucket
 
 
@@ -13,7 +13,7 @@ def gcp_auth_service():
 @pytest.fixture
 def gcs_file_manager(gcp_auth_service):
     """Fixture to provide a GCSFileManager instance."""
-    return GCSSourceRegistry(
+    return GCSFileRegistry(
         bucket_name=TestBucket.BUCKET_NAME,
         auth_service=gcp_auth_service
     )
@@ -22,7 +22,7 @@ def gcs_file_manager(gcp_auth_service):
 def test_list_files_success(gcs_file_manager):
     """Integration test for successfully listing all files."""
     # act
-    result = gcs_file_manager.get_source_ids()
+    result = gcs_file_manager.get_file_paths()
 
     # assert
     assert isinstance(result, set)
@@ -31,11 +31,11 @@ def test_list_files_success(gcs_file_manager):
 def test_list_files_bucket_not_found(gcp_auth_service):
     """Integration test for handling non-existent bucket."""
     # act
-    file_manager = GCSSourceRegistry(
+    file_manager = GCSFileRegistry(
         bucket_name="non-existent-bucket-98542354082764032",
         auth_service=gcp_auth_service
     )
 
     # act & assert
     with pytest.raises(Exception, match="404 Client Error"):
-        file_manager.get_source_ids()
+        file_manager.get_file_paths()

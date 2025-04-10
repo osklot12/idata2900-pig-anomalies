@@ -1,82 +1,72 @@
-import concurrent.futures
+import queue
 import threading
-from typing import Type
+from typing import TypeVar, Generic
 
-from src.data.streaming.managers.runnable_streamer_manager import RunnableStreamerManager
-from src.data.streaming.managers.streamer_manager import StreamerManager
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataset.streams.dock_stream import DockStream
 from src.data.streaming.factories.streamer_factory import StreamerFactory
+from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.streamer import Streamer
 
+T = TypeVar("T")
 
-class DockingStreamerManager(RunnableStreamerManager, StreamerManager):
-    """
-    A stream manager effective for large sets of finite streams, maintaining a constant number of streams at all time.
-    The Streamers "dock" the manager, before leaving and making space for the next streamer.
-    """
 
-    def __init__(self, streamer_provider: StreamerFactory, n_streamers: int):
+class DockingStreamerManager(Generic[T], ConcurrentStreamerManager):
+    """A streamer manager for directing streamers to a SequentialStream."""
+
+    def __init__(self, streamer_factory: StreamerFactory[T], stream: DockStream[T],
+                 max_streamers: int = 10):
         """
-        Initializes a new instance of the DockingStreamManager class.
+        Initializes a RoutingStreamerManager instance.
 
         Args:
-            streamer_provider (Type[StreamerFactory]): Provides streamers.
-            n_streamers (int): The number of streamers to maintain at all times.
+            streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
+            stream (DockStream): the sequential streams to feed
+            max_streamers (int): the maximum number of concurrent streamers
         """
-        if n_streamers < 1:
-            raise ValueError("n_streamers must be greater than 0")
+        super().__init__(max_streamers)
+        self._streamer_factory = streamer_factory
+        self._stream = stream
 
-        super().__init__()
+        self._worker = None
 
-        self._streamer_provider = streamer_provider
-        self._n_streamers = n_streamers
+    def _worker_loop(self) -> None:
+        """Worker thread function."""
+        print(f"[SequentialStreamerManager] Ran worker")
+        while self._running:
+            try:
+                feedable = self._stream.dock(timeout=0.1)
+                if feedable:
+                    streamer = self._streamer_factory.create_streamer(feedable)
+                    if streamer:
+                        print(f"[SequentialStreamerManager] Launched streamer...")
+                        self._launch_streamer(streamer)
+                    else:
+                        print(f"[SequentialStreamerManager] End of stream")
+                        feedable.feed(None)
+                        self._stream.close()
 
-        self._running = False
+            except queue.Full:
+                pass
 
-        self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=self._n_streamers)
-        self._lock = threading.Lock()
+            except RuntimeError as e:
+                print(f"[SequentialStreamerManager] Failed to launch streamer: {e}")
 
-    def run(self) -> None:
-        self._running = True
-        for _ in range(self._n_streamers):
-            self._start_new_streamer()
+    def _setup(self) -> None:
+        print(f"[SequentialStreamerManager] Setting up...")
+        self._worker = threading.Thread(target=self._worker_loop)
+        self._worker.start()
 
-    def _start_new_streamer(self):
-        """Fetches a new streamer, assigns it an ID, and submits it to the executor."""
-        streamer = self._streamer_provider.create_streamer()
-
-        # only start next streamer if the streamer exists
-        if streamer:
-            streamer_id = self._add_streamer(streamer)
-
-            streamer.start_streaming()
-            future = self._executor.submit(self._manage_streamer, streamer, streamer_id)
-            future.add_done_callback(self._on_streamer_done)
-
-    @staticmethod
-    def _manage_streamer(streamer: Streamer, streamer_id: str) -> str:
-        """Manages the streamer."""
+    def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:
         streamer.wait_for_completion()
         streamer.stop_streaming()
-        return streamer_id
 
-    def _on_streamer_done(self, future: concurrent.futures.Future) -> None:
-        """Callback for streamers done streaming."""
-        with self._lock:
-            if self._running:
-                streamer_id = future.result()
-                self._remove_streamer(streamer_id)
-                self._start_new_streamer()
+    def _handle_done_streamer(self, streamer_id: str) -> None:
+        self._remove_streamer(streamer_id)
 
-    def stop(self) -> None:
-        with self._lock:
-            self._running = False
-        for streamer_id in self.get_streamer_ids():
-            streamer = self.get_streamer(streamer_id)
-            if streamer:
-                streamer.stop_streaming()
-            self._remove_streamer(streamer_id)
+    def _handle_crashed_streamer(self, streamer_id: str, e: Exception) -> None:
+        self._remove_streamer(streamer_id)
 
-        self._executor.shutdown(wait=True)
-
-    def n_active_streamers(self) -> int:
-        return len(self._get_streamers())
+    def _stop(self) -> None:
+        self._worker.join()
+        self._worker = None

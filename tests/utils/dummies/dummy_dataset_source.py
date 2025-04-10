@@ -1,9 +1,9 @@
 from typing import List
 
-from src.data.dataset.sources.dataset_source_registry import SourceRegistry
+from src.data.dataset.registries.file_registry import FileRegistry
 
 
-class DummyDatasetSource(SourceRegistry):
+class DummyDatasetSource(FileRegistry):
     """A dummy DatasetSource implementation for testing."""
 
     def __init__(self):
@@ -26,5 +26,5 @@ class DummyDatasetSource(SourceRegistry):
         """
         self.file_paths = file_paths
 
-    def get_source_ids(self) -> List[str]:
+    def get_file_paths(self) -> List[str]:
         return self.file_paths

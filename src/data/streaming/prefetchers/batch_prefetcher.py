@@ -1,6 +1,5 @@
 import queue
 import threading
-import time
 from typing import TypeVar, List
 
 from typing_extensions import Generic
@@ -54,12 +53,16 @@ class BatchPrefetcher(Generic[T], Prefetcher[List[T]]):
     def _worker(self) -> None:
         """Worker function that runs on the worker threads."""
         while self._running:
-            time.sleep(.2)
-            try:
-                batch = self._provider.get_batch(self._split, self._batch_size)
-                self._queue.put(batch, timeout=.1)
-            except queue.Full:
-                pass
+            batch = self._provider.get_batch(self._split, self._batch_size)
+
+            put = False
+            while not put and self._running:
+                try:
+                    self._queue.put(batch, timeout=0.1)
+                    put = True
+                except queue.Full:
+                    pass
+
 
     def stop(self) -> None:
         with self._run_lock:
