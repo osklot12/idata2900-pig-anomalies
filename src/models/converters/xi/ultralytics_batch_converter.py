@@ -49,5 +49,7 @@ class UltralyticsBatchConverter:
                 "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],
             })
 
+            print(f"[Converter] Frame shape: {frame.frame.shape}")
+
         return results
 

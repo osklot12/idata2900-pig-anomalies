@@ -177,6 +177,11 @@ def test_converted_batches_after_streaming(stream, manager):
                 print(f"[Batch {i}] Skipping due to no annotated frames.")
                 continue
 
+            for idx, f in enumerate(frames):
+                print(f"[Pre-Convert] Frame {idx} has {len(f.annotations)} annotations")
+                for ann in f.annotations:
+                    print(f" - Class: {ann.cls.value}, Box: {ann.bbox}")
+
             converted = UltralyticsBatchConverter.convert(frames)
 
             for j, sample in enumerate(converted):
