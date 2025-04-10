@@ -296,3 +296,81 @@ def test_rcnn_converted_tensors_after_streaming(stream, manager):
 
     finally:
         manager.stop()
+
+
+def test_yolox_converted_batches_after_streaming(stream, manager):
+    """
+    Tests the format of converted batches from streamed AnnotatedFrames (YOLOX format), and saves 20 annotated images.
+    """
+    from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
+
+    save_dir = "/mnt/c/Users/chris/Pictures/yolox_tensor_debug"
+    os.makedirs(save_dir, exist_ok=True)
+
+    saved_count = 0
+    max_images = 20
+
+    manager.run()
+
+    try:
+        for i in range(10):  # Try 10 batches
+            frames = []
+            for _ in range(4):  # Simulate batch size
+                frame = stream.read()
+                if frame is None:
+                    break
+                frames.append(frame)
+
+            if not frames or all(len(f.annotations) == 0 for f in frames):
+                print(f"[Batch {i}] Skipping empty or unannotated batch")
+                continue
+
+            for idx, f in enumerate(frames):
+                print(f"[Pre-Convert] Frame {idx} has {len(f.annotations)} annotations")
+                for ann in f.annotations:
+                    print(f" - Class: {ann.cls.value}, Box: {ann.bbox}")
+
+            imgs, targets, img_info, _ = YOLOXBatchConverter.convert(frames)
+
+            for j in range(len(frames)):
+                if saved_count >= max_images:
+                    break
+
+                img_tensor = imgs[j]
+                target = targets[j]
+                height, width, _ = img_info[j].tolist()
+
+                img_np = (img_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8).copy()
+
+                print(f"[Image {saved_count}] Detected {len(target)} boxes")
+
+                for k, box in enumerate(target):
+                    cls_id, cx, cy, bw, bh = box.tolist()
+
+                    x_min = max(0, int((cx - bw / 2)))
+                    y_min = max(0, int((cy - bh / 2)))
+                    x_max = min(int((cx + bw / 2)), int(width - 1))
+                    y_max = min(int((cy + bh / 2)), int(height - 1))
+
+                    print(f"Drawing box {k}: [{x_min}, {y_min}, {x_max}, {y_max}] for class {int(cls_id)}")
+
+                    if x_max > x_min and y_max > y_min:
+                        cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+                        cv2.putText(
+                            img_np, f"cls {int(cls_id)}", (x_min, max(10, y_min - 5)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
+                        )
+                    else:
+                        print(f"⚠️ Skipping invalid box for class {int(cls_id)}")
+
+                filename = f"yolox_frame_{saved_count}.jpg"
+                full_path = os.path.join(save_dir, filename)
+                cv2.imwrite(full_path, cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR))
+                print(f"✅ Saved annotated image to: {full_path}")
+                saved_count += 1
+
+            if saved_count >= max_images:
+                break
+
+    finally:
+        manager.stop()
