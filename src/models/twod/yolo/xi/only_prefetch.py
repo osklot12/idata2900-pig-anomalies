@@ -32,23 +32,10 @@ def main():
 
     print("🚀 Streaming started: Train and Val prefetchers are now running")
 
-    print("🧠 Testing train dataset streaming...")
-    train_dataset = UltralyticsDataset(train_prefetcher, num_batches=3)
-    for i, sample in enumerate(train_dataset):
-        print(f"🖼️ [Train] Sample {i + 1}: class={sample['instances']['cls'].tolist()}")
 
-    print("🧠 Testing val dataset streaming...")
-    val_dataset = EvalUltralyticsDataset(val_prefetcher, num_batches=2)
-    for i, sample in enumerate(val_dataset):
-        print(f"🖼️ [Val] Sample {i + 1}: class={sample['instances']['cls'].tolist()}")
-
-    print("✅ Streaming and conversion test complete")
-
-    # Let threads flush
-    sleep(1)
-    train_prefetcher.stop()
-    val_prefetcher.stop()
-    print("🛑 Prefetchers stopped")
+    while(True):
+        print(train_prefetcher.get())
+        print(val_prefetcher.get())
 
 
 if __name__ == "__main__":
