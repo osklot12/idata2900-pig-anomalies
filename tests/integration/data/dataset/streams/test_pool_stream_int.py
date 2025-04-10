@@ -194,18 +194,23 @@ def test_converted_batches_after_streaming(stream, manager):
 
                 for k in range(len(bboxes)):
                     cx, cy, bw, bh, _ = bboxes[k].tolist()
-                    x_min = int((cx - bw / 2) * width)
-                    y_min = int((cy - bh / 2) * height)
-                    x_max = int((cx + bw / 2) * width)
-                    y_max = int((cy + bh / 2) * height)
+                    x_min = max(0, int((cx - bw / 2) * width))
+                    y_min = max(0, int((cy - bh / 2) * height))
+                    x_max = min(width - 1, int((cx + bw / 2) * width))
+                    y_max = min(height - 1, int((cy + bh / 2) * height))
 
                     class_id = classes[k].item()
 
-                    cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
-                    cv2.putText(
-                        img_np, f"cls {class_id}", (x_min, max(10, y_min - 5)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
-                    )
+                    print(f"Drawing box {k}: [{x_min}, {y_min}, {x_max}, {y_max}] for class {class_id}")
+
+                    if x_max > x_min and y_max > y_min:
+                        cv2.rectangle(img_np, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+                        cv2.putText(
+                            img_np, f"cls {class_id}", (x_min, max(10, y_min - 5)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
+                        )
+                    else:
+                        print(f"⚠️ Skipping invalid box for class {class_id}")
 
                 filename = f"converted_sample_{saved_count}.jpg"
                 full_path = os.path.join(save_dir, filename)
