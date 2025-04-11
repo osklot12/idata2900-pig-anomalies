@@ -4,38 +4,39 @@ from typing import Optional, List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
+from src.data.pipeline.producer import Producer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
+from src.data.structures.atomic_var import AtomicVar
 
 
-class AnnotationStreamer(ConcurrentStreamer):
+class AnnotationStreamer(Producer[FrameAnnotations], ConcurrentStreamer):
     """A streamer for streaming annotation data."""
 
-    def __init__(self, consumer: Consumer[FrameAnnotations], normalizer: Optional[BBoxNormalizer]):
+    def __init__(self, consumer: Optional[Consumer[FrameAnnotations]] = None):
         """
         Initializes a AnnotationStreamer instance.
 
         Args:
-            consumer (Consumer[FrameAnnotations]): the consumer of the streaming data
-            normalizer (BBoxNormalizer): the bounding box normalization strategy
+            consumer (Optional[Consumer[FrameAnnotations]]): the consumer of the streamed data
         """
         super().__init__()
-        self._consumer = consumer
-        self._normalizer = normalizer
+        self._consumer = AtomicVar[Consumer[FrameAnnotations]](consumer)
 
     def _stream(self) -> StreamerStatus:
         result = StreamerStatus.COMPLETED
         annotation = self._get_next_annotation()
         while annotation is not None and not self._is_requested_to_stop():
-            normalized_annotation = self._normalize_frame_annotations(annotation)
-            self._consumer.consume(normalized_annotation)
-
-            annotation = self._get_next_annotation()
+            consumer = self._consumer.get()
+            if consumer is not None:
+                consumer.consume(annotation)
+                annotation = self._get_next_annotation()
 
         # indicating end of streams
-        self._consumer.consume(None)
+        consumer = self._consumer.get()
+        if consumer is not None:
+            consumer.consume(annotation)
 
         if annotation and self._is_requested_to_stop():
             result = StreamerStatus.STOPPED
@@ -81,3 +82,6 @@ class AnnotationStreamer(ConcurrentStreamer):
             Optional[FrameAnnotations]: the next annotation, or None if end of streams
         """
         raise NotImplementedError
+
+    def set_consumer(self, consumer: Consumer[FrameAnnotations]) -> None:
+        self._consumer.set(consumer)
