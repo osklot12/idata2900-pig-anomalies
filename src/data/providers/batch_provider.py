@@ -6,7 +6,7 @@ from src.data.dataset.dataset_split import DatasetSplit
 T = TypeVar('T')
 
 class BatchProvider(ABC, Generic[T]):
-    """Interface for data batch providers."""
+    """Interface for data batch factories."""
 
     @abstractmethod
     def get_batch(self, split: DatasetSplit, batch_size: int) -> List[T]:

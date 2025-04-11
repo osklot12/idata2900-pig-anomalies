@@ -5,7 +5,7 @@ from src.data.dataclasses.dataset_instance import DatasetInstance
 
 
 class InstanceProvider(ABC):
-    """Interface for dataset instance providers."""
+    """Interface for dataset instance factories."""
 
     @abstractmethod
     def get(self) -> Optional[DatasetInstance]:

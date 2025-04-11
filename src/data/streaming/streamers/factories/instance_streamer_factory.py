@@ -7,7 +7,7 @@ from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregato
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.feedables.feedable_func import FeedableFunc
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
-from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
+from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
