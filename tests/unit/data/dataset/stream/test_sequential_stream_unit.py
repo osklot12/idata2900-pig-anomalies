@@ -31,11 +31,11 @@ def test_input_data_is_read_sequentially(data1, data2):
     # act
     feedable1 = stream.dock()
     for s in data1:
-        feedable1.feed(s)
+        feedable1.consume(s)
 
     feedable2 = stream.dock()
     for s in data2:
-        feedable2.feed(s)
+        feedable2.consume(s)
 
     # assert
     for i in range(len(data1) - 1):
@@ -53,7 +53,7 @@ def test_close_closes_stream(data1):
 
     feedable = stream.dock()
     for s in data1:
-        feedable.feed(s)
+        feedable.consume(s)
 
     # act
     stream.close()

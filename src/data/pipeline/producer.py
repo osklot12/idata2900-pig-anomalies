@@ -1,0 +1,19 @@
+from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
+
+from src.data.pipeline.consumer import Consumer
+
+T = TypeVar("T")
+
+class Producer(Generic[T], ABC):
+    """Interface for producers of data."""
+
+    @abstractmethod
+    def set_consumer(self, consumer: Consumer[T]) -> None:
+        """
+        Sets the consumer for the producer.
+
+        Args:
+            consumer (Consumer): the consumer to sets
+        """
+        raise NotImplementedError

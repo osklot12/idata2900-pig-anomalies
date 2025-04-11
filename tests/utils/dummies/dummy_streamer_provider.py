@@ -1,9 +1,9 @@
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.streamer import Streamer
 from tests.utils.dummies.dummy_streamer import DummyStreamer
 
 
-class DummyStreamerProvider(StreamerProvider):
+class DummyStreamerProvider(StreamerFactory):
     """A dummy streamer provider for testing."""
 
     def __init__(self, n_streamers: int = -1, streamer_wait_time: float = .5):
@@ -22,7 +22,7 @@ class DummyStreamerProvider(StreamerProvider):
 
         self._counter = 0
 
-    def next_streamer(self) -> Streamer:
+    def create_streamer(self) -> Streamer:
         result = None
 
         streamers_left = self._n_streamers - self._counter

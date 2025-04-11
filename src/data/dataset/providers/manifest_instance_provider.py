@@ -20,7 +20,7 @@ class ManifestInstanceProvider(InstanceProvider):
         self._manifest = manifest
         self._selector = selector
 
-    def next(self) -> Optional[DatasetInstance]:
+    def get(self) -> Optional[DatasetInstance]:
         instance = None
 
         id_ = self._selector.next()
@@ -31,4 +31,5 @@ class ManifestInstanceProvider(InstanceProvider):
 
         if instance is None:
             print(f"[ManifestInstanceProvider] End of stream")
+            
         return instance

@@ -3,7 +3,7 @@ import threading
 from typing import TypeVar, Generic
 
 from src.data.dataset.streams.dock_stream import DockStream
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.streamer import Streamer
 
@@ -13,13 +13,13 @@ T = TypeVar("T")
 class DockingStreamerManager(Generic[T], ConcurrentStreamerManager):
     """A streamer manager for directing streamers to a SequentialStream."""
 
-    def __init__(self, streamer_factory: StreamerProvider[T], stream: DockStream[T],
+    def __init__(self, streamer_factory: StreamerFactory[T], stream: DockStream[T],
                  max_streamers: int = 10):
         """
         Initializes a RoutingStreamerManager instance.
 
         Args:
-            streamer_factory (StreamerProvider[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
+            streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
             stream (DockStream): the sequential streams to feed
             max_streamers (int): the maximum number of concurrent streamers
         """
@@ -36,13 +36,13 @@ class DockingStreamerManager(Generic[T], ConcurrentStreamerManager):
             try:
                 feedable = self._stream.dock(timeout=0.1)
                 if feedable:
-                    streamer = self._streamer_factory.next_streamer(feedable)
+                    streamer = self._streamer_factory.create_streamer(feedable)
                     if streamer:
                         print(f"[SequentialStreamerManager] Launched streamer...")
                         self._launch_streamer(streamer)
                     else:
                         print(f"[SequentialStreamerManager] End of stream")
-                        feedable.feed(None)
+                        feedable.consume(None)
                         self._stream.close()
 
             except queue.Full:

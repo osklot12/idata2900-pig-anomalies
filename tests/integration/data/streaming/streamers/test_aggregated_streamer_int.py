@@ -4,7 +4,7 @@ import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
+from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
@@ -67,7 +67,7 @@ def instance_provider(loader_factory, video_selector, annotation_matcher):
 @pytest.fixture
 def dataset_entity_factory(loader_factory):
     """Fixture to provide a DatasetEntityFactory instance."""
-    return LazyEntityProvider(loader_factory, BaseNameParser())
+    return LazyEntityFactory(loader_factory, BaseNameParser())
 
 
 @pytest.fixture
