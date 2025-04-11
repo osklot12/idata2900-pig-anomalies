@@ -1,4 +1,4 @@
-from src.data.dataset.providers.dataset_entity_provider import DatasetEntityProvider
+from src.data.dataset.providers.entity_factory import EntityFactory
 from src.data.dataset.providers.factories.entity_provider_factory import EntityProviderFactory
 from src.data.dataset.providers.factories.instance_provider_factory import InstanceProviderFactory
 from src.data.preprocessing.normalization.factories.bbox_normalizer_factory import BBoxNormalizerFactory

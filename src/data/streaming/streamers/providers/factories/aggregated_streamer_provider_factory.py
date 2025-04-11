@@ -1,7 +1,7 @@
 from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
 from src.data.streaming.streamers.providers.factories.streamer_pair_provider_factory import StreamerPairProviderFactory
 from src.data.streaming.streamers.providers.factories.streamer_provider_factory import StreamerProviderFactory
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 
 
 class AggregatedStreamerProviderFactory(StreamerProviderFactory):
@@ -16,5 +16,5 @@ class AggregatedStreamerProviderFactory(StreamerProviderFactory):
         """
         self._pair_provider_factory = pair_provider_factory
 
-    def create_provider(self) -> StreamerProvider:
+    def create_provider(self) -> StreamerFactory:
         return AggregatedStreamerProvider(self._pair_provider_factory.create_pair_provider())

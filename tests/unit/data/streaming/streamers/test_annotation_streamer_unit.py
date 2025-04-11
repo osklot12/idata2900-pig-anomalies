@@ -10,7 +10,7 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
@@ -20,14 +20,14 @@ from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 class DummyAnnotationStreamer(AnnotationStreamer):
     """A testable implementation of the abstract class AnnotationStreamer."""
 
-    def __init__(self, n_annotations: int, consumer: Feedable[FrameAnnotations],
+    def __init__(self, n_annotations: int, consumer: Consumer[FrameAnnotations],
                  normalizer: BBoxNormalizer = None):
         """
         Initializes a DummyAnnotationStreamer.
 
         Args:
             n_annotations (int): number of annotations in the streams
-            consumer (Feedable[FrameAnnotations]): the consumer of the streaming annotations
+            consumer (Consumer[FrameAnnotations]): the consumer of the streaming annotations
             normalizer (BBoxNormalizer): the normalization strategy for normalizing bounding boxes
         """
         super().__init__(consumer, normalizer)

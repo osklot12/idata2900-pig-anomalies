@@ -8,7 +8,7 @@ class InstanceProvider(ABC):
     """Interface for dataset instance providers."""
 
     @abstractmethod
-    def next(self) -> Optional[DatasetInstance]:
+    def get(self) -> Optional[DatasetInstance]:
         """
         Returns the next dataset instance.
 

@@ -4,7 +4,7 @@ from typing import Type
 
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.managers.streamer_registry import StreamerRegistry
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.streamer import Streamer
 
 
@@ -14,12 +14,12 @@ class OldDockingStreamerManager(StreamerManager, StreamerRegistry):
     The Streamers "dock" the manager, before leaving and making space for the next streamer.
     """
 
-    def __init__(self, streamer_provider: StreamerProvider, n_streamers: int):
+    def __init__(self, streamer_provider: StreamerFactory, n_streamers: int):
         """
         Initializes a new instance of the DockingStreamManager class.
 
         Args:
-            streamer_provider (Type[StreamerProvider]): Provides streamers.
+            streamer_provider (Type[StreamerFactory]): Provides streamers.
             n_streamers (int): The number of streamers to maintain at all times.
         """
         if n_streamers < 1:
@@ -42,7 +42,7 @@ class OldDockingStreamerManager(StreamerManager, StreamerRegistry):
 
     def _start_new_streamer(self):
         """Fetches a new streamer, assigns it an ID, and submits it to the executor."""
-        streamer = self._streamer_provider.next_streamer()
+        streamer = self._streamer_provider.create_streamer()
 
         # only start next streamer if the streamer exists
         if streamer:

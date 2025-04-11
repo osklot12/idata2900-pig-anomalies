@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
+from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.splitters.consistent_dataset_splitter import ConsistentDatasetSplitter
@@ -60,7 +60,7 @@ def instance_provider(loader_factory):
 @pytest.fixture
 def entity_factory(loader_factory):
     """Fixture to provide a DatasetEntityFactory instance."""
-    return LazyEntityProvider(loader_factory, BaseNameParser())
+    return LazyEntityFactory(loader_factory, BaseNameParser())
 
 
 @pytest.fixture
@@ -121,7 +121,7 @@ def aggregated_streamer_factory(streamer_pair_factory, virtual_dataset, source_p
 def test_streaming_data(virtual_dataset, aggregated_streamer_factory):
     """Tests that data is successfully streamed from the could and stored in the VirtualDataset."""
     # arrange
-    streamer = aggregated_streamer_factory.next_streamer()
+    streamer = aggregated_streamer_factory.create_streamer()
 
     # act
     streamer.start_streaming()

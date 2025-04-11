@@ -8,7 +8,7 @@ import pytest
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
@@ -17,16 +17,16 @@ from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStra
 class DummyVideoStreamer(VideoStreamer):
     """A testable implementation of the abstract class VideoStreamer."""
 
-    def __init__(self, n_frames: int, consumer: Feedable[Frame], resizer: FrameResizeStrategy = None):
+    def __init__(self, n_frames: int, consumer: Consumer[Frame], resizer: FrameResizeStrategy = None):
         """
         Initializes a DummyVideoStreamer instance.
 
         Args:
             n_frames (int): the number of frames in the streams
-            consumer (Feedable[Frame]): the consumer that receives the frames
+            consumer (Consumer[Frame]): the consumer that receives the frames
             resizer (FrameResizeStrategy): the frame resize strategy
         """
-        super().__init__(consumer, resizer)
+        super().__init__(consumer)
         self.n_frames = n_frames
         self.frame_index = 0
         self.source = SourceMetadata("test-source", (1920, 1080))
@@ -67,35 +67,16 @@ def test_video_streamer_produces_and_feeds_expected_number_of_frames(n_frames, c
     streamer.wait_for_completion()
 
     # assert
-    assert consumer.feed.call_count == n_frames + 1
+    assert consumer.consume.call_count == n_frames + 1
 
     for i in range(n_frames):
-        call_args = consumer.feed.call_args_list[i]
+        call_args = consumer.consume.call_args_list[i]
         frame = call_args[0][0]
         assert isinstance(frame, Frame)
 
-    assert consumer.feed.call_args_list[n_frames][0][0] is None
+    assert consumer.consume.call_args_list[n_frames][0][0] is None
 
     assert streamer.get_status() == StreamerStatus.COMPLETED
-
-
-@pytest.mark.unit
-def test_video_streamer_resizes_all_frames(consumer, dummy_resize_strategy):
-    """Tests that the VideoStreamer resizes all frames while streaming."""
-    # arrange
-    n_frames = 5
-    streamer = DummyVideoStreamer(n_frames, consumer, dummy_resize_strategy)
-
-    # act
-    streamer.start_streaming()
-    streamer.wait_for_completion()
-
-    # assert
-    for i in range(n_frames):
-        call_args = consumer.feed.call_args_list[i]
-        frame = call_args[0][0]
-        assert isinstance(frame, Frame)
-        assert frame.data.shape == (*dummy_resize_strategy.resize_shape, 3)
 
 
 @pytest.mark.unit

@@ -2,7 +2,7 @@ from typing import Optional
 from threading import Lock
 
 from src.data.streaming.aggregators.aggregator import Aggregator
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 from src.data.structures.hash_buffer import HashBuffer
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
@@ -13,12 +13,12 @@ END_OF_STREAM_INDEX = -1
 class BufferedAggregator(Aggregator):
     """Buffers incoming frames and annotations and feeds forward an aggregated instance once matched."""
 
-    def __init__(self, consumer: Feedable[StreamedAnnotatedFrame], buffer_size: int = 1000):
+    def __init__(self, consumer: Consumer[StreamedAnnotatedFrame], buffer_size: int = 1000):
         """
         Initializes aBufferedInstanceAggregator instance.
 
         Args:
-            consumer (Feedable[StreamedAnnotatedFrame]): the consumer of the aggregated data
+            consumer (Consumer[StreamedAnnotatedFrame]): the consumer of the aggregated data
             buffer_size (int): The maximum capacity of the buffer.
         """
         self._consumer = consumer
@@ -37,7 +37,7 @@ class BufferedAggregator(Aggregator):
 
             else:
                 if self._annotation_buffer.has(END_OF_STREAM_INDEX):
-                    self._consumer.feed(self._annotation_buffer.pop(END_OF_STREAM_INDEX))
+                    self._consumer.consume(self._annotation_buffer.pop(END_OF_STREAM_INDEX))
                 else:
                     self._frame_buffer.add(END_OF_STREAM_INDEX, None)
 
@@ -52,13 +52,13 @@ class BufferedAggregator(Aggregator):
 
             else:
                 if self._frame_buffer.has(END_OF_STREAM_INDEX):
-                    self._consumer.feed(self._frame_buffer.pop(END_OF_STREAM_INDEX))
+                    self._consumer.consume(self._frame_buffer.pop(END_OF_STREAM_INDEX))
                 else:
                     self._annotation_buffer.add(END_OF_STREAM_INDEX, None)
 
     def _feed_consumer(self, frame: Frame, anno: FrameAnnotations) -> None:
         """Feeds the consumer with a StreamedAnnotatedFrame instance."""
-        self._consumer.feed(
+        self._consumer.consume(
             StreamedAnnotatedFrame(
                 source=frame.source,
                 index=frame.index,

@@ -27,7 +27,7 @@ def test_feed_no_augmentor():
     s = "string"
 
     # act
-    stream.feed(s)
+    stream.consume(s)
 
     instance = stream.read()
 
@@ -43,7 +43,7 @@ def test_feed_with_augmentor(augmentor, augmented):
     s = "string"
 
     # act
-    stream.feed(s)
+    stream.consume(s)
 
     instance = stream.read()
 

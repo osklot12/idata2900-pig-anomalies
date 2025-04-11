@@ -2,15 +2,15 @@ from typing import Optional
 
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.providers.streamer_pair_provider import StreamerPairProvider
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 from src.data.streaming.feedables.feedable_func import FeedableFunc
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.streamer import Streamer
 
 
-class AggregatedStreamerProvider(StreamerProvider[StreamedAnnotatedFrame]):
+class AggregatedStreamerProvider(StreamerFactory[StreamedAnnotatedFrame]):
     """Streamer provider that provides pairs of video - annotations streamers and aggregates their output."""
 
     def __init__(self, streamer_pair_provider: StreamerPairProvider):
@@ -22,7 +22,7 @@ class AggregatedStreamerProvider(StreamerProvider[StreamedAnnotatedFrame]):
         """
         self._pair_factory = streamer_pair_provider
 
-    def next_streamer(self, consumer: Feedable[StreamedAnnotatedFrame]) -> Optional[Streamer]:
+    def create_streamer(self, consumer: Consumer[StreamedAnnotatedFrame]) -> Optional[Streamer]:
         streamer = None
 
         aggregator = BufferedAggregator(consumer)

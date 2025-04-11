@@ -2,7 +2,7 @@ import queue
 from typing import TypeVar, Generic, Optional
 
 from src.data.dataset.streams.stream import Stream
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 from src.data.streaming.feedables.feedable_queue import FeedableQueue
 from src.data.structures.atomic_bool import AtomicBool
 
@@ -51,12 +51,12 @@ class DockStream(Generic[T], Stream[T]):
 
         return result
 
-    def dock(self, timeout: float = None) -> Optional[Feedable[T]]:
+    def dock(self, timeout: float = None) -> Optional[Consumer[T]]:
         """
         Returns the next input to stream to.
 
         Returns:
-            Optional[Feedable[T]]: the opened feedable stream, or None if stream is closed
+            Optional[Consumer[T]]: the opened feedable stream, or None if stream is closed
 
         Raises:
             queue.Full: raised when the internal queue is full after the timeout period

@@ -2,7 +2,7 @@ from typing import List
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
+from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.matching.base_name_matcher import BaseNameMatcher
 from src.data.dataset.providers.simple_dataset_instance_provider import SimpleDatasetInstanceProvider
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
@@ -52,7 +52,7 @@ class CheapPipeline(BatchProvider):
             annotation_matcher=BaseNameMatcher(["json"])
         )
 
-        entity_factory = LazyEntityProvider(self._loader_factory, BaseNameParser())
+        entity_factory = LazyEntityFactory(self._loader_factory, BaseNameParser())
 
         frame_resizer_factory = StaticFrameResizerFactory((640, 640))
 

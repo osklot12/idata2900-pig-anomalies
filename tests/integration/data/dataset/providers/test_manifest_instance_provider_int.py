@@ -58,10 +58,10 @@ def test_split_providers_are_consistent(manifest, splitter):
             provider = ManifestInstanceProvider(manifest, DetermStringSelector(splitter.splits[i]))
 
             instances = []
-            instance = provider.next()
+            instance = provider.get()
             while instance is not None:
                 instances.append(instance)
-                instance = provider.next()
+                instance = provider.get()
 
             splits_list[i].append(instances)
 

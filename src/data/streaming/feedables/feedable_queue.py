@@ -1,12 +1,12 @@
 import queue
 from typing import Generic, TypeVar
 
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
 
 T = TypeVar("T")
 
 
-class FeedableQueue(Generic[T], Feedable[T]):
+class FeedableQueue(Generic[T], Consumer[T]):
     """Feedable queue."""
 
     def __init__(self, q: queue.Queue):
@@ -18,8 +18,8 @@ class FeedableQueue(Generic[T], Feedable[T]):
         """
         self._queue = q
 
-    def feed(self, food: T) -> None:
-        self._queue.put(food)
+    def consume(self, data: T) -> None:
+        self._queue.put(data)
 
     @property
     def queue(self) -> queue.Queue:

@@ -1,8 +1,8 @@
 import traceback
 from typing import TypeVar, Generic, Optional
 
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
+from src.data.pipeline.consumer import Consumer
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.streamer import Streamer
 
@@ -12,13 +12,13 @@ T = TypeVar("T")
 class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
     """Maintains a static number of streamers, streaming into a single consumer."""
 
-    def __init__(self, streamer_factory: StreamerProvider[T], consumer: Feedable[T], n_streamers: int = 4):
+    def __init__(self, streamer_factory: StreamerFactory[T], consumer: Consumer[T], n_streamers: int = 4):
         """
         Initializes a StaticStreamerManager instance.
 
         Args:
-            streamer_factory (StreamerProvider[T]): factory for creating streamers
-            consumer (Feedable[T]): the consumer of the streaming data
+            streamer_factory (StreamerFactory[T]): factory for creating streamers
+            consumer (Consumer[T]): the consumer of the streaming data
             n_streamers (int): number of streamers to maintain, defaults to 4
         """
         if n_streamers < 1:
@@ -54,4 +54,4 @@ class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
 
     def _get_next_streamer(self) -> Optional[Streamer]:
         """Returns the next streamer, or None if no streamer is available."""
-        return self._factory.next_streamer(self._consumer)
+        return self._factory.create_streamer(self._consumer)

@@ -6,9 +6,9 @@ from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.manifests.manifest import Manifest
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
-from src.data.dataset.providers.dataset_entity_provider import DatasetEntityProvider
+from src.data.dataset.providers.entity_factory import EntityFactory
 from src.data.dataset.providers.instance_provider import InstanceProvider
-from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
+from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
@@ -31,7 +31,7 @@ from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
 from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
 from src.data.streaming.streamers.providers.streamer_pair_provider import StreamerPairProvider
-from src.data.streaming.streamers.providers.streamer_provider import StreamerProvider
+from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.typevars.enum_type import T_Enum
 
 class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
@@ -126,9 +126,9 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         )
 
     @staticmethod
-    def _create_entity_provider(loader_factory: LoaderFactory) -> DatasetEntityProvider:
+    def _create_entity_provider(loader_factory: LoaderFactory) -> EntityFactory:
         """Creates a DatasetEntityProvider instance."""
-        return LazyEntityProvider(
+        return LazyEntityFactory(
             loader_factory=loader_factory,
             id_parser=BaseNameParser()
         )
@@ -144,7 +144,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         )
 
     @staticmethod
-    def _create_streamer_factory(streamer_pair_provider: StreamerPairProvider) -> StreamerProvider:
+    def _create_streamer_factory(streamer_pair_provider: StreamerPairProvider) -> StreamerFactory:
         """Creates an AggregatedStreamerFactory instance."""
         return AggregatedStreamerProvider(streamer_pair_provider=streamer_pair_provider)
 
@@ -154,7 +154,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         return DockStream(buffer_size=pool_size)
 
     @staticmethod
-    def _create_streamer_manager(streamer_factory: StreamerProvider[StreamedAnnotatedFrame],
+    def _create_streamer_manager(streamer_factory: StreamerFactory[StreamedAnnotatedFrame],
                                  stream: DockStream[StreamedAnnotatedFrame]) -> StreamerManager:
         """Creates a StaticStreamerManager instance."""
         return DockingStreamerManager(

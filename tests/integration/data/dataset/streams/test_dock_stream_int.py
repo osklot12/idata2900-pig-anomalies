@@ -2,7 +2,7 @@ import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.dataset.providers.lazy_entity_provider import LazyEntityProvider
+from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
@@ -75,7 +75,7 @@ def instance_provider(manifest, splitter):
 @pytest.fixture
 def entity_factory(loader_factory):
     """Fixture to provide an EntityFactory instance."""
-    return LazyEntityProvider(loader_factory, BaseNameParser())
+    return LazyEntityFactory(loader_factory, BaseNameParser())
 
 
 @pytest.fixture
