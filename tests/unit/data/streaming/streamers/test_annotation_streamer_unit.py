@@ -30,7 +30,7 @@ class DummyAnnotationStreamer(AnnotationStreamer):
             consumer (Consumer[FrameAnnotations]): the consumer of the streaming annotations
             normalizer (BBoxNormalizer): the normalization strategy for normalizing bounding boxes
         """
-        super().__init__(consumer, normalizer)
+        super().__init__(consumer)
         self.n_annotations = n_annotations
         self.frame_index = 0
 
@@ -78,14 +78,14 @@ def test_annotation_streamer_produces_and_feeds_expected_number_of_annotations(n
     streamer.wait_for_completion()
 
     # assert
-    assert consumer.feed.call_count == n_annotations + 1
+    assert consumer.consume.call_count == n_annotations + 1
 
     for i in range(n_annotations):
-        call_args = consumer.feed.call_args_list[i]
+        call_args = consumer.consume.call_args_list[i]
         annotation = call_args[0][0]
         assert isinstance(annotation, FrameAnnotations)
 
-    assert consumer.feed.call_args_list[n_annotations][0][0] is None
+    assert consumer.consume.call_args_list[n_annotations][0][0] is None
 
     assert streamer.get_status() == StreamerStatus.COMPLETED
 
@@ -102,27 +102,3 @@ def test_annotation_streamer_should_indicate_stopping_when_stopped_early(consume
 
     # assert
     assert streamer.get_status() == StreamerStatus.STOPPED
-
-
-@pytest.mark.unit
-def test_annotation_streamer_should_normalize_bboxes(consumer):
-    """Tests that the AnnotationStreamer normalizes bboxes when provided a normalizer."""
-    # arrange
-    n_annotations = 3
-    normalizer = SimpleBBoxNormalizer((0, 1))
-    streamer = DummyAnnotationStreamer(n_annotations, consumer, normalizer)
-
-    # act
-    streamer.start_streaming()
-    streamer.wait_for_completion()
-
-    # assert
-    assert consumer.feed.call_count == 4
-    for i in range(n_annotations):
-        call_args = consumer.feed.call_args_list[i]
-        annotation = call_args[0][0]
-        for anno_bbox in annotation.annotations:
-            assert anno_bbox.bbox.x < 1
-            assert anno_bbox.bbox.x > 0
-            assert anno_bbox.bbox.y < 1
-            assert anno_bbox.bbox.y > 0
