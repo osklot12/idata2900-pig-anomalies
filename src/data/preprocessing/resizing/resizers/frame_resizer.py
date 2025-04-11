@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class FrameResizeStrategy(ABC):
+class FrameResizer(ABC):
     """A strategy for resizing video frames."""
 
     @abstractmethod

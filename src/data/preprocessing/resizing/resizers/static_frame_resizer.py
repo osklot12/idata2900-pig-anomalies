@@ -3,10 +3,10 @@ from typing import Tuple
 import numpy as np
 import cv2
 
-from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
 
 
-class StaticFrameResizer(FrameResizeStrategy):
+class StaticFrameResizer(FrameResizer):
     """A frame resize strategy that resizes frames to a static shape."""
 
     def __init__(self, resize_shape: Tuple[int, int]):

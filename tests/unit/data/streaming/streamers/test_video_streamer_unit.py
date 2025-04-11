@@ -7,7 +7,7 @@ import pytest
 
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.source_metadata import SourceMetadata
-from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from src.data.streaming.streamers.video_streamer import VideoStreamer
@@ -17,14 +17,14 @@ from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStra
 class DummyVideoStreamer(VideoStreamer):
     """A testable implementation of the abstract class VideoStreamer."""
 
-    def __init__(self, n_frames: int, consumer: Consumer[Frame], resizer: FrameResizeStrategy = None):
+    def __init__(self, n_frames: int, consumer: Consumer[Frame], resizer: FrameResizer = None):
         """
         Initializes a DummyVideoStreamer instance.
 
         Args:
             n_frames (int): the number of frames in the streams
             consumer (Consumer[Frame]): the consumer that receives the frames
-            resizer (FrameResizeStrategy): the frame resize strategy
+            resizer (FrameResizer): the frame resize strategy
         """
         super().__init__(consumer)
         self.n_frames = n_frames
