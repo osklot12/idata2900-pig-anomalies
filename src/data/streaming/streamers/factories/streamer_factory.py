@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 
 class StreamerFactory(Generic[T], ABC):
-    """Interface for streamer providers."""
+    """Interface for streamer factories."""
 
     @abstractmethod
     def create_streamer(self, consumer: Consumer[T]) -> Optional[Streamer]:
