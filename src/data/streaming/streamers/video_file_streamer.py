@@ -6,7 +6,7 @@ from cppbindings import FrameStream
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataset.entities.video_file import VideoFile
-from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 
@@ -15,14 +15,14 @@ class VideoFileStreamer(VideoStreamer):
     """A streamer for streaming video file data."""
 
     def __init__(self, video: VideoFile, consumer: Consumer[Frame],
-                 resize_strategy: FrameResizeStrategy = None):
+                 resize_strategy: FrameResizer = None):
         """
         Initializes a VideoFileStreamer instance.
 
         Args:
             video (VideoFile): the video to streams
             consumer (Consumer[Frame]): the consumer of the streaming data
-            resize_strategy (Optional[FrameResizeStrategy]): the frame resize strategy to use
+            resize_strategy (Optional[FrameResizer]): the frame resize strategy to use
         """
         super().__init__(consumer, resize_strategy)
         self._video = video

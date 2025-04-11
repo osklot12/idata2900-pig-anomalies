@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 
-from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
 
 
 class FrameResizerFactory(ABC):
     """An interface for frame resizer factories."""
 
     @abstractmethod
-    def create_frame_resizer(self) -> FrameResizeStrategy:
+    def create_frame_resizer(self) -> FrameResizer:
         """
         Creates a FrameResizeStrategy instance.
 
         Returns:
-            FrameResizeStrategy: a FrameResizeStrategy instance
+            FrameResizer: a FrameResizeStrategy instance
         """
         raise NotImplementedError
