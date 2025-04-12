@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def batch_provider():
 def test_prefetch_and_retrieve(batch_provider):
     """Tests that prefetching and retrieving batches works as expected."""
     # arrange
-    prefetcher = BatchPrefetcher[str](
+    prefetcher = Prefetcher[str](
         batch_provider=batch_provider,
         split=DatasetSplit.TRAIN,
         batch_size=1
@@ -43,7 +43,7 @@ def test_prefetch_and_retrieve(batch_provider):
 def test_double_run_raises(batch_provider):
     """Tests that running the prefetcher while already running will raise."""
     # arrange
-    prefetcher = BatchPrefetcher[str](
+    prefetcher = Prefetcher[str](
         batch_provider=batch_provider,
         split=DatasetSplit.TRAIN,
         batch_size=1
@@ -62,7 +62,7 @@ def test_double_run_raises(batch_provider):
 def test_stop_works_cleanly(batch_provider):
     """Tests that stopping the prefetcher works as expected."""
     # arrange
-    prefetcher = BatchPrefetcher[str](
+    prefetcher = Prefetcher[str](
         batch_provider=batch_provider,
         split=DatasetSplit.TRAIN,
         batch_size=1
@@ -83,7 +83,7 @@ def test_stop_works_cleanly(batch_provider):
 def test_prefetching_halts_when_full_queue(batch_provider):
     """Tests that prefetching temporarily halts whenever the internal queue is full."""
     # arrange
-    prefetcher = BatchPrefetcher[str](
+    prefetcher = Prefetcher[str](
         batch_provider=batch_provider,
         split=DatasetSplit.TRAIN,
         batch_size=2,
