@@ -37,3 +37,6 @@ class PoolStream(Generic[T], Stream[T], Consumer[T]):
 
     def read(self) -> Optional[T]:
         return self._pool.get()
+
+    def get_entry(self) -> Consumer[T]:
+        return self

@@ -12,16 +12,20 @@ T = TypeVar("T")
 class DockStream(Generic[T], Stream[T]):
     """Sequential streams of data, where input streams are ordered sequentially."""
 
-    def __init__(self, buffer_size: int = 3, dock_size: int = 100):
+    def __init__(self, buffer_size: int = 3, dock_size: int = 100, timeout: Optional[float] = None):
         """
         Initializes a SequentialStream instance.
 
         Args:
             buffer_size (int): the size of the internal buffer
+            dock_size (int): the size of each dock
+            timeout (Optional[float]): the timeout in seconds to block on input/output of stream
         """
         self._dock_queue: queue.Queue[Optional[queue.Queue[T]]] = queue.Queue(maxsize=buffer_size)
         self._buffer_size = buffer_size
         self._dock_size = dock_size
+
+        self._timeout = timeout
 
         self._current_dock = None
         self._eos = False
@@ -51,21 +55,12 @@ class DockStream(Generic[T], Stream[T]):
 
         return result
 
-    def dock(self, timeout: float = None) -> Optional[Consumer[T]]:
-        """
-        Returns the next input to stream to.
-
-        Returns:
-            Optional[Consumer[T]]: the opened feedable stream, or None if stream is closed
-
-        Raises:
-            queue.Full: raised when the internal queue is full after the timeout period
-        """
+    def get_entry(self) -> Consumer[T]:
         dock_input = None
 
         if not self._closed:
             q = queue.Queue(maxsize=self._dock_size)
-            self._dock_queue.put(q, timeout=timeout)
+            self._dock_queue.put(q, timeout=self._timeout)
             dock_input = ConsumingQueue[T](q)
 
         return dock_input
