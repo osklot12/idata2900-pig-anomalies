@@ -5,7 +5,7 @@ from functools import partial
 
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.managers.streamer_registry import StreamerRegistry
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.linear_streamer import LinearStreamer
 from src.data.structures.atomic_bool import AtomicBool
 
 
@@ -41,12 +41,12 @@ class ConcurrentStreamerManager(StreamerManager, StreamerRegistry):
         """Sets up for running. Cannot stop the manager while setup is executing."""
         raise NotImplementedError
 
-    def _launch_streamer(self, streamer: Streamer) -> None:
+    def _launch_streamer(self, streamer: LinearStreamer) -> None:
         """
         Launches a streamer.
 
         Args:
-            streamer (Streamer): the streamer to launch
+            streamer (LinearStreamer): the streamer to launch
         """
 
         if not self._running:
@@ -62,12 +62,12 @@ class ConcurrentStreamerManager(StreamerManager, StreamerRegistry):
         future.add_done_callback(partial(self._on_streamer_done, streamer_id=streamer_id))
 
     @abstractmethod
-    def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:
+    def _run_streamer(self, streamer: LinearStreamer, streamer_id: str) -> None:
         """
         Manages the streamer after launched.
 
         Args:
-            streamer (Streamer): the streamer to manage
+            streamer (LinearStreamer): the streamer to manage
             streamer_id (str): the streamer id
         """
         raise NotImplementedError

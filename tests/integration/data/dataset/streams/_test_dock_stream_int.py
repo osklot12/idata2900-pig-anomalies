@@ -16,8 +16,6 @@ from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
-from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
-from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
 from src.data.streaming.managers.stream_feeding_manager import StreamFeedingManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
@@ -76,23 +74,6 @@ def instance_provider(manifest, splitter):
 def entity_factory(loader_factory):
     """Fixture to provide an EntityFactory instance."""
     return LazyEntityFactory(loader_factory, BaseNameParser())
-
-
-@pytest.fixture
-def streamer_pair_factory(instance_provider, entity_factory):
-    """Fixture to provide a StreamerPairFactory instance."""
-    return FileStreamerPairProvider(
-        instance_provider=instance_provider,
-        entity_factory=entity_factory,
-        frame_resizer_factory=StaticFrameResizerFactory((300, 300)),
-        bbox_normalizer_factory=SimpleBBoxNormalizerFactory((0, 1))
-    )
-
-
-@pytest.fixture
-def streamer_factory(streamer_pair_factory):
-    """Fixture to provide an AggregatedStreamerFactory instance."""
-    return AggregatedStreamerProvider(streamer_pair_factory)
 
 
 @pytest.fixture
