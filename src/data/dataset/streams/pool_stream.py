@@ -1,6 +1,6 @@
 from typing import TypeVar, Optional, Generic
 
-from src.data.dataset.streams.stream import Stream
+from src.data.dataset.streams.writeable_stream import WriteableStream
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.consuming_pool import ConsumingPool
 from src.data.structures.atomic_bool import AtomicBool
@@ -9,7 +9,7 @@ from src.data.structures.rab_pool import RABPool
 T = TypeVar("T")
 
 
-class PoolStream(Generic[T], Stream[T]):
+class PoolStream(Generic[T], WriteableStream[T]):
     """Stream reading randomly from a pool of instances."""
 
     def __init__(self, pool_size: int = 3000):
