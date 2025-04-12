@@ -43,7 +43,8 @@ class DockStream(Generic[T], Stream[T]):
             while self._current_dock and result is None:
                 print(f"[SequentialStream] Fetching next instance")
                 instance = self._current_dock.get()
-                if instance:
+
+                if instance is not None:
                     print(f"[SequentialStream] Got instance")
                     result = instance
 
