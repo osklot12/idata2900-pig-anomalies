@@ -5,10 +5,10 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.entities.video_annotations import VideoAnnotations
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.pipeline.consumer import Consumer
-from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
+from src.data.streaming.streamers.annotations_streamer import AnnotationsStreamer
 
 
-class VideoAnnotationsStreamer(AnnotationStreamer):
+class VideoAnnotationsStreamer(AnnotationsStreamer):
     """A streamer for streaming video annotations data."""
 
     def __init__(self, annotations: VideoAnnotations, consumer: Consumer[FrameAnnotations],

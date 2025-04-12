@@ -55,7 +55,7 @@ class DockStream(Generic[T], Stream[T]):
 
         return result
 
-    def get_entry(self) -> Consumer[T]:
+    def get_entry(self) -> Optional[Consumer[T]]:
         dock_input = None
 
         if not self._closed:

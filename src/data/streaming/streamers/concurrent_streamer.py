@@ -2,13 +2,15 @@ import queue
 import threading
 from abc import abstractmethod
 import logging
+from typing import TypeVar, Generic
 
 from src.command.command import Command
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
+T = TypeVar("T")
 
-class ConcurrentStreamer(Streamer):
+class ConcurrentStreamer(Generic[T], Streamer[T]):
     """A threaded streamer, providing base functionality for streaming asynchronously."""
 
     def __init__(self):
