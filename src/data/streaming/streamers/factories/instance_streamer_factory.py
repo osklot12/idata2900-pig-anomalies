@@ -29,7 +29,7 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
         self._instance_provider = instance_provider
         self._entity_factory = entity_factory
 
-    def create_streamer(self, consumer: Consumer[StreamedAnnotatedFrame]) -> Optional[Streamer]:
+    def create_streamer(self) -> Optional[Streamer]:
         streamer = None
 
         aggregator = BufferedAggregator(consumer)

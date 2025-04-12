@@ -1,8 +1,10 @@
 from typing import Optional
 from threading import Lock
 
+from src.data.pipeline.producer import Producer, T
 from src.data.streaming.aggregators.aggregator import Aggregator
 from src.data.pipeline.consumer import Consumer
+from src.data.structures.atomic_var import AtomicVar
 from src.data.structures.hash_buffer import HashBuffer
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
@@ -10,18 +12,18 @@ from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 
 END_OF_STREAM_INDEX = -1
 
-class BufferedAggregator(Aggregator):
+class BufferedAggregator(Aggregator, Producer[StreamedAnnotatedFrame]):
     """Buffers incoming frames and annotations and feeds forward an aggregated instance once matched."""
 
-    def __init__(self, consumer: Consumer[StreamedAnnotatedFrame], buffer_size: int = 1000):
+    def __init__(self, buffer_size: int = 1000, consumer: Optional[Consumer[StreamedAnnotatedFrame]] = None):
         """
         Initializes aBufferedInstanceAggregator instance.
 
         Args:
-            consumer (Consumer[StreamedAnnotatedFrame]): the consumer of the aggregated data
             buffer_size (int): The maximum capacity of the buffer.
+            consumer (Optional[Consumer[StreamedAnnotatedFrame]]): optional consumer of the aggregated data
         """
-        self._consumer = consumer
+        self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](consumer)
         self._lock = Lock()
 
         self._frame_buffer = HashBuffer[int, Optional[Frame]](max_size=buffer_size)
@@ -41,7 +43,6 @@ class BufferedAggregator(Aggregator):
                 else:
                     self._frame_buffer.add(END_OF_STREAM_INDEX, None)
 
-
     def feed_annotations(self, annotations: Optional[FrameAnnotations]) -> None:
         with self._lock:
             if annotations is not None:
@@ -56,6 +57,7 @@ class BufferedAggregator(Aggregator):
                 else:
                     self._annotation_buffer.add(END_OF_STREAM_INDEX, None)
 
+
     def _feed_consumer(self, frame: Frame, anno: FrameAnnotations) -> None:
         """Feeds the consumer with a StreamedAnnotatedFrame instance."""
         self._consumer.consume(
@@ -66,3 +68,6 @@ class BufferedAggregator(Aggregator):
                 annotations=anno.annotations
             )
         )
+
+    def connect(self, consumer: Consumer[StreamedAnnotatedFrame]) -> None:
+        self.
