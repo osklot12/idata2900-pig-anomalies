@@ -5,10 +5,11 @@ from src.data.dataclasses.frame import Frame
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.producer import T
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
+from src.data.streaming.streamers.linear_streamer import LinearStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from src.data.structures.atomic_var import AtomicVar
 
-class VideoStreamer(ConcurrentStreamer[Frame]):
+class VideoStreamer(ConcurrentStreamer[Frame], LinearStreamer[Frame]):
     """A streamer for streaming video data."""
 
     def __init__(self, consumer: Optional[Consumer[Frame]] = None):

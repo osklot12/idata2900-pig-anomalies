@@ -1,5 +1,5 @@
 from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.linear_streamer import LinearStreamer
 from tests.utils.dummies.dummy_streamer import DummyStreamer
 
 
@@ -22,7 +22,7 @@ class DummyStreamerProvider(StreamerFactory):
 
         self._counter = 0
 
-    def create_streamer(self) -> Streamer:
+    def create_streamer(self) -> LinearStreamer:
         result = None
 
         streamers_left = self._n_streamers - self._counter

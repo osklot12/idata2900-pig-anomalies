@@ -5,7 +5,7 @@ from typing import TypeVar, Generic
 from src.data.dataset.streams.stream import Stream
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.linear_streamer import LinearStreamer
 from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
@@ -58,7 +58,7 @@ class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
         self._worker = threading.Thread(target=self._worker_loop)
         self._worker.start()
 
-    def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:
+    def _run_streamer(self, streamer: LinearStreamer, streamer_id: str) -> None:
         streamer.wait_for_completion()
         streamer.stop_streaming()
 

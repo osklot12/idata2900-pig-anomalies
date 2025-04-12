@@ -10,7 +10,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 T = TypeVar("T")
 
-class ConcurrentStreamer(Generic[T], Streamer[T]):
+class ConcurrentStreamer(Generic[T], Streamer):
     """A threaded streamer, providing base functionality for streaming asynchronously."""
 
     def __init__(self):

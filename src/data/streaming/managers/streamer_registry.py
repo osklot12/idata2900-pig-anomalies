@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 from src.data.structures.concurrent_dict import ConcurrentDict
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.linear_streamer import LinearStreamer
 
 
 class StreamerRegistry:
@@ -10,7 +10,7 @@ class StreamerRegistry:
 
     def __init__(self):
         """Initializes an instance of StreamerManager."""
-        self._streamers = ConcurrentDict[str, Streamer]()
+        self._streamers = ConcurrentDict[str, LinearStreamer]()
 
     def get_streamer_ids(self) -> List[str]:
         """
@@ -21,12 +21,12 @@ class StreamerRegistry:
         """
         return self._streamers.keys()
 
-    def get_streamer(self, streamer_id: str) -> Streamer:
+    def get_streamer(self, streamer_id: str) -> LinearStreamer:
         """
         Returns the streamer with the given id.
 
         Returns:
-            Streamer: The streamer with the given id.
+            LinearStreamer: The streamer with the given id.
         """
         return self._streamers.get(streamer_id)
 
@@ -39,7 +39,7 @@ class StreamerRegistry:
         """
         return self._streamers.contains(streamer_id)
 
-    def _get_streamers(self) -> ConcurrentDict[str, Streamer]:
+    def _get_streamers(self) -> ConcurrentDict[str, LinearStreamer]:
         """
         Returns the streamer dictionary."""
         return self._streamers
@@ -48,12 +48,12 @@ class StreamerRegistry:
         """Clears the streamers."""
         self._streamers.clear()
 
-    def _add_streamer(self, streamer: Streamer) -> str:
+    def _add_streamer(self, streamer: LinearStreamer) -> str:
         """
         Adds a streamer to the manager, creating a unique id for it.
 
         Args:
-            streamer (Streamer): The streamer to be added.
+            streamer (LinearStreamer): The streamer to be added.
 
         Returns:
             str: The id of the added streamer.

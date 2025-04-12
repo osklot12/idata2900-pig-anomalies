@@ -1,14 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
 
-from src.data.pipeline.producer import Producer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
-T = TypeVar("T")
 
-
-class Streamer(Generic[T], Producer[T], ABC):
-    """An interface for streamers."""
+class Streamer(ABC):
+    """Streams data."""
 
     @abstractmethod
     def start_streaming(self) -> None:
