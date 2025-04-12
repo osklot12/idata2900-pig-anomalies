@@ -15,8 +15,3 @@ class Stream(Generic[T], ABC):
             T: the item, or None if end of streams is reached
         """
         raise NotImplementedError
-
-    @abstractmethod
-    def close(self) -> None:
-        """Closes the stream."""
-        raise NotImplementedError

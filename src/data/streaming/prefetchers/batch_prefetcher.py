@@ -6,7 +6,7 @@ from typing_extensions import Generic
 
 from src.data.streaming.prefetchers.prefetcher import Prefetcher
 from src.data.structures.atomic_bool import AtomicBool
-from src.network.network_dataset_stream import NetworkDatasetStream
+from src.data.dataset.streams.network_stream import NetworkStream
 
 T = TypeVar("T")
 
@@ -14,7 +14,7 @@ T = TypeVar("T")
 class BatchPrefetcher(Generic[T], Prefetcher[List[T]]):
     """A data batch prefetcher."""
 
-    def __init__(self, stream: NetworkDatasetStream, batch_size: int,
+    def __init__(self, stream: NetworkStream, batch_size: int,
                  buffer_size: int = 10, fetch_timeout: float = 1.0):
         """
         Initializes a BatchPrefetcher instance.
