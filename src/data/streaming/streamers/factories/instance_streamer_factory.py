@@ -8,7 +8,7 @@ from src.data.pipeline.consuming_func import ConsumingFunc
 from src.data.streaming.streamers.composite_streamer import CompositeStreamer
 from src.data.streaming.streamers.ensemble_streamer import EnsembleStreamer
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
-from src.data.streaming.streamers.linear_streamer import LinearStreamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 
@@ -29,7 +29,7 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
         self._instance_provider = instance_provider
         self._entity_factory = entity_factory
 
-    def create_streamer(self) -> Optional[LinearStreamer]:
+    def create_streamer(self) -> Optional[ProducerStreamer]:
         streamer = None
 
         aggregator = BufferedAggregator()

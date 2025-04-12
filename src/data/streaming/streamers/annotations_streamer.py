@@ -7,11 +7,12 @@ from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.pipeline.producer import Producer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 from src.data.structures.atomic_var import AtomicVar
 
 
-class AnnotationsStreamer(ConcurrentStreamer[FrameAnnotations]):
+class AnnotationsStreamer(ConcurrentStreamer, ProducerStreamer[FrameAnnotations]):
     """A streamer for streaming annotation data."""
 
     def __init__(self, consumer: Optional[Consumer[FrameAnnotations]] = None):

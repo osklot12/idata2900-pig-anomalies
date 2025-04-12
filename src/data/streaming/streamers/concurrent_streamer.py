@@ -1,16 +1,13 @@
 import queue
 import threading
 from abc import abstractmethod
-import logging
-from typing import TypeVar, Generic
 
 from src.command.command import Command
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
-T = TypeVar("T")
 
-class ConcurrentStreamer(Generic[T], Streamer):
+class ConcurrentStreamer(Streamer):
     """A threaded streamer, providing base functionality for streaming asynchronously."""
 
     def __init__(self):
@@ -43,7 +40,6 @@ class ConcurrentStreamer(Generic[T], Streamer):
 
         except Exception as e:
             self._set_status(StreamerStatus.FAILED)
-            logging.error(f"Failed to streams data: {e}")
 
         finally:
             while not self._eos_commands.empty():
