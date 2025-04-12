@@ -1,10 +1,10 @@
 import random
 from typing import List, Optional
 
-from src.data.dataset.selectors.string_selector import StringSelector
+from src.data.dataset.selectors.selector import Selector
 
 
-class DetermStringSelector(StringSelector):
+class DetermStringSelector(Selector):
     """Selects strings in a particular order deterministically, returning each string only once."""
 
     def __init__(self, strings: List[str], seed: int = 42):
@@ -26,7 +26,7 @@ class DetermStringSelector(StringSelector):
         rng.shuffle(shuffled)
         return shuffled
 
-    def next(self) -> Optional[str]:
+    def select(self) -> Optional[str]:
         file = None
 
         if not self._index >= len(self._shuffled_files):

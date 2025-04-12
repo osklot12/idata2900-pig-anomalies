@@ -8,7 +8,7 @@ from src.data.structures.atomic_bool import AtomicBool
 T = TypeVar("T")
 
 
-class WriteableStream(Generic[T], Stream[T]):
+class WritableStream(Generic[T], Stream[T]):
     """Interface for streams what can be written to."""
 
     @abstractmethod
