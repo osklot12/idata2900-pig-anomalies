@@ -1,8 +1,8 @@
-from typing import TypeVar, Optional, Generic, List
+from typing import TypeVar, Optional, Generic
 
 from src.data.dataset.streams.stream import Stream
-from src.data.preprocessing.preprocessor import Preprocessor
 from src.data.pipeline.consumer import Consumer
+from src.data.pipeline.consuming_pool import ConsumingPool
 from src.data.structures.atomic_bool import AtomicBool
 from src.data.structures.rab_pool import RABPool
 
@@ -35,13 +35,14 @@ class PoolStream(Generic[T], Stream[T], Consumer[T]):
 
         return instance
 
-    def get_entry(self) -> Optional[Consumer[T]]:
+    def get_entry(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
         entry = None
 
         if not self._closed:
-            entry = self
+            entry = ConsumingPool[T](pool=self._pool, release=release)
 
         return entry
+
 
     def close(self) -> None:
         self._closed.set(True)

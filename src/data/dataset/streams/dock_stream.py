@@ -1,4 +1,5 @@
 import queue
+import threading
 from typing import TypeVar, Generic, Optional
 
 from src.data.dataset.streams.stream import Stream
@@ -8,28 +9,28 @@ from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
 
+GET_ENTRY_LOOP_TIMEOUT = 0.1
 
 class DockStream(Generic[T], Stream[T]):
     """Sequential streams of data, where input streams are ordered sequentially."""
 
-    def __init__(self, buffer_size: int = 3, dock_size: int = 100, timeout: Optional[float] = None):
+    def __init__(self, buffer_size: int = 3, dock_size: int = 100):
         """
         Initializes a SequentialStream instance.
 
         Args:
             buffer_size (int): the size of the internal buffer
             dock_size (int): the size of each dock
-            timeout (Optional[float]): the timeout in seconds to block on input/output of stream
         """
         self._dock_queue: queue.Queue[Optional[queue.Queue[T]]] = queue.Queue(maxsize=buffer_size)
         self._buffer_size = buffer_size
         self._dock_size = dock_size
 
-        self._timeout = timeout
-
         self._current_dock = None
         self._eos = False
         self._closed = AtomicBool(False)
+
+        self._get_entry_lock = threading.Lock()
 
     def read(self) -> Optional[T]:
         print(f"[SequentialStream] Reading...")
@@ -55,15 +56,23 @@ class DockStream(Generic[T], Stream[T]):
 
         return result
 
-    def get_entry(self) -> Optional[Consumer[T]]:
-        dock_input = None
+    def get_entry(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
+        dock = None
 
-        if not self._closed:
-            q = queue.Queue(maxsize=self._dock_size)
-            self._dock_queue.put(q, timeout=self._timeout)
-            dock_input = ConsumingQueue[T](q)
+        with self._get_entry_lock:
+            keep_trying = True
+            while not self._closed and dock is None and keep_trying:
+                q = queue.Queue(maxsize=self._dock_size)
+                try:
+                    self._dock_queue.put(q, timeout=GET_ENTRY_LOOP_TIMEOUT)
+                    dock = ConsumingQueue[T](q=q, release=release)
+                except queue.Full:
+                    pass
 
-        return dock_input
+                if release is not None and release:
+                    keep_trying = False
+
+        return dock
 
     def close(self) -> None:
         """Closes the streams."""

@@ -18,7 +18,7 @@ from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_facto
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
 from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
-from src.data.streaming.managers.docking_streamer_manager import DockingStreamerManager
+from src.data.streaming.managers.stream_feeding_manager import StreamFeedingManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
@@ -104,7 +104,7 @@ def stream():
 @pytest.fixture
 def manager(streamer_factory, stream):
     """Fixture to provide a DockingStreamerManager instance."""
-    return DockingStreamerManager[StreamedAnnotatedFrame](
+    return StreamFeedingManager[StreamedAnnotatedFrame](
         streamer_factory=streamer_factory,
         stream=stream
     )
