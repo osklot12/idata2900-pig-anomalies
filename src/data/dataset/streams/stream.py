@@ -20,11 +20,16 @@ class Stream(Generic[T], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_entry(self) -> Consumer[T]:
+    def get_entry(self) -> Optional[Consumer[T]]:
         """
         Returns entry of input data for the stream.
 
         Returns:
-            Consumer[T]: entry of input data for the stream
+            Optional[Consumer[T]]: entry of input data for the stream, or None if stream is closed
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def close(self) -> None:
+        """Closes the stream."""
         raise NotImplementedError

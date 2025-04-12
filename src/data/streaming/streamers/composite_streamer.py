@@ -7,7 +7,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 T = TypeVar("T")
 
-class CompositeStreamer(Generic[T], Streamer, Producer[T]):
+class CompositeStreamer(Generic[T], Streamer[T]):
     """Composition of streaming components, providing an abstract interface for connecting it in a pipeline."""
 
     def __init__(self, streamer: Streamer, output: Producer[T]):

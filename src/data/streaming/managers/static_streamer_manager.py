@@ -1,9 +1,9 @@
 import traceback
 from typing import TypeVar, Generic, Optional
 
-from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
+from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.streamer import Streamer
 
 T = TypeVar("T")
@@ -54,4 +54,6 @@ class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
 
     def _get_next_streamer(self) -> Optional[Streamer]:
         """Returns the next streamer, or None if no streamer is available."""
-        return self._factory.create_streamer(self._consumer)
+        streamer = self._factory.create_streamer()
+        streamer.connect(self._consumer)
+        return streamer

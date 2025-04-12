@@ -11,7 +11,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 from src.data.structures.atomic_var import AtomicVar
 
 
-class AnnotationStreamer(Producer[FrameAnnotations], ConcurrentStreamer):
+class AnnotationsStreamer(ConcurrentStreamer[FrameAnnotations]):
     """A streamer for streaming annotation data."""
 
     def __init__(self, consumer: Optional[Consumer[FrameAnnotations]] = None):
@@ -42,36 +42,6 @@ class AnnotationStreamer(Producer[FrameAnnotations], ConcurrentStreamer):
             result = StreamerStatus.STOPPED
 
         return result
-
-    def _normalize_frame_annotations(self, annotations: FrameAnnotations) -> FrameAnnotations:
-        """Normalizes annotations for a frame."""
-        if self._normalizer:
-            normalized_bboxes = self._get_normalized_bboxes(
-                annotations.annotations,
-                annotations.source.frame_resolution
-            )
-
-            annotations = FrameAnnotations(
-                source=annotations.source,
-                index=annotations.index,
-                annotations=normalized_bboxes
-            )
-
-        return annotations
-
-    def _get_normalized_bboxes(self, bboxes: List[AnnotatedBBox], resolution: Tuple[int, int]) -> List[AnnotatedBBox]:
-        """Normalizes a list of AnnotatedBBox instances."""
-        normalized_bboxes = []
-
-        for anno_box in bboxes:
-            normalized_bboxes.append(
-                AnnotatedBBox(
-                    cls=anno_box.cls,
-                    bbox=self._normalizer.normalize_bounding_box(anno_box.bbox, resolution)
-                )
-            )
-
-        return normalized_bboxes
 
     @abstractmethod
     def _get_next_annotation(self) -> Optional[FrameAnnotations]:

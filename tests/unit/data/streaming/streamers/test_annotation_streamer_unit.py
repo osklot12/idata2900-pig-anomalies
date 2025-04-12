@@ -11,13 +11,13 @@ from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.pipeline.consumer import Consumer
-from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
+from src.data.streaming.streamers.annotations_streamer import AnnotationsStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 from tests.utils.dummy_annotation_label import DummyAnnotationLabel
 
 
-class DummyAnnotationStreamer(AnnotationStreamer):
+class DummyAnnotationStreamer(AnnotationsStreamer):
     """A testable implementation of the abstract class AnnotationStreamer."""
 
     def __init__(self, n_annotations: int, consumer: Consumer[FrameAnnotations],
