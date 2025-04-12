@@ -9,7 +9,7 @@ from src.data.structures.rab_pool import RABPool
 T = TypeVar("T")
 
 
-class PoolStream(Generic[T], Stream[T], Consumer[T]):
+class PoolStream(Generic[T], Stream[T]):
     """Stream reading randomly from a pool of instances."""
 
     def __init__(self, pool_size: int = 3000):
@@ -23,9 +23,6 @@ class PoolStream(Generic[T], Stream[T], Consumer[T]):
         self._pool = RABPool[T](maxsize=pool_size, min_ready=pool_size)
 
         self._closed = AtomicBool(False)
-
-    def consume(self, data: Optional[T]) -> None:
-        self._pool.put(data)
 
     def read(self) -> Optional[T]:
         instance = None
@@ -42,7 +39,6 @@ class PoolStream(Generic[T], Stream[T], Consumer[T]):
             entry = ConsumingPool[T](pool=self._pool, release=release)
 
         return entry
-
 
     def close(self) -> None:
         self._closed.set(True)

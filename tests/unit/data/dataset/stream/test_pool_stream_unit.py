@@ -1,50 +1,62 @@
-from unittest.mock import Mock
+import threading
+import time
 
 import pytest
 
 from src.data.dataset.streams.pool_stream import PoolStream
+from src.data.structures.atomic_bool import AtomicBool
+from src.data.structures.atomic_var import AtomicVar
 
 
 @pytest.fixture
-def augmented():
-    """Fixture to provide an 'augmented' string."""
-    return "augmented"
-
-
-@pytest.fixture
-def augmentor(augmented):
-    """Fixture to provide an Augmentor instance."""
-    augmentor = Mock()
-    augmentor.augment.return_value = [augmented]
-    return augmentor
+def data():
+    """Fixture to provide test data."""
+    return [f"string{i}" for i in range(1000)]
 
 
 @pytest.mark.unit
-def test_feed_no_augmentor():
-    """Tests that feeding data without an augmentor should preserve the data."""
+def test_feeding_when_not_full(data):
+    """Tests that feeding the PoolStream while not full should not block, and feed successfully."""
     # arrange
-    stream = PoolStream(pool_size=1, augmentor=None)
-    s = "string"
+    stream = PoolStream[str](pool_size=1000)
+    successes = []
 
     # act
-    stream.consume(s)
-
-    instance = stream.read()
+    for d in data:
+        successes.append(stream.get_entry().consume(d))
 
     # assert
-    assert instance == s
+    assert all(successes)
 
 
 @pytest.mark.unit
-def test_feed_with_augmentor(augmentor, augmented):
-    """Tests that feeding data with an augmentor augments the data."""
+def test_release_mechanism(data):
+    """Tests that feeding the PoolStream with a release should unblock when release is set."""
     # arrange
-    stream = PoolStream(pool_size=1, augmentor=augmentor)
-    s = "string"
+    stream = PoolStream[str](pool_size=1000)
+    for d in data:
+        stream.get_entry().consume(d)
+
+    release = AtomicBool(False)
+    consumer = stream.get_entry(release=release)
+    span = AtomicVar[float](0.0)
+
+    def put() -> None:
+        start_time = time.time()
+        consumer.consume("block-string")
+        end_time = time.time()
+
+        new_span = span.get() + end_time - start_time
+        span.set(new_span)
+
+    t = threading.Thread(target=put)
+    sleep_time = 0.2
 
     # act
-    stream.consume(s)
+    t.start()
+    time.sleep(sleep_time)
+    release.set(True)
+    t.join()
 
-    instance = stream.read()
-
-    assert instance == augmented
+    # assert
+    assert span.get() >= sleep_time
