@@ -69,12 +69,12 @@ def consumer():
 @pytest.fixture
 def aggregator(consumer):
     """Fixture to provide a BufferedInstanceAggregator instance."""
-    return BufferedAggregator(consumer)
+    return BufferedAggregator(consumer=consumer)
 
 
 def _validate_fed_pair(consumer: Mock, frame: Frame, annotations: FrameAnnotations):
     """Validates that the fed StreamedAnnotatedFrame is consistent with the fed frame and annotations."""
-    fed_instance = consumer.feed.call_args[0][0]
+    fed_instance = consumer.consume.call_args[0][0]
     assert isinstance(fed_instance, StreamedAnnotatedFrame)
 
     assert fed_instance.index == frame.index
@@ -93,7 +93,7 @@ def test_matches_matching_pair_frame_first(aggregator, matching_annotations, mat
     aggregator.feed_annotations(matching_annotations)
 
     # assert
-    assert consumer.feed.call_count == 1
+    assert consumer.consume.call_count == 1
 
     _validate_fed_pair(consumer, matching_frame, matching_annotations)
 
@@ -106,7 +106,7 @@ def test_matches_matching_pair_annotations_first(aggregator, matching_annotation
     aggregator.feed_frame(matching_frame)
 
     # assert
-    assert consumer.feed.call_count == 1
+    assert consumer.consume.call_count == 1
     _validate_fed_pair(consumer, matching_frame, matching_annotations)
 
 
@@ -118,7 +118,7 @@ def test_non_matching_data_is_not_matched(aggregator, matching_frame, single_ann
     aggregator.feed_annotations(single_annotations)
 
     # assert
-    assert not consumer.feed.called
+    assert not consumer.consume.called
 
 
 @pytest.mark.unit
@@ -132,7 +132,7 @@ def test_feeding_non_matching_data_between_matches_still_causes_matching(aggrega
     aggregator.feed_annotations(matching_annotations)
 
     # assert
-    assert consumer.feed.call_count == 1
+    assert consumer.consume.call_count == 1
 
     _validate_fed_pair(consumer, matching_frame, matching_annotations)
 
@@ -149,7 +149,7 @@ def test_feeding_over_capacity_evicts_stored_data(matching_frame, matching_annot
     buffer_aggregator.feed_frame(matching_frame)
 
     # assert
-    assert not consumer.feed.called
+    assert not consumer.consume.called
 
 
 @pytest.mark.unit
@@ -160,5 +160,5 @@ def test_feeding_none_frame_and_annotations_signals_end_of_stream(aggregator, co
     aggregator.feed_annotations(None)
 
     # assert
-    assert consumer.feed.call_count == 1
-    assert consumer.feed.call_args[0][0] is None
+    assert consumer.consume.call_count == 1
+    assert consumer.consume.call_args[0][0] is None
