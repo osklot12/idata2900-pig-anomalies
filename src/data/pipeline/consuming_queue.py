@@ -27,7 +27,7 @@ class ConsumingQueue(Generic[T], Consumer[T]):
         success = False
 
         keep_trying = True
-        while keep_trying:
+        while keep_trying and not success:
             try:
                 self._queue.put(data, timeout=CONSUME_LOOP_TIMEOUT)
                 success = True
