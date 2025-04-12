@@ -3,7 +3,7 @@ from src.network.messages.serialization.pickle_message_serializer import PickleM
 from src.models.twod.fastrcnn.train_fastrcnn import RCNNTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.data.dataset.dataset_split import DatasetSplit
 from src.ui.telemetry.rich_dashboard import RichDashboard
 
@@ -26,7 +26,7 @@ class TrainingPipelineCoordinator:
 
         # Set up provider + prefetcher
         provider = NetworkFrameInstanceProvider(self.client)
-        prefetcher = BatchPrefetcher(
+        prefetcher = Prefetcher(
             batch_provider=provider,
             split=DatasetSplit.TRAIN,
             batch_size=8,

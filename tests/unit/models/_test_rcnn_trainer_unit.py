@@ -2,7 +2,7 @@ import pytest
 import torch
 from unittest.mock import MagicMock, patch
 from src.models.twod.fastrcnn.train_fastrcnn import RCNNTrainer
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 
 
 @pytest.mark.unit
@@ -18,7 +18,7 @@ def test_trainer_runs_three_iterations(mock_model_ctor, mock_makedirs, mock_torc
     fake_ann.category_id = 1
     fake_frame.annotations = [fake_ann]
 
-    mock_prefetcher = MagicMock(spec=BatchPrefetcher)
+    mock_prefetcher = MagicMock(spec=Prefetcher)
     mock_prefetcher.get.side_effect = [[fake_frame] * 8] * 3  # 3 batches
 
     # --- Patch model ---

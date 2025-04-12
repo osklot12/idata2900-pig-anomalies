@@ -1,6 +1,6 @@
 import pytest
 
-from src.data.dataset.splitters.determ_splitter import DetermSplitter
+from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def strings():
 def test_strings_provided_on_construction(strings):
     """Tests that passing the strings on construction makes valid splits."""
     # arrange
-    splitter = DetermSplitter(strings)
+    splitter = StringSetSplitter(strings)
 
     # act
     splits = splitter.splits
@@ -30,7 +30,7 @@ def test_strings_provided_on_construction(strings):
 def test_giving_n_weights_produces_n_splits(strings):
     """Tests that giving n valid weights will produce n valid splits."""
     # arrange
-    splitter = DetermSplitter(strings=strings, weights=[0.2 for _ in range(5)])
+    splitter = StringSetSplitter(strings=strings, weights=[0.2 for _ in range(5)])
 
     # act
     splits = splitter.splits
@@ -45,8 +45,8 @@ def test_giving_n_weights_produces_n_splits(strings):
 def test_adding_incrementally_gives_the_same_splits(strings):
     """Tests that adding strings incrementally instead of giving all in the constructor produces the same splits."""
     # arrange
-    splitter = DetermSplitter()
-    prefilled_splitter = DetermSplitter(strings=strings)
+    splitter = StringSetSplitter()
+    prefilled_splitter = StringSetSplitter(strings=strings)
 
     # act
     for s in strings:
@@ -61,7 +61,7 @@ def test_giving_less_than_two_weights_raises():
     """Tests that giving less than two weights on construction causes a raise."""
     # act & assert
     with pytest.raises(ValueError):
-        DetermSplitter(weights=[1])
+        StringSetSplitter(weights=[1])
 
 
 @pytest.mark.unit
@@ -77,7 +77,7 @@ def test_weights_not_summing_to_one_raises(weights):
     """Tests that giving weights that does not sum to one on construction causes a raise."""
     # act & assert
     with pytest.raises(ValueError):
-        DetermSplitter(weights=weights)
+        StringSetSplitter(weights=weights)
 
 
 @pytest.mark.unit
@@ -87,7 +87,7 @@ def test_weights_not_summing_to_one_raises(weights):
 def test_seed_gives_determinism_in_splits(strings, seed):
     """Tests that the seed gives determinism in the splitting."""
     # act
-    splitters = [DetermSplitter(strings=strings, seed=seed) for _ in range(10)]
+    splitters = [StringSetSplitter(strings=strings, seed=seed) for _ in range(10)]
 
     # assert
     split_structures = {

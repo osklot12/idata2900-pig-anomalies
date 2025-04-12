@@ -1,5 +1,5 @@
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
 from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
@@ -13,7 +13,7 @@ def main():
 
     provider = NetworkFrameInstanceProvider(client)
 
-    prefetcher = BatchPrefetcher(provider, DatasetSplit.TRAIN, batch_size=8)
+    prefetcher = Prefetcher(provider, DatasetSplit.TRAIN, batch_size=8)
     prefetcher.run()
 
     while True:

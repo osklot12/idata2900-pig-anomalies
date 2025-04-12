@@ -7,7 +7,7 @@ from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
-from src.data.dataset.splitters.determ_splitter import DetermSplitter
+from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.dock_stream import DockStream
 from src.data.dataset.streams.factories.gcs_eval_stream_factory import GCSEvalStreamFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
@@ -58,7 +58,7 @@ def manifest(loader_factory):
 @pytest.fixture
 def splitter(manifest):
     """Fixture to provide a DetermSplitter instance."""
-    return DetermSplitter(strings=manifest.ids, weights=[0.8, 0.1, 0.1])
+    return StringSetSplitter(strings=manifest.ids, weights=[0.8, 0.1, 0.1])
 
 
 @pytest.fixture

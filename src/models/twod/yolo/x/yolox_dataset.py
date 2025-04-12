@@ -1,18 +1,18 @@
 from torch.utils.data import IterableDataset
 
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 
 
 class YOLOXDataset(IterableDataset):
     """A dataset for YOLOX."""
 
-    def __init__(self, prefetcher: BatchPrefetcher, n_batches: int):
+    def __init__(self, prefetcher: Prefetcher, n_batches: int):
         """
         Initializes a YOLOXDataset instance.
 
         Args:
-            prefetcher (BatchPrefetcher): the prefetcher to fetch data with
+            prefetcher (Prefetcher): the prefetcher to fetch data with
         """
         super().__init__()
         self._prefetcher = prefetcher

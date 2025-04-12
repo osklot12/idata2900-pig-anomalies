@@ -1,42 +1,40 @@
 import queue
 import threading
-from typing import TypeVar, List
+from typing import TypeVar, List, Optional
 
 from typing_extensions import Generic
 
 from src.data.dataset.streams.stream import Stream
-from src.data.streaming.prefetchers.prefetcher import Prefetcher
 from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
 
 
-class SimplePrefetcher(Generic[T], Prefetcher[T]):
+class Prefetcher(Generic[T], Stream[T]):
     """Simple data prefetcher."""
 
-    def __init__(self, stream: Stream, buffer_size: int = 10, fetch_timeout: float = 1.0):
+    def __init__(self, stream: Stream, buffer_size: int = 10):
         """
         Initializes a BatchPrefetcher instance.
 
         Args:
-            batch_size (int): the size of the batches
             buffer_size (int): the size of the buffer
-            fetch_timeout (float): the time to wait for a response
         """
         if buffer_size < 1:
             raise ValueError("buffer_size must be greater than 0")
 
         self._stream = stream
-        self._batch_size = batch_size
-        self._fetch_timeout = fetch_timeout
         self._queue: queue.Queue[List[T]] = queue.Queue(maxsize=buffer_size)
 
         self._thread = None
         self._run_lock = threading.Lock()
-
         self._running = AtomicBool(False)
 
+    def read(self) -> Optional[T]:
+        return self._queue.get()
+
     def run(self) -> None:
+        """Runs the prefetcher."""
         with self._run_lock:
             if self._running:
                 raise RuntimeError("Prefetcher is already running")
@@ -48,7 +46,9 @@ class SimplePrefetcher(Generic[T], Prefetcher[T]):
     def _worker(self) -> None:
         """Worker function that runs on the worker threads."""
         while self._running:
-            batch = self._stream.get_batch(self._batch_size)
+            batch = self._stream.read()
+            if batch is None:
+                self._running.set(False)
 
             put = False
             while not put and self._running:
@@ -59,10 +59,8 @@ class SimplePrefetcher(Generic[T], Prefetcher[T]):
                     pass
 
     def stop(self) -> None:
+        """Stops the prefetcher."""
         with self._run_lock:
             self._running.set(False)
             self._thread.join()
             self._thread = None
-
-    def get(self) -> List[T]:
-        return self._queue.get(timeout=self._fetch_timeout)
