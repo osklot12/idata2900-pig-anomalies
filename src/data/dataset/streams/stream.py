@@ -1,14 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, List, Optional
-
-from src.data.pipeline.consumer import Consumer
-from src.data.structures.atomic_bool import AtomicBool
+from typing import TypeVar, Generic, Optional
 
 T = TypeVar("T")
 
-
 class Stream(Generic[T], ABC):
-    """A stream of data."""
+    """Interface for data streams."""
 
     @abstractmethod
     def read(self) -> Optional[T]:
@@ -17,19 +13,6 @@ class Stream(Generic[T], ABC):
 
         Returns:
             T: the item, or None if end of streams is reached
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_entry(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
-        """
-        Returns entry of input data for the stream.
-
-        Args:
-            release (Optional[AtomicBool]): optional flag that cancels the operation when true
-
-        Returns:
-            Optional[Consumer[T]]: entry of input data for the stream, or None if stream is closed
         """
         raise NotImplementedError
 

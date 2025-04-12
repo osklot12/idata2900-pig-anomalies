@@ -1,5 +1,5 @@
 from src.data.dataset.streams.factories.dataset_stream_factory import DatasetStreamFactory, T
-from src.data.dataset.streams.stream import Stream
+from src.data.dataset.streams.writeable_stream import WriteableStream
 
 
 class NorsvinStreamFactory(DatasetStreamFactory):
@@ -14,11 +14,11 @@ class NorsvinStreamFactory(DatasetStreamFactory):
         """
         self._service_account_path = service_account_path
 
-    def create_train_stream(self) -> Stream[T]:
+    def create_train_stream(self) -> WriteableStream[T]:
         pass
 
-    def create_validation_stream(self) -> Stream[T]:
+    def create_validation_stream(self) -> WriteableStream[T]:
         pass
 
-    def create_test_stream(self) -> Stream[T]:
+    def create_test_stream(self) -> WriteableStream[T]:
         pass
