@@ -25,7 +25,7 @@ class FrameResizerComponent(Consumer[Frame], Producer[Frame]):
         resized = self._resize_frame(data)
         return self._consumer.get().consume(resized)
 
-    def set_consumer(self, consumer: Consumer[Frame]) -> None:
+    def connect(self, consumer: Consumer[Frame]) -> None:
         self._consumer.set(consumer)
 
     def _resize_frame(self, frame: Frame) -> Frame:

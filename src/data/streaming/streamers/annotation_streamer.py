@@ -83,5 +83,5 @@ class AnnotationStreamer(Producer[FrameAnnotations], ConcurrentStreamer):
         """
         raise NotImplementedError
 
-    def set_consumer(self, consumer: Consumer[FrameAnnotations]) -> None:
+    def connect(self, consumer: Consumer[FrameAnnotations]) -> None:
         self._consumer.set(consumer)

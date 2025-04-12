@@ -26,7 +26,7 @@ class BBoxNormalizerComponent(Consumer[FrameAnnotations], Producer[FrameAnnotati
         normalized = self._normalize_frame_annotations(data)
         return self._consumer.get().consume(normalized)
 
-    def set_consumer(self, consumer: Consumer[FrameAnnotations]) -> None:
+    def connect(self, consumer: Consumer[FrameAnnotations]) -> None:
         self._consumer.set(consumer)
 
     def _normalize_frame_annotations(self, annotations: FrameAnnotations) -> FrameAnnotations:

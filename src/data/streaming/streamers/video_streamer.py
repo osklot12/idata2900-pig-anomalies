@@ -52,5 +52,5 @@ class VideoStreamer(Producer[Frame], ConcurrentStreamer):
         """
         raise NotImplementedError
 
-    def set_consumer(self, consumer: Consumer[Frame]) -> None:
+    def connect(self, consumer: Consumer[Frame]) -> None:
         self._consumer.set(consumer)

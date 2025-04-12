@@ -9,7 +9,7 @@ class Producer(Generic[T], ABC):
     """Interface for producers of data."""
 
     @abstractmethod
-    def set_consumer(self, consumer: Consumer[T]) -> None:
+    def connect(self, consumer: Consumer[T]) -> None:
         """
         Sets the consumer for the producer.
 
