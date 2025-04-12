@@ -4,7 +4,7 @@ from typing import TypeVar, Generic, Optional
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
-from src.data.streaming.streamers.linear_streamer import LinearStreamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 
 T = TypeVar("T")
 
@@ -35,7 +35,7 @@ class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
             if streamer:
                 self._launch_streamer(streamer)
 
-    def _run_streamer(self, streamer: LinearStreamer, streamer_id: str) -> None:
+    def _run_streamer(self, streamer: ProducerStreamer, streamer_id: str) -> None:
         streamer.wait_for_completion()
         streamer.stop_streaming()
 
@@ -52,7 +52,7 @@ class StaticStreamerManager(Generic[T], ConcurrentStreamerManager):
         if streamer:
             self._launch_streamer(streamer)
 
-    def _get_next_streamer(self) -> Optional[LinearStreamer]:
+    def _get_next_streamer(self) -> Optional[ProducerStreamer]:
         """Returns the next streamer, or None if no streamer is available."""
         streamer = self._factory.create_streamer()
         streamer.connect(self._consumer)

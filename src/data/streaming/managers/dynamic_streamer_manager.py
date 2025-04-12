@@ -7,7 +7,7 @@ import time
 
 from src.data.streaming.streamers.providers.streamer_factory import StreamerFactory
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
-from src.data.streaming.streamers.linear_streamer import LinearStreamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 from src.data.structures.atomic_bool import AtomicBool
 from src.data.structures.atomic_var import AtomicVar
 from src.schemas.algorithms.demand_estimator import DemandEstimator
@@ -59,7 +59,7 @@ class DynamicStreamerManager(ConcurrentStreamerManager, SchemaListener[PressureS
         self._controller_running.set(True)
         self._controller_thread.start()
 
-    def _run_streamer(self, streamer: LinearStreamer, streamer_id: str) -> None:
+    def _run_streamer(self, streamer: ProducerStreamer, streamer_id: str) -> None:
         streamer.wait_for_completion()
         streamer.stop_streaming()
 

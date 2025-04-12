@@ -7,5 +7,5 @@ from src.data.streaming.streamers.streamer import Streamer
 T = TypeVar("T")
 
 
-class LinearStreamer(Generic[T], Streamer, Producer[T], ABC):
+class ProducerStreamer(Generic[T], Streamer, Producer[T], ABC):
     """An interface for streamers that have one consumer, creating a linear flow of data."""
