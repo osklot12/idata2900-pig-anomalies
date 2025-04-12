@@ -2,7 +2,7 @@ import queue
 import threading
 from typing import TypeVar, Generic
 
-from src.data.dataset.streams.writeable_stream import WriteableStream
+from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.producer_streamer import ProducerStreamer
@@ -14,13 +14,13 @@ T = TypeVar("T")
 class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
     """A streamer manager for feeding streams."""
 
-    def __init__(self, streamer_factory: StreamerFactory[T], stream: WriteableStream[T], max_streamers: int = 10):
+    def __init__(self, streamer_factory: StreamerFactory[T], stream: WritableStream[T], max_streamers: int = 10):
         """
         Initializes a StreamFeedingManager instance.
 
         Args:
             streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
-            stream (WriteableStream): the sequential streams to feed
+            stream (WritableStream): the sequential streams to feed
             max_streamers (int): the maximum number of concurrent streamers
         """
         super().__init__(max_streamers)

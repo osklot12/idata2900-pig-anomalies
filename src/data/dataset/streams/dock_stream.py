@@ -2,7 +2,7 @@ import queue
 import threading
 from typing import TypeVar, Generic, Optional
 
-from src.data.dataset.streams.writeable_stream import WriteableStream
+from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.consuming_queue import ConsumingQueue
 from src.data.structures.atomic_bool import AtomicBool
@@ -11,7 +11,7 @@ T = TypeVar("T")
 
 GET_ENTRY_LOOP_TIMEOUT = 0.1
 
-class DockStream(Generic[T], WriteableStream[T]):
+class DockStream(Generic[T], WritableStream[T]):
     """Sequential streams of data, where input streams are ordered sequentially."""
 
     def __init__(self, buffer_size: int = 3, dock_size: int = 100):
