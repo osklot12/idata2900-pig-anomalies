@@ -14,17 +14,15 @@ from src.data.streaming.streamers.video_streamer import VideoStreamer
 class VideoFileStreamer(VideoStreamer):
     """A streamer for streaming video file data."""
 
-    def __init__(self, video: VideoFile, consumer: Consumer[Frame],
-                 resize_strategy: FrameResizer = None):
+    def __init__(self, video: VideoFile, consumer: Consumer[Frame]):
         """
         Initializes a VideoFileStreamer instance.
 
         Args:
             video (VideoFile): the video to streams
             consumer (Consumer[Frame]): the consumer of the streaming data
-            resize_strategy (Optional[FrameResizer]): the frame resize strategy to use
         """
-        super().__init__(consumer, resize_strategy)
+        super().__init__(consumer)
         self._video = video
         self._fstream = None
         self._frame_index = 0
