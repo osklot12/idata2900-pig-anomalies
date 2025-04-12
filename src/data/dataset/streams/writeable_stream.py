@@ -23,3 +23,8 @@ class WriteableStream(Generic[T], Stream[T]):
             Optional[Consumer[T]]: entry of input data for the stream, or None if stream is closed
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def close(self) -> None:
+        """Closes the stream."""
+        raise NotImplementedError
