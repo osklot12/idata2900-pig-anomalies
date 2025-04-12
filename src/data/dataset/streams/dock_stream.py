@@ -3,7 +3,7 @@ from typing import TypeVar, Generic, Optional
 
 from src.data.dataset.streams.stream import Stream
 from src.data.pipeline.consumer import Consumer
-from src.data.streaming.feedables.feedable_queue import FeedableQueue
+from src.data.pipeline.consuming_queue import ConsumingQueue
 from src.data.structures.atomic_bool import AtomicBool
 
 T = TypeVar("T")
@@ -66,7 +66,7 @@ class DockStream(Generic[T], Stream[T]):
         if not self._closed:
             q = queue.Queue(maxsize=self._dock_size)
             self._dock_queue.put(q, timeout=timeout)
-            dock_input = FeedableQueue[T](q)
+            dock_input = ConsumingQueue[T](q)
 
         return dock_input
 

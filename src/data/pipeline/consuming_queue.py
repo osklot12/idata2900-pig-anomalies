@@ -6,12 +6,12 @@ from src.data.pipeline.consumer import Consumer
 T = TypeVar("T")
 
 
-class FeedableQueue(Generic[T], Consumer[T]):
-    """Feedable queue."""
+class ConsumingQueue(Generic[T], Consumer[T]):
+    """Consumer adapter for queues."""
 
     def __init__(self, q: queue.Queue):
         """
-        Initializes a FeedableQueue instance.
+        Initializes a ConsumingQueue instance.
 
         Args:
             q (queue.Queue): the queue to feed
