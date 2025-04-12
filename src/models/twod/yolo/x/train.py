@@ -1,7 +1,7 @@
 import traceback
 
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
@@ -25,8 +25,8 @@ def main():
     val_stream = NetworkStream(client=val_client, split=DatasetSplit.VAL)
 
     batch_size = 8
-    train_prefetcher = BatchPrefetcher(train_stream, batch_size, 8, fetch_timeout=200)
-    val_prefetcher = BatchPrefetcher(val_stream, batch_size, 8, fetch_timeout=200)
+    train_prefetcher = Prefetcher(train_stream, batch_size, 8, fetch_timeout=200)
+    val_prefetcher = Prefetcher(val_stream, batch_size, 8, fetch_timeout=200)
 
     train_prefetcher.run()
     val_prefetcher.run()

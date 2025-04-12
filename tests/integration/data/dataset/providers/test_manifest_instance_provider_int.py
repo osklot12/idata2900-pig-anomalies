@@ -6,7 +6,7 @@ from src.data.dataset.providers.manifest_instance_provider import ManifestInstan
 from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
-from src.data.dataset.splitters.determ_splitter import DetermSplitter
+from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from tests.utils.gcs.test_bucket import TestBucket
 
 
@@ -43,7 +43,7 @@ def manifest(video_registry, annotations_registry):
 @pytest.fixture
 def splitter(manifest):
     """Fixture to provide a DetermSplitter instance."""
-    return DetermSplitter(manifest.ids, [0.8, 0.1, 0.1])
+    return StringSetSplitter(manifest.ids, [0.8, 0.1, 0.1])
 
 
 @pytest.mark.integration

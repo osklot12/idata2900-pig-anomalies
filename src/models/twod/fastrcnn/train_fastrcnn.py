@@ -5,7 +5,7 @@ import torch
 import logging
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.model_trainer import ModelTrainer
 
 from src.schemas.metric_schema import MetricSchema
@@ -22,7 +22,7 @@ issuer_id = "rcnn-trainer"
 
 
 class RCNNTrainer(ModelTrainer):
-    def __init__(self, prefetcher: BatchPrefetcher):
+    def __init__(self, prefetcher: Prefetcher):
         self.prefetcher = prefetcher
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

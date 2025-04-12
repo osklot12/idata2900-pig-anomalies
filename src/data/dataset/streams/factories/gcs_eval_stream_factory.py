@@ -13,7 +13,7 @@ from src.data.dataset.providers.manifest_instance_provider import ManifestInstan
 from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
-from src.data.dataset.splitters.determ_splitter import DetermSplitter
+from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.dock_stream import DockStream
 from src.data.dataset.streams.factories.managed_stream_factory import ManagedStreamFactory, T
 from src.data.dataset.streams.managed_stream import ManagedStream
@@ -106,9 +106,9 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         )
 
     @staticmethod
-    def _create_splitter(ids: List[str], split_ratios: DatasetSplitRatios) -> DetermSplitter:
+    def _create_splitter(ids: List[str], split_ratios: DatasetSplitRatios) -> StringSetSplitter:
         """Creates a DetermSplitter instance."""
-        return DetermSplitter(
+        return StringSetSplitter(
             strings=ids,
             weights=[
                 split_ratios.train,
@@ -118,7 +118,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
         )
 
     @staticmethod
-    def _create_instance_provider(manifest: Manifest, splitter: DetermSplitter, split: int) -> InstanceProvider:
+    def _create_instance_provider(manifest: Manifest, splitter: StringSetSplitter, split: int) -> InstanceProvider:
         """Creates a InstanceProvider instance."""
         return ManifestInstanceProvider(
             manifest=manifest,

@@ -1,19 +1,19 @@
 import hashlib
 from typing import Iterable, List, Optional
 
+from src.data.dataset.splitters.splitter import Splitter
 
-class DetermSplitter:
-    """
-    Splits string collections into two subsets deterministically.
-    """
 
-    def __init__(self, strings: Optional[Iterable[str]] = None, weights: List[float] = None, seed: int = 42):
+class StringSetSplitter(Splitter[str]):
+    """Splits string collections into subsets deterministically."""
+
+    def __init__(self, weights: List[float], strings: Optional[Iterable[str]] = None, seed: int = 42):
         """
-        Initializes a StringSetSplitter.
+        Initializes a Splitter instance.
 
         Args:
-            strings (Iterable[str]): the collection of strings to split
             weights (List[float]): list of weights for each split (must sum to 1), defaults to [0.5, 0.5]
+            strings (Iterable[str]): the collection of strings to split
             seed (int): the random seed for hashing
         """
         if weights is None:

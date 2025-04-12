@@ -1,7 +1,6 @@
 import os
 import time
 import torch
-from typing import List, Dict
 from ultralytics import YOLO
 from ultralytics.nn.tasks import v8DetectionLoss
 
@@ -12,13 +11,13 @@ from src.models.model_trainer import ModelTrainer
 from src.models.twod.fastrcnn.train_fastrcnn import metrics_broker
 from src.schemas.signed_schema import SignedSchema
 from src.schemas.training_metric_formater import TrainingMetricsFormatter
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 
 issuer_id = "yolov11"
 formatter = TrainingMetricsFormatter()
 
 class YOLOv11Trainer(ModelTrainer):
-    def __init__(self, prefetcher: BatchPrefetcher, model_variant: str = "yolo11m.pt", epochs: int = 50):
+    def __init__(self, prefetcher: Prefetcher, model_variant: str = "yolo11m.pt", epochs: int = 50):
         self.prefetcher = prefetcher
         self.model_variant = model_variant
         self.epochs = epochs

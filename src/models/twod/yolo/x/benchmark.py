@@ -1,5 +1,5 @@
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
@@ -17,7 +17,7 @@ def main():
     test_client.connect(server_ip)
 
     test_provider = NetworkFrameInstanceProvider(test_client)
-    test_prefetcher = BatchPrefetcher(test_provider, DatasetSplit.TEST, 8, fetch_timeout=60)
+    test_prefetcher = Prefetcher(test_provider, DatasetSplit.TEST, 8, fetch_timeout=60)
     test_prefetcher.run()
 
     test_set = YOLOXDataset(test_prefetcher)
