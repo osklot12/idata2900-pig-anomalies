@@ -12,7 +12,7 @@ from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 T = TypeVar("T")
 
 
-class NorsvinStreamFactory(Generic[T], SplitStreamFactory):
+class NorsvinStreamFactory(Generic[T], SplitStreamFactory[T]):
     """Factory for creating dataset split streams for Norsvin dataset."""
 
     def __init__(self, gcs_creds: GCSCredentials, split_ratios: DatasetSplitRatios,

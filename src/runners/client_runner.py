@@ -20,3 +20,7 @@ def main():
         batch = prefetcher.read()
         for frame in batch:
             print(f"Received frame {frame.index} from {frame.source.source_id}")
+
+
+if __name__ == "__main__":
+    main()
