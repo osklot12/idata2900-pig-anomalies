@@ -48,7 +48,7 @@ class ClientHandler:
         recv_raw_msg = self._read_next_msg()
         while recv_raw_msg and self._running:
             recv_msg = self._deserializer.deserialize(recv_raw_msg)
-            handler = self._handler_registry.get_handler(type(recv_msg))
+            handler = self._handler_registry.get_handler(recv_msg)
             if not handler:
                 raise RuntimeError(f"No handler registered for {recv_msg}")
 
