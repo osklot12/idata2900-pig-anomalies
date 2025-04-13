@@ -79,3 +79,17 @@ class RABPool(Generic[T]):
                 self._not_full.notify()
 
         return result
+
+    def is_full(self) -> bool:
+        """
+        Returns whether the pool is full.
+
+        Returns:
+            bool: True if pool is full, False otherwise
+        """
+        with self._lock:
+            return len(self._items) >= self._maxsize
+
+    def __len__(self) -> int:
+        with self._lock:
+            return len(self._items)
