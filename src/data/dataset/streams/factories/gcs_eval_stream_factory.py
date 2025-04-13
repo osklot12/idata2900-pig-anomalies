@@ -26,7 +26,7 @@ from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
-from src.data.streaming.managers.stream_feeding_manager import StreamFeedingManager
+from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.providers.aggregated_streamer_provider import AggregatedStreamerProvider
 from src.data.streaming.streamers.providers.file_streamer_pair_provider import FileStreamerPairProvider
@@ -157,7 +157,7 @@ class GCSEvalStreamFactory(ManagedStreamFactory[StreamedAnnotatedFrame]):
     def _create_streamer_manager(streamer_factory: StreamerFactory[StreamedAnnotatedFrame],
                                  stream: DockStream[StreamedAnnotatedFrame]) -> StreamerManager:
         """Creates a StaticStreamerManager instance."""
-        return StreamFeedingManager(
+        return ThrottledStreamerManager(
             streamer_factory=streamer_factory,
             stream=stream
         )

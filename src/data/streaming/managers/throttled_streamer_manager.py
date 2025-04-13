@@ -1,7 +1,8 @@
 import time
 import threading
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Iterable, Optional
 
+from src.data.dataset.streams.closable import Closable
 from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
@@ -14,21 +15,24 @@ T = TypeVar("T")
 WORKER_BACKOFF_TIMEOUT = 0.1
 
 
-class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
-    """A streamer manager for feeding streams."""
+class ThrottledStreamerManager(Generic[T], ConcurrentStreamerManager):
+    """Streamer manager that adjusts dynamically to consuming targets."""
 
-    def __init__(self, streamer_factory: StreamerFactory[T], provider: ConsumerProvider[T], max_streamers: int = 10):
+    def __init__(self, streamer_factory: StreamerFactory[T], provider: ConsumerProvider[T], max_streamers: int = 4,
+                 closables: Optional[Iterable[Closable]] = None):
         """
-        Initializes a StreamFeedingManager instance.
+        Initializes a ThrottledStreamerManager instance.
 
         Args:
             streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
             provider (ConsumerProvider[T]): provider of consumers to consume the stream data
             max_streamers (int): the maximum number of concurrent streamers
+            closables (Optional[Iterable[Closable]]): optional iterable of objects that will be closed on stopping
         """
         super().__init__(max_streamers)
         self._streamer_factory = streamer_factory
         self._provider = provider
+        self._closables = closables
 
         self._worker = None
         self._shutting_down = AtomicBool(False)
@@ -44,13 +48,16 @@ class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
                     if consumer:
                         streamer = self._streamer_factory.create_streamer()
                         print(f"[StreamFeedingManager] Streamer: {streamer}")
-                        streamer.connect(consumer)
                         if streamer:
                             print(f"[StreamFeedingManager] Launched streamer...")
+                            streamer.connect(consumer)
                             self._launch_streamer(streamer)
                         else:
                             print(f"[StreamFeedingManager] End of stream")
                             consumer.consume(None)
+                            for closable in self._closables:
+                                closable.close()
+                            self._running.set(False)
 
                 except RuntimeError as e:
                     print(f"[StreamFeedingManager] Failed to launch streamer: {e}")
