@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
-from src.data.dataset.streams.managed_stream import ManagedStream
+from src.data.dataset.streams.managed.managed_stream import ManagedStream
 
 T = TypeVar("T")
 
-class ManagedStreamFactory(Generic[T], ABC):
+class StreamFactory(Generic[T], ABC):
     """Interface for managed streams factories."""
 
     @abstractmethod
