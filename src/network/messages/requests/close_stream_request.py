@@ -6,4 +6,10 @@ from src.network.messages.requests.request import Request
 
 @dataclass(frozen=True)
 class CloseStreamRequest(Request):
+    """
+    Request to close a dataset stream.
+
+    Attributes:
+        split (DatasetSplit): the dataset split to close the stream for
+    """
     split: DatasetSplit

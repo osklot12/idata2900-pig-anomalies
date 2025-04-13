@@ -18,8 +18,8 @@ from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
 from src.data.dataset.streams.dock_stream import DockStream
-from src.data.dataset.streams.factories.managed_stream_factory import ManagedStreamFactory
-from src.data.dataset.streams.managed_stream import ManagedStream
+from src.data.dataset.streams.managed.factories.stream_factory import StreamFactory
+from src.data.dataset.streams.managed.managed_stream import ManagedStream
 from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
@@ -42,7 +42,7 @@ from src.utils.gcs_credentials import GCSCredentials
 T = TypeVar("T")
 
 
-class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
+class GCSStreamFactory(Generic[T], StreamFactory[T]):
     """Factory for creating managed Google Cloud Storage (GCS) streams."""
 
     def __init__(self, gcs_creds: GCSCredentials,

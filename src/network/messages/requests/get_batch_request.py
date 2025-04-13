@@ -6,5 +6,12 @@ from src.network.messages.requests.request import Request
 
 @dataclass(frozen=True)
 class GetBatchRequest(Request):
+    """
+    Request to get a batch of data.
+
+    Attributes:
+        split (DatasetSplit): the dataset split to get the data from
+        batch_size (int): the batch size
+    """
     split: DatasetSplit
     batch_size: int
