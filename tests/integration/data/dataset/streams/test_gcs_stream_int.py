@@ -14,6 +14,8 @@ def test_norsvin_train_stream():
     gcs_creds = GCSCredentials(bucket_name=TestBucket.BUCKET_NAME, service_account_path=TestBucket.SERVICE_ACCOUNT_FILE)
     split_ratios = DatasetSplitRatios(train=0.8, val=0.2, test=0.2)
 
+
+
     stream = GCSStreamFactory(
         gcs_creds=gcs_creds,
         split_ratios=split_ratios,
