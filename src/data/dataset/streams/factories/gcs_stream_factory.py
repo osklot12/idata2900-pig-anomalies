@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Optional, Dict
+from typing import TypeVar, Generic, List, Optional, Dict, Iterable
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
@@ -16,6 +16,7 @@ from src.data.dataset.selectors.determ_string_selector import DetermStringSelect
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
 from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
+from src.data.dataset.streams.closable import Closable
 from src.data.dataset.streams.dock_stream import DockStream
 from src.data.dataset.streams.factories.managed_stream_factory import ManagedStreamFactory
 from src.data.dataset.streams.managed_stream import ManagedStream
@@ -31,7 +32,7 @@ from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.pipeline.component_factory import ComponentFactory
 from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.pipeline.pipeline_provider import PipelineProvider
-from src.data.streaming.managers.stream_feeding_manager import StreamFeedingManager
+from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.factories.instance_streamer_factory import InstanceStreamerFactory
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
@@ -80,7 +81,7 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
 
         stream = self._create_stream(self._split)
         pipeline_provider = PipelineProvider(*self._preprocessor_factories, consumer_provider=stream)
-        manager = self._create_streamer_manager(streamer_factory, pipeline_provider)
+        manager = self._create_streamer_manager(streamer_factory, pipeline_provider, [stream])
 
         return ManagedStream[T](stream=stream, manager=manager)
 
@@ -184,10 +185,12 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
         return stream
 
     @staticmethod
-    def _create_streamer_manager(streamer_factory: StreamerFactory[T], consumer_provider: ConsumerProvider[T]) -> StreamerManager:
+    def _create_streamer_manager(streamer_factory: StreamerFactory[T], consumer_provider: ConsumerProvider[T],
+                                 closables: Iterable[Closable]) -> StreamerManager:
         """Creates a StreamerManager instance."""
-        return StreamFeedingManager(
+        return ThrottledStreamerManager(
             streamer_factory=streamer_factory,
             provider=consumer_provider,
+            closables=closables,
             max_streamers=2
         )
