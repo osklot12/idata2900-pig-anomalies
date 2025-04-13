@@ -15,6 +15,7 @@ def main():
 
     stream = NetworkStream(client=client, split=DatasetSplit.TRAIN, batch_type=StreamedAnnotatedFrame, batch_size=8)
     prefetcher = Prefetcher[List[StreamedAnnotatedFrame]](stream=stream)
+    prefetcher.run()
 
     for _ in range(10000):
         batch = prefetcher.read()
