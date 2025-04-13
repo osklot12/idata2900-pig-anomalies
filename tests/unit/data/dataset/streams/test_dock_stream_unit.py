@@ -31,11 +31,11 @@ def test_input_data_is_read_sequentially(data1, data2):
     stream = DockStream[str](buffer_size=2, dock_size=10)
 
     # act
-    entry1 = stream.get_entry()
+    entry1 = stream.get_consumer()
     for s in data1:
         entry1.consume(s)
 
-    entry2 = stream.get_entry()
+    entry2 = stream.get_consumer()
     for s in data2:
         entry2.consume(s)
 
@@ -53,7 +53,7 @@ def test_close_closes_stream(data1):
     # arrange
     stream = DockStream[str]()
 
-    entry = stream.get_entry()
+    entry = stream.get_consumer()
     for s in data1:
         entry.consume(s)
 
@@ -72,7 +72,7 @@ def test_release_unblocks_outer_queue():
     """Tests that a release unblocks the outer queue successfully."""
     # arrange
     stream = DockStream[str](buffer_size=1, dock_size=10)
-    stream.get_entry()
+    stream.get_consumer()
 
     release = AtomicBool(False)
 
@@ -80,7 +80,7 @@ def test_release_unblocks_outer_queue():
 
     def put() -> None:
         start_time = time.time()
-        stream.get_entry(release=release)
+        stream.get_consumer(release=release)
         end_time = time.time()
 
         spanned = end_time - start_time
@@ -106,7 +106,7 @@ def test_release_unblocks_inner_queue(data1):
     # arrange
     stream = DockStream[str](buffer_size=1, dock_size=1)
     release = AtomicBool(False)
-    entry = stream.get_entry(release=release)
+    entry = stream.get_consumer(release=release)
     entry.consume("first-string")
 
     span = AtomicVar[float](0.0)

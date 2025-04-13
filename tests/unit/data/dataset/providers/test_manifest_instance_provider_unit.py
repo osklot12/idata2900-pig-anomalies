@@ -65,7 +65,7 @@ def test_next_returns_none_when_selector_returns_none(manifest):
     """Tests that calling next returns None when the internal selector returns None."""
     # arrange
     selector = Mock()
-    selector.next.return_value = None
+    selector.select.return_value = None
 
     provider = ManifestInstanceProvider(
         manifest=manifest,

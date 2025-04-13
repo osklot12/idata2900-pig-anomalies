@@ -10,7 +10,7 @@ from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.preprocessing.preprocessor import Preprocessor
 
 
-class AnnotatedFrameAugmentor(Preprocessor[StreamedAnnotatedFrame]):
+class AnnotatedFrameAugmentor():
     """Augments annotated frames."""
 
     @staticmethod

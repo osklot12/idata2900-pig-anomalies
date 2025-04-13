@@ -57,7 +57,7 @@ class DockStream(Generic[T], WritableStream[T]):
 
         return result
 
-    def get_entry(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
+    def get_consumer(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
         dock = None
 
         with self._get_entry_lock:

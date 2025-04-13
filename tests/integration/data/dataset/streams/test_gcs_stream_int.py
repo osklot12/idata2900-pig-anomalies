@@ -19,5 +19,4 @@ def test_norsvin_train_stream():
         split_ratios=split_ratios,
         split=DatasetSplit.TRAIN,
         label_map=NorsvinBehaviorClass.get_label_map(),
-        preprocessors=
     )

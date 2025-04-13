@@ -7,7 +7,7 @@ from src.data.dataset.splitters.splitter import Splitter
 class StringSetSplitter(Splitter[str]):
     """Splits string collections into subsets deterministically."""
 
-    def __init__(self, weights: List[float], strings: Optional[Iterable[str]] = None, seed: int = 42):
+    def __init__(self, weights: List[float] = None, strings: Optional[Iterable[str]] = None, seed: int = 42):
         """
         Initializes a Splitter instance.
 

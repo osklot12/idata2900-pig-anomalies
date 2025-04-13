@@ -13,7 +13,7 @@ def strings():
 def test_strings_provided_on_construction(strings):
     """Tests that passing the strings on construction makes valid splits."""
     # arrange
-    splitter = StringSetSplitter(strings)
+    splitter = StringSetSplitter(strings=strings)
 
     # act
     splits = splitter.splits
