@@ -6,6 +6,7 @@ from src.data.dataset.streams.managed.managed_stream import ManagedStream
 
 T = TypeVar("T")
 
+
 class SplitStreamFactory(Generic[T], ABC):
     """Interface for factories of dataset split streams."""
 
