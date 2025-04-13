@@ -25,12 +25,14 @@ class PipelineProvider(Generic[T], ConsumerProvider[T]):
         result = None
 
         final_consumer = self._consumer_provider.get_consumer(release=release)
-        if self._component_factories and final_consumer is not None:
-            components = [factory.create_component() for factory in self._component_factories]
-            for i in range(len(components) - 1):
-                components[i].connect(components[i + 1])
+        if final_consumer is not None:
+            result = final_consumer
+            if self._component_factories:
+                components = [factory.create_component() for factory in self._component_factories]
+                for i in range(len(components) - 1):
+                    components[i].connect(components[i + 1])
 
-            components[-1].connect(final_consumer)
-            result = components[0]
+                components[-1].connect(final_consumer)
+                result = components[0]
 
         return result

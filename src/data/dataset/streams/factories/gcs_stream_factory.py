@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Optional, Dict, Tuple
+from typing import TypeVar, Generic, List, Optional, Dict
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
@@ -28,7 +28,9 @@ from src.data.label.factories.simple_label_parser_factory import SimpleLabelPars
 from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
-from src.data.preprocessing.preprocessor import Preprocessor
+from src.data.pipeline.component_factory import ComponentFactory
+from src.data.pipeline.consumer_provider import ConsumerProvider
+from src.data.pipeline.pipeline_provider import PipelineProvider
 from src.data.streaming.managers.stream_feeding_manager import StreamFeedingManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.factories.instance_streamer_factory import InstanceStreamerFactory
@@ -46,7 +48,7 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
                  split_ratios: DatasetSplitRatios,
                  split: DatasetSplit,
                  label_map: Dict[str, T_Enum],
-                 preprocessors: Optional[List[Preprocessor[T]]] = None):
+                 preprocessor_factories: Optional[List[ComponentFactory[T]]] = None):
         """
         Initializes a GCSStreamFactory instance.
 
@@ -55,13 +57,13 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
             split_ratios (DatasetSplitRatios): dataset split ratios
             split (DatasetSplit): dataset split to create stream for
             label_map (Dict[str, T_Enum]): label map for annotation classes
-            preprocessors (Optional[List[Preprocessor[T]]]): optional list of preprocessors to use, defaults to None
+            preprocessor_factories (Optional[List[ComponentFactory[T]]]): optional list of preprocessor factories to use, defaults to None
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
         self._split = split
         self._label_map = label_map
-        self._preprocessors = preprocessors
+        self._preprocessor_factories = preprocessor_factories if preprocessor_factories is not None else []
 
     def create_stream(self) -> ManagedStream[T]:
         auth_factory = self._create_auth_service_factory(self._gcs_creds.service_account_path)
@@ -77,7 +79,8 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
 
         stream = self._create_stream(self._split)
-        manager = self._create_streamer_manager(streamer_factory, stream)
+        pipeline_provider = PipelineProvider(*self._preprocessor_factories, consumer_provider=stream)
+        manager = self._create_streamer_manager(streamer_factory, pipeline_provider)
 
         return ManagedStream[T](stream=stream, manager=manager)
 
@@ -171,7 +174,7 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
         )
 
     @staticmethod
-    def _create_stream(split: DatasetSplit):
+    def _create_stream(split: DatasetSplit) -> WritableStream[T]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
             stream = DockStream()
@@ -181,6 +184,6 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
         return stream
 
     @staticmethod
-    def _create_streamer_manager(streamer_factory: StreamerFactory[T], stream: WritableStream) -> StreamerManager:
+    def _create_streamer_manager(streamer_factory: StreamerFactory[T], consumer_provider: ConsumerProvider[T]) -> StreamerManager:
         """Creates a StreamerManager instance."""
-        return StreamFeedingManager(streamer_factory=streamer_factory, stream=stream)
+        return StreamFeedingManager(streamer_factory=streamer_factory, provider=consumer_provider)
