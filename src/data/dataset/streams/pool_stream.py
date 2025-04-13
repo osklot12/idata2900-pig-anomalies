@@ -32,7 +32,7 @@ class PoolStream(Generic[T], WritableStream[T]):
 
         return instance
 
-    def get_entry(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
+    def get_consumer(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[T]]:
         entry = None
 
         if not self._closed:

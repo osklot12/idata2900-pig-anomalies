@@ -23,7 +23,7 @@ def test_feeding_when_not_full(data):
 
     # act
     for d in data:
-        successes.append(stream.get_entry().consume(d))
+        successes.append(stream.get_consumer().consume(d))
 
     # assert
     assert all(successes)
@@ -35,10 +35,10 @@ def test_release_mechanism(data):
     # arrange
     stream = PoolStream[str](pool_size=1000)
     for d in data:
-        stream.get_entry().consume(d)
+        stream.get_consumer().consume(d)
 
     release = AtomicBool(False)
-    consumer = stream.get_entry(release=release)
+    consumer = stream.get_consumer(release=release)
     span = AtomicVar[float](0.0)
 
     def put() -> None:
