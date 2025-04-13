@@ -23,10 +23,13 @@ class GetBatchHandler(RequestHandler):
         self._session = session
 
     def handle(self, request: GetBatchRequest) -> Response:
-        response = GetBatchResponse(status=ResponseStatus.ERROR, batch=[])
+        status = ResponseStatus.ERROR
+        batch = []
 
         try:
             stream = self._session.get_stream(request.split)
+            if stream is None:
+                raise RuntimeError(f"No stream available for split {request.split}")
 
             batch = []
             instance = stream.read()
@@ -34,9 +37,9 @@ class GetBatchHandler(RequestHandler):
                 batch.append(instance)
                 instance = stream.read()
 
-            response = GetBatchResponse(status=ResponseStatus.SUCCESS, batch=batch)
+            status = ResponseStatus.SUCCESS
 
         except RuntimeError as e:
             print(f"[GetBatchHandler] Failed to create batch: {e}")
 
-        return response
+        return GetBatchResponse(status=status, batch=batch)
