@@ -18,7 +18,6 @@ from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.dock_stream import DockStream
 from src.data.dataset.streams.factories.managed_stream_factory import ManagedStreamFactory
-from src.data.dataset.streams.factories.stream_factory import StreamFactory
 from src.data.dataset.streams.managed_stream import ManagedStream
 from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.dataset.streams.writable_stream import WritableStream

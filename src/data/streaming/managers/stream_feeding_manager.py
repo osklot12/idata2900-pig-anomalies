@@ -3,6 +3,7 @@ import threading
 from typing import TypeVar, Generic
 
 from src.data.dataset.streams.writable_stream import WritableStream
+from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.data.streaming.streamers.producer_streamer import ProducerStreamer
@@ -14,18 +15,18 @@ T = TypeVar("T")
 class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
     """A streamer manager for feeding streams."""
 
-    def __init__(self, streamer_factory: StreamerFactory[T], stream: WritableStream[T], max_streamers: int = 10):
+    def __init__(self, streamer_factory: StreamerFactory[T], provider: ConsumerProvider[T], max_streamers: int = 10):
         """
         Initializes a StreamFeedingManager instance.
 
         Args:
             streamer_factory (StreamerFactory[StreamedAnnotatedFrame]): the factory for creating aggregated streamers
-            stream (WritableStream): the sequential streams to feed
+            provider (ConsumerProvider[T]): provider of consumers to consume the stream data
             max_streamers (int): the maximum number of concurrent streamers
         """
         super().__init__(max_streamers)
         self._streamer_factory = streamer_factory
-        self._stream = stream
+        self._provider = provider
 
         self._worker = None
         self._shutting_down = AtomicBool(False)
@@ -35,17 +36,16 @@ class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
         print(f"[SequentialStreamerManager] Ran worker")
         while self._running:
             try:
-                entry = self._stream.get_entry(self._shutting_down)
-                if entry:
+                consumer = self._provider.get_consumer(self._shutting_down)
+                if consumer:
                     streamer = self._streamer_factory.create_streamer()
-                    streamer.connect(entry)
+                    streamer.connect(consumer)
                     if streamer:
                         print(f"[SequentialStreamerManager] Launched streamer...")
                         self._launch_streamer(streamer)
                     else:
                         print(f"[SequentialStreamerManager] End of stream")
-                        entry.consume(None)
-                        self._stream.close()
+                        consumer.consume(None)
 
             except queue.Full:
                 pass
