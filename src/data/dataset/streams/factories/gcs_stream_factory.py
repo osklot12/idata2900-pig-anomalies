@@ -177,13 +177,17 @@ class GCSStreamFactory(Generic[T], ManagedStreamFactory[T]):
     def _create_stream(split: DatasetSplit) -> WritableStream[T]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
-            stream = DockStream()
+            stream = PoolStream(pool_size=2000)
         else:
-            stream = PoolStream()
+            stream = DockStream(buffer_size=3, dock_size=300)
 
         return stream
 
     @staticmethod
     def _create_streamer_manager(streamer_factory: StreamerFactory[T], consumer_provider: ConsumerProvider[T]) -> StreamerManager:
         """Creates a StreamerManager instance."""
-        return StreamFeedingManager(streamer_factory=streamer_factory, provider=consumer_provider)
+        return StreamFeedingManager(
+            streamer_factory=streamer_factory,
+            provider=consumer_provider,
+            max_streamers=2
+        )
