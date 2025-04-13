@@ -80,12 +80,13 @@ class ConcurrentStreamerManager(StreamerManager, StreamerRegistry):
             streamer_id (str): the streamer id
             future (concurrent.futures.Future): the future returned from the background task running `_manage_streamer`
         """
-        if self._running:
-            try:
-                future.result()
-                self._handle_done_streamer(streamer_id)
-            except Exception as e:
-                self._handle_crashed_streamer(streamer_id, e)
+        with self._lock:
+            if self._running:
+                try:
+                    future.result()
+                    self._handle_done_streamer(streamer_id)
+                except Exception as e:
+                    self._handle_crashed_streamer(streamer_id, e)
 
     @abstractmethod
     def _handle_done_streamer(self, streamer_id: str) -> None:
@@ -114,18 +115,20 @@ class ConcurrentStreamerManager(StreamerManager, StreamerRegistry):
     def stop(self) -> None:
         with self._lock:
             self._running.set(False)
-            self._stop()
+        self._stop()
 
-            try:
-                if self._executor is not None:
-                    self._executor.shutdown(wait=True)
-                    self._executor = None
-            finally:
-                for streamer_id in self.get_streamer_ids():
-                    streamer = self.get_streamer(streamer_id)
-                    if streamer:
-                        streamer.stop_streaming()
-                    self._remove_streamer(streamer_id)
+        for streamer_id in self.get_streamer_ids():
+            streamer = self.get_streamer(streamer_id)
+            if streamer:
+                streamer.stop_streaming()
+
+        try:
+            if self._executor is not None:
+                self._executor.shutdown(wait=True)
+                self._executor = None
+        finally:
+            for streamer_id in self.get_streamer_ids():
+                self._remove_streamer(streamer_id)
 
     def _stop(self) -> None:
         """Custom stop logic to run before shutting down executor and stopping and removing streamers."""

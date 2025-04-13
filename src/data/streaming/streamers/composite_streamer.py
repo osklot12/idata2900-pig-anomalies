@@ -3,6 +3,7 @@ from typing import Generic, TypeVar
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.producer import Producer
 from src.data.streaming.streamers.producer_streamer import ProducerStreamer
+from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
 T = TypeVar("T")
@@ -10,7 +11,7 @@ T = TypeVar("T")
 class CompositeStreamer(Generic[T], ProducerStreamer[T]):
     """Composition of streaming components, providing an abstract interface for connecting it in a pipeline."""
 
-    def __init__(self, streamer: ProducerStreamer, output: ProducerStreamer[T]):
+    def __init__(self, streamer: Streamer, output: Producer[T]):
         """
         Initializes a CompositeStreamer instance.
 
