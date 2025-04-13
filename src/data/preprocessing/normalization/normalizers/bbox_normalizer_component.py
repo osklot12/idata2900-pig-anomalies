@@ -24,7 +24,11 @@ class BBoxNormalizerComponent(Component[StreamedAnnotatedFrame]):
         self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](consumer)
 
     def consume(self, data: Optional[StreamedAnnotatedFrame]) -> bool:
-        normalized = self._normalize_frame_annotations(data)
+        normalized = None
+
+        if data is not None:
+            normalized = self._normalize_frame_annotations(data)
+
         return self._consumer.get().consume(normalized)
 
     def connect(self, consumer: Consumer[StreamedAnnotatedFrame]) -> None:
