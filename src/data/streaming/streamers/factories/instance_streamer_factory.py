@@ -34,16 +34,22 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
 
         aggregator = BufferedAggregator()
         instance = self._instance_provider.get()
+        print(f"[InstanceStreamerFactory] Got instance {instance}")
         if instance:
             video = self._entity_factory.create_video(instance.video_file)
             annotations = self._entity_factory.create_video_annotations(instance.annotation_file)
+            print(f"[InstanceStreamerFactory] Got video {video} and annotations {annotations}")
             if video and annotations:
                 video_streamer = VideoFileStreamer(video, ConsumingFunc(aggregator.feed_frame))
-                annotation_streamer = VideoAnnotationsStreamer(annotations, ConsumingFunc(aggregator.feed_annotations))
+                annotations_streamer = VideoAnnotationsStreamer(annotations, ConsumingFunc(aggregator.feed_annotations))
+
+                print(f"[InstanceStreamerFactory] Got video streamer {video_streamer} and annotations streamer {annotations_streamer}")
 
                 streamer = CompositeStreamer(
-                    streamer=EnsembleStreamer(video_streamer, annotation_streamer),
+                    streamer=EnsembleStreamer(video_streamer, annotations_streamer),
                     output=aggregator
                 )
+
+                print(f"[InstanceStreamerFactory] Returned streamer {streamer}")
 
         return streamer

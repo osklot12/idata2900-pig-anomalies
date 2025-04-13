@@ -33,28 +33,30 @@ class StreamFeedingManager(Generic[T], ConcurrentStreamerManager):
 
     def _worker_loop(self) -> None:
         """Worker thread function."""
-        print(f"[SequentialStreamerManager] Ran worker")
+        print(f"[StreamFeedingManager] Ran worker")
         while self._running:
             try:
                 consumer = self._provider.get_consumer(self._shutting_down)
+                print(f"[StreamFeedingManager] Consumer: {consumer}")
                 if consumer:
                     streamer = self._streamer_factory.create_streamer()
+                    print(f"[StreamFeedingManager] Streamer: {streamer}")
                     streamer.connect(consumer)
                     if streamer:
-                        print(f"[SequentialStreamerManager] Launched streamer...")
+                        print(f"[StreamFeedingManager] Launched streamer...")
                         self._launch_streamer(streamer)
                     else:
-                        print(f"[SequentialStreamerManager] End of stream")
+                        print(f"[StreamFeedingManager] End of stream")
                         consumer.consume(None)
 
             except queue.Full:
                 pass
 
             except RuntimeError as e:
-                print(f"[SequentialStreamerManager] Failed to launch streamer: {e}")
+                print(f"[StreamFeedingManager] Failed to launch streamer: {e}")
 
     def _setup(self) -> None:
-        print(f"[SequentialStreamerManager] Setting up...")
+        print(f"[StreamFeedingManager] Setting up...")
         self._worker = threading.Thread(target=self._worker_loop)
         self._worker.start()
 

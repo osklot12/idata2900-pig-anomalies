@@ -6,8 +6,6 @@ from cppbindings import FrameStream
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataset.entities.video_file import VideoFile
-from src.data.pipeline.producer import T
-from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.video_streamer import VideoStreamer
 
