@@ -17,7 +17,7 @@ def main():
     prefetcher = Prefetcher[List[StreamedAnnotatedFrame]](stream=stream)
     prefetcher.run()
 
-    for _ in range(10000):
+    while True:
         batch = prefetcher.read()
         for frame in batch:
             print(f"Received frame {frame.index} from {frame.source.source_id}")
