@@ -27,7 +27,6 @@ class VideoStreamer(ConcurrentStreamer, ProducerStreamer[Frame]):
 
         frame = self._get_next_frame()
         while frame is not None and not self._is_requested_to_stop():
-            print(f"[VideoStreamer] Streaming frame {frame.index} for {frame.source.source_id}")
             consumer = self._consumer.get()
             if consumer is not None:
                 consumer.consume(frame)

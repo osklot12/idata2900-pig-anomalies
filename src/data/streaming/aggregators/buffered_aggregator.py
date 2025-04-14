@@ -31,7 +31,7 @@ class BufferedAggregator(Aggregator, Producer[StreamedAnnotatedFrame]):
 
     def feed_frame(self, frame: Optional[Frame]) -> bool:
         success = False
-
+        print(f"[BufferedAggregator] Got frame {frame.index} for {frame.source.source_id}")
         consumer = self._consumer.get()
         if consumer is not None:
             with self._lock:
@@ -53,7 +53,7 @@ class BufferedAggregator(Aggregator, Producer[StreamedAnnotatedFrame]):
 
     def feed_annotations(self, annotations: Optional[FrameAnnotations]) -> bool:
         success = False
-
+        print(f"[BufferedAggregator] Got annotations {annotations.index} for {annotations.source.source_id}")
         consumer = self._consumer.get()
         if consumer is not None:
             with self._lock:
@@ -77,6 +77,7 @@ class BufferedAggregator(Aggregator, Producer[StreamedAnnotatedFrame]):
     @staticmethod
     def _feed_consumer(frame: Frame, anno: FrameAnnotations, consumer: Consumer[StreamedAnnotatedFrame]) -> bool:
         """Feeds the consumer with a StreamedAnnotatedFrame instance."""
+        print(f"[BufferedAggregator] Forwarding to {consumer}")
         return consumer.consume(
             StreamedAnnotatedFrame(
                 source=frame.source,

@@ -3,7 +3,13 @@ import time
 import random
 from typing import TypeVar, Generic, Optional
 
+from src.data.structures.atomic_bool import AtomicBool
+from src.data.structures.atomic_var import AtomicVar
+
 T = TypeVar("T")
+
+WAITING_TIMEOUT = 0.1
+
 
 class RABPool(Generic[T]):
     """Thread-safe random access pool with blocking put and get methods (Random Access Blocking Pool)."""
@@ -17,68 +23,68 @@ class RABPool(Generic[T]):
             min_ready (int): the required min size of the pool to get instances
         """
         self._items: list[T] = []
-        self._maxsize = maxsize
-        self._min_ready = min_ready
+        self._maxsize = AtomicVar[int](maxsize)
+        self._min_ready = AtomicVar[int](min_ready)
 
         self._lock = threading.Lock()
         self._not_full = threading.Condition(self._lock)
-        self._not_ready = threading.Condition(self._lock)
+        self._ready = threading.Condition(self._lock)
 
-    def put(self, item: Optional[T], timeout: Optional[float] = None) -> bool:
+    def put(self, item: T, release: Optional[AtomicBool] = None) -> bool:
         """
         Puts an item into the pool.
 
         Args:
-            item (Optional[T]): the item to put
-            timeout (Optional[float]): the time to wait before timing out
+            item (T): the item to put
+            release (Optional[AtomicBool]): optional release for unblocking the operation
         """
-        result = False
+        success = False
 
-        with self._not_full:
-            timed_out = False
-            end_time = time.time() + timeout if timeout is not None else None
-            while len(self._items) >= self._maxsize and not timed_out:
-                remaining = end_time - time.time() if end_time is not None else None
-                if remaining is not None and remaining <= 0:
-                    timed_out = True
-                self._not_full.wait(timeout=remaining)
+        if item is not None:
+            print(f"[RABPool] Putting item: {type(item)}")
+            released = False
+            with self._not_full:
+                while len(self._items) >= self._maxsize.get() and not released:
+                    released = self._is_released(release)
+                    self._not_full.wait(WAITING_TIMEOUT)
 
-            if not timed_out:
-                self._items.append(item)
-                result = True
+                if not released:
+                    self._items.append(item)
+                    success = True
+                self._ready.notify()
 
-            self._not_ready.notify()
+        print(f"[RABPool] Pool size: {len(self)}")
+        return success
 
-        return result
-
-
-    def get(self, timeout: Optional[float] = None) -> Optional[T]:
+    def get(self, release: Optional[AtomicBool] = None) -> Optional[T]:
         """
         Gets a random item from the pool.
 
         Args:
-            timeout (Optional[float]): the time to wait before timing out
+            release (Optional[AtomicBool]): optional release for unblocking the operation
 
         Returns:
-            Optional[T]: the random item
+            Optional[T]: the random item, or None if released
         """
-        result = None
+        item = None
 
-        with self._not_ready:
-            timed_out = False
-            end_time = time.time() + timeout if timeout is not None else None
-            while len(self._items) < self._min_ready and not timed_out:
-                remaining = end_time - time.time() if end_time is not None else None
-                if remaining is not None and remaining <= 0:
-                    timed_out = True
-                self._not_ready.wait(timeout=remaining)
+        released = False
+        with self._ready:
+            while len(self._items) < self._min_ready.get() and not released:
+                released = self._is_released(release)
+                self._ready.wait(WAITING_TIMEOUT)
 
-            if not timed_out and self._items:
+            if not released and len(self._items) > 0:
                 index = random.randint(0, len(self._items) - 1)
-                result = self._items.pop(index)
-                self._not_full.notify()
+                item = self._items.pop(index)
+            self._not_full.notify()
 
-        return result
+        return item
+
+    @staticmethod
+    def _is_released(release: Optional[AtomicBool]) -> bool:
+        """Checks whether the release is released."""
+        return release is not None and release
 
     def is_full(self) -> bool:
         """
@@ -88,7 +94,7 @@ class RABPool(Generic[T]):
             bool: True if pool is full, False otherwise
         """
         with self._lock:
-            return len(self._items) >= self._maxsize
+            return len(self._items) >= self._maxsize.get()
 
     def __len__(self) -> int:
         with self._lock:

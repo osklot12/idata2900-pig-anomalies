@@ -6,7 +6,6 @@ from src.data.structures.rab_pool import RABPool
 
 T = TypeVar("T")
 
-CONSUME_LOOP_TIMEOUT = 0.1
 
 class ConsumingPool(Generic[T], Consumer[T]):
     """Consumer adapter for RABPool instances."""
@@ -23,13 +22,5 @@ class ConsumingPool(Generic[T], Consumer[T]):
         self._release = release
 
     def consume(self, data: Optional[T]) -> bool:
-        success = False
-
-        keep_trying = True
-        while keep_trying and not success:
-            success = self._pool.put(item=data, timeout=CONSUME_LOOP_TIMEOUT)
-
-            if self._release is not None and self._release:
-                keep_trying = False
-
-        return success
+        print(f"[BBoxNormalizerComponent] Consumed instance and forward it to {self._pool}")
+        return self._pool.put(data, self._release)
