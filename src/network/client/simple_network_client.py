@@ -42,9 +42,7 @@ class SimpleNetworkClient(NetworkClient):
 
         try:
             self._writer.write(self._serializer.serialize(request))
-            print(f"[SimpleNetworkClient] Sent {request}")
             response = self._deserializer.deserialize(self._reader.read())
-            print(f"[SimpleNetworkClient] Received {response}")
         except socket.error as e:
             raise ConnectionError(f"Failed to send request to {request}: {e}")
 
