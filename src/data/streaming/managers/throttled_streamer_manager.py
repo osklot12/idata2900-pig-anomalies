@@ -3,7 +3,6 @@ import threading
 from typing import TypeVar, Generic, Iterable, Optional
 
 from src.data.dataset.streams.closable import Closable
-from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
@@ -51,6 +50,7 @@ class ThrottledStreamerManager(Generic[T], ConcurrentStreamerManager):
                         if streamer:
                             print(f"[StreamFeedingManager] Launched streamer...")
                             streamer.connect(consumer)
+                            print(f"[StreamFeedingManager] Connected streamer to {consumer}")
                             self._launch_streamer(streamer)
                         else:
                             print(f"[StreamFeedingManager] End of stream")

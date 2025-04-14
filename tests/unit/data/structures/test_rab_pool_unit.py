@@ -4,6 +4,8 @@ import threading
 import pytest
 import time
 
+from src.data.structures.atomic_bool import AtomicBool
+from src.data.structures.atomic_var import AtomicVar
 from src.data.structures.rab_pool import RABPool
 
 
@@ -33,16 +35,28 @@ def test_get_blocks_when_min_ready_is_not_met(data):
     pool = RABPool[str](maxsize=1001, min_ready=1001)
     for s in data:
         pool.put(s)
-    timeout = 0.1
+
+    release = AtomicBool(False)
+
+    span = AtomicVar[float](0.0)
+
+    def put() -> None:
+        start_time = time.time()
+        pool.get(release=release)
+        end_time = time.time()
+        span.set(end_time - start_time)
+
+    t = threading.Thread(target=put)
+    sleep_time = 0.1
 
     # act
-    start_time = time.time()
-    instance = pool.get(timeout=timeout)
-    end_time = time.time()
+    t.start()
+    time.sleep(sleep_time)
+    release.set(True)
+    t.join()
 
     # assert
-    assert instance is None
-    assert end_time - start_time >= timeout
+    assert span.get() >= sleep_time
 
 
 @pytest.mark.unit
@@ -52,36 +66,62 @@ def test_get_does_not_block_when_min_ready_is_met(data):
     pool = RABPool[str](maxsize=1000, min_ready=999)
     for s in data:
         pool.put(s)
-    timeout = 1
+
+    release = AtomicBool(False)
+
+    span = AtomicVar[float](0.0)
+
+    item = AtomicVar[str]("")
+
+    def get() -> None:
+        start_time = time.time()
+        item.set(pool.get(release=release))
+        end_time = time.time()
+        span.set(end_time - start_time)
+
+    t = threading.Thread(target=get)
+    sleep_time = 0.1
 
     # act
-    start_time = time.time()
-    instance = pool.get(timeout=timeout)
-    end_time = time.time()
+    t.start()
+    time.sleep(sleep_time)
+    release.set(True)
+    t.join()
 
     # assert
-    assert instance is not None
-    assert isinstance(instance, str)
-    assert end_time - start_time < timeout
+    assert span.get() < sleep_time
+    assert item.get() is not ""
 
 
 @pytest.mark.unit
 def test_put_blocks_on_full_pool(data):
     """Tests that the put() blocks if the pool is full."""
     # arrange
-    pool = RABPool[str](maxsize=1000, min_ready=0)
+    pool = RABPool[str](maxsize=1000, min_ready=999)
     for s in data:
         pool.put(s)
-    timeout = 0.1
+
+    release = AtomicBool(False)
+
+    span = AtomicVar[float](0.0)
+
+    def get() -> None:
+        start_time = time.time()
+        pool.put(item="block", release=release)
+        end_time = time.time()
+        span.set(end_time - start_time)
+
+    t = threading.Thread(target=get)
+    sleep_time = 0.1
 
     # act
-    start_time = time.time()
-    put = pool.put("block", timeout=timeout)
-    end_time = time.time()
+    t.start()
+    time.sleep(sleep_time)
+    release.set(True)
+    t.join()
 
     # assert
-    assert not put
-    assert end_time - start_time >= timeout
+    assert span.get() >= sleep_time
 
 
 @pytest.mark.unit

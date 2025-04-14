@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
@@ -9,6 +10,7 @@ from src.data.preprocessing.normalization.factories.bbox_normalizer_component_fa
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_component_factory import FrameResizerComponentFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
+from src.data.structures.atomic_bool import AtomicBool
 from src.utils.gcs_credentials import GCSCredentials
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
@@ -41,6 +43,18 @@ def normalizer_component_factory():
     return BBoxNormalizerComponentFactory(bbox_normalizer_factory)
 
 
+import tracemalloc
+import threading
+
+tracemalloc.start()
+
+
+def report_memory():
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"[Memory] Current = {current / 1024 ** 2:.2f} MB; Peak = {peak / 1024 ** 2:.2f} MB")
+    print(f"[Threads] Active threads: {threading.active_count()}")
+
+
 def test_norsvin_train_stream(gcs_creds, split_ratios, resizer_component_factory, normalizer_component_factory):
     """Tests that creating the Norsvin training set stream with GCSStreamFactory gives the correct stream."""
     # arrange
@@ -56,10 +70,26 @@ def test_norsvin_train_stream(gcs_creds, split_ratios, resizer_component_factory
     # act
     stream.run()
 
-    for _ in range(100):
-        StreamedAnnotatedFrameVisualizer.visualize(stream.read())
+    # for _ in range(1000000):
+    # stream.read()
+    # StreamedAnnotatedFrameVisualizer.visualize(stream.read())
+    running = AtomicBool(True)
+    def print_memory():
+        while running:
+            print(report_memory())
+            time.sleep(0.5)
 
-    stream.stop()
+    t = threading.Thread(target=print_memory)
+
+    try:
+        t.start()
+        while True:
+            instance = stream.read()
+            print(f"[Test] Got item: {type(instance)}")
+    except KeyboardInterrupt:
+        running.set(False)
+        stream.stop()
+        t.join()
 
 
 def test_norsvin_val_stream(gcs_creds, split_ratios, resizer_component_factory, normalizer_component_factory):
@@ -106,7 +136,7 @@ def test_norsvin_test_stream(gcs_creds, split_ratios, resizer_component_factory,
     instance = stream.read()
     while instance:
         assert isinstance(instance, StreamedAnnotatedFrame)
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        # StreamedAnnotatedFrameVisualizer.visualize(instance)
         instance = stream.read()
 
     stream.stop()

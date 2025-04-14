@@ -178,7 +178,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     def _create_stream(split: DatasetSplit) -> WritableStream[T]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
-            stream = PoolStream(pool_size=2000)
+            stream = PoolStream(pool_size=500)
         else:
             stream = DockStream(buffer_size=3, dock_size=300)
 
