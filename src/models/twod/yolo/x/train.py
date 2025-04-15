@@ -1,5 +1,6 @@
 import traceback
 
+from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
@@ -21,17 +22,26 @@ def main():
     val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     val_client.connect(server_ip)
 
-    train_stream = NetworkStream(client=train_client, split=DatasetSplit.TRAIN)
-    val_stream = NetworkStream(client=val_client, split=DatasetSplit.VAL)
+    train_stream = NetworkStream(
+        client=train_client,
+        split=DatasetSplit.TRAIN,
+        batch_type=StreamedAnnotatedFrame,
+        batch_size=8
+    )
+    val_stream = NetworkStream(
+        client=val_client,
+        split=DatasetSplit.VAL,
+        batch_type=StreamedAnnotatedFrame,
+        batch_size=8
+    )
 
-    batch_size = 8
-    train_prefetcher = Prefetcher(train_stream, batch_size, 8, fetch_timeout=200)
-    val_prefetcher = Prefetcher(val_stream, batch_size, 8, fetch_timeout=200)
+    train_prefetcher = Prefetcher(stream=train_stream, buffer_size=10)
+    val_prefetcher = Prefetcher(stream=val_stream, buffer_size=10)
 
     train_prefetcher.run()
     val_prefetcher.run()
 
-    train_set = YOLOXDataset(train_prefetcher, 6495)
+    train_set = YOLOXDataset(train_prefetcher, 6125)
     val_set = YOLOXDataset(val_prefetcher, 430)
 
     exp = Exp(train_set=train_set, val_set=val_set)
@@ -45,7 +55,7 @@ def main():
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt=None, # "YOLOX_outputs/streaming_yolox/latest_ckpt.pth",
+        ckpt="YOLOX_weights/yolox_s.pth",
         fp16=False,
         fuse=False,
         cache=False,
@@ -53,9 +63,7 @@ def main():
         logger="tensorboard"
     )
 
-    print(f"Using exp of type {type(exp)}")
     trainer = StreamingTrainer(exp, args)
-    print("TRAINING!")
     try:
         trainer.train()
     except Exception as e:
