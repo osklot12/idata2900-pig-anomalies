@@ -13,11 +13,12 @@ T = TypeVar("T")
 class Prefetcher(Generic[T], Stream[T]):
     """Simple data prefetcher."""
 
-    def __init__(self, stream: Stream, buffer_size: int = 10):
+    def __init__(self, stream: Stream[T], buffer_size: int = 10):
         """
         Initializes a BatchPrefetcher instance.
 
         Args:
+            stream (Stream[T]): stream to fetch from
             buffer_size (int): the size of the buffer
         """
         if buffer_size < 1:
