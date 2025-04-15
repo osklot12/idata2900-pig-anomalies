@@ -5,6 +5,7 @@ from abc import abstractmethod
 from src.command.command import Command
 from src.data.streaming.streamers.streamer import Streamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
+from src.data.structures.atomic_bool import AtomicBool
 
 
 class ConcurrentStreamer(Streamer):
@@ -16,6 +17,7 @@ class ConcurrentStreamer(Streamer):
 
         self._thread = None
         self._stream_lock = threading.Lock()
+        self._release = AtomicBool(True)
 
         self._requested_stop = False
         self._stop_lock = threading.Lock()
@@ -28,6 +30,7 @@ class ConcurrentStreamer(Streamer):
             if self._thread:
                 raise RuntimeError("Streamer is already running")
 
+            self._release.set(False)
             self._set_status(StreamerStatus.STREAMING)
             self._thread = threading.Thread(target=self._stream_worker)
             self._thread.start()
@@ -62,6 +65,7 @@ class ConcurrentStreamer(Streamer):
 
     def stop_streaming(self) -> None:
         with self._stream_lock:
+            self._release.set(True)
             self._request_stop()
             self._stop()
             self._safe_join()
@@ -117,3 +121,12 @@ class ConcurrentStreamer(Streamer):
         """Indicates whether the streamer has been requested to stop."""
         with self._stop_lock:
             return self._requested_stop
+
+    def get_releaser(self) -> AtomicBool:
+        """
+        Returns a releaser that can be used to release resources.
+
+        Returns:
+            AtomicBool: the releaser
+        """
+        return self._release

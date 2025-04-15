@@ -23,35 +23,53 @@ class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
         """
         self._frame: Optional[Frame] = None
         self._annotations: Optional[FrameAnnotations] = None
+        self._eos = False
 
         self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](consumer)
 
         self._lock = threading.Lock()
         self._condition = threading.Condition(self._lock)
 
-    def feed_frame(self, frame: Optional[Frame], release: Optional[AtomicBool] = None) -> None:
-        with self._condition:
-            self._frame = frame
-            self._condition.notify_all()
+    def feed_frame(self, frame: Optional[Frame], release: Optional[AtomicBool] = None) -> bool:
+        match_found = False
 
-            match_found = False
-            while not self._is_released(release) and not match_found:
-                if self._annotations and self._annotations.index == frame.index:
+        print(
+            f"[BlockingAggregator] Got frame {getattr(frame, 'index', None)} from {getattr(frame, 'source', {}).source_id if frame else 'END'}")
+        with self._condition:
+            if frame is not None:
+                self._frame = frame
+                if self._annotations is None:
+                    while self._frame is not None and not self._is_released(release):
+                        self._condition.wait(timeout=WAITING_TIMEOUT)
+
+                else:
                     self._consume()
                     match_found = True
-                self._condition.wait(timeout=WAITING_TIMEOUT)
 
-    def feed_annotations(self, annotations: Optional[FrameAnnotations], release: Optional[AtomicBool] = None) -> None:
+            else:
+                self._handle_eos()
+
+        return match_found
+
+    def feed_annotations(self, annotations: Optional[FrameAnnotations], release: Optional[AtomicBool] = None) -> bool:
+        match_found = False
+
+        print(f"[BlockingAggregator] Got annotations {getattr(annotations, 'index', None)} from {getattr(annotations, 'source', {}).source_id if annotations else 'END'}")
         with self._condition:
-            self._annotations = annotations
-            self._condition.notify_all()
+            if not annotations is None:
+                self._annotations = annotations
+                if self._frame is None:
+                    while self._annotations is not None and not self._is_released(release):
+                        self._condition.wait(timeout=WAITING_TIMEOUT)
 
-            match_found = False
-            while not self._is_released(release) and not match_found:
-                if self._frame and self._frame.index == annotations.index:
+                else:
                     self._consume()
                     match_found = True
-                self._condition.wait(timeout=WAITING_TIMEOUT)
+
+            else:
+                self._handle_eos()
+
+        return match_found
 
     def _consume(self) -> None:
         """Feeds the current pair of frame and annotations to the consumer."""
@@ -60,6 +78,14 @@ class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
             self._frame = None
             self._annotations = None
             self._consumer.get().consume(instance)
+            self._condition.notify_all()
+
+    def _handle_eos(self) -> None:
+        if self._eos:
+            self._eos = False
+            self._consumer.get().consume(None)
+        else:
+            self._eos = True
 
     @staticmethod
     def _is_released(release: Optional[AtomicBool]) -> bool:

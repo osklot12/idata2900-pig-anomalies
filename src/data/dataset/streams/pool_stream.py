@@ -12,15 +12,16 @@ T = TypeVar("T")
 class PoolStream(Generic[T], WritableStream[T]):
     """Stream reading randomly from a pool of instances."""
 
-    def __init__(self, pool_size: int = 3000):
+    def __init__(self, pool_size: int = 3000, min_ready: int = 2000):
         """
         Initializes a PoolStream instance.
 
 
         Args:
             pool_size (int): the max number of instances in the pool at a time, 3000 by default
+            min_ready (int): the minimum number of instances before allowing reading
         """
-        self._pool = RABPool[T](maxsize=pool_size, min_ready=pool_size)
+        self._pool = RABPool[T](maxsize=pool_size, min_ready=min_ready)
 
         self._closed = AtomicBool(False)
 
