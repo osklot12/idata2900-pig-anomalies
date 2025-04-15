@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 from src.schemas.logging.log_level import LogLevel
-from src.schemas.schemas.schema import Schema
 from src.schemas.schemas.timestamped_schema import TimestampedSchema
 
 

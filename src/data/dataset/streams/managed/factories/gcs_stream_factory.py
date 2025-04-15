@@ -135,7 +135,8 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     def _create_selector(splits: List[List[str]], split: DatasetSplit) -> Selector[str]:
         """Creates a selector for selecting dataset instances."""
         if split == DatasetSplit.TRAIN:
-            selector = RandomStringSelector(strings=splits[0])
+            # selector = RandomStringSelector(strings=splits[0])
+            selector = DetermStringSelector(strings=splits[0])
         elif split == DatasetSplit.VAL:
             selector = DetermStringSelector(strings=splits[1])
         else:
@@ -168,7 +169,8 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     def _create_stream(split: DatasetSplit) -> WritableStream[T]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
-            stream = PoolStream(pool_size=3000, min_ready=2000)
+            # stream = PoolStream(pool_size=3000, min_ready=2000)
+            stream = DockStream(buffer_size=3, dock_size=300)
         else:
             stream = DockStream(buffer_size=3, dock_size=300)
 

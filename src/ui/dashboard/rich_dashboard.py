@@ -15,15 +15,15 @@ from src.data.structures.atomic_bool import AtomicBool
 from src.data.structures.atomic_var import AtomicVar
 from src.schemas.logging.log_schema import LogSchema
 from src.schemas.schemas.metric_schema import MetricSchema
-from src.schemas.schemas.schema_listener import SchemaListener
 from src.schemas.schemas.schema import Schema
 from src.schemas.schemas.signed_schema import SignedSchema
+from src.ui.telemetry.client_telemetry import ClientTelemetry
 from tests.unit.schemas.signers.test_simple_schema_signer_unit import schema
 
 S = TypeVar("S", bound=Schema)
 
 
-class RichDashboard(SchemaListener[SignedSchema[MetricSchema]]):
+class RichDashboard(ClientTelemetry):
     """A Rich telemetry dashboard."""
 
     def __init__(self, refresh_interval: float = 0.5) -> None:
@@ -43,8 +43,16 @@ class RichDashboard(SchemaListener[SignedSchema[MetricSchema]]):
 
         self._render_thread = None
 
-    def new_schema(self, schema: SignedSchema) -> None:
-        self._schemas.update(lambda m: {**m, schema.signature: schema})
+        self._clients: Dict[str, Dict] = {}
+
+    def add_client(self, address: str) -> None:
+        pass
+
+    def remove_client(self, address: str) -> None:
+        pass
+
+    def report_request(self, client_address) -> None:
+        pass
 
     def _render_tables(self) -> Columns:
         """Renders the tables."""
