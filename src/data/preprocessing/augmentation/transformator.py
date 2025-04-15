@@ -15,9 +15,9 @@ class Transformator:
             cy (float): the y-coordinate of the center
         """
         return (
-                Transformator._compute_translation_matrix(cx, cy) @
+                Transformator.compute_translation_matrix(cx, cy) @
                 t @
-                Transformator._compute_translation_matrix(-cx, -cy)
+                Transformator.compute_translation_matrix(-cx, -cy)
         )
 
     @staticmethod

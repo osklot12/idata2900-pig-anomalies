@@ -5,7 +5,7 @@ from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
 from src.data.dataset.streams.prefetcher import Prefetcher
 from src.data.dataset.dataset_split import DatasetSplit
-from src.ui.telemetry.rich_dashboard import RichDashboard
+from src.ui.dashboard.rich_dashboard import RichDashboard
 
 
 class TrainingPipelineCoordinator:

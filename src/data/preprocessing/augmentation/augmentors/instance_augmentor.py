@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import cv2
 import numpy as np
@@ -7,6 +7,7 @@ from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.preprocessing.augmentation.augmentors.augmentor import Augmentor, T
+from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.preprocessing.augmentation.transformator import Transformator
 
@@ -14,18 +15,20 @@ from src.data.preprocessing.augmentation.transformator import Transformator
 class InstanceAugmentor(Augmentor[StreamedAnnotatedFrame]):
     """Augments frames."""
 
-    def __init__(self, plan_factory: AugmentationPlanFactory):
+    def __init__(self, plan_factory: AugmentationPlanFactory, filters: Optional[List[PhotometricFilter]] = None):
         """
         Initializes a FrameAugmentor instance.
 
         Args:
             plan_factory (AugmentationPlanFactory): factory for creating augmentation plans
+            filters (Optional[List[PhotometricFilter]]): a list of photometric filters to use for image augmentation
         """
         self._plan_factory = plan_factory
+        self._filters: List[PhotometricFilter] = filters if filters is not None else []
 
     def augment(self, data: StreamedAnnotatedFrame) -> StreamedAnnotatedFrame:
         frame_width, frame_height = data.frame.data.shape[1], data.frame.data.shape[0]
-        transform = self._plan_factory.get_current_plan().transform
+        transform = self._plan_factory.get_plan().transform
         shifted_transform = Transformator.compute_shift_and_transform_matrix(
             t=transform, cx=frame_width / 2, cy=frame_height / 2
         )
@@ -44,9 +47,11 @@ class InstanceAugmentor(Augmentor[StreamedAnnotatedFrame]):
             )
         )
 
-    @staticmethod
-    def _augment_frame(data: np.ndarray, transform: np.ndarray) -> np.ndarray:
+    def _augment_frame(self, data: np.ndarray, transform: np.ndarray) -> np.ndarray:
         """Augments an image using the given transformation matrix."""
+        for f in self._filters:
+            data = f.apply(data)
+
         width, height = data.shape[1], data.shape[0]
         affine_2x3 = transform[:2, :]
 

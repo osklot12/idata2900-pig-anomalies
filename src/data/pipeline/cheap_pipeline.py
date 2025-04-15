@@ -25,7 +25,7 @@ from src.schemas.algorithms.simple_demand_estimator import SimpleDemandEstimator
 from src.schemas.brokers.schema_broker import SchemaBroker
 from src.schemas.signing.sign import Sign
 from src.schemas.signing.simple_schema_signer import SimpleSchemaSigner
-from src.ui.telemetry.rich_dashboard import RichDashboard
+from src.ui.dashboard.rich_dashboard import RichDashboard
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.gcs.test_bucket import TestBucket
 
