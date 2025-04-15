@@ -33,7 +33,6 @@ class DockStream(Generic[T], WritableStream[T]):
         self._get_entry_lock = threading.Lock()
 
     def read(self) -> Optional[T]:
-        print(f"[SequentialStream] Reading...")
         result = None
 
         if not self._eos:
@@ -41,18 +40,14 @@ class DockStream(Generic[T], WritableStream[T]):
                 self._current_dock = self._dock_queue.get()
 
             while self._current_dock and result is None:
-                print(f"[SequentialStream] Fetching next instance")
                 instance = self._current_dock.get()
 
                 if instance is not None:
-                    print(f"[SequentialStream] Got instance")
                     result = instance
 
                 else:
                     self._current_dock = self._dock_queue.get()
-                    print(f"[SequentialStream] Fetching next stream")
                     if self._current_dock is None:
-                        print("[SequentialStream] End of stream")
                         self._eos = True
 
         return result
