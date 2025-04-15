@@ -38,22 +38,17 @@ class ThrottledStreamerManager(Generic[T], ConcurrentStreamerManager):
 
     def _worker_loop(self) -> None:
         """Worker thread function."""
-        print(f"[StreamFeedingManager] Ran worker")
         while self._running:
             if self.n_active_streamers() < self._max_streamers:
                 try:
                     consumer = self._provider.get_consumer(self._shutting_down)
-                    print(f"[StreamFeedingManager] Consumer: {consumer}")
                     if consumer:
                         streamer = self._streamer_factory.create_streamer()
-                        print(f"[StreamFeedingManager] Streamer: {streamer}")
                         if streamer:
-                            print(f"[StreamFeedingManager] Launched streamer...")
                             streamer.connect(consumer)
-                            print(f"[StreamFeedingManager] Connected streamer to {consumer}")
                             self._launch_streamer(streamer)
+
                         else:
-                            print(f"[StreamFeedingManager] End of stream")
                             consumer.consume(None)
                             for closable in self._closables:
                                 closable.close()
@@ -65,7 +60,6 @@ class ThrottledStreamerManager(Generic[T], ConcurrentStreamerManager):
                 time.sleep(WORKER_BACKOFF_TIMEOUT)
 
     def _setup(self) -> None:
-        print(f"[StreamFeedingManager] Setting up...")
         self._worker = threading.Thread(target=self._worker_loop)
         self._worker.start()
 

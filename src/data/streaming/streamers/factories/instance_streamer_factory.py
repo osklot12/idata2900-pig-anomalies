@@ -36,11 +36,9 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
 
         aggregator = BlockingAggregator()
         instance = self._instance_provider.get()
-        print(f"[InstanceStreamerFactory] Got instance {instance}")
         if instance:
             video = self._entity_factory.create_video(instance.video_file)
             annotations = self._entity_factory.create_video_annotations(instance.annotation_file)
-            print(f"[InstanceStreamerFactory] Got video {video} and annotations {annotations}")
             if video and annotations:
                 video_streamer = VideoFileStreamer(video)
                 video_consumer = ConsumingRFunc(aggregator.feed_frame, video_streamer.get_releaser())
@@ -50,13 +48,9 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
                 annotations_consumer = ConsumingRFunc(aggregator.feed_annotations, annotations_streamer.get_releaser())
                 annotations_streamer.connect(annotations_consumer)
 
-                print(f"[InstanceStreamerFactory] Got video streamer {video_streamer} and annotations streamer {annotations_streamer}")
-
                 streamer = CompositeStreamer(
                     streamer=EnsembleStreamer(video_streamer, annotations_streamer),
                     output=aggregator
                 )
-
-                print(f"[InstanceStreamerFactory] Returned streamer {streamer}")
 
         return streamer

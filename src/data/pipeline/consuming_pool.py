@@ -22,5 +22,4 @@ class ConsumingPool(Generic[T], Consumer[T]):
         self._release = release
 
     def consume(self, data: Optional[T]) -> bool:
-        print(f"[BBoxNormalizerComponent] Consumed instance and forward it to {self._pool}")
         return self._pool.put(data, self._release)

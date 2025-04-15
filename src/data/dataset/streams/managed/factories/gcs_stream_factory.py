@@ -89,26 +89,22 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_auth_service_factory(service_account_path: str) -> AuthServiceFactory:
         """Creates an AuthServiceFactory instance."""
-        print(f"[GCSTrainingStreamFactory] Created auth service")
         return GCPAuthServiceFactory(service_account_path)
 
     @staticmethod
     def _create_label_parser_factory(label_map: Dict[str, T_Enum]) -> LabelParserFactory:
         """Creates a LabelParserFactory instance."""
-        print(f"[GCSTrainingStreamFactory] Created SimpleLabelParserFactory")
         return SimpleLabelParserFactory(label_map)
 
     @staticmethod
     def _create_decoder_factory(label_parser_factory: LabelParserFactory) -> AnnotationDecoderFactory:
         """Creates an AnnotationDecoderFactory instance."""
-        print(f"[GCSTrainingStreamFactory] Created DarwinDecoderFactory")
         return DarwinDecoderFactory(label_parser_factory)
 
     @staticmethod
     def _create_loader_factory(bucket_name: str, auth_service_factory: AuthServiceFactory,
                                decoder_factory: AnnotationDecoderFactory) -> LoaderFactory:
         """Creates a LoaderFactory instance."""
-        print(f"[GCSTrainingStreamFactory] Created LoaderFactory")
         return GCSLoaderFactory(
             bucket_name=bucket_name,
             auth_factory=auth_service_factory,
@@ -118,7 +114,6 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_manifest(source: FileRegistry) -> Manifest:
         """Creates a dataset manifest."""
-        print(f"[GCSTrainingStreamFactory] Created MatchinManifest")
         return MatchingManifest(
             video_registry=SuffixFileRegistry(source=source, suffixes=("mp4",)),
             annotations_registry=SuffixFileRegistry(source=source, suffixes=("json",)),
@@ -127,7 +122,6 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_splitter(ids: List[str], split_ratios: DatasetSplitRatios) -> StringSetSplitter:
         """Creates a DetermSplitter instance."""
-        print(f"[GCSTrainingStreamFactory] Created Splitter")
         return StringSetSplitter(
             strings=ids,
             weights=[
@@ -140,7 +134,6 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_selector(splits: List[List[str]], split: DatasetSplit) -> Selector[str]:
         """Creates a selector for selecting dataset instances."""
-        print(f"[GCSTrainingStreamFactory] Created Selector")
         if split == DatasetSplit.TRAIN:
             selector = RandomStringSelector(strings=splits[0])
         elif split == DatasetSplit.VAL:
@@ -153,13 +146,11 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_instance_provider(manifest: Manifest, selector: Selector[str]) -> InstanceProvider:
         """Creates a InstanceProvider instance."""
-        print(f"[GCSTrainingStreamFactory] Created InstanceProvider")
         return ManifestInstanceProvider(manifest=manifest, selector=selector)
 
     @staticmethod
     def _create_entity_provider(loader_factory: LoaderFactory) -> EntityFactory:
         """Creates a DatasetEntityProvider instance."""
-        print(f"[GCSTrainingStreamFactory] Created EntityProvider")
         return LazyEntityFactory(
             loader_factory=loader_factory,
             id_parser=BaseNameParser()
@@ -168,7 +159,6 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     @staticmethod
     def _create_streamer_factory(instance_provider: InstanceProvider, entity_factory: EntityFactory) -> StreamerFactory[T]:
         """Creates an AggregatedStreamerFactory instance."""
-        print(f"[GCSTrainingStreamFactory] Created StreamerFactory")
         return InstanceStreamerFactory(
             instance_provider=instance_provider,
             entity_factory=entity_factory

@@ -34,7 +34,6 @@ class GCPAuthService(AuthService):
             self.credentials_path, scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
         self.refresh_token()
-        print("[GCPAuthService] Authenticated successfully")
 
     def refresh_token(self) -> None:
         """Refreshes the token if needed."""
