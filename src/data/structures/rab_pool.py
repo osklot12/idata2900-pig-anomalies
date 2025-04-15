@@ -1,5 +1,4 @@
 import threading
-import time
 import random
 from typing import TypeVar, Generic, Optional
 
@@ -41,7 +40,6 @@ class RABPool(Generic[T]):
         success = False
 
         if item is not None:
-            print(f"[RABPool] Putting item: {type(item)}")
             released = False
             with self._not_full:
                 while len(self._items) >= self._maxsize.get() and not released:
@@ -53,7 +51,6 @@ class RABPool(Generic[T]):
                     success = True
                 self._ready.notify()
 
-        print(f"[RABPool] Pool size: {len(self)}")
         return success
 
     def get(self, release: Optional[AtomicBool] = None) -> Optional[T]:

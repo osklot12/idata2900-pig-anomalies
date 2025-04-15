@@ -24,5 +24,4 @@ class GCSAnnotationLoader(GCSBucketClient, VideoAnnotationsLoader):
 
     def load_video_annotations(self, annotations_id: str) -> List[FrameAnnotations]:
         raw_data = self._make_request(self._get_file_url(annotations_id)).content
-        print(f"[GCSAnnotationLoader] Loaded video annotation file {annotations_id}")
         return self._decoder.decode_annotations(raw_data)

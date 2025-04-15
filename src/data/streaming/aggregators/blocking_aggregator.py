@@ -33,8 +33,6 @@ class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
     def feed_frame(self, frame: Optional[Frame], release: Optional[AtomicBool] = None) -> bool:
         match_found = False
 
-        print(
-            f"[BlockingAggregator] Got frame {getattr(frame, 'index', None)} from {getattr(frame, 'source', {}).source_id if frame else 'END'}")
         with self._condition:
             if frame is not None:
                 self._frame = frame
@@ -54,7 +52,6 @@ class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
     def feed_annotations(self, annotations: Optional[FrameAnnotations], release: Optional[AtomicBool] = None) -> bool:
         match_found = False
 
-        print(f"[BlockingAggregator] Got annotations {getattr(annotations, 'index', None)} from {getattr(annotations, 'source', {}).source_id if annotations else 'END'}")
         with self._condition:
             if not annotations is None:
                 self._annotations = annotations

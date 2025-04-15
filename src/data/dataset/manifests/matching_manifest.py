@@ -41,7 +41,6 @@ class MatchingManifest(Manifest):
     def get_instance(self, instance_id: str) -> Optional[DatasetInstance]:
         if not self._instances:
             self.update()
-        print(f"[MatchingManifest] Returned instance {instance_id}")
         return self._instances.get(instance_id, None)
 
     def update(self) -> None:
