@@ -89,6 +89,7 @@ class NetworkServer:
 
     def stop(self) -> None:
         """Stops the server."""
+        print(f"[NetworkServer] Stopping server, please wait...")
         self._running.set(False)
 
         if self._server_sock:

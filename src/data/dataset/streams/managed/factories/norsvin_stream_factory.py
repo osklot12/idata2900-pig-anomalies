@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List
+from typing import TypeVar, Generic, List, Tuple
 
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataset.dataset_split import DatasetSplit
@@ -16,18 +16,22 @@ class NorsvinStreamFactory(Generic[T], SplitStreamFactory[T]):
     """Factory for creating dataset split streams for Norsvin dataset."""
 
     def __init__(self, gcs_creds: GCSCredentials, split_ratios: DatasetSplitRatios,
-                 preprocessor_factories: List[ComponentFactory[T]]):
+                 preprocessor_factories: Tuple[List[ComponentFactory[T]], List[ComponentFactory[T]], List[ComponentFactory[T]]]):
         """
         Initializes a NorsvinStreamFactory instance.
 
         Args:
             gcs_creds (GCSCredentials): Google Cloud Storage credentials
             split_ratios (DatasetSplitRatios): the split ratios for the dataset
-            preprocessor_factories (List[ComponentFactory]): factories for creating preprocessors, in the particular order
+            preprocessor_factories (List[ComponentFactory]): a list of factories for creating preprocessors for each split
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
-        self._preprocessor_factories = preprocessor_factories
+        self._preprocessor_factories = {
+            DatasetSplit.TRAIN: preprocessor_factories[0],
+            DatasetSplit.VAL: preprocessor_factories[1],
+            DatasetSplit.TEST: preprocessor_factories[2]
+        }
 
     def create_stream(self, split: DatasetSplit) -> ManagedStream[T]:
         return GCSStreamFactory(
@@ -35,5 +39,5 @@ class NorsvinStreamFactory(Generic[T], SplitStreamFactory[T]):
             split_ratios=self._split_ratios,
             split=split,
             label_map=NorsvinBehaviorClass.get_label_map(),
-            preprocessor_factories=self._preprocessor_factories
+            preprocessor_factories=self._preprocessor_factories[split]
         ).create_stream()

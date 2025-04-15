@@ -150,7 +150,7 @@ def test_norsvin_train_stream(gcs_creds, split_ratios, resizer_component_factory
         # t.start()
         instance = stream.read()
         while instance:
-            #StreamedAnnotatedFrameVisualizer.visualize(instance)
+            StreamedAnnotatedFrameVisualizer.visualize(instance)
             print(f"[Test] Got item: {type(instance)}")
             for annotation in instance.annotations:
                 if annotation.cls == NorsvinBehaviorClass.TAIL_BITING:
