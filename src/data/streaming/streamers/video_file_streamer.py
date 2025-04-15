@@ -13,13 +13,13 @@ from src.data.streaming.streamers.video_streamer import VideoStreamer
 class VideoFileStreamer(VideoStreamer):
     """A streamer for streaming video file data."""
 
-    def __init__(self, video: VideoFile, consumer: Consumer[Frame]):
+    def __init__(self, video: VideoFile, consumer: Optional[Consumer[Frame]] = None):
         """
         Initializes a VideoFileStreamer instance.
 
         Args:
             video (VideoFile): the video to streams
-            consumer (Consumer[Frame]): the consumer of the streaming data
+            consumer (Optional[Consumer[Frame]]): optional the consumer of the streaming data
         """
         super().__init__(consumer)
         self._video = video

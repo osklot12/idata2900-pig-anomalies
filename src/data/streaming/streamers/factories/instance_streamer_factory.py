@@ -3,6 +3,8 @@ from typing import TypeVar, Optional
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
 from src.data.dataset.providers.entity_factory import EntityFactory
 from src.data.dataset.providers.instance_provider import InstanceProvider
+from src.data.pipeline.consuming_rfunc import ConsumingRFunc
+from src.data.streaming.aggregators.blocking_aggregator import BlockingAggregator
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from src.data.pipeline.consuming_func import ConsumingFunc
 from src.data.streaming.streamers.composite_streamer import CompositeStreamer
@@ -32,7 +34,7 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
     def create_streamer(self) -> Optional[ProducerStreamer]:
         streamer = None
 
-        aggregator = BufferedAggregator()
+        aggregator = BlockingAggregator()
         instance = self._instance_provider.get()
         print(f"[InstanceStreamerFactory] Got instance {instance}")
         if instance:
@@ -40,8 +42,13 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
             annotations = self._entity_factory.create_video_annotations(instance.annotation_file)
             print(f"[InstanceStreamerFactory] Got video {video} and annotations {annotations}")
             if video and annotations:
-                video_streamer = VideoFileStreamer(video, ConsumingFunc(aggregator.feed_frame))
-                annotations_streamer = VideoAnnotationsStreamer(annotations, ConsumingFunc(aggregator.feed_annotations))
+                video_streamer = VideoFileStreamer(video)
+                video_consumer = ConsumingRFunc(aggregator.feed_frame, video_streamer.get_releaser())
+                video_streamer.connect(video_consumer)
+
+                annotations_streamer = VideoAnnotationsStreamer(annotations)
+                annotations_consumer = ConsumingRFunc(aggregator.feed_annotations, annotations_streamer.get_releaser())
+                annotations_streamer.connect(annotations_consumer)
 
                 print(f"[InstanceStreamerFactory] Got video streamer {video_streamer} and annotations streamer {annotations_streamer}")
 

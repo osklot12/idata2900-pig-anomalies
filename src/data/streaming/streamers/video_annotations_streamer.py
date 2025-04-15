@@ -11,13 +11,13 @@ from src.data.streaming.streamers.annotations_streamer import AnnotationsStreame
 class VideoAnnotationsStreamer(AnnotationsStreamer):
     """A streamer for streaming video annotations data."""
 
-    def __init__(self, annotations: VideoAnnotations, consumer: Consumer[FrameAnnotations]):
+    def __init__(self, annotations: VideoAnnotations, consumer: Optional[Consumer[FrameAnnotations]] = None):
         """
         Initializes an VideoAnnotationStreamer instance.
 
         Args:
             annotations (VideoAnnotations): the video annotation data
-            consumer (Consumer[Frame]): the consumer of the streaming data
+            consumer (Optional[Consumer[Frame]]): optional consumer of the streaming data
         """
         super().__init__(consumer)
         self._annotations = annotations

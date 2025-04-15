@@ -82,9 +82,10 @@ def test_norsvin_train_stream(gcs_creds, split_ratios, resizer_component_factory
     t = threading.Thread(target=print_memory)
 
     try:
-        t.start()
+        # t.start()
         while True:
             instance = stream.read()
+            #StreamedAnnotatedFrameVisualizer.visualize(instance)
             print(f"[Test] Got item: {type(instance)}")
     except KeyboardInterrupt:
         running.set(False)
