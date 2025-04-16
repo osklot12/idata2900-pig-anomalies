@@ -2,6 +2,9 @@ from typing import TypeVar, Generic, List, Optional, Dict, Iterable
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
+from src.data.compressors.zlib_compressor import ZlibCompressor
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
+from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.manifests.manifest import Manifest
@@ -31,15 +34,39 @@ from src.data.loading.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.pipeline.component_factory import ComponentFactory
 from src.data.pipeline.consumer_provider import ConsumerProvider
-from src.data.pipeline.pipeline_provider import PipelineProvider
+from src.data.pipeline.norsvin_train_pipeline_provider import NorsvinTrainPipelineProvider
+from src.data.pipeline.pipeline import Pipeline
+from src.data.preprocessing.augmentation.augmentors.augmentor_component import AugmentorComponent
+from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
+from src.data.preprocessing.augmentation.augmentors.photometric.factories.brightness_filter_factory import \
+    BrightnessFilterFactory
+from src.data.preprocessing.augmentation.augmentors.photometric.factories.color_jitter_filter_factory import \
+    ColorJitterFilterFactory
+from src.data.preprocessing.augmentation.augmentors.photometric.factories.constrast_filter_factory import \
+    ContrastFilterFactory
+from src.data.preprocessing.augmentation.augmentors.photometric.factories.gaussian_noise_filter_factory import \
+    GaussianNoiseFilterFactory
+from src.data.preprocessing.augmentation.cond_multiplier_component import CondMultiplierComponent
+from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.preprocessing.class_balancer import ClassBalancer
+from src.data.preprocessing.normalization.normalizers.bbox_normalizer_component import BBoxNormalizerComponent
+from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.preprocessing.resizing.resizers.frame_resizer_component import FrameResizerComponent
+from src.data.preprocessing.resizing.resizers.static_frame_resizer import StaticFrameResizer
 from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.factories.instance_streamer_factory import InstanceStreamerFactory
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.typevars.enum_type import T_Enum
 from src.utils.gcs_credentials import GCSCredentials
+from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 T = TypeVar("T")
+
+
+def is_annotated(instance: AnnotatedFrame) -> bool:
+    """Predicate for checking whether the instance is annotated."""
+    return len(instance.annotations) > 0
 
 
 class GCSStreamFactory(Generic[T], StreamFactory[T]):
@@ -48,8 +75,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     def __init__(self, gcs_creds: GCSCredentials,
                  split_ratios: DatasetSplitRatios,
                  split: DatasetSplit,
-                 label_map: Dict[str, T_Enum],
-                 preprocessor_factories: Optional[List[ComponentFactory[T]]] = None):
+                 label_map: Dict[str, T_Enum]):
         """
         Initializes a GCSStreamFactory instance.
 
@@ -58,13 +84,11 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
             split_ratios (DatasetSplitRatios): dataset split ratios
             split (DatasetSplit): dataset split to create stream for
             label_map (Dict[str, T_Enum]): label map for annotation classes
-            preprocessor_factories (Optional[List[ComponentFactory[T]]]): optional list of preprocessor factories to use, defaults to None
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
         self._split = split
         self._label_map = label_map
-        self._preprocessor_factories = preprocessor_factories if preprocessor_factories is not None else []
 
     def create_stream(self) -> ManagedStream[T]:
         auth_factory = self._create_auth_service_factory(self._gcs_creds.service_account_path)
@@ -80,11 +104,11 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
 
         stream = self._create_stream(self._split)
-        pipeline_provider = PipelineProvider(*self._preprocessor_factories, consumer_provider=stream)
+        # pipeline_provider = PipelineProvider(*self._preprocessor_factories, consumer_provider=stream)
+        pipeline_provider = NorsvinTrainPipelineProvider(sink_provider=stream)
         manager = self._create_streamer_manager(streamer_factory, pipeline_provider, [stream])
 
         return ManagedStream[T](stream=stream, manager=manager)
-
 
     @staticmethod
     def _create_auth_service_factory(service_account_path: str) -> AuthServiceFactory:
@@ -157,7 +181,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         )
 
     @staticmethod
-    def _create_streamer_factory(instance_provider: InstanceProvider, entity_factory: EntityFactory) -> StreamerFactory[T]:
+    def _create_streamer_factory(instance_provider: InstanceProvider, entity_factory: EntityFactory) -> InstanceStreamerFactory:
         """Creates an AggregatedStreamerFactory instance."""
         return InstanceStreamerFactory(
             instance_provider=instance_provider,
@@ -165,7 +189,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         )
 
     @staticmethod
-    def _create_stream(split: DatasetSplit) -> WritableStream[T]:
+    def _create_stream(split: DatasetSplit) -> WritableStream[CompressedAnnotatedFrame]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
             stream = PoolStream(pool_size=3000, min_ready=2000)

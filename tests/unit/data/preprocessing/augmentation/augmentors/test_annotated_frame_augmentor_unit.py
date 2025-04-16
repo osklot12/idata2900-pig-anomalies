@@ -1,7 +1,7 @@
 import pytest
 
 from src.data.dataclasses.source_metadata import SourceMetadata
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.preprocessing.augmentation.augmentors.annotated_frame_augmentor import AnnotatedFrameAugmentor
 from tests.utils.generators.dummy_annotations_generator import DummyAnnotationsGenerator
 from tests.utils.generators.dummy_frame_generator import DummyFrameGenerator
@@ -23,7 +23,7 @@ def annotations():
 def test_augment(frame, annotations):
     """Tests that the instance is augmented without raising."""
     # arrange
-    instance = StreamedAnnotatedFrame(
+    instance = AnnotatedFrame(
         source=SourceMetadata(source_id="test-source-id", frame_resolution=(640, 640)),
         index=0,
         frame=frame,

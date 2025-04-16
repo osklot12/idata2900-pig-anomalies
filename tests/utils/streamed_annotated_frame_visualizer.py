@@ -7,14 +7,14 @@ from matplotlib import pyplot as plt
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.bbox import BBox
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 
 
 class StreamedAnnotatedFrameVisualizer:
     """Visualizer for AnnotatedFrame instances."""
 
     @staticmethod
-    def visualize(instance: StreamedAnnotatedFrame) -> None:
+    def visualize(instance: AnnotatedFrame) -> None:
         """
         Visualizes an AnnotatedFrame instance.
 

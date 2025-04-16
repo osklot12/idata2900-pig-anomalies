@@ -6,7 +6,7 @@ import numpy as np
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.preprocessing.preprocessor import Preprocessor
 
 
@@ -204,7 +204,7 @@ class AnnotatedFrameAugmentor():
             borderValue=(0, 0, 0)
         )
 
-    def process(self, instance: StreamedAnnotatedFrame) -> List[StreamedAnnotatedFrame]:
+    def process(self, instance: AnnotatedFrame) -> List[AnnotatedFrame]:
         rot_deg = self._compute_rotation_degrees(10)
         rot_matrix = self._compute_rotation_matrix(rot_deg)
 
@@ -235,7 +235,7 @@ class AnnotatedFrameAugmentor():
             aug_frame = self._jitter_color(aug_frame, saturation_scale=random.uniform(0.8, 1.2), hue_shift=random.randint(-10, 10))
 
         return [
-            StreamedAnnotatedFrame(
+            AnnotatedFrame(
                 source=instance.source,
                 index=instance.index,
                 frame=aug_frame,

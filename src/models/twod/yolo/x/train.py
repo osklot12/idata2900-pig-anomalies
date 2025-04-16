@@ -1,6 +1,6 @@
 import traceback
 
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
@@ -25,13 +25,13 @@ def main():
     train_stream = NetworkStream(
         client=train_client,
         split=DatasetSplit.TRAIN,
-        batch_type=StreamedAnnotatedFrame,
+        batch_type=AnnotatedFrame,
         batch_size=8
     )
     val_stream = NetworkStream(
         client=val_client,
         split=DatasetSplit.VAL,
-        batch_type=StreamedAnnotatedFrame,
+        batch_type=AnnotatedFrame,
         batch_size=8
     )
 

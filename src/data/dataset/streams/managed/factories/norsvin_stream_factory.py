@@ -15,8 +15,7 @@ T = TypeVar("T")
 class NorsvinStreamFactory(Generic[T], SplitStreamFactory[T]):
     """Factory for creating dataset split streams for Norsvin dataset."""
 
-    def __init__(self, gcs_creds: GCSCredentials, split_ratios: DatasetSplitRatios,
-                 preprocessor_factories: Tuple[List[ComponentFactory[T]], List[ComponentFactory[T]], List[ComponentFactory[T]]]):
+    def __init__(self, gcs_creds: GCSCredentials, split_ratios: DatasetSplitRatios):
         """
         Initializes a NorsvinStreamFactory instance.
 
@@ -27,17 +26,11 @@ class NorsvinStreamFactory(Generic[T], SplitStreamFactory[T]):
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
-        self._preprocessor_factories = {
-            DatasetSplit.TRAIN: preprocessor_factories[0],
-            DatasetSplit.VAL: preprocessor_factories[1],
-            DatasetSplit.TEST: preprocessor_factories[2]
-        }
 
     def create_stream(self, split: DatasetSplit) -> ManagedStream[T]:
         return GCSStreamFactory(
             gcs_creds=self._gcs_creds,
             split_ratios=self._split_ratios,
             split=split,
-            label_map=NorsvinBehaviorClass.get_label_map(),
-            preprocessor_factories=self._preprocessor_factories[split]
+            label_map=NorsvinBehaviorClass.get_label_map()
         ).create_stream()

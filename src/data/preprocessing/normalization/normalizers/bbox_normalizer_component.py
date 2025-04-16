@@ -2,17 +2,17 @@ from typing import Optional, List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.pipeline.component import Component
 from src.data.pipeline.consumer import Consumer
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
 from src.data.structures.atomic_var import AtomicVar
 
 
-class BBoxNormalizerComponent(Component[StreamedAnnotatedFrame]):
+class BBoxNormalizerComponent(Component[AnnotatedFrame, AnnotatedFrame]):
     """Pipeline component adapter for normalizing bounding boxes."""
 
-    def __init__(self, normalizer: BBoxNormalizer, consumer: Optional[Consumer[StreamedAnnotatedFrame]] = None):
+    def __init__(self, normalizer: BBoxNormalizer, consumer: Optional[Consumer[AnnotatedFrame]] = None):
         """
         Initializes a BBoxNormalizerComponent.
 
@@ -21,9 +21,9 @@ class BBoxNormalizerComponent(Component[StreamedAnnotatedFrame]):
             consumer (Optional[Consumer[FrameAnnotations]]): optional consumer to receive normalized annotations
         """
         self._normalizer = normalizer
-        self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](consumer)
+        self._consumer = AtomicVar[Consumer[AnnotatedFrame]](consumer)
 
-    def consume(self, data: Optional[StreamedAnnotatedFrame]) -> bool:
+    def consume(self, data: Optional[AnnotatedFrame]) -> bool:
         normalized = None
 
         if data is not None:
@@ -31,10 +31,10 @@ class BBoxNormalizerComponent(Component[StreamedAnnotatedFrame]):
 
         return self._consumer.get().consume(normalized)
 
-    def connect(self, consumer: Consumer[StreamedAnnotatedFrame]) -> None:
+    def connect(self, consumer: Consumer[AnnotatedFrame]) -> None:
         self._consumer.set(consumer)
 
-    def _normalize_frame_annotations(self, instance: StreamedAnnotatedFrame) -> StreamedAnnotatedFrame:
+    def _normalize_frame_annotations(self, instance: AnnotatedFrame) -> AnnotatedFrame:
         """Normalizes annotations for a frame."""
         if self._normalizer:
             normalized_bboxes = self._get_normalized_bboxes(
@@ -42,7 +42,7 @@ class BBoxNormalizerComponent(Component[StreamedAnnotatedFrame]):
                 instance.source.frame_resolution
             )
 
-            instance = StreamedAnnotatedFrame(
+            instance = AnnotatedFrame(
                 source=instance.source,
                 index=instance.index,
                 frame=instance.frame,

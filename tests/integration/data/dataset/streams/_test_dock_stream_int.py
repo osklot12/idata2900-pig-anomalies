@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
@@ -79,13 +79,13 @@ def entity_factory(loader_factory):
 @pytest.fixture
 def stream():
     """Fixture to provide a DockStream instance."""
-    return DockStream[StreamedAnnotatedFrame]()
+    return DockStream[AnnotatedFrame]()
 
 
 @pytest.fixture
 def manager(streamer_factory, stream):
     """Fixture to provide a DockingStreamerManager instance."""
-    return ThrottledStreamerManager[StreamedAnnotatedFrame](
+    return ThrottledStreamerManager[AnnotatedFrame](
         streamer_factory=streamer_factory,
         stream=stream
     )
@@ -99,7 +99,7 @@ def test_streaming_test_set(stream, manager):
     # act
     instance = stream.read()
     while instance:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
         StreamedAnnotatedFrameVisualizer.visualize(instance)
     print(f"Finished reading!")
@@ -125,7 +125,7 @@ def test_norsvin_test_stream():
     instance = stream.read()
     count = 0
     while instance:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
         # StreamedAnnotatedFrameVisualizer.visualize(instance)
         count += 1

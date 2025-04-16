@@ -5,14 +5,14 @@ import numpy as np
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.preprocessing.augmentation.augmentors.augmentor import Augmentor, T
 from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.preprocessing.augmentation.transformator import Transformator
 
 
-class InstanceAugmentor(Augmentor[StreamedAnnotatedFrame]):
+class InstanceAugmentor(Augmentor[AnnotatedFrame]):
     """Augments frames."""
 
     def __init__(self, plan_factory: AugmentationPlanFactory, filters: Optional[List[PhotometricFilter]] = None):
@@ -26,14 +26,14 @@ class InstanceAugmentor(Augmentor[StreamedAnnotatedFrame]):
         self._plan_factory = plan_factory
         self._filters: List[PhotometricFilter] = filters if filters is not None else []
 
-    def augment(self, data: StreamedAnnotatedFrame) -> StreamedAnnotatedFrame:
+    def augment(self, data: AnnotatedFrame) -> AnnotatedFrame:
         frame_width, frame_height = data.frame.data.shape[1], data.frame.data.shape[0]
         transform = self._plan_factory.get_plan().transform
         shifted_transform = Transformator.compute_shift_and_transform_matrix(
             t=transform, cx=frame_width / 2, cy=frame_height / 2
         )
 
-        return StreamedAnnotatedFrame(
+        return AnnotatedFrame(
             source=data.source,
             index=data.index,
             frame=self._augment_frame(

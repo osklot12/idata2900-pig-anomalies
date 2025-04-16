@@ -6,7 +6,7 @@ from src.data.preprocessing.augmentation.cond_multiplier_component import CondMu
 
 T = TypeVar("T")
 
-class CondMultiplierComponentFactory(Generic[T], ComponentFactory[T]):
+class CondMultiplierComponentFactory(Generic[T], ComponentFactory[T, T]):
     """Factory for creating CondMultiplierComponent instances."""
 
     def __init__(self, n: int, predicate: Callable[[T], bool]):
@@ -20,5 +20,5 @@ class CondMultiplierComponentFactory(Generic[T], ComponentFactory[T]):
         self._n = n
         self._predicate = predicate
 
-    def create_component(self) -> Component[T]:
+    def create_component(self) -> Component[T, T]:
         return CondMultiplierComponent(n=self._n, predicate=self._predicate)

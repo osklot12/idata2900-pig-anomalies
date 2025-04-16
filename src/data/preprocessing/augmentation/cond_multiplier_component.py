@@ -7,7 +7,7 @@ from src.data.structures.atomic_var import AtomicVar
 
 T = TypeVar("T")
 
-class CondMultiplierComponent(Generic[T], Component[T]):
+class CondMultiplierComponent(Generic[T], Component[T, T]):
     """Component that multiplies data based on some condition."""
 
     def __init__(self, n: int, predicate: Callable[[T], bool]):
