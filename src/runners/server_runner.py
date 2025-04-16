@@ -1,7 +1,7 @@
 import time
+from pympler import muppy, summary
 
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
-from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.managed.factories.norsvin_stream_factory import NorsvinStreamFactory
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_component_factory import \
     AugmentorComponentFactory
@@ -31,7 +31,21 @@ from src.utils.gcs_credentials import GCSCredentials
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
-from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
+
+import tracemalloc
+import threading
+
+
+def report_memory():
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"[Memory] Current = {current / 1024 ** 2:.2f} MB; Peak = {peak / 1024 ** 2:.2f} MB")
+    print(f"[Threads] Active threads: {threading.active_count()}")
+
+
+def report_objects():
+    all_objects = muppy.get_objects()
+    sum1 = summary.summarize(all_objects)
+    summary.print_(sum1)
 
 
 def is_annotated(instance: StreamedAnnotatedFrame) -> bool:
@@ -99,10 +113,14 @@ def main():
     server.run()
 
     try:
+        tracemalloc.start()
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
+            report_memory()
+            report_objects()
     except KeyboardInterrupt:
         server.stop()
+
 
 if __name__ == "__main__":
     main()
