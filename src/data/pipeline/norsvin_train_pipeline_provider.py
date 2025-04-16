@@ -20,7 +20,7 @@ from src.data.preprocessing.augmentation.augmentors.photometric.factories.gaussi
     GaussianNoiseFilterFactory
 from src.data.preprocessing.augmentation.cond_multiplier_component import CondMultiplierComponent
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
-from src.data.preprocessing.class_balancer import ClassBalancer
+from src.data.processing.class_balancer import ClassBalancer
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer_component import BBoxNormalizerComponent
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.processing.bbox_normalizer_processor import BBoxNormalizerProcessor
@@ -64,11 +64,6 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             ).into(sink)
 
         return result
-
-    @staticmethod
-    def _create_normalizer() -> BBoxNormalizerComponent:
-        """Creates and returns a BBoxNormalizerComponent instance."""
-        return BBoxNormalizerComponent(SimpleBBoxNormalizer(NORMALIZE_RANGE))
 
     @staticmethod
     def _create_balancer() -> ClassBalancer:

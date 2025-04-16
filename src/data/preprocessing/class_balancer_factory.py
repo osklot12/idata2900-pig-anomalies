@@ -3,7 +3,7 @@ from typing import Dict
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.pipeline.component import Component
 from src.data.pipeline.component_factory import ComponentFactory
-from src.data.preprocessing.class_balancer import ClassBalancer
+from src.data.processing.class_balancer import ClassBalancer
 from src.typevars.enum_type import T_Enum
 
 
