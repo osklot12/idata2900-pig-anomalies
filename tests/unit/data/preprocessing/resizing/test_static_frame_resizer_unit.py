@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.data.preprocessing.resizing.resizers.static_frame_resizer import StaticFrameResizer
+from src.data.processing.frame_resizer import StaticFrameResizer
 
 
 @pytest.fixture

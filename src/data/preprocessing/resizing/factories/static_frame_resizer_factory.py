@@ -1,8 +1,8 @@
 from typing import Tuple
 
 from src.data.preprocessing.resizing.factories.frame_resizer_factory import FrameResizerFactory
-from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
-from src.data.preprocessing.resizing.resizers.static_frame_resizer import StaticFrameResizer
+from src.data.processing.frame_resizer import FrameResizer
+from src.data.processing.frame_resizer import StaticFrameResizer
 
 
 class StaticFrameResizerFactory(FrameResizerFactory):

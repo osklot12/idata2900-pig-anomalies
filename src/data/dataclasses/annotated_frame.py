@@ -8,7 +8,7 @@ from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataclasses.source_metadata import SourceMetadata
 
 
-@dataclass(frozen=True)
+@dataclass
 class AnnotatedFrame(Identifiable):
     """
     Represents a single video frame along with its associated annotations and metadata.

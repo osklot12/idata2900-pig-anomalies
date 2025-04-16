@@ -3,7 +3,6 @@ from typing import Optional
 
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
-from src.data.loading.feed_status import FeedStatus
 
 
 class Aggregator(ABC):

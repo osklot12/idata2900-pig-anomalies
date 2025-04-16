@@ -1,7 +1,6 @@
 from typing import Generic, TypeVar
 
 from src.data.pipeline.component import Component
-from src.data.pipeline.pipeline_builder import PipelineBuilder
 from src.data.pipeline.pipeline_tail import PipelineTail
 
 # input type of pipeline
@@ -13,7 +12,7 @@ B = TypeVar("B")
 # next output type
 C = TypeVar("C")
 
-class Pipeline(Generic[A, B, C], PipelineBuilder[A, B]):
+class Pipeline(Generic[A, B, C]):
     """Pipeline builder."""
 
     def __init__(self, head: Component[A, B]):
@@ -26,5 +25,14 @@ class Pipeline(Generic[A, B, C], PipelineBuilder[A, B]):
         self._head = head
 
     def then(self, next_component: Component[B, C]) -> PipelineTail[A, C]:
+        """
+        Adds a component to the current pipeline and returns a builder for the extended pipeline.
+
+        Args:
+            next_component (Component[A, C]): the next component of the pipeline
+
+        Returns:
+            PipelineTail[A, C]: builder representing the new end of the pipeline
+        """
         self._head.connect(next_component)
         return PipelineTail(head=self._head, tail=next_component)
