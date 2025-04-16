@@ -7,6 +7,7 @@ from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.pipeline.field_transformer import FieldTransformer
 from src.data.pipeline.pipeline import Pipeline
+from src.data.pipeline.preprocessor import Preprocessor
 from src.data.preprocessing.augmentation.augmentors.augmentor_component import AugmentorComponent
 from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
 from src.data.preprocessing.augmentation.augmentors.photometric.factories.brightness_filter_factory import \
@@ -22,7 +23,7 @@ from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import A
 from src.data.preprocessing.class_balancer import ClassBalancer
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer_component import BBoxNormalizerComponent
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
-from src.data.preprocessing.resizing.resizers.frame_resizer_component import FrameResizerComponent
+from src.data.processing.bbox_normalizer_processor import BBoxNormalizerProcessor
 from src.data.processing.frame_resizer import FrameResizer
 from src.data.structures.atomic_bool import AtomicBool
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
@@ -51,7 +52,7 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             result = Pipeline(
                 FieldTransformer.of("frame").using(FrameResizer(RESIZE_SHAPE))
             ).then(
-                self._create_normalizer()
+                Preprocessor(BBoxNormalizerProcessor(SimpleBBoxNormalizer(NORMALIZE_RANGE)))
             ).then(
                 self._create_balancer()
             ).then(

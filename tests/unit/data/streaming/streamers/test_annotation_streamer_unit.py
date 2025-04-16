@@ -9,7 +9,6 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
-from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.pipeline.consumer import Consumer
 from src.data.streaming.streamers.annotations_streamer import AnnotationsStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus

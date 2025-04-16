@@ -1,38 +1,25 @@
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
-from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.pipeline.component import Component
-from src.data.pipeline.consumer import Consumer
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
-from src.data.structures.atomic_var import AtomicVar
+from src.data.processing.processor import Processor
 
 
-class BBoxNormalizerComponent(Component[AnnotatedFrame, AnnotatedFrame]):
-    """Pipeline component adapter for normalizing bounding boxes."""
+class BBoxNormalizerProcessor(Processor[AnnotatedFrame, AnnotatedFrame]):
+    """Processor for normalizing bounding boxes."""
 
-    def __init__(self, normalizer: BBoxNormalizer, consumer: Optional[Consumer[AnnotatedFrame]] = None):
+    def __init__(self, normalizer: BBoxNormalizer):
         """
-        Initializes a BBoxNormalizerComponent.
+        Initializes a BBoxNormalizerProcessor instance.
 
         Args:
-            normalizer (BBoxNormalizer): the normalizer to use
-            consumer (Optional[Consumer[FrameAnnotations]]): optional consumer to receive normalized annotations
+            normalizer (BBoxNormalizer): normalizer to use
         """
         self._normalizer = normalizer
-        self._consumer = AtomicVar[Consumer[AnnotatedFrame]](consumer)
 
-    def consume(self, data: Optional[AnnotatedFrame]) -> bool:
-        normalized = None
-
-        if data is not None:
-            normalized = self._normalize_frame_annotations(data)
-
-        return self._consumer.get().consume(normalized)
-
-    def connect(self, consumer: Consumer[AnnotatedFrame]) -> None:
-        self._consumer.set(consumer)
+    def process(self, data: AnnotatedFrame) -> AnnotatedFrame:
+        return self._normalize_frame_annotations(data)
 
     def _normalize_frame_annotations(self, instance: AnnotatedFrame) -> AnnotatedFrame:
         """Normalizes annotations for a frame."""
