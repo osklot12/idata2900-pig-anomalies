@@ -4,7 +4,7 @@ from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.pipeline.component import Component
 from src.data.pipeline.consumer import Consumer
-from src.data.preprocessing.resizing.resizers.frame_resizer import FrameResizer
+from src.data.processing.frame_resizer import FrameResizer
 from src.data.structures.atomic_var import AtomicVar
 
 

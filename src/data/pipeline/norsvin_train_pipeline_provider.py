@@ -4,7 +4,8 @@ from src.data.compressors.zlib_compressor import ZlibCompressor
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.pipeline.consumer import Consumer
-from src.data.pipeline.consumer_provider import ConsumerProvider, T
+from src.data.pipeline.consumer_provider import ConsumerProvider
+from src.data.pipeline.field_transformer import FieldTransformer
 from src.data.pipeline.pipeline import Pipeline
 from src.data.preprocessing.augmentation.augmentors.augmentor_component import AugmentorComponent
 from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
@@ -22,7 +23,7 @@ from src.data.preprocessing.class_balancer import ClassBalancer
 from src.data.preprocessing.normalization.normalizers.bbox_normalizer_component import BBoxNormalizerComponent
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.preprocessing.resizing.resizers.frame_resizer_component import FrameResizerComponent
-from src.data.preprocessing.resizing.resizers.static_frame_resizer import StaticFrameResizer
+from src.data.processing.frame_resizer import FrameResizer
 from src.data.structures.atomic_bool import AtomicBool
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
@@ -48,7 +49,7 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
         sink = self._sink_provider.get_consumer(release=release)
         if sink is not None:
             result = Pipeline(
-                self._create_resizer()
+                FieldTransformer.of("frame").using(FrameResizer(RESIZE_SHAPE))
             ).then(
                 self._create_normalizer()
             ).then(
@@ -62,11 +63,6 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             ).into(sink)
 
         return result
-
-    @staticmethod
-    def _create_resizer() -> FrameResizerComponent:
-        """Creates and returns a FrameResizerComponent instance."""
-        return FrameResizerComponent(StaticFrameResizer(RESIZE_SHAPE))
 
     @staticmethod
     def _create_normalizer() -> BBoxNormalizerComponent:

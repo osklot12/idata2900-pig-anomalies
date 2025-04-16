@@ -79,15 +79,6 @@ def main():
             report_memory()
             time.sleep(2)
 
-            big_bytes = [obj for obj in gc.get_objects() if isinstance(obj, bytes) and len(obj) > 100_000_000]
-            print(f"Found {len(big_bytes)} large byte objects")
-
-            arrays = [obj for obj in gc.get_objects() if isinstance(obj, np.ndarray)]
-            if arrays:
-                biggest = max(arrays, key=lambda a: a.nbytes if hasattr(a, 'nbytes') else 0)
-                print(f"Largest array: {biggest.shape}, {biggest.nbytes / 1024:.1f} KB")
-                objgraph.show_backrefs([biggest], max_depth=5, filename='leak.png')
-
             mem = proc.memory_info()
             print(f"[System] RSS={mem.rss / 1024 ** 2:.2f} MB | VMS={mem.vms / 1024 ** 2:.2f} MB")
 
@@ -110,7 +101,6 @@ def main():
             )
 
             StreamedAnnotatedFrameVisualizer.visualize(frame)
-            time.sleep(.5)
             # report_memory()
             # report_objects()
     except KeyboardInterrupt:

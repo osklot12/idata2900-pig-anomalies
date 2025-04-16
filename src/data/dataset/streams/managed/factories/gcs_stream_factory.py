@@ -6,6 +6,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataset.dataset_split import DatasetSplit
+from src.data.dataset.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.dataset.manifests.manifest import Manifest
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.entity_factory import EntityFactory
@@ -27,7 +28,6 @@ from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.dataset.label.factories.label_parser_factory import LabelParserFactory
-from src.data.dataset.label import SimpleLabelParserFactory
 from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
@@ -171,7 +171,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
     def _create_stream(split: DatasetSplit) -> WritableStream[CompressedAnnotatedFrame]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
-            stream = PoolStream(pool_size=3000, min_ready=2000)
+            stream = PoolStream(pool_size=3000, min_ready=500)
         else:
             stream = DockStream(buffer_size=3, dock_size=300)
 
