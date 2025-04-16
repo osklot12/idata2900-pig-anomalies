@@ -41,7 +41,7 @@ def main():
     train_prefetcher.run()
     val_prefetcher.run()
 
-    train_set = YOLOXDataset(train_prefetcher, 300) # 6125
+    train_set = YOLOXDataset(train_prefetcher, 30) # 6125
     val_set = YOLOXDataset(val_prefetcher, 430)
 
     exp = Exp(train_set=train_set, val_set=val_set)

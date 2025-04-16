@@ -19,4 +19,4 @@ class GetBatchResponse(Generic[T], Response):
     batch: List[T]
 
     def __repr__(self):
-        return f"GetBatchResponse(status={self.status}, batch_size={self.batch})"
+        return f"GetBatchResponse(status={self.status}, batch_size={len(self.batch)})"

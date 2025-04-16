@@ -42,8 +42,8 @@ class StreamingEvaluator:
         all_annotations: List[np.ndarray] = []
 
         for batch in tqdm(self._dataloader, desc="Evaluating"):
-            images = batch['image'].to(self._device)
-            targets = batch['target']
+            images, targets, _, _ = batch
+            images = images.to(self._device)
 
             with torch.no_grad():
                 outputs = self._model(images)
