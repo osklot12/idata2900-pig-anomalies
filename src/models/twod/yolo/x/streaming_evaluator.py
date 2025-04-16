@@ -68,6 +68,9 @@ class StreamingEvaluator:
         for image_preds in outputs:
             converted = []
             for pred in image_preds:
+                print(pred)
+                print(len(pred))
+
                 cx, cy, w, h, score, cls = pred.tolist()
                 x1 = cx - w / 2
                 y1 = cy - h / 2
