@@ -14,6 +14,6 @@ class Producer(Generic[T], ABC):
         Sets the consumer for the producer.
 
         Args:
-            consumer (Consumer): the consumer to sets
+            consumer (Consumer[T]): the consumer to set
         """
         raise NotImplementedError

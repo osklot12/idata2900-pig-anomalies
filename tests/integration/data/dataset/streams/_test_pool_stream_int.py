@@ -11,8 +11,8 @@ from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.factories.gcs_training_stream_factory import GCSTrainingStreamFactory
 from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
-from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
-from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
+from src.data.dataset.label import SimpleLabelParserFactory
+from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.preprocessing.augmentation.augmentors.annotated_frame_augmentor import AnnotatedFrameAugmentor
 from src.data.preprocessing.augmentation.augmentors.cond_augmentor import CondMultiplier

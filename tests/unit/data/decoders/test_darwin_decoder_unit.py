@@ -3,7 +3,7 @@ import pytest
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.decoders.darwin_decoder import DarwinDecoder
-from src.data.label.simple_label_parser import SimpleLabelParser
+from src.data.dataset.label import SimpleLabelParser
 from src.typevars.enum_type import T_Enum
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder

@@ -1,8 +1,8 @@
 from typing import Dict
 
-from src.data.label.factories.label_parser_factory import LabelParserFactory
-from src.data.label.label_parser import LabelParser
-from src.data.label.simple_label_parser import SimpleLabelParser
+from src.data.dataset.label.factories.label_parser_factory import LabelParserFactory
+from src.data.dataset.label.label_parser import LabelParser
+from src.data.dataset.label.simple_label_parser import SimpleLabelParser
 from src.typevars.enum_type import T_Enum
 
 

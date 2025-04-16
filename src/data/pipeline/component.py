@@ -8,4 +8,4 @@ I = TypeVar("I")
 O = TypeVar("O")
 
 class Component(Generic[I, O], Consumer[I], Producer[O], ABC):
-    """Interface for pipeline components, consuming and producing the same type of data."""
+    """Interface for components that both consume and produce data."""

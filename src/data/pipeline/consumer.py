@@ -10,7 +10,7 @@ class Consumer(Generic[T], ABC):
     @abstractmethod
     def consume(self, data: Optional[T]) -> bool:
         """
-        Consumes data.
+        Consumes the given data.
 
         Args:
             data (T): f the data to be consumed, or None if end ostream

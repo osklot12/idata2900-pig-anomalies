@@ -3,7 +3,7 @@ from src.data.dataset.entities.lazy_video_file import LazyVideoFile
 from src.data.dataset.entities.video_annotations import VideoAnnotations
 from src.data.dataset.entities.video_file import VideoFile
 from src.data.dataset.providers.entity_factory import EntityFactory
-from src.data.loading.factories.loader_factory import LoaderFactory
+from src.data.loading.loaders.factories.loader_factory import LoaderFactory
 from src.data.parsing.string_parser import StringParser
 
 
