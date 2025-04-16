@@ -98,18 +98,11 @@ def main():
 
     server.run()
 
-    stream = stream_factory.create_stream(DatasetSplit.TEST)
-    stream.run()
-
     try:
-        instance = stream.read()
         while True:
-            StreamedAnnotatedFrameVisualizer.visualize(instance)
-            # time.sleep(0.1)
-            instance = stream.read()
+            time.sleep(0.1)
     except KeyboardInterrupt:
         server.stop()
-        stream.stop()
 
 if __name__ == "__main__":
     main()

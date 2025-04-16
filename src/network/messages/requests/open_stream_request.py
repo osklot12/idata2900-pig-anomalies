@@ -13,3 +13,6 @@ class OpenStreamRequest(Request):
         split (DatasetSplit): the dataset split to open stream for
     """
     split: DatasetSplit
+
+    def __repr__(self):
+        return f"OpenStreamRequest(split={self.split})"
