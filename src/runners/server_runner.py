@@ -1,7 +1,12 @@
+import gc
 import time
+
+import numpy as np
 from pympler import muppy, summary
+import objgraph
 
 from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.managed.factories.norsvin_stream_factory import NorsvinStreamFactory
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_component_factory import \
     AugmentorComponentFactory
@@ -21,6 +26,7 @@ from src.data.preprocessing.normalization.factories.bbox_normalizer_component_fa
 from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
 from src.data.preprocessing.resizing.factories.frame_resizer_component_factory import FrameResizerComponentFactory
 from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
+from src.data.structures.atomic_bool import AtomicBool
 from src.network.messages.requests.handlers.registry.factories.default_handler_registry_factory import \
     DefaultHandlerRegistryFactory
 from src.network.messages.serialization.factories.pickle_deserializer_factory import PickleDeserializerFactory
@@ -111,15 +117,37 @@ def main():
     )
 
     server.run()
+    stream = stream_factory.create_stream(DatasetSplit.TRAIN)
+    stream.run()
+
+    running = AtomicBool(False)
+
+    def log_mem():
+        while running:
+            report_objects()
+            report_memory()
+            time.sleep(2)
+
+            arrays = [obj for obj in gc.get_objects() if isinstance(obj, np.ndarray)]
+            if arrays:
+                biggest = max(arrays, key=lambda a: a.nbytes if hasattr(a, 'nbytes') else 0)
+                print(f"Largest array: {biggest.shape}, {biggest.nbytes / 1024:.1f} KB")
+                objgraph.show_backrefs([biggest], max_depth=5, filename='leak.png')
+
+    t = threading.Thread(target=log_mem)
 
     try:
-        tracemalloc.start()
+        tracemalloc.start(25)
+        running.set(True)
+        t.start()
         while True:
-            time.sleep(1)
-            report_memory()
-            report_objects()
+            # instance = stream.read()
+            time.sleep(.5)
+            # report_memory()
+            # report_objects()
     except KeyboardInterrupt:
         server.stop()
+        t.join()
 
 
 if __name__ == "__main__":

@@ -9,4 +9,3 @@ class PickleMessageSerializer(MessageSerializer):
 
     def serialize(self, message: Message) -> bytes:
         return pickle.dumps(message)
-
