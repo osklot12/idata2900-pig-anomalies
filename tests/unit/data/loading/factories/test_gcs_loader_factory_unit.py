@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
-from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
+from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
 from tests.utils.dummies.dummy_auth_service import DummyAuthService

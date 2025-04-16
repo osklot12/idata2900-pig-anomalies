@@ -6,7 +6,7 @@ from requests.exceptions import HTTPError
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
-from src.data.label.simple_label_parser import SimpleLabelParser
+from src.data.dataset.label import SimpleLabelParser
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.path_finder import PathFinder
 from tests.utils.dummies.dummy_auth_service import DummyAuthService

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.data.label.label_parser import LabelParser
+from src.data.dataset.label.label_parser import LabelParser
 
 
 class LabelParserFactory(ABC):

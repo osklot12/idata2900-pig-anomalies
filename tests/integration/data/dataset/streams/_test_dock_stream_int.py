@@ -11,11 +11,9 @@ from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.dock_stream import DockStream
 from src.data.dataset.streams.factories.gcs_eval_stream_factory import GCSEvalStreamFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
-from src.data.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
-from src.data.loading.factories.gcs_loader_factory import GCSLoaderFactory
+from src.data.dataset.label import SimpleLabelParserFactory
+from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
-from src.data.preprocessing.normalization.factories.simple_bbox_normalizer_factory import SimpleBBoxNormalizerFactory
-from src.data.preprocessing.resizing.factories.static_frame_resizer_factory import StaticFrameResizerFactory
 from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS

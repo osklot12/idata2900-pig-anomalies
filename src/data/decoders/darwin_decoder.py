@@ -3,7 +3,7 @@ from typing import Dict, Tuple, List, Optional
 import json
 
 from src.data.dataclasses.source_metadata import SourceMetadata
-from src.data.label.label_parser import LabelParser
+from src.data.dataset.label.label_parser import LabelParser
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations

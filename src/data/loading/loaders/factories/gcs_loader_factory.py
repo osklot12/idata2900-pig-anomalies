@@ -2,7 +2,7 @@ from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.dataset.registries.gcs_file_registry import GCSFileRegistry
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
-from src.data.loading.factories.loader_factory import LoaderFactory
+from src.data.loading.loaders.factories.loader_factory import LoaderFactory
 from src.data.loading.loaders.gcs_annotation_loader import GCSAnnotationLoader
 from src.data.loading.loaders.gcs_video_loader import GCSVideoLoader
 from src.data.loading.loaders.video_annotations_loader import VideoAnnotationsLoader
