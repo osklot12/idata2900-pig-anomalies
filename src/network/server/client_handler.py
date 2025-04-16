@@ -1,3 +1,4 @@
+import struct
 from socket import socket
 from typing import TypeVar
 

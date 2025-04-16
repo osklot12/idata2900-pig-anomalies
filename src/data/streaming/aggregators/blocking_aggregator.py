@@ -3,7 +3,7 @@ from typing import Optional
 
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.producer import Producer
 from src.data.structures.atomic_bool import AtomicBool
@@ -11,21 +11,21 @@ from src.data.structures.atomic_var import AtomicVar
 
 WAITING_TIMEOUT = 0.1
 
-class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
+class BlockingAggregator(Producer[AnnotatedFrame]):
     """Aggregator of streaming data that blocks until a match is received."""
 
-    def __init__(self, consumer: Optional[Consumer[StreamedAnnotatedFrame]] = None):
+    def __init__(self, consumer: Optional[Consumer[AnnotatedFrame]] = None):
         """
         Initializes a BlockingAggregator instance.
 
         Args:
-            consumer (Optional[Consumer[StreamedAnnotatedFrame]]): optional consumer of the aggregated data
+            consumer (Optional[Consumer[AnnotatedFrame]]): optional consumer of the aggregated data
         """
         self._frame: Optional[Frame] = None
         self._annotations: Optional[FrameAnnotations] = None
         self._eos = False
 
-        self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](consumer)
+        self._consumer = AtomicVar[Consumer[AnnotatedFrame]](consumer)
 
         self._lock = threading.Lock()
         self._condition = threading.Condition(self._lock)
@@ -90,14 +90,14 @@ class BlockingAggregator(Producer[StreamedAnnotatedFrame]):
         return release is not None and release
 
     @staticmethod
-    def _create_instance(frame: Frame, annotations: FrameAnnotations) -> StreamedAnnotatedFrame:
+    def _create_instance(frame: Frame, annotations: FrameAnnotations) -> AnnotatedFrame:
         """Creates a StreamedAnnotatedFrame instance."""
-        return StreamedAnnotatedFrame(
+        return AnnotatedFrame(
             source=frame.source,
             index=frame.index,
             frame=frame.data,
             annotations=annotations.annotations,
         )
 
-    def connect(self, consumer: Consumer[StreamedAnnotatedFrame]) -> None:
+    def connect(self, consumer: Consumer[AnnotatedFrame]) -> None:
         self._consumer.set(consumer)

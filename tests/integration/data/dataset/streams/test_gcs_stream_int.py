@@ -2,7 +2,7 @@ import pytest
 import time
 
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_component_factory import \
@@ -68,7 +68,7 @@ def balancer_factory():
         max_samples_per=3
     )
 
-def is_annotated(instance: StreamedAnnotatedFrame) -> bool:
+def is_annotated(instance: AnnotatedFrame) -> bool:
     """Predicate for checking whether the instance is annotated."""
     return len(instance.annotations) > 0
 
@@ -192,7 +192,7 @@ def test_norsvin_val_stream(gcs_creds, split_ratios, resizer_component_factory, 
 
     instance = stream.read()
     while instance:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         # StreamedAnnotatedFrameVisualizer.visualize(instance)
         instance = stream.read()
 
@@ -217,7 +217,7 @@ def test_norsvin_test_stream(gcs_creds, split_ratios, resizer_component_factory,
 
     instance = stream.read()
     while instance:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         # StreamedAnnotatedFrameVisualizer.visualize(instance)
         instance = stream.read()
 

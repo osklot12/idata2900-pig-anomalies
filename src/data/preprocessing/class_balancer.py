@@ -3,14 +3,14 @@ from typing import Dict, Optional
 import math
 import random
 
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.pipeline.component import Component
 from src.data.pipeline.consumer import Consumer
 from src.data.structures.atomic_var import AtomicVar
 from src.typevars.enum_type import T_Enum
 
 
-class ClassBalancer(Component[StreamedAnnotatedFrame]):
+class ClassBalancer(Component[AnnotatedFrame, AnnotatedFrame]):
     """Pipeline component for balancing classes."""
 
     def __init__(self, class_counts: Dict[T_Enum, int], max_samples_per: int):
@@ -25,7 +25,7 @@ class ClassBalancer(Component[StreamedAnnotatedFrame]):
         self._dominant_class: T_Enum = self._get_dominant_class()
         self._factors = self._compute_factors()
         self._max_samples_per = max_samples_per
-        self._consumer = AtomicVar[Consumer[StreamedAnnotatedFrame]](None)
+        self._consumer = AtomicVar[Consumer[AnnotatedFrame]](None)
 
     def _get_dominant_class(self) -> T_Enum:
         """Finds the dominant class."""
@@ -46,7 +46,7 @@ class ClassBalancer(Component[StreamedAnnotatedFrame]):
 
         return factors
 
-    def consume(self, data: Optional[StreamedAnnotatedFrame]) -> bool:
+    def consume(self, data: Optional[AnnotatedFrame]) -> bool:
         success = False
 
         outputs = 1
@@ -75,5 +75,5 @@ class ClassBalancer(Component[StreamedAnnotatedFrame]):
 
         return success
 
-    def connect(self, consumer: Consumer[StreamedAnnotatedFrame]) -> None:
+    def connect(self, consumer: Consumer[AnnotatedFrame]) -> None:
         self._consumer.set(consumer)

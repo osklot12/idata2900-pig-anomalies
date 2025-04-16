@@ -1,7 +1,7 @@
 import pytest
 
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
@@ -101,7 +101,7 @@ def streamer_factory(streamer_pair_factory):
 def multiplier():
     """Fixture to provide a CondMultiplier instance."""
 
-    def is_annotated(instance: StreamedAnnotatedFrame):
+    def is_annotated(instance: AnnotatedFrame):
         return len(instance.annotations) > 0
 
     return CondMultiplier(50, is_annotated)
@@ -116,7 +116,7 @@ def augmentor():
 @pytest.fixture
 def stream(multiplier, augmentor):
     """Fixture to provide a PoolStream instance."""
-    return PoolStream[StreamedAnnotatedFrame](
+    return PoolStream[AnnotatedFrame](
         pool_size=1000,
         preprocessors=[multiplier, augmentor]
     )
@@ -125,7 +125,7 @@ def stream(multiplier, augmentor):
 @pytest.fixture
 def manager(streamer_factory, stream):
     """Fixture to provide a StaticStreamerManager instance."""
-    return StaticStreamerManager[StreamedAnnotatedFrame](
+    return StaticStreamerManager[AnnotatedFrame](
         streamer_factory=streamer_factory,
         consumer=stream
     )
@@ -140,7 +140,7 @@ def test_streaming_train_set(stream, manager):
     instance = stream.read()
     i = 0
     while instance and i < 10000:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
         StreamedAnnotatedFrameVisualizer.visualize(instance)
         i += 1
@@ -166,7 +166,7 @@ def test_norsvin_train_stream():
     instance = stream.read()
     i = 0
     while instance and i < 10000:
-        assert isinstance(instance, StreamedAnnotatedFrame)
+        assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
         StreamedAnnotatedFrameVisualizer.visualize(instance)
         i += 1

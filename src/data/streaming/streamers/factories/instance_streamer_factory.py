@@ -1,6 +1,6 @@
 from typing import TypeVar, Optional
 
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.providers.entity_factory import EntityFactory
 from src.data.dataset.providers.instance_provider import InstanceProvider
 from src.data.pipeline.consuming_rfunc import ConsumingRFunc
@@ -14,10 +14,8 @@ from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotationsStreamer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 
-T = TypeVar("T")
 
-
-class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
+class InstanceStreamerFactory(StreamerFactory[AnnotatedFrame]):
     """Factory for creating dataset instance streamers."""
 
     def __init__(self, instance_provider: InstanceProvider, entity_factory: EntityFactory):
@@ -31,7 +29,7 @@ class InstanceStreamerFactory(StreamerFactory[StreamedAnnotatedFrame]):
         self._instance_provider = instance_provider
         self._entity_factory = entity_factory
 
-    def create_streamer(self) -> Optional[ProducerStreamer]:
+    def create_streamer(self) -> Optional[ProducerStreamer[AnnotatedFrame]]:
         streamer = None
 
         aggregator = BlockingAggregator()

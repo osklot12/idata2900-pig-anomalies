@@ -8,7 +8,7 @@ from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame import Frame
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.source_metadata import SourceMetadata
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.streaming.aggregators.buffered_aggregator import BufferedAggregator
 from tests.utils.dummy_annotation_label import DummyAnnotationLabel
@@ -75,7 +75,7 @@ def aggregator(consumer):
 def _validate_fed_pair(consumer: Mock, frame: Frame, annotations: FrameAnnotations):
     """Validates that the fed StreamedAnnotatedFrame is consistent with the fed frame and annotations."""
     fed_instance = consumer.consume.call_args[0][0]
-    assert isinstance(fed_instance, StreamedAnnotatedFrame)
+    assert isinstance(fed_instance, AnnotatedFrame)
 
     assert fed_instance.index == frame.index
     assert fed_instance.index == annotations.index

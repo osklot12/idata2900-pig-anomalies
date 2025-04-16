@@ -3,13 +3,14 @@ from typing import TypeVar, Generic
 
 from src.data.pipeline.component import Component
 
-T = TypeVar("T")
+I = TypeVar("I")
+O = TypeVar("O")
 
-class ComponentFactory(Generic[T], ABC):
+class ComponentFactory(Generic[I, O], ABC):
     """Interface for component factories."""
 
     @abstractmethod
-    def create_component(self) -> Component[T]:
+    def create_component(self) -> Component[I, O]:
         """
         Creates and returns a new Component instance.
 

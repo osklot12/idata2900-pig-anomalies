@@ -1,29 +1,26 @@
 from dataclasses import dataclass
-from typing import List
-
-import numpy as np
+from typing import List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
-from src.data.dataclasses.identifiable import Identifiable
 from src.data.dataclasses.source_metadata import SourceMetadata
 
 
 @dataclass(frozen=True)
-class StreamedAnnotatedFrame(Identifiable):
+class CompressedAnnotatedFrame:
     """
-    Represents a single video frame along with its associated annotations and metadata.
+    Represents a single compressed video frame along with its associated annotations and metadata.
 
     Attributes:
         source (SourceMetadata): the source metadata
         index (int): the frame index within its source
-        frame (np.ndarray): the raw frame pixel data
+        frame (bytes): the compressed frame data
+        shape (Tuple[int, int, int]): the shape of the frame
+        dtype (str): the data type of the frame
         annotations (List[AnnotatedBBox]): the annotations associated with the frame
     """
-
     source: SourceMetadata
     index: int
-    frame: np.ndarray
+    frame: bytes
+    shape: Tuple[int, int, int]
+    dtype: str
     annotations: List[AnnotatedBBox]
-
-    def get_id(self) -> str:
-        return self.source.source_id
