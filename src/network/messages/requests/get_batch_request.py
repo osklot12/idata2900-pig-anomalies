@@ -15,3 +15,6 @@ class GetBatchRequest(Request):
     """
     split: DatasetSplit
     batch_size: int
+
+    def __repr__(self):
+        return f"GetBatchRequest(split={self.split}, batch_size={self.batch_size})"

@@ -48,15 +48,18 @@ class ClientHandler:
         recv_raw_msg = self._read_next_msg()
         while recv_raw_msg and self._running:
             recv_msg = self._deserializer.deserialize(recv_raw_msg)
+            print(f"[ClientHandler] Got request {type(recv_msg)} from '{self._session.get_client_address()}'")
             handler = self._handler_registry.get_handler(recv_msg)
             if not handler:
                 raise RuntimeError(f"No handler registered for {recv_msg}")
 
             response = handler.handle(recv_msg)
+            print(f"[ClientHandler] Sent response {type(response)} to '{self._session.get_client_address()}'")
             self._msg_writer.write(self._serializer.serialize(response))
 
             recv_raw_msg = self._read_next_msg()
 
+        print(f"[ClientHandler] '{self._session.get_client_address()}' disconnected")
         self._session.cleanup()
 
     def _read_next_msg(self) -> bytes:

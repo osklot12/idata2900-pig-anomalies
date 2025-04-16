@@ -24,7 +24,7 @@ class Exp(BaseExp):
         self.input_size = (640, 640)
         self.test_size = (640, 640)
         self.max_epoch = 300
-        self.eval_interval = 10
+        self.eval_interval = 1
         self.data_num_workers = 0
         self.tensorboard_writer = True
         self.save_history_ckpt = True

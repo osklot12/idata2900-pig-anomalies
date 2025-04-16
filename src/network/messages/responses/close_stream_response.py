@@ -13,3 +13,6 @@ class CloseStreamResponse(Response):
         status (ResponseStatus): the status of the response
     """
     status: ResponseStatus
+
+    def __repr__(self):
+        return f"CloseStreamResponse(status={self.status})"

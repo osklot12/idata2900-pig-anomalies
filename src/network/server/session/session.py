@@ -69,4 +69,5 @@ class Session(Generic[T]):
     def cleanup(self) -> None:
         """Cleans up resources."""
         for stream in self._streams.values():
-            stream.stop()
+            if stream is not None:
+                stream.stop()
