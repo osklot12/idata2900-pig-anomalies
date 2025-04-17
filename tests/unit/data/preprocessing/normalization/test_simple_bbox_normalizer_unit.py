@@ -1,7 +1,7 @@
 import pytest
 
 from src.data.dataclasses.bbox import BBox
-from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.processing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 
 
 @pytest.fixture

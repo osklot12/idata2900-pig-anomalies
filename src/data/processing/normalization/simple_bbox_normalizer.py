@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from src.data.dataclasses.bbox import BBox
-from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
+from src.data.processing.normalization.bbox_normalizer import BBoxNormalizer
 
 
 class SimpleBBoxNormalizer(BBoxNormalizer):

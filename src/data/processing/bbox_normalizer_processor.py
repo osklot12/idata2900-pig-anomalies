@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
+from src.data.processing.normalization.bbox_normalizer import BBoxNormalizer
 from src.data.processing.processor import Processor
 
 
