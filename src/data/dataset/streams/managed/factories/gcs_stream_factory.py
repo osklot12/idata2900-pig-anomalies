@@ -46,6 +46,7 @@ A = TypeVar("A")
 # data type fed into stream
 B = TypeVar("B")
 
+
 class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
     """Factory for creating managed Google Cloud Storage (GCS) streams."""
 
