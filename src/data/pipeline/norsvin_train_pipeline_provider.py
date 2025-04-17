@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from src.data.compressors.zlib_compressor import ZlibCompressor
+from src.data.processing.zlib_compressor import ZlibCompressor
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.pipeline.consumer import Consumer
@@ -66,7 +66,7 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             ).then(
                 Preprocessor(Augmentor(plan_factory=AugmentationPlanFactory(), filters=self._create_filters()))
             ).then(
-                self._create_compressor()
+                Preprocessor(ZlibCompressor())
             ).into(sink)
 
         return result
@@ -80,8 +80,3 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             ColorJitterFilter(saturation_scale=RandomFloat(0.8, 1.2), hue_shift=RandomFloat(-10, 10)),
             GaussianNoiseFilter(std=RandomFloat(5, 15))
         ]
-
-    @staticmethod
-    def _create_compressor() -> ZlibCompressor:
-        """Creates and returns a ZlibCompressor instance."""
-        return ZlibCompressor()
