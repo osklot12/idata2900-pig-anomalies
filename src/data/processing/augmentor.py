@@ -6,13 +6,13 @@ import numpy as np
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.preprocessing.augmentation.augmentors.augmentor import Augmentor, T
 from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.preprocessing.augmentation.transformator import Transformator
+from src.data.processing.processor import Processor
 
 
-class InstanceAugmentor(Augmentor[AnnotatedFrame]):
+class Augmentor(Processor[AnnotatedFrame, AnnotatedFrame]):
     """Augments frames."""
 
     def __init__(self, plan_factory: AugmentationPlanFactory, filters: Optional[List[PhotometricFilter]] = None):
@@ -26,7 +26,7 @@ class InstanceAugmentor(Augmentor[AnnotatedFrame]):
         self._plan_factory = plan_factory
         self._filters: List[PhotometricFilter] = filters if filters is not None else []
 
-    def augment(self, data: AnnotatedFrame) -> AnnotatedFrame:
+    def process(self, data: AnnotatedFrame) -> AnnotatedFrame:
         frame_width, frame_height = data.frame.data.shape[1], data.frame.data.shape[0]
         transform = self._plan_factory.get_plan().transform
         shifted_transform = Transformator.compute_shift_and_transform_matrix(
@@ -72,8 +72,8 @@ class InstanceAugmentor(Augmentor[AnnotatedFrame]):
 
         for anno in annotations:
             bbox = anno.bbox
-            absolute_bbox = InstanceAugmentor._get_absolute_bbox(bbox, frame_shape)
-            corners = InstanceAugmentor._get_corner_points(absolute_bbox)
+            absolute_bbox = Augmentor._get_absolute_bbox(bbox, frame_shape)
+            corners = Augmentor._get_corner_points(absolute_bbox)
 
             transformed = [transform @ corner for corner in corners]
             xs = [pt[0] for pt in transformed]
@@ -87,7 +87,7 @@ class InstanceAugmentor(Augmentor[AnnotatedFrame]):
 
             augmented.append(AnnotatedBBox(
                 cls=anno.cls,
-                bbox=InstanceAugmentor._get_normalized_bbox(
+                bbox=Augmentor._get_normalized_bbox(
                     BBox(x=x_min, y=y_min, width=width, height=height),
                     frame_shape
                 )

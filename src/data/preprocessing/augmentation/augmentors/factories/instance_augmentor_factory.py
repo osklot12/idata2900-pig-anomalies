@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from src.data.preprocessing.augmentation.augmentors.augmentor import Augmentor
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_factory import AugmentorFactory, T
-from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
+from src.data.processing.augmentor import Augmentor
 from src.data.preprocessing.augmentation.augmentors.photometric.factories.photometric_filter_factory import \
     PhotometricFilterFactory
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
@@ -21,7 +21,7 @@ class InstanceAugmentorFactory(AugmentorFactory):
         self.filter_factories = filter_factories if filter_factories is not None else []
 
     def create_augmentor(self) -> Augmentor[T]:
-        return InstanceAugmentor(
+        return Augmentor(
             plan_factory=AugmentationPlanFactory(),
             filters=[factory.create_filter() for factory in self.filter_factories]
         )

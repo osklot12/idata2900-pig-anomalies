@@ -3,7 +3,7 @@ from typing import List
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.preprocessing.augmentation.augmentors.annotations_augmentor import AnnotationsAugmentor
 from src.data.preprocessing.preprocessor import Preprocessor
-from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
+from src.data.processing.augmentor import Augmentor
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
 
 
@@ -28,7 +28,7 @@ class AnnotatedFrameAugmentor(Preprocessor[AnnotatedFrame]):
         augmentations = []
 
         frame_shape = (instance.frame.shape[1], instance.frame.shape[0])
-        frame_augmentor = InstanceAugmentor(self._plan_factory)
+        frame_augmentor = Augmentor(self._plan_factory)
         annotations_aug = AnnotationsAugmentor(self._plan_factory, frame_shape)
 
         for _ in range(self._outputs):
