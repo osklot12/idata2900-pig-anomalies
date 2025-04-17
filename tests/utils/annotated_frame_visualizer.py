@@ -5,12 +5,11 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 
 
-class StreamedAnnotatedFrameVisualizer:
+class AnnotatedFrameVisualizer:
     """Visualizer for AnnotatedFrame instances."""
 
     @staticmethod
@@ -21,14 +20,15 @@ class StreamedAnnotatedFrameVisualizer:
         Args:
             instance (AnnotatedFrame): the annotated frame to visualize
         """
+        frame = np.copy(instance.frame)
         for annotation in instance.annotations:
-            x_min, y_min, x_max, y_max = StreamedAnnotatedFrameVisualizer._get_absolute_coordinates(
-                annotation.bbox, instance.frame.shape[1], instance.frame.shape[0]
+            x_min, y_min, x_max, y_max = AnnotatedFrameVisualizer._get_absolute_coordinates(
+                annotation.bbox, frame.shape[1], frame.shape[0]
             )
-            StreamedAnnotatedFrameVisualizer._draw_bbox(instance.frame, annotation.cls, x_min, y_min, x_max, y_max)
+            AnnotatedFrameVisualizer._draw_bbox(frame, annotation.cls, x_min, y_min, x_max, y_max)
 
-        StreamedAnnotatedFrameVisualizer._show_plot(
-            frame=instance.frame,
+        AnnotatedFrameVisualizer._show_plot(
+            frame=frame,
             frame_index=instance.index,
             source=instance.source.source_id,
             annotated=len(instance.annotations) > 0

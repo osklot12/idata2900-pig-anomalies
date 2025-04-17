@@ -5,9 +5,12 @@ from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
 from src.data.dataset.streams.factories.dock_stream_factory import DockStreamFactory
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
+from src.data.pipeline.factories.norsvin_eval_pipeline_factory import NorsvinEvalPipelineFactory
 from src.data.pipeline.factories.norsvin_train_pipeline_factory import NorsvinTrainPipelineFactory
+from src.data.processing.zlib_decompressor import ZlibDecompressor
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_GCS_CREDS, NORSVIN_SPLIT_RATIOS
+from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
 
 
 def test_norsvin_train_stream():
@@ -56,51 +59,59 @@ def test_norsvin_train_stream():
         stream.stop()
 
 
-def test_norsvin_val_stream(gcs_creds, split_ratios, resizer_component_factory, normalizer_component_factory):
+def test_norsvin_val_stream():
     """Tests that creating the Norsvin validation set stream with GCSStreamFactory gives the correct stream."""
     # arrange
     stream_factory = GCSStreamFactory(
-        gcs_creds=gcs_creds,
-        split_ratios=split_ratios,
+        gcs_creds=NORSVIN_GCS_CREDS,
+        split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.VAL,
+        selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        preprocessor_factories=[resizer_component_factory, normalizer_component_factory]
+        stream_factory=DockStreamFactory(buffer_size=6, dock_size=1000),
+        pipeline_factory=NorsvinEvalPipelineFactory()
     )
 
-    stream = stream_factory.create_stream()
+    stream=stream_factory.create_stream()
+    stream.run()
+    decompressor = ZlibDecompressor()
 
     # act
-    stream.run()
-
     instance = stream.read()
+    i = 1
     while instance:
-        assert isinstance(instance, AnnotatedFrame)
-        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         instance = stream.read()
+        print(f"Frames read: {i}")
 
+        i += 1
     stream.stop()
 
 
-def test_norsvin_test_stream(gcs_creds, split_ratios, resizer_component_factory, normalizer_component_factory):
+def test_norsvin_test_stream():
     """Tests that creating the Norsvin test set stream with GCSStreamFactory gives the correct stream."""
     # arrange
     stream_factory = GCSStreamFactory(
-        gcs_creds=gcs_creds,
-        split_ratios=split_ratios,
+        gcs_creds=NORSVIN_GCS_CREDS,
+        split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TEST,
+        selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        preprocessor_factories=[resizer_component_factory, normalizer_component_factory]
+        stream_factory=DockStreamFactory(buffer_size=6, dock_size=1000),
+        pipeline_factory=NorsvinEvalPipelineFactory()
     )
 
     stream = stream_factory.create_stream()
+    stream.run()
+    decompressor = ZlibDecompressor()
 
     # act
-    stream.run()
-
     instance = stream.read()
+    i = 1
     while instance:
-        assert isinstance(instance, AnnotatedFrame)
-        # StreamedAnnotatedFrameVisualizer.visualize(instance)
+        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         instance = stream.read()
+        print(f"Frames read: {i}")
+        i += 1
 
     stream.stop()

@@ -18,7 +18,7 @@ from src.data.streaming.managers.throttled_streamer_manager import ThrottledStre
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
-from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
+from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
 
 
 @pytest.fixture
@@ -99,7 +99,7 @@ def test_streaming_test_set(stream, manager):
     while instance:
         assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        AnnotatedFrameVisualizer.visualize(instance)
     print(f"Finished reading!")
     manager.stop()
 
