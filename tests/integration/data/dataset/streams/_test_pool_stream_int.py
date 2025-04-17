@@ -24,7 +24,7 @@ from src.data.streaming.managers.static_streamer_manager import StaticStreamerMa
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
-from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
+from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
 
 
 @pytest.fixture
@@ -142,7 +142,7 @@ def test_streaming_train_set(stream, manager):
     while instance and i < 10000:
         assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        AnnotatedFrameVisualizer.visualize(instance)
         i += 1
     print(f"Finished reading!")
     manager.stop()
@@ -168,7 +168,7 @@ def test_norsvin_train_stream():
     while instance and i < 10000:
         assert isinstance(instance, AnnotatedFrame)
         instance = stream.read()
-        StreamedAnnotatedFrameVisualizer.visualize(instance)
+        AnnotatedFrameVisualizer.visualize(instance)
         i += 1
     print(f"Finished reading!")
     

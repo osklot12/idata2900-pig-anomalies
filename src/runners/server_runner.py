@@ -12,7 +12,7 @@ from src.data.dataset.streams.factories.pool_stream_factory import PoolStreamFac
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
 from src.data.pipeline.factories.norsvin_train_pipeline_factory import NorsvinTrainPipelineFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
-from tests.utils.streamed_annotated_frame_visualizer import StreamedAnnotatedFrameVisualizer
+from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
 
 proc = psutil.Process(os.getpid())
 
@@ -110,7 +110,7 @@ def main():
                 last_time = time.time()
                 frames = 0
 
-            StreamedAnnotatedFrameVisualizer.visualize(frame)
+            AnnotatedFrameVisualizer.visualize(frame)
             # report_memory()
             # report_objects()
     except KeyboardInterrupt:
