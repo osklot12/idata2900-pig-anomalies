@@ -2,7 +2,6 @@ from typing import TypeVar, Generic, List, Dict, Iterable, Optional
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
@@ -19,11 +18,9 @@ from src.data.dataset.selectors.random_string_selector import RandomStringSelect
 from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
-from src.data.dataset.streams.dock_stream import DockStream
+from src.data.dataset.streams.factories.stream_factory import StreamFactory
 from src.data.dataset.streams.managed.factories.manged_stream_factory import ManagedStreamFactory
 from src.data.dataset.streams.managed.managed_stream import ManagedStream
-from src.data.dataset.streams.pool_stream import PoolStream
-from src.data.dataset.streams.writable_stream import WritableStream
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.dataset.label.factories.label_parser_factory import LabelParserFactory
@@ -56,6 +53,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
                  split_ratios: DatasetSplitRatios,
                  split: DatasetSplit,
                  label_map: Dict[str, T_Enum],
+                 stream_factory: StreamFactory[B],
                  pipeline_factory: Optional[PipelineFactory[A, B]] = None):
         """
         Initializes a GCSStreamFactory instance.
@@ -65,13 +63,15 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             split_ratios (DatasetSplitRatios): dataset split ratios
             split (DatasetSplit): dataset split to create stream for
             label_map (Dict[str, T_Enum]): label map for annotation classes
+            stream_factory (StreamFactory[B]): factory for creating stream instances
             pipeline_factory (Optional[PipelineFactory[T]]): optional pipeline provider
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
         self._split = split
         self._label_map = label_map
-        self._pipeline_factory: Optional[PipelineFactory[A, CompressedAnnotatedFrame]] = pipeline_factory
+        self._stream_factory = stream_factory
+        self._pipeline_factory: Optional[PipelineFactory[A, B]] = pipeline_factory
 
     def create_stream(self) -> ManagedStream[T]:
         auth_factory = self._create_auth_service_factory(self._gcs_creds.service_account_path)
@@ -86,7 +86,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
         entity_provider = self._create_entity_provider(loader_factory)
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
 
-        stream = self._create_stream(self._split)
+        stream = self._stream_factory.create_stream()
         if self._pipeline_factory is not None:
             consumer_provider = PipelineToSinkProvider(
                 pipeline_factory=self._pipeline_factory,
@@ -176,16 +176,6 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             instance_provider=instance_provider,
             entity_factory=entity_factory
         )
-
-    @staticmethod
-    def _create_stream(split: DatasetSplit) -> WritableStream[B]:
-        """Creates a Stream instance."""
-        if split == DatasetSplit.TRAIN:
-            stream = PoolStream(pool_size=3000, min_ready=500)
-        else:
-            stream = DockStream(buffer_size=3, dock_size=300)
-
-        return stream
 
     @staticmethod
     def _create_streamer_manager(streamer_factory: StreamerFactory[T], consumer_provider: ConsumerProvider[T],
