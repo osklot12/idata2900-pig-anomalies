@@ -10,6 +10,8 @@ from src.data.structures.atomic_bool import AtomicBool
 T = TypeVar("T")
 
 
+WORKER_LOOP_TIMEOUT = 0.1
+
 class Prefetcher(Generic[T], Stream[T]):
     """Simple data prefetcher."""
 
@@ -25,7 +27,7 @@ class Prefetcher(Generic[T], Stream[T]):
             raise ValueError("buffer_size must be greater than 0")
 
         self._stream = stream
-        self._queue: queue.Queue[List[T]] = queue.Queue(maxsize=buffer_size)
+        self._queue: queue.Queue[T] = queue.Queue(maxsize=buffer_size)
 
         self._thread = None
         self._run_lock = threading.Lock()
@@ -47,15 +49,14 @@ class Prefetcher(Generic[T], Stream[T]):
     def _worker(self) -> None:
         """Worker function that runs on the worker threads."""
         while self._running:
-            batch = self._stream.read()
-            if batch is None:
-                self._running.set(False)
+            item = self._stream.read()
 
-            put = False
-            while not put and self._running:
+            putting = True
+            while putting and self._running:
                 try:
-                    self._queue.put(batch, timeout=0.1)
-                    put = True
+                    self._queue.put(item, timeout=WORKER_LOOP_TIMEOUT)
+                    putting = False
+                    
                 except queue.Full:
                     pass
 

@@ -20,4 +20,4 @@ class ReadStreamResponse(Generic[T], Response):
     instance: Optional[T]
 
     def __repr__(self) -> str:
-        return f"ReadStreamResponse(status={self.status})"
+        return f"ReadStreamResponse(status={self.status}, end_of_stream={self.instance is None})"
