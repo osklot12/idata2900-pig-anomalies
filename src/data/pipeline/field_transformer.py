@@ -1,9 +1,9 @@
 from typing import TypeVar, Generic, Callable, Any, Optional
 
+from src.data.pipeline.base_component import BaseComponent, O
 from src.data.pipeline.component import Component
 from src.data.pipeline.consumer import Consumer
 from src.data.processing.processor import Processor
-from src.data.structures.atomic_var import AtomicVar
 
 # input type
 I = TypeVar("I")
@@ -57,27 +57,17 @@ class FieldTransformer(Generic[I, P]):
         extractor = self._extractor
         field_name = self._field_name
 
-        class _FieldTransformComponent(Component[I, I]):
+        class _FieldTransformComponent(BaseComponent[I, I]):
 
             def __init__(self):
-                self._consumer = AtomicVar[Consumer[I]](None)
+                super().__init__()
 
-            def consume(self, data: Optional[I]) -> bool:
-                success = False
+            def _consume(self, data: I, consumer: Consumer[O]) -> bool:
+                field = extractor(data)
+                processed = processor.process(field)
 
-                consumer = self._consumer.get()
-                if consumer is not None:
-                    if data is not None:
-                        field = extractor(data)
-                        processed = processor.process(field)
+                setattr(data, field_name, processed)
 
-                        setattr(data, field_name, processed)
-
-                    success = consumer.consume(data)
-
-                return success
-
-            def connect(self, consumer: Consumer[I]) -> None:
-                self._consumer.set(consumer)
+                return consumer.consume(data)
 
         return _FieldTransformComponent()
