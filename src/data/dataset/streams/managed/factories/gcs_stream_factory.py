@@ -20,7 +20,7 @@ from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
 from src.data.dataset.streams.dock_stream import DockStream
-from src.data.dataset.streams.managed.factories.stream_factory import StreamFactory
+from src.data.dataset.streams.managed.factories.manged_stream_factory import ManagedStreamFactory
 from src.data.dataset.streams.managed.managed_stream import ManagedStream
 from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.dataset.streams.writable_stream import WritableStream
@@ -49,7 +49,7 @@ A = TypeVar("A")
 # data type fed into stream
 B = TypeVar("B")
 
-class GCSStreamFactory(Generic[T, A, B], StreamFactory[T]):
+class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
     """Factory for creating managed Google Cloud Storage (GCS) streams."""
 
     def __init__(self, gcs_creds: GCSCredentials,
