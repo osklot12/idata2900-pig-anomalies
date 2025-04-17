@@ -17,7 +17,7 @@ from src.data.processing.augmentation.photometric.gaussian_noise_filter import G
 from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.processing.augmentor import Augmentor
 from src.data.processing.class_balancer import ClassBalancer
-from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
+from src.data.processing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.processing.bbox_normalizer_processor import BBoxNormalizerProcessor
 from src.data.processing.cond_multiplier import CondMultiplier
 from src.data.processing.frame_resizer import FrameResizer
