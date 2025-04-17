@@ -6,9 +6,9 @@ import numpy as np
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
-from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
-from src.data.preprocessing.augmentation.transformator import Transformator
+from src.data.processing.augmentation.photometric.photometric_filter import PhotometricFilter
+from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.processing.transformator import Transformator
 from src.data.processing.processor import Processor
 
 

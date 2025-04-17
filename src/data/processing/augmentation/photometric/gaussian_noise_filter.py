@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
+from src.data.processing.augmentation.photometric.photometric_filter import PhotometricFilter
 from src.data.structures.runtime_param import RuntimeParam
 
 

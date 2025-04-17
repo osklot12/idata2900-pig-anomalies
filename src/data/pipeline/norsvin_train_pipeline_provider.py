@@ -1,5 +1,8 @@
 from typing import Optional, List
 
+from src.data.processing.augmentation.photometric.color_jitter_filter import ColorJitterFilter
+from src.data.processing.augmentation.photometric.contrast_filter import ContrastFilter
+from src.data.processing.augmentation.photometric.photometric_filter import PhotometricFilter
 from src.data.processing.zlib_compressor import ZlibCompressor
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
@@ -9,12 +12,9 @@ from src.data.pipeline.field_transformer import FieldTransformer
 from src.data.pipeline.pipeline import Pipeline
 from src.data.pipeline.preprocessor import Preprocessor
 from src.data.pipeline.splitting_preprocessor import SplittingPreprocessor
-from src.data.preprocessing.augmentation.augmentors.photometric.brightness_filter import BrightnessFilter
-from src.data.preprocessing.augmentation.augmentors.photometric.color_jitter_filter import ColorJitterFilter
-from src.data.preprocessing.augmentation.augmentors.photometric.contrast_filter import ContrastFilter
-from src.data.preprocessing.augmentation.augmentors.photometric.gaussian_noise_filter import GaussianNoiseFilter
-from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
-from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.processing.augmentation.photometric.brightness_filter import BrightnessFilter
+from src.data.processing.augmentation.photometric.gaussian_noise_filter import GaussianNoiseFilter
+from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.processing.augmentor import Augmentor
 from src.data.processing.class_balancer import ClassBalancer
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer

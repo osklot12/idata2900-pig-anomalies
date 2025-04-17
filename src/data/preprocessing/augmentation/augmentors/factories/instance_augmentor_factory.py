@@ -3,9 +3,9 @@ from typing import Optional, List
 from src.data.preprocessing.augmentation.augmentors.augmentor import Augmentor
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_factory import AugmentorFactory, T
 from src.data.processing.augmentor import Augmentor
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.photometric_filter_factory import \
+from src.data.processing.augmentation.photometric.factories.photometric_filter_factory import \
     PhotometricFilterFactory
-from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
 
 
 class InstanceAugmentorFactory(AugmentorFactory):
