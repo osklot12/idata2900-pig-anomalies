@@ -25,13 +25,13 @@ def main():
     train_stream = NetworkStream(
         client=train_client,
         split=DatasetSplit.TRAIN,
-        batch_type=AnnotatedFrame,
+        data_type=AnnotatedFrame,
         batch_size=8
     )
     val_stream = NetworkStream(
         client=val_client,
         split=DatasetSplit.VAL,
-        batch_type=AnnotatedFrame,
+        data_type=AnnotatedFrame,
         batch_size=8
     )
 

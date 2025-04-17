@@ -26,3 +26,6 @@ class AnnotatedFrame(Identifiable):
 
     def get_id(self) -> str:
         return self.source.source_id
+
+    def __repr__(self) -> str:
+        return f"AnnotatedFrame(source={self.source.source_id}, index={self.index}, num_annotations={len(self.annotations)})"
