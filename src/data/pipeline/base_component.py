@@ -29,13 +29,16 @@ class BaseComponent(Generic[I, O], Component[I, O], ABC):
 
         consumer = self._consumer.get()
         if consumer is not None:
-            success = self._consume(data, consumer)
+            if data is not None:
+                success = self._consume(data, consumer)
+            else:
+                success = consumer.consume(data)
 
         return success
 
     @abstractmethod
-    def _consume(self, data: Optional[I], consumer: Consumer[O]) -> bool:
-        """Subclass implementation of consume, guarding against consumer set to None."""
+    def _consume(self, data: I, consumer: Consumer[O]) -> bool:
+        """Subclass implementation of consume, guarding against consumer set to None and None data."""
         raise NotImplementedError
 
     def connect(self, consumer: Consumer[O]) -> None:

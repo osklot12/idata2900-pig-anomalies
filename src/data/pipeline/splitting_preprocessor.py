@@ -24,5 +24,5 @@ class SplittingPreprocessor(BaseComponent[I, O]):
         super().__init__(consumer)
         self._processor: Processor[I, Iterable[O]] = processor
 
-    def _consume(self, data: Optional[I], consumer: Consumer[O]) -> bool:
+    def _consume(self, data: I, consumer: Consumer[O]) -> bool:
         return all(consumer.consume(d) for d in self._processor.process(data))

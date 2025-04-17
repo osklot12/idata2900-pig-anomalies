@@ -25,5 +25,5 @@ class Preprocessor(Generic[I, O], BaseComponent[I, O]):
         super().__init__(consumer)
         self._processor = processor
 
-    def _consume(self, data: Optional[I], consumer: Consumer[O]) -> bool:
+    def _consume(self, data: I, consumer: Consumer[O]) -> bool:
         return consumer.consume(self._processor.process(data))
