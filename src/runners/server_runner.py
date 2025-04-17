@@ -108,10 +108,10 @@ def main():
         tracemalloc.start(25)
 
         while True:
-            report_memory()
-            report_objects()
-            mem = proc.memory_info()
-            print(f"[System] RSS={mem.rss / 1024 ** 2:.2f} MB | VMS={mem.vms / 1024 ** 2:.2f} MB")
+            #report_memory()
+            #report_objects()
+            # mem = proc.memory_info()
+            # print(f"[System] RSS={mem.rss / 1024 ** 2:.2f} MB | VMS={mem.vms / 1024 ** 2:.2f} MB")
 
             time.sleep(1)
 
