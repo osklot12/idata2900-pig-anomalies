@@ -7,6 +7,7 @@ from pympler import muppy, summary
 import os
 import psutil
 
+from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory
 from src.data.dataset.streams.factories.pool_stream_factory import PoolStreamFactory
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
 from src.data.pipeline.factories.norsvin_train_pipeline_factory import NorsvinTrainPipelineFactory
@@ -51,6 +52,7 @@ def main():
         gcs_creds=gcs_creds,
         split_ratios=split_ratios,
         split=DatasetSplit.TRAIN,
+        selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
         stream_factory=PoolStreamFactory(pool_size=3000, min_ready=2000),
         pipeline_factory=NorsvinTrainPipelineFactory()

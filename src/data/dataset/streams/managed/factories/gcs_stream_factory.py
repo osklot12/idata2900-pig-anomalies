@@ -13,8 +13,7 @@ from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
 from src.data.dataset.providers.manifest_instance_provider import ManifestInstanceProvider
 from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
-from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
-from src.data.dataset.selectors.random_string_selector import RandomStringSelector
+from src.data.dataset.selectors.factories.selector_factory import SelectorFactory
 from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
@@ -53,6 +52,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
     def __init__(self, gcs_creds: GCSCredentials,
                  split_ratios: DatasetSplitRatios,
                  split: DatasetSplit,
+                 selector_factory: SelectorFactory[str],
                  label_map: Dict[str, T_Enum],
                  stream_factory: StreamFactory[B],
                  pipeline_factory: Optional[PipelineFactory[A, B]] = None):
@@ -63,6 +63,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             gcs_creds (GCSCredentials): Google Cloud Storage credentials
             split_ratios (DatasetSplitRatios): dataset split ratios
             split (DatasetSplit): dataset split to create stream for
+            selector_factory (SelectorFactory[str]): factory for creating selectors of dataset instances
             label_map (Dict[str, T_Enum]): label map for annotation classes
             stream_factory (StreamFactory[B]): factory for creating stream instances
             pipeline_factory (Optional[PipelineFactory[T]]): optional pipeline provider
@@ -70,6 +71,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
         self._split = split
+        self._selector_factory = selector_factory
         self._label_map = label_map
         self._stream_factory = stream_factory
         self._pipeline_factory: Optional[PipelineFactory[A, B]] = pipeline_factory
@@ -144,17 +146,9 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             ]
         )
 
-    @staticmethod
-    def _create_selector(splits: List[List[str]], split: DatasetSplit) -> Selector[str]:
+    def _create_selector(self, splits: List[List[str]], split: DatasetSplit) -> Selector[str]:
         """Creates a selector for selecting dataset instances."""
-        if split == DatasetSplit.TRAIN:
-            selector = RandomStringSelector(strings=splits[0])
-        elif split == DatasetSplit.VAL:
-            selector = DetermStringSelector(strings=splits[1])
-        else:
-            selector = DetermStringSelector(strings=splits[2])
-
-        return selector
+        return self._selector_factory.create_selector(candidates=splits[split.value])
 
     @staticmethod
     def _create_instance_provider(manifest: Manifest, selector: Selector[str]) -> InstanceProvider:
