@@ -18,3 +18,6 @@ class ReadStreamResponse(Generic[T], Response):
     """
     status: ResponseStatus
     instance: Optional[T]
+
+    def __repr__(self) -> str:
+        return f"ReadStreamResponse(status={self.status})"

@@ -13,3 +13,6 @@ class ReadStreamRequest(Request):
         split (DatasetSplit): the dataset split for stream to read from
     """
     split: DatasetSplit
+
+    def __repr__(self) -> str:
+        return f"ReadStreamRequest(split={self.split})"
