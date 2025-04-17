@@ -1,7 +1,7 @@
 from typing import Dict
 
 from src.data.dataset.label.label_parser import LabelParser
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 
 
 class SimpleLabelParser(LabelParser):

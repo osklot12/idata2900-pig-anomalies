@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 
 
 class LabelParser(ABC):

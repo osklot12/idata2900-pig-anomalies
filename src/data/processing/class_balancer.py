@@ -5,7 +5,7 @@ import random
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.processing.processor import Processor
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 
 
 class ClassBalancer(Processor[AnnotatedFrame, List[AnnotatedFrame]]):
