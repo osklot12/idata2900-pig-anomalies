@@ -1,4 +1,4 @@
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Generic
 from abc import ABC, abstractmethod
 
 from src.data.pipeline.component import Component
@@ -12,7 +12,7 @@ I = TypeVar("I")
 O = TypeVar("O")
 
 
-class BaseComponent(Component[I, O], ABC):
+class BaseComponent(Generic[I, O], Component[I, O], ABC):
     """Base class for pipeline components providing thread-safe connection to consumers."""
 
     def __init__(self, consumer: Optional[Consumer[O]] = None):
@@ -29,12 +29,12 @@ class BaseComponent(Component[I, O], ABC):
 
         consumer = self._consumer.get()
         if consumer is not None:
-            success = self._consume(data)
+            success = self._consume(data, consumer)
 
         return success
 
     @abstractmethod
-    def _consume(self, data: Optional[I]) -> bool:
+    def _consume(self, data: Optional[I], consumer: Consumer[O]) -> bool:
         """Subclass implementation of consume, guarding against consumer set to None."""
         raise NotImplementedError
 

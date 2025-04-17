@@ -6,6 +6,7 @@ from src.data.preprocessing.augmentation.cond_multiplier_component import CondMu
 
 T = TypeVar("T")
 
+
 class CondMultiplierComponentFactory(Generic[T], ComponentFactory[T, T]):
     """Factory for creating CondMultiplierComponent instances."""
 
