@@ -8,6 +8,7 @@ from src.data.pipeline.consumer_provider import ConsumerProvider
 from src.data.pipeline.field_transformer import FieldTransformer
 from src.data.pipeline.pipeline import Pipeline
 from src.data.pipeline.preprocessor import Preprocessor
+from src.data.pipeline.splitting_preprocessor import SplittingPreprocessor
 from src.data.preprocessing.augmentation.augmentors.augmentor_component import AugmentorComponent
 from src.data.preprocessing.augmentation.augmentors.instance_augmentor import InstanceAugmentor
 from src.data.preprocessing.augmentation.augmentors.photometric.factories.brightness_filter_factory import \
@@ -21,15 +22,21 @@ from src.data.preprocessing.augmentation.augmentors.photometric.factories.gaussi
 from src.data.preprocessing.augmentation.cond_multiplier_component import CondMultiplierComponent
 from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
 from src.data.processing.class_balancer import ClassBalancer
-from src.data.preprocessing.normalization.normalizers.bbox_normalizer_component import BBoxNormalizerComponent
 from src.data.preprocessing.normalization.normalizers.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.processing.bbox_normalizer_processor import BBoxNormalizerProcessor
+from src.data.processing.cond_multiplier import CondMultiplier
 from src.data.processing.frame_resizer import FrameResizer
 from src.data.structures.atomic_bool import AtomicBool
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 RESIZE_SHAPE = (640, 640)
 NORMALIZE_RANGE = (0, 1)
+CLASS_COUNTS = {
+    NorsvinBehaviorClass.BELLY_NOSING: 1885,
+    NorsvinBehaviorClass.TAIL_BITING: 1073,
+    NorsvinBehaviorClass.EAR_BITING: 1008,
+    NorsvinBehaviorClass.TAIL_DOWN: 1107
+}
 
 
 class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
@@ -47,6 +54,9 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
     def get_consumer(self, release: Optional[AtomicBool] = None) -> Optional[Consumer[AnnotatedFrame]]:
         result = None
 
+        def is_annotated(frame: AnnotatedFrame) -> bool:
+            return len(frame.annotations) > 0
+
         sink = self._sink_provider.get_consumer(release=release)
         if sink is not None:
             result = Pipeline(
@@ -54,9 +64,9 @@ class NorsvinTrainPipelineProvider(ConsumerProvider[AnnotatedFrame]):
             ).then(
                 Preprocessor(BBoxNormalizerProcessor(SimpleBBoxNormalizer(NORMALIZE_RANGE)))
             ).then(
-                self._create_balancer()
+                SplittingPreprocessor(ClassBalancer(class_counts=CLASS_COUNTS, max_samples_per=3))
             ).then(
-                self._create_multiplier()
+                SplittingPreprocessor(CondMultiplier(n=2, condition=is_annotated))
             ).then(
                 self._create_augmentor()
             ).then(
