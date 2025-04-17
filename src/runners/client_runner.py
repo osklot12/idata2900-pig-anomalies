@@ -13,7 +13,7 @@ def main():
     client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     client.connect("10.0.0.1")
 
-    stream = NetworkStream(client=client, split=DatasetSplit.TRAIN, batch_type=AnnotatedFrame, batch_size=8)
+    stream = NetworkStream(client=client, split=DatasetSplit.TRAIN, data_type=AnnotatedFrame, batch_size=8)
     prefetcher = Prefetcher[List[AnnotatedFrame]](stream=stream)
     prefetcher.run()
 

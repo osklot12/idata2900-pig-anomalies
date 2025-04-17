@@ -13,21 +13,21 @@ from src.network.messages.responses.response_status import ResponseStatus
 T = TypeVar("T")
 
 
-class NetworkStream(Generic[T], Stream[List[T]]):
+class NetworkStream(Generic[T], Stream[T]):
     """Dataset stream that fetches data from a server."""
 
-    def __init__(self, client: NetworkClient, split: DatasetSplit, batch_type: type[T]):
+    def __init__(self, client: NetworkClient, split: DatasetSplit, data_type: type[T]):
         """
         Initializes a NetworkStream instance.
 
         Args:
             client (NetworkClient): network client for sending requests to server
             split (DatasetSplit): dataset split to get data from
-            batch_type (type[T]): data type
+            data_type (type[T]): data type
         """
         self._client = client
         self._split = split
-        self._data_type = batch_type
+        self._data_type = data_type
 
         self._stream_open = False
 

@@ -32,7 +32,7 @@ def client(batch):
 def test_read_returns_batch_successfully(client, batch):
     """Tests that calling read returns the expected batch."""
     # arrange
-    stream = NetworkStream[str](client=client, split=DatasetSplit.TRAIN, batch_type=str, batch_size=8)
+    stream = NetworkStream[str](client=client, split=DatasetSplit.TRAIN, data_type=str, batch_size=8)
 
     # arrange
     received = stream.read()
@@ -45,7 +45,7 @@ def test_read_returns_batch_successfully(client, batch):
 def test_read_returns_unexpected_batch_type_raises(client, batch):
     """Tests that reading an unexpected batch type raises an exception."""
     # arrange
-    stream = NetworkStream[int](client=client, split=DatasetSplit.TRAIN, batch_type=int, batch_size=8)
+    stream = NetworkStream[int](client=client, split=DatasetSplit.TRAIN, data_type=int, batch_size=8)
 
     # act & assert
     with pytest.raises(RuntimeError):
