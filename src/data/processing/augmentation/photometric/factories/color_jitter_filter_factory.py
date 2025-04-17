@@ -1,9 +1,9 @@
 from typing import Tuple
 
-from src.data.preprocessing.augmentation.augmentors.photometric.color_jitter_filter import ColorJitterFilter
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.photometric_filter_factory import \
+from src.data.processing.augmentation.photometric.color_jitter_filter import ColorJitterFilter
+from src.data.processing.augmentation.photometric.factories.photometric_filter_factory import \
     PhotometricFilterFactory
-from src.data.preprocessing.augmentation.augmentors.photometric.photometric_filter import PhotometricFilter
+from src.data.processing.augmentation.photometric.photometric_filter import PhotometricFilter
 from src.data.structures.random_float import RandomFloat
 
 

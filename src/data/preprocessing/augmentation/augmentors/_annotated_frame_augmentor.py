@@ -4,7 +4,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.preprocessing.augmentation.augmentors.annotations_augmentor import AnnotationsAugmentor
 from src.data.preprocessing.preprocessor import Preprocessor
 from src.data.processing.augmentor import Augmentor
-from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
 
 
 class AnnotatedFrameAugmentor(Preprocessor[AnnotatedFrame]):

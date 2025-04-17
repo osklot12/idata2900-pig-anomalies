@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 
-from src.data.preprocessing.augmentation.transformator import Transformator
+from src.data.processing.transformator import Transformator
 
 
 @dataclass(frozen=True)

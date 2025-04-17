@@ -8,13 +8,13 @@ from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStr
 from src.data.preprocessing.augmentation.augmentors.factories.augmentor_component_factory import \
     AugmentorComponentFactory
 from src.data.preprocessing.augmentation.augmentors.factories.instance_augmentor_factory import InstanceAugmentorFactory
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.brightness_filter_factory import \
+from src.data.processing.augmentation.photometric.factories.brightness_filter_factory import \
     BrightnessFilterFactory
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.color_jitter_filter_factory import \
+from src.data.processing.augmentation.photometric.factories import \
     ColorJitterFilterFactory
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.constrast_filter_factory import \
+from src.data.processing.augmentation.photometric.factories.constrast_filter_factory import \
     ContrastFilterFactory
-from src.data.preprocessing.augmentation.augmentors.photometric.factories.gaussian_noise_filter_factory import \
+from src.data.processing.augmentation.photometric.factories import \
     GaussianNoiseFilterFactory
 from src.data.preprocessing.class_balancer_factory import ClassBalancerFactory
 from src.data.preprocessing.cond_multiplier_component_factory import CondMultiplierComponentFactory

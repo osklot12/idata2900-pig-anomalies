@@ -1,12 +1,8 @@
 from typing import List, Tuple
 
-import cv2
-import numpy as np
-
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
-from src.data.dataclasses.bbox import BBox
 from src.data.preprocessing.preprocessor import Preprocessor
-from src.data.preprocessing.augmentation.plan.augmentation_plan_factory import AugmentationPlanFactory
+from src.data.processing.augmentation.augmentation_plan_factory import AugmentationPlanFactory
 
 
 class AnnotationsAugmentor(Preprocessor[List[AnnotatedBBox]]):

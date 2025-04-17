@@ -1,4 +1,4 @@
-from src.data.preprocessing.augmentation.plan.augmentation_plan import AugmentationPlan
+from src.data.processing.augmentation.augmentation_plan import AugmentationPlan
 
 
 class AugmentationPlanFactory:
