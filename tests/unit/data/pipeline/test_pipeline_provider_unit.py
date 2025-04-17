@@ -7,7 +7,7 @@ from src.data.pipeline.component import Component
 from src.data.pipeline.component_factory import ComponentFactory
 from src.data.pipeline.consumer import Consumer
 from src.data.pipeline.consumer_provider import ConsumerProvider
-from src.data.pipeline.pipeline_provider import PipelineProvider
+from src.data.pipeline.pipeline_to_sink_provider import PipelineToSinkProvider
 from src.data.structures.atomic_bool import AtomicBool
 
 
@@ -51,8 +51,8 @@ def test_data_goes_through_all_components_successfully():
     final_consumer = Mock()
     consumer_provider = DummyConsumerProvider(final_consumer)
 
-    pipeline_provider = PipelineProvider(factory1, factory2, factory3,
-                                         consumer_provider=consumer_provider)
+    pipeline_provider = PipelineToSinkProvider(factory1, factory2, factory3,
+                                               consumer_provider=consumer_provider)
     pipeline = pipeline_provider.get_consumer()
 
     # act

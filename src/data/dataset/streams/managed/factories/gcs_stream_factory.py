@@ -1,8 +1,7 @@
-from typing import TypeVar, Generic, List, Dict, Iterable
+from typing import TypeVar, Generic, List, Dict, Iterable, Optional
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataclasses.dataset_split_ratios import DatasetSplitRatios
 from src.data.dataset.dataset_split import DatasetSplit
@@ -32,29 +31,32 @@ from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFacto
 from src.data.loading.loaders.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.data.pipeline.consumer_provider import ConsumerProvider
-from src.data.pipeline.norsvin_train_pipeline_provider import NorsvinTrainPipelineProvider
+from src.data.pipeline.factories.pipeline_factory import PipelineFactory
+from src.data.pipeline.pipeline_to_sink_provider import PipelineToSinkProvider
 from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
 from src.data.streaming.streamers.factories.instance_streamer_factory import InstanceStreamerFactory
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 from src.utils.gcs_credentials import GCSCredentials
 
+# data type read from the stream
 T = TypeVar("T")
 
+# data type fed into pipeline
+A = TypeVar("A")
 
-def is_annotated(instance: AnnotatedFrame) -> bool:
-    """Predicate for checking whether the instance is annotated."""
-    return len(instance.annotations) > 0
+# data type fed into stream
+B = TypeVar("B")
 
-
-class GCSStreamFactory(Generic[T], StreamFactory[T]):
+class GCSStreamFactory(Generic[T, A, B], StreamFactory[T]):
     """Factory for creating managed Google Cloud Storage (GCS) streams."""
 
     def __init__(self, gcs_creds: GCSCredentials,
                  split_ratios: DatasetSplitRatios,
                  split: DatasetSplit,
-                 label_map: Dict[str, T_Enum]):
+                 label_map: Dict[str, T_Enum],
+                 pipeline_factory: Optional[PipelineFactory[A, B]] = None):
         """
         Initializes a GCSStreamFactory instance.
 
@@ -63,11 +65,13 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
             split_ratios (DatasetSplitRatios): dataset split ratios
             split (DatasetSplit): dataset split to create stream for
             label_map (Dict[str, T_Enum]): label map for annotation classes
+            pipeline_factory (Optional[PipelineFactory[T]]): optional pipeline provider
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
         self._split = split
         self._label_map = label_map
+        self._pipeline_factory: Optional[PipelineFactory[A, CompressedAnnotatedFrame]] = pipeline_factory
 
     def create_stream(self) -> ManagedStream[T]:
         auth_factory = self._create_auth_service_factory(self._gcs_creds.service_account_path)
@@ -83,9 +87,14 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
 
         stream = self._create_stream(self._split)
-        # pipeline_provider = PipelineProvider(*self._preprocessor_factories, consumer_provider=stream)
-        pipeline_provider = NorsvinTrainPipelineProvider(sink_provider=stream)
-        manager = self._create_streamer_manager(streamer_factory, pipeline_provider, [stream])
+        if self._pipeline_factory is not None:
+            consumer_provider = PipelineToSinkProvider(
+                pipeline_factory=self._pipeline_factory,
+                sink_provider=stream
+            )
+            manager = self._create_streamer_manager(streamer_factory, consumer_provider, [stream])
+        else:
+            manager = self._create_streamer_manager(streamer_factory, stream, [stream])
 
         return ManagedStream[T](stream=stream, manager=manager)
 
@@ -160,7 +169,8 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         )
 
     @staticmethod
-    def _create_streamer_factory(instance_provider: InstanceProvider, entity_factory: EntityFactory) -> InstanceStreamerFactory:
+    def _create_streamer_factory(instance_provider: InstanceProvider,
+                                 entity_factory: EntityFactory) -> InstanceStreamerFactory:
         """Creates an AggregatedStreamerFactory instance."""
         return InstanceStreamerFactory(
             instance_provider=instance_provider,
@@ -168,7 +178,7 @@ class GCSStreamFactory(Generic[T], StreamFactory[T]):
         )
 
     @staticmethod
-    def _create_stream(split: DatasetSplit) -> WritableStream[CompressedAnnotatedFrame]:
+    def _create_stream(split: DatasetSplit) -> WritableStream[B]:
         """Creates a Stream instance."""
         if split == DatasetSplit.TRAIN:
             stream = PoolStream(pool_size=3000, min_ready=500)

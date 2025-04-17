@@ -8,7 +8,7 @@ from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.decoders.annotation_decoder import AnnotationDecoder
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 
 
 class DarwinDecoder(AnnotationDecoder):
