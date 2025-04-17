@@ -31,6 +31,8 @@ def main():
             print(f"[Test] Read instance {instance}")
             time.sleep(1)
 
+            instance = stream.read()
+
     except KeyboardInterrupt:
         print("[Test] Stopping...")
         prefetcher.stop()
