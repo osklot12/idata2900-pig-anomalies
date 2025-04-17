@@ -15,7 +15,7 @@ from src.network.messages.serialization.pickle_message_serializer import PickleM
 SERVER_IP = "10.0.0.1"
 
 
-def main():
+def run_train_stream():
     client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     client.connect(SERVER_IP)
 
@@ -38,5 +38,28 @@ def main():
         prefetcher.stop()
 
 
+def run_val_stream():
+    client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
+    client.connect(SERVER_IP)
+
+    network_stream = NetworkStream(client=client, split=DatasetSplit.VAL, data_type=CompressedAnnotatedFrame)
+    prefetcher = Prefetcher(network_stream)
+    pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
+    stream = PipelineStream(source=prefetcher, pipeline=pipeline)
+
+    prefetcher.run()
+    instance = stream.read()
+    try:
+        while instance:
+            print(f"[Test] Read instance {instance}")
+            instance = stream.read()
+
+        print(f"[Test] Reached end of stream!")
+
+    except KeyboardInterrupt:
+        print("[Test] Stopping...")
+        prefetcher.stop()
+
+
 if __name__ == "__main__":
-    main()
+    run_val_stream()
