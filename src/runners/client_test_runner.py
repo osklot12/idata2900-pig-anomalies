@@ -34,3 +34,7 @@ def main():
     except KeyboardInterrupt:
         print("[Test] Stopping...")
         prefetcher.stop()
+
+
+if __name__ == "__main__":
+    main()

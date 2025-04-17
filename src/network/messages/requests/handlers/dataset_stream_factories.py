@@ -14,13 +14,13 @@ class DatasetStreamFactories(Generic[T]):
     Collection of factories for creating streams for each dataset split.
 
     Attributes:
-        train_stream (ManagedStreamFactory): factory that creates training set streams
-        val_stream (ManagedStreamFactory): factory that creates validation set streams
-        test_stream (ManagedStreamFactory): factory that creates test set streams
+        train_factory (ManagedStreamFactory): factory that creates training set streams
+        val_factory (ManagedStreamFactory): factory that creates validation set streams
+        test_factory (ManagedStreamFactory): factory that creates test set streams
     """
-    train_stream: ManagedStreamFactory[T]
-    val_stream: ManagedStreamFactory[T]
-    test_stream: ManagedStreamFactory[T]
+    train_factory: ManagedStreamFactory[T]
+    val_factory: ManagedStreamFactory[T]
+    test_factory: ManagedStreamFactory[T]
 
     def for_split(self, split: DatasetSplit) -> ManagedStreamFactory[T]:
         """
@@ -33,7 +33,7 @@ class DatasetStreamFactories(Generic[T]):
             ManagedStreamFactory[T]: the factory for the given split
         """
         return {
-            DatasetSplit.TRAIN: self.train_stream,
-            DatasetSplit.VAL: self.val_stream,
-            DatasetSplit.TEST: self.test_stream
+            DatasetSplit.TRAIN: self.train_factory,
+            DatasetSplit.VAL: self.val_factory,
+            DatasetSplit.TEST: self.test_factory
         }.get(split)

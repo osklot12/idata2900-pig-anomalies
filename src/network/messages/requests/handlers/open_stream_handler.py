@@ -15,7 +15,7 @@ from src.network.server.session.session import Session
 T = TypeVar("T")
 
 
-class OpenStreamHandler(Generic[T], RequestHandler):
+class OpenStreamHandler(Generic[T], RequestHandler[T]):
     """Handles OpenStreamRequest instances."""
 
     def __init__(self, session: Session[T], stream_factories: DatasetStreamFactories[T]):

@@ -9,7 +9,7 @@ from src.network.server.session.session import Session
 
 T = TypeVar("T")
 
-class CloseStreamHandler(Generic[T], RequestHandler):
+class CloseStreamHandler(Generic[T], RequestHandler[T]):
     """Handles CloseStreamRequest instances."""
 
     def __init__(self, session: Session[T]):

@@ -7,10 +7,20 @@ from pympler import muppy, summary
 import os
 import psutil
 
+from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
 from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory
+from src.data.dataset.streams.factories.dock_stream_factory import DockStreamFactory
 from src.data.dataset.streams.factories.pool_stream_factory import PoolStreamFactory
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
+from src.data.pipeline.factories.norsvin_eval_pipeline_factory import NorsvinEvalPipelineFactory
 from src.data.pipeline.factories.norsvin_train_pipeline_factory import NorsvinTrainPipelineFactory
+from src.network.messages.requests.handlers.dataset_stream_factories import DatasetStreamFactories
+from src.network.messages.requests.handlers.registry.factories.default_handler_registry_factory import \
+    DefaultHandlerRegistryFactory
+from src.network.messages.serialization.factories.pickle_deserializer_factory import PickleDeserializerFactory
+from src.network.messages.serialization.factories.pickle_serializer_factory import PickleSerializerFactory
+from src.network.server.network_server import NetworkServer
+from src.network.server.session.factories.clean_session_factory import CleanSessionFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
 
@@ -18,7 +28,6 @@ proc = psutil.Process(os.getpid())
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.structures.atomic_bool import AtomicBool
 from src.utils.gcs_credentials import GCSCredentials
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
@@ -48,7 +57,7 @@ def main():
     gcs_creds = GCSCredentials(bucket_name=TestBucket.BUCKET_NAME, service_account_path=TestBucket.SERVICE_ACCOUNT_FILE)
     split_ratios = NORSVIN_SPLIT_RATIOS
 
-    stream_factory = GCSStreamFactory(
+    train_stream_factory = GCSStreamFactory(
         gcs_creds=gcs_creds,
         split_ratios=split_ratios,
         split=DatasetSplit.TRAIN,
@@ -58,64 +67,56 @@ def main():
         pipeline_factory=NorsvinTrainPipelineFactory()
     )
 
+    val_stream_factory = GCSStreamFactory(
+        gcs_creds=gcs_creds,
+        split_ratios=split_ratios,
+        split=DatasetSplit.VAL,
+        selector_factory=DetermStringSelectorFactory(),
+        label_map=NorsvinBehaviorClass.get_label_map(),
+        stream_factory=DockStreamFactory(buffer_size=3, dock_size=300),
+        pipeline_factory=NorsvinEvalPipelineFactory()
+    )
 
-    # session_factory = CleanSessionFactory()
-    # handler_factory = DefaultHandlerRegistryFactory(stream_factory=stream_factory)
+    test_stream_factory = GCSStreamFactory(
+        gcs_creds=gcs_creds,
+        split_ratios=split_ratios,
+        split=DatasetSplit.TEST,
+        selector_factory=DetermStringSelectorFactory(),
+        label_map=NorsvinBehaviorClass.get_label_map(),
+        stream_factory=DockStreamFactory(buffer_size=3, dock_size=300),
+        pipeline_factory=NorsvinEvalPipelineFactory()
+    )
 
-    # server = NetworkServer(
-    #     serializer_factory=PickleSerializerFactory(),
-    #     deserializer_factory=PickleDeserializerFactory(),
-    #     session_factory=session_factory,
-    #     handler_factory=handler_factory
-    # )
+    stream_factories = DatasetStreamFactories(
+        train_factory=train_stream_factory,
+        val_factory=val_stream_factory,
+        test_factory=test_stream_factory
+    )
 
-    # server.run()
-    stream = stream_factory.create_stream()
-    stream.run()
+    session_factory = CleanSessionFactory()
+    handler_factory = DefaultHandlerRegistryFactory(stream_factories=stream_factories)
 
-    running = AtomicBool(False)
+    server = NetworkServer(
+        serializer_factory=PickleSerializerFactory(),
+        deserializer_factory=PickleDeserializerFactory(),
+        session_factory=session_factory,
+        handler_factory=handler_factory
+    )
 
-    def log_mem():
-        while running:
-            report_objects()
+    try:
+        server.run()
+        tracemalloc.start(25)
+
+        while True:
             report_memory()
-            time.sleep(2)
-
+            report_objects()
             mem = proc.memory_info()
             print(f"[System] RSS={mem.rss / 1024 ** 2:.2f} MB | VMS={mem.vms / 1024 ** 2:.2f} MB")
 
-    t = threading.Thread(target=log_mem)
+            time.sleep(1)
 
-    frames = 0
-    last_time = time.time()
-    try:
-        tracemalloc.start(25)
-        running.set(True)
-        t.start()
-        while True:
-            data = stream.read()
-            array = np.frombuffer(zlib.decompress(data.frame), dtype=np.dtype(data.dtype)).reshape(data.shape)
-            writable_array = np.copy(array)  # Now it's a writable copy
-
-            frame = AnnotatedFrame(
-                source=data.source,
-                index=data.index,
-                frame=writable_array,
-                annotations=data.annotations
-            )
-
-            frames += 1
-            if frames > 10:
-                print(f"FPS: {frames / (time.time() - last_time)}")
-                last_time = time.time()
-                frames = 0
-
-            AnnotatedFrameVisualizer.visualize(frame)
-            # report_memory()
-            # report_objects()
     except KeyboardInterrupt:
-        # server.stop()
-        t.join()
+        server.stop()
 
 
 if __name__ == "__main__":
