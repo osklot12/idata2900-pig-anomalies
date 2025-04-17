@@ -31,7 +31,7 @@ class NetworkStream(Generic[T], Stream[T]):
 
         self._stream_open = False
 
-    def read(self) -> Optional[List[T]]:
+    def read(self) -> Optional[T]:
         if not self._stream_open:
             self._open_stream()
             self._stream_open = True
@@ -45,7 +45,7 @@ class NetworkStream(Generic[T], Stream[T]):
         if not response.status == ResponseStatus.SUCCESS:
             raise RuntimeError("Could not get batch")
 
-        if not isinstance(response.instance, self._data_type):
+        if response.instance is not None and not isinstance(response.instance, self._data_type):
             raise RuntimeError("Response contains unexpected data type")
 
         return response.instance
