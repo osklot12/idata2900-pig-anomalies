@@ -36,7 +36,6 @@ class YoloExp(BaseExp):
             batch_size=None,
             num_workers=0,
             pin_memory=True,
-            persistent_workers=False
         )
 
     def get_eval_loader(self, batch_size, is_distributed, **kwargs):
@@ -45,5 +44,4 @@ class YoloExp(BaseExp):
             batch_size=None,
             num_workers=0,
             pin_memory=True,
-            persistent_workers=False
         )
