@@ -5,6 +5,7 @@ import torch
 from src.models.twod.yolo.x.streaming_evaluator import StreamingEvaluator
 from yolox.core.trainer import Trainer
 from yolox.utils import is_parallel, adjust_status, synchronize
+from yolox.utils import is_distributed
 
 
 class StreamingTrainer(Trainer):
@@ -43,7 +44,9 @@ class StreamingTrainer(Trainer):
         if self.rank == 0:
             self._show_evaluation_results(results=results)
 
-        synchronize()
+        if is_distributed():
+            print(f"[StreamingTrainer] IT IS DISTRIBUTED!")
+            synchronize()
 
         self.save_ckpt("last_epoch", update_best_ckpt=True)
         if self.save_history_ckpt:
