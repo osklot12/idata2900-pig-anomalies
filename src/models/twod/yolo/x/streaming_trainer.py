@@ -10,6 +10,25 @@ from yolox.utils import is_parallel, adjust_status, synchronize
 class StreamingTrainer(Trainer):
     """A custom trainer for streaming data."""
 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.iter_loader = None
+
+    def train_in_epoch(self):
+        """Train the model for one epoch."""
+        self.iter_loader = iter(self.get_train_loader())
+
+        self.model.train()
+        self.before_epoch()
+
+        for self.iter in range(self.iters_per_epoch):
+            self.before_iter()
+            self.train_one_iter()
+            self.after_iter()
+
+        self.after_epoch()
+
     def get_train_loader(self):
         return self.exp.get_data_loader(
             self.args.batch_size,
