@@ -75,37 +75,18 @@ class StreamingEvaluator:
         """
         detections = []
 
-        outputs = postprocess(
+        processed_outputs = postprocess(
             outputs, self._num_classes, conf_thre=POST_PROCESS_CONF_THRE, nms_thre=POST_PROCESS_NMS_THRE
         )
 
-        # move outputs to cpu once and convert to numpy in batch
-        outputs_np = outputs.cpu().numpy()
-
-        for image_preds in outputs_np:
-            if image_preds.shape[0] == 0:
+        for preds in processed_outputs:
+            if preds is None or preds.shape[0] == 0:
                 detections.append(np.zeros((0, 6), dtype=np.float32))
 
             else:
-                cx, cy, w, h = image_preds[:, 0], image_preds[:, 1], image_preds[:, 2], image_preds[:, 3]
-                obj_score = image_preds[:, 4]
-                class_probs = image_preds[:, 5:]
-
-                # get predicted class (class with the highest probability)
-                cls = np.argmax(class_probs, axis=1)
-                cls_score = class_probs[np.arange(len(cls)), cls]
-
-                # joint probability of object + correct class
-                final_score = obj_score * cls_score
-
-                x1 = cx - w / 2
-                y1 = cy - h / 2
-                x2 = cx + w / 2
-                y2 = cy + h / 2
-
-                boxes = np.stack([x1, y1, x2, y2, final_score, cls], axis=-1).astype(np.float32)
-                detections.append(boxes)
-
+                preds_np = preds.cpu().numpy().astype(np.float32)
+                detections.append(preds_np)
+            
         return detections
 
     @staticmethod
