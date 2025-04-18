@@ -42,6 +42,8 @@ class YOLOXDataset(IterableDataset):
             batch = self._fetch_batch()
             if len(batch) > 0:
                 total_instances += len(batch)
+                for item in batch:
+                    print(f"[YOLOXDataset] Read frame {item.index} for {item.source.source_id}")
                 print(f"[YOLOXDataset] Yielding batch {i + 1} with {len(batch)} instances")
                 yield YOLOXBatchConverter.convert(batch)
                 i += 1
