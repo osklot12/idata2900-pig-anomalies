@@ -38,7 +38,10 @@ class StreamingTrainer(Trainer):
                 device=torch.device(self.device),
                 num_classes=self.exp.num_classes
             )
-            results = evaluator.evaluate()
+            try:
+                results = evaluator.evaluate()
+            except Exception as e:
+                print(f"[Trainer] ❌ Exception during evaluation: {e}")
 
         print(f"Finished evaluation")
         if self.rank == 0:
