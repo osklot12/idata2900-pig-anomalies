@@ -37,7 +37,6 @@ def run_train_stream():
 
     except KeyboardInterrupt:
         print("[Test] Stopping...")
-        prefetcher.stop()
 
 
 def run_val_stream():

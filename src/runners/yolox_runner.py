@@ -1,6 +1,7 @@
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
+from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.dataset.streams.pipeline_stream import PipelineStream
 from src.data.dataset.streams.prefetcher import Prefetcher
 from src.data.dataset.streams.stream import Stream
@@ -16,33 +17,13 @@ from src.data.dataset.streams.network_stream import NetworkStream
 
 SERVER_IP = "10.0.0.1"
 
-def create_dataset_stream(split: DatasetSplit) -> Stream[AnnotatedFrame]:
-    """Creates a dataset stream."""
-    client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
-    client.connect(SERVER_IP)
-
-    network_stream = NetworkStream(client=client, split=split, data_type=CompressedAnnotatedFrame)
-    prefetcher = Prefetcher(network_stream)
-    pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
-    stream = PipelineStream(source=prefetcher, pipeline=pipeline)
-
-    prefetcher.run()
-
-    return stream
-
-def create_train_dataset() -> YOLOXDataset[AnnotatedFrame]:
-    """Creates a dataset for training."""
-    stream = create_dataset_stream(DatasetSplit.TRAIN)
-    return YOLOXDataset(stream=stream, batch_size=8, n_batches=430)
-
-def create_val_dataset() -> YOLOXDataset[AnnotatedFrame]:
-    """Creates a dataset for validation."""
-    stream = create_dataset_stream(DatasetSplit.VAL)
-    return YOLOXDataset(stream=stream, batch_size=8, n_batches=6125)
-
 def main():
-    train_set = create_train_dataset()
-    val_set = create_val_dataset()
+    train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
+    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
+
+    train_set = YOLOXDataset(stream_factory=train_factory, batch_size=8, n_batches=6125)
+    val_set = YOLOXDataset(stream_factory=val_factory, batch_size=8, n_batches=10)
+
     exp = YoloExp(train_set=train_set, val_set=val_set)
 
     args = argparse.Namespace(
