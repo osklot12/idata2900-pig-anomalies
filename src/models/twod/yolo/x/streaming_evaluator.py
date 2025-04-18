@@ -70,13 +70,25 @@ class StreamingEvaluator:
             for pred in image_preds:
                 print(pred)
                 print(len(pred))
+                values = pred.tolist()
 
-                cx, cy, w, h, score, cls = pred.tolist()
+                cx, cy, w, h = values[:4]
+                obj_score = values[4]
+                class_probs = values[5:]
+
+                # get predicted class (class with the highest probability)
+                cls = int(np.argmax(class_probs))
+                cls_score = class_probs[cls]
+
+                # joint probability of object + correct class
+                final_score = obj_score * cls_score
+
                 x1 = cx - w / 2
                 y1 = cy - h / 2
                 x2 = cx + w / 2
                 y2 = cy + h / 2
-                converted.append([x1, y1, x2, y2, score, cls])
+
+                converted.append([x1, y1, x2, y2, final_score, cls])
             detections.append(np.array(converted, dtype=np.float32))
 
         return detections
