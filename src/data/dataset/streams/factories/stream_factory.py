@@ -1,19 +1,21 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
-from src.data.dataset.streams.writable_stream import WritableStream
+from src.data.dataset.streams.closable_stream import ClosableStream
 
+# stream data type
 T = TypeVar("T")
 
-class StreamFactory(Generic[T], ABC):
-    """Interface for stream factories."""
+
+class ClosableStreamFactory(Generic[T], ABC):
+    """Interface for closable stream factories."""
 
     @abstractmethod
-    def create_stream(self) -> WritableStream[T]:
+    def create_stream(self) -> ClosableStream[T]:
         """
         Creates and returns a stream instance.
 
         Returns:
-            WritableStream[T]: the created stream instance
+            ClosableStream[T]: the created stream instance
         """
         raise NotImplementedError

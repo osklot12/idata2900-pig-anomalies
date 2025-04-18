@@ -1,12 +1,12 @@
 from typing import TypeVar, Generic
 
-from src.data.dataset.streams.factories.stream_factory import StreamFactory
+from src.data.dataset.streams.factories.writable_stream_factory import WritableStreamFactory
 from src.data.dataset.streams.pool_stream import PoolStream
 from src.data.dataset.streams.stream import Stream
 
 T = TypeVar("T")
 
-class PoolStreamFactory(Generic[T], StreamFactory[T]):
+class PoolStreamFactory(Generic[T], WritableStreamFactory[T]):
     """Factory for creating PoolStream instances."""
 
     def __init__(self, pool_size: int, min_ready: int):
