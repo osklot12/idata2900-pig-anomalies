@@ -38,20 +38,12 @@ class StreamingTrainer(Trainer):
                 device=torch.device(self.device),
                 num_classes=self.exp.num_classes
             )
-            try:
-                results = evaluator.evaluate()
-            except Exception as e:
-                print(f"[Trainer] ❌ Exception during evaluation: {e}")
+            results = evaluator.evaluate()
 
-        print(f"Finished evaluation")
         if self.rank == 0:
-            print(f"Showing results")
             self._show_evaluation_results(results=results)
 
-        print(f"Finished showing evaluation results")
-
         if torch.distributed.is_initialized():
-            print(f"[StreamingTrainer] IT IS DISTRIBUTED!")
             synchronize()
 
         self.save_ckpt("last_epoch", update_best_ckpt=True)
