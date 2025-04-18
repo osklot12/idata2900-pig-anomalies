@@ -56,11 +56,8 @@ class StreamingEvaluator:
             all_detections.extend(self._convert_outputs(outputs))
             all_annotations.extend(self._convert_targets(targets))
 
-        print("[Evaluator] Finished all batch processing.")
-
         metrics = self._compute_metrics(all_detections, all_annotations)
 
-        print("[Evaluator] Returning metrics...")
         return metrics
 
     def _convert_outputs(self, outputs: torch.Tensor) -> List[np.ndarray]:
@@ -137,7 +134,6 @@ class StreamingEvaluator:
 
         # iterate through each image
         for i, (pred, gt) in enumerate(zip(detections, annotations)):
-            print(f"[Evaluator] Pair {i}: {len(pred)} preds, {len(gt)} GTs")
             detected_gt_indices = set()
 
             # iterate over each prediction
@@ -182,13 +178,8 @@ class StreamingEvaluator:
 
             n_gt += gt.shape[0]
 
-        print("[Evaluator] Finished loop over detections and annotations.")
-        print(f"[Evaluator] #TP: {len(true_positives)}, #Scores: {len(scores)}, #Labels: {len(labels)}, GT: {n_gt}")
-        print("[Evaluator] Calling _calculate_scores()...")
-
         precision, recall, f1, ap, ap_dict = self._calculate_scores(true_positives, scores, labels, n_gt)
 
-        print("[Evaluator] Done computing scores.")
         return {
             "precision": precision,
             "recall": recall,

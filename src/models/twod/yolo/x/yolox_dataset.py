@@ -24,7 +24,6 @@ class YOLOXDataset(IterableDataset):
         """
         super().__init__()
         self._stream_factory = stream_factory
-        self._stream: Optional[ClosableStream[T]] = None
         self._batch_size = batch_size
         self._n_batches = n_batches
 
@@ -32,13 +31,12 @@ class YOLOXDataset(IterableDataset):
         self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
 
     def __iter__(self):
-        if self._stream is None:
-            self._stream = self._stream_factory.create_stream()
+        stream = self._stream_factory.create_stream()
 
         i = 0
         eos = False
         while i < len(self) and not eos:
-            batch = self._fetch_batch()
+            batch = self._fetch_batch(stream)
             if len(batch) > 0:
                 yield YOLOXBatchConverter.convert(batch)
                 i += 1
@@ -46,17 +44,15 @@ class YOLOXDataset(IterableDataset):
             if len(batch) < self._batch_size:
                 eos = True
 
-        if self._stream is not None:
-            self._stream.close()
-            self._stream = None
+        stream.close()
 
-    def _fetch_batch(self) -> List[T]:
+    def _fetch_batch(self, stream: ClosableStream[T]) -> List[T]:
         """Fetches the next batch."""
         batch = []
 
         eos = False
         while len(batch) < self._batch_size and not eos:
-            instance = self._stream.read()
+            instance = stream.read()
             if instance is not None:
                 batch.append(instance)
             else:
