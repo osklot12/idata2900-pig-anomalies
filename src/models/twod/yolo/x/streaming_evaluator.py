@@ -6,8 +6,12 @@ from tqdm import tqdm
 
 from yolox.data import DataLoader
 from yolox.evaluators.voc_eval import voc_ap
+from yolox.utils import postprocess
 
 EPSILON = 1e-6
+
+POST_PROCESS_CONF_THRE = 0.1
+POST_PROCESS_NMS_THRE = 0.65
 
 
 class StreamingEvaluator:
@@ -59,8 +63,7 @@ class StreamingEvaluator:
         print("[Evaluator] Returning metrics...")
         return metrics
 
-    @staticmethod
-    def _convert_outputs(outputs: torch.Tensor) -> List[np.ndarray]:
+    def _convert_outputs(self, outputs: torch.Tensor) -> List[np.ndarray]:
         """
         Converts model predictions to NumPy arrays.
 
@@ -71,6 +74,10 @@ class StreamingEvaluator:
             List[np.ndarray]: list of detections per sample
         """
         detections = []
+
+        outputs = postprocess(
+            outputs, self._num_classes, conf_thre=POST_PROCESS_CONF_THRE, nms_thre=POST_PROCESS_NMS_THRE
+        )
 
         # move outputs to cpu once and convert to numpy in batch
         outputs_np = outputs.cpu().numpy()
