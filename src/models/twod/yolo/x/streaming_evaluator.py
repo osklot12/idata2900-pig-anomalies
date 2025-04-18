@@ -51,6 +51,8 @@ class StreamingEvaluator:
             all_detections.extend(self._convert_outputs(outputs))
             all_annotations.extend(self._convert_targets(targets))
 
+        print(f"[Evaluator] Finished {len(all_detections)} detections, {len(all_annotations)} annotations.")
+
         return self._compute_metrics(all_detections, all_annotations)
 
     @staticmethod
