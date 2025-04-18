@@ -68,8 +68,6 @@ class StreamingEvaluator:
         for image_preds in outputs:
             converted = []
             for pred in image_preds:
-                print(pred)
-                print(len(pred))
                 values = pred.tolist()
 
                 cx, cy, w, h = values[:4]
