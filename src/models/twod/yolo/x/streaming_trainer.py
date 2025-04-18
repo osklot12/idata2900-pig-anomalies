@@ -5,7 +5,6 @@ import torch
 from src.models.twod.yolo.x.streaming_evaluator import StreamingEvaluator
 from yolox.core.trainer import Trainer
 from yolox.utils import is_parallel, adjust_status, synchronize
-from yolox.utils import is_distributed
 
 
 class StreamingTrainer(Trainer):
@@ -44,7 +43,7 @@ class StreamingTrainer(Trainer):
         if self.rank == 0:
             self._show_evaluation_results(results=results)
 
-        if is_distributed():
+        if torch.distributed.is_initialized():
             print(f"[StreamingTrainer] IT IS DISTRIBUTED!")
             synchronize()
 
