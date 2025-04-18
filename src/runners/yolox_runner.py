@@ -1,3 +1,4 @@
+import math
 import traceback
 
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
@@ -10,12 +11,14 @@ import argparse
 
 SERVER_IP = "10.0.0.1"
 
+LEN_VAL_SET = 3442
+
 def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
     val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
 
     train_set = YOLOXDataset(stream_factory=train_factory, batch_size=8, n_batches=10) # 6125
-    val_set = YOLOXDataset(stream_factory=val_factory, batch_size=8, n_batches=430)
+    val_set = YOLOXDataset(stream_factory=val_factory, batch_size=8, n_batches=math.ceil(LEN_VAL_SET / 8))
 
     exp = YoloExp(train_set=train_set, val_set=val_set)
 
