@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Optional
+from typing import TypeVar, List, Optional
 
 from torch.utils.data import IterableDataset
 
@@ -10,7 +10,7 @@ from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 T = TypeVar("T")
 
 
-class YOLOXDataset(Generic[T], IterableDataset):
+class YOLOXDataset(IterableDataset):
     """A dataset for YOLOX."""
 
     def __init__(self, stream_factory: ClosableStreamFactory[T], batch_size: int, n_batches: int):
