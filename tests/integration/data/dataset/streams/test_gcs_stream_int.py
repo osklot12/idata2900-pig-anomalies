@@ -78,8 +78,9 @@ def test_norsvin_val_stream():
     i = 1
     while instance:
         # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        print(f"[Test] Frames read: {i}")
+        print(f"[Test] Read frame {instance.index} for {instance.source.source_id}")
         instance = stream.read()
-        print(f"Frames read: {i}")
 
         i += 1
     stream.stop()
@@ -107,8 +108,9 @@ def test_norsvin_test_stream():
     i = 1
     while instance:
         # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
-        instance = stream.read()
         print(f"Frames read: {i}")
+        print(f"[YOLOXDataset] Read frame {instance.index} for {instance.source.source_id}")
+        instance = stream.read()
         i += 1
 
     stream.stop()
