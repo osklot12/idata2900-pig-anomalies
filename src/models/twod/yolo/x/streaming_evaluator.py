@@ -148,7 +148,8 @@ class StreamingEvaluator:
         n_gt = 0
 
         # iterate through each image
-        for pred, gt in zip(detections, annotations):
+        for i, (pred, gt) in enumerate(zip(detections, annotations)):
+            print(f"[Evaluator] Pair {i}: {len(pred)} preds, {len(gt)} GTs")
             detected_gt_indices = set()
 
             # iterate over each prediction
@@ -193,8 +194,13 @@ class StreamingEvaluator:
 
             n_gt += gt.shape[0]
 
+        print("[Evaluator] Finished loop over detections and annotations.")
+        print(f"[Evaluator] #TP: {len(true_positives)}, #Scores: {len(scores)}, #Labels: {len(labels)}, GT: {n_gt}")
+        print("[Evaluator] Calling _calculate_scores()...")
+
         precision, recall, f1, ap, ap_dict = self._calculate_scores(true_positives, scores, labels, n_gt)
 
+        print("[Evaluator] Done computing scores.")
         return {
             "precision": precision,
             "recall": recall,
