@@ -56,7 +56,7 @@ class Prefetcher(Generic[T], Stream[T]):
                 try:
                     self._queue.put(item, timeout=WORKER_LOOP_TIMEOUT)
                     putting = False
-                    
+
                 except queue.Full:
                     pass
 

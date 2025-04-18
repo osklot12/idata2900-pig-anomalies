@@ -17,7 +17,7 @@ from src.data.dataset.selectors.factories.selector_factory import SelectorFactor
 from src.data.dataset.selectors.selector import Selector
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
-from src.data.dataset.streams.factories.stream_factory import StreamFactory
+from src.data.dataset.streams.factories.writable_stream_factory import WritableStreamFactory
 from src.data.dataset.streams.managed.factories.manged_stream_factory import ManagedStreamFactory
 from src.data.dataset.streams.managed.managed_stream import ManagedStream
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
@@ -54,7 +54,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
                  split: DatasetSplit,
                  selector_factory: SelectorFactory[str],
                  label_map: Dict[str, T_Enum],
-                 stream_factory: StreamFactory[B],
+                 stream_factory: WritableStreamFactory[B],
                  pipeline_factory: Optional[PipelineFactory[A, B]] = None):
         """
         Initializes a GCSStreamFactory instance.
@@ -65,7 +65,7 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             split (DatasetSplit): dataset split to create stream for
             selector_factory (SelectorFactory[str]): factory for creating selectors of dataset instances
             label_map (Dict[str, T_Enum]): label map for annotation classes
-            stream_factory (StreamFactory[B]): factory for creating stream instances
+            stream_factory (WritableStreamFactory[B]): factory for creating stream instances
             pipeline_factory (Optional[PipelineFactory[T]]): optional pipeline provider
         """
         self._gcs_creds = gcs_creds

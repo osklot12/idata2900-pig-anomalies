@@ -3,7 +3,7 @@ from yolox.exp import Exp as BaseExp
 from torch.utils.data import DataLoader
 import logging
 
-class Exp(BaseExp):
+class YoloExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
     def __init__(self, train_set: YOLOXDataset, val_set: YOLOXDataset):

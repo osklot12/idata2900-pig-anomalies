@@ -1,12 +1,12 @@
 from typing import TypeVar, Generic
 
 from src.data.dataset.streams.dock_stream import DockStream
-from src.data.dataset.streams.factories.stream_factory import StreamFactory
+from src.data.dataset.streams.factories.writable_stream_factory import WritableStreamFactory
 from src.data.dataset.streams.stream import Stream
 
 T = TypeVar("T")
 
-class DockStreamFactory(Generic[T], StreamFactory[T]):
+class DockStreamFactory(Generic[T], WritableStreamFactory[T]):
     """Factory for creating DockStream instances."""
 
     def __init__(self, buffer_size: int, dock_size: int):
