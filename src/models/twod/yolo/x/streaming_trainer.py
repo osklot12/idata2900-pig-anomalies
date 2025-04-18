@@ -4,11 +4,27 @@ import torch
 
 from src.models.twod.yolo.x.streaming_evaluator import StreamingEvaluator
 from yolox.core.trainer import Trainer
+from yolox.data import DataPrefetcher
 from yolox.utils import is_parallel, adjust_status, synchronize
 
 
 class StreamingTrainer(Trainer):
     """A custom trainer for streaming data."""
+
+    def train_in_epoch(self):
+        for self.epoch in range(self.start_epoch, self.max_epoch):
+            self.train_loader = self.exp.get_data_loader(
+                batch_size=self.args.batch_size,
+                is_distributed=self.is_distributed,
+                no_aug=self.no_aug,
+                cache_img=self.args.cache,
+            )
+            self.prefetcher = DataPrefetcher(self.train_loader)
+            self.max_iter = len(self.train_loader)
+
+            self.before_epoch()
+            self.train_in_iter()
+            self.after_epoch()
 
     def get_train_loader(self):
         return self.exp.get_data_loader(
