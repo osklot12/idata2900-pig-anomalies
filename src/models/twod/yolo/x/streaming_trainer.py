@@ -62,7 +62,10 @@ class StreamingTrainer(Trainer):
         """Displays evaluation results."""
         print(f"Evaluation results at epoch {self.epoch + 1}:")
         for k, v in results.items():
-            print(f"{k}: {v:.4f}")
+            if isinstance(v, float):
+                print(f"{k}: {v:.4f}")
+            else:
+                print(f"{k}:\n{v}")
 
         if self.args.logger == "tensorboard":
             for k, v in results.items():
