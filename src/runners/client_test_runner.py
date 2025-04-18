@@ -45,8 +45,9 @@ def run_val_stream():
     dataset = YOLOXDataset(stream_factory=factory, batch_size=8, n_batches=430)
 
     try:
-        for batch in dataset:
-            print(f"[Test] Read batch of size {len(batch[0])}")
+        while True:
+            for batch in dataset:
+                print(f"[Test] Read batch of size {len(batch[0])}")
 
     except KeyboardInterrupt:
         print("[Test] Stopping...")
