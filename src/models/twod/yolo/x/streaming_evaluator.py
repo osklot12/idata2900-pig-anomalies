@@ -52,7 +52,12 @@ class StreamingEvaluator:
             all_detections.extend(self._convert_outputs(outputs))
             all_annotations.extend(self._convert_targets(targets))
 
-        return self._compute_metrics(all_detections, all_annotations)
+        print("[Evaluator] Finished all batch processing.")
+
+        metrics = self._compute_metrics(all_detections, all_annotations)
+
+        print("[Evaluator] Returning metrics...")
+        return metrics
 
     @staticmethod
     def _convert_outputs(outputs: torch.Tensor) -> List[np.ndarray]:
