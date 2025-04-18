@@ -65,18 +65,22 @@ class StreamingEvaluator:
             List[np.ndarray]: list of detections per sample
         """
         detections = []
-        for image_preds in outputs:
-            converted = []
-            for pred in image_preds:
-                values = pred.tolist()
 
-                cx, cy, w, h = values[:4]
-                obj_score = values[4]
-                class_probs = values[5:]
+        # move outputs to cpu once and convert to numpy in batch
+        outputs_np = outputs.cpu().numpy()
+
+        for image_preds in outputs_np:
+            if image_preds.shape[0] == 0:
+                detections.append(np.zeros((0, 6), dtype=np.float32))
+
+            else:
+                cx, cy, w, h = image_preds[:, 0], image_preds[:, 1], image_preds[:, 2], image_preds[:, 3]
+                obj_score = image_preds[:, 4]
+                class_probs = image_preds[:, 5:]
 
                 # get predicted class (class with the highest probability)
-                cls = int(np.argmax(class_probs))
-                cls_score = class_probs[cls]
+                cls = np.argmax(class_probs, axis=1)
+                cls_score = class_probs[np.arange(len(cls)), cls]
 
                 # joint probability of object + correct class
                 final_score = obj_score * cls_score
@@ -86,8 +90,8 @@ class StreamingEvaluator:
                 x2 = cx + w / 2
                 y2 = cy + h / 2
 
-                converted.append([x1, y1, x2, y2, final_score, cls])
-            detections.append(np.array(converted, dtype=np.float32))
+                boxes = np.stack([x1, y1, x2, y2, final_score, cls], axis=-1).astype(np.float32)
+                detections.append(boxes)
 
         return detections
 
