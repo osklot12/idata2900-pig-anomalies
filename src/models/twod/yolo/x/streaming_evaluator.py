@@ -10,7 +10,7 @@ from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
-POST_PROCESS_CONF_THRE = 0.1
+POST_PROCESS_CONF_THRE = 0.01
 POST_PROCESS_NMS_THRE = 0.65
 
 
@@ -86,7 +86,7 @@ class StreamingEvaluator:
             else:
                 preds_np = preds.cpu().numpy().astype(np.float32)
                 detections.append(preds_np)
-            
+
         return detections
 
     @staticmethod
@@ -237,20 +237,26 @@ class StreamingEvaluator:
         Returns:
             Tuple[float, float, float, float]: precision, recall, f1 score, map
         """
-        indices = np.argsort(-scores)
-        tp = tp[indices]
-        labels = labels[indices]
+        if len(scores) == 0:
+            results = 0.0, 0.0, 0.0, 0.0, {c: 0.0 for c in range(self._num_classes)}
 
-        cum_tp = np.cumsum(tp)
-        cum_fp = np.cumsum(1 - tp)
+        else:
+            indices = np.argsort(-scores)
+            tp = tp[indices]
+            labels = labels[indices]
 
-        recall = cum_tp / (n_gt + EPSILON)
-        precision = cum_tp / (cum_tp + cum_fp + EPSILON)
-        f1 = 2 * precision * recall / (precision + recall + EPSILON)
+            cum_tp = np.cumsum(tp)
+            cum_fp = np.cumsum(1 - tp)
 
-        ap, ap_dict = self._mean_average_precision(tp, labels)
+            recall = cum_tp / (n_gt + EPSILON)
+            precision = cum_tp / (cum_tp + cum_fp + EPSILON)
+            f1 = 2 * precision * recall / (precision + recall + EPSILON)
 
-        return float(precision[-1]), float(recall[-1]), float(f1[-1]), ap, ap_dict
+            ap, ap_dict = self._mean_average_precision(tp, labels)
+
+            results = float(precision[-1]), float(recall[-1]), float(f1[-1]), ap, ap_dict
+
+        return results
 
     def _mean_average_precision(self, tp: np.ndarray, labels: np.ndarray) -> (float, Dict[int, float]):
         """
