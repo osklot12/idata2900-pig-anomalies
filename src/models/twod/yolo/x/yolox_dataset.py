@@ -38,12 +38,17 @@ class YOLOXDataset(IterableDataset):
         i = 0
         total_instances = 0
         eos = False
+        videos = {}
         while i < len(self) and not eos:
             batch = self._fetch_batch()
             if len(batch) > 0:
                 total_instances += len(batch)
                 for item in batch:
                     print(f"[YOLOXDataset] Read frame {item.index} for {item.source.source_id}")
+                    if not item.source.source_id in videos:
+                        videos[item.source.source_id] = 0
+                    else:
+                        videos[item.source.source_id] += 1
                 print(f"[YOLOXDataset] Yielding batch {i + 1} with {len(batch)} instances")
                 yield YOLOXBatchConverter.convert(batch)
                 i += 1
@@ -56,6 +61,7 @@ class YOLOXDataset(IterableDataset):
             self._stream = None
 
         print(f"[YOLOXDataset] Total yielded: {total_instances} instances in {i} batches")
+        print(f"[YOLOXDataset] Videos: {videos}")
 
     def _fetch_batch(self) -> List[T]:
         """Fetches the next batch."""
