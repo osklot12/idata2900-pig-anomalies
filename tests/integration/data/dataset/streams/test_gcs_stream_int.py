@@ -76,13 +76,19 @@ def test_norsvin_val_stream():
     # act
     instance = stream.read()
     i = 1
+    videos = {}
     while instance:
         # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        if not instance.source.source_id in videos:
+            videos[instance.source.source_id] = 0
+        else:
+            videos[instance.source.source_id] += 1
         print(f"[Test] Frames read: {i}")
         print(f"[Test] Read frame {instance.index} for {instance.source.source_id}")
         instance = stream.read()
 
         i += 1
+    print(f"[Test] Videos: {videos}")
     stream.stop()
 
 
