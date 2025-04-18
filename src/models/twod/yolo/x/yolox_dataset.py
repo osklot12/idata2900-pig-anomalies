@@ -31,7 +31,6 @@ class YOLOXDataset(IterableDataset):
         self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
 
     def __iter__(self):
-        print("==> __iter__ called")
         stream = self._stream_factory.create_stream()
 
         i = 0

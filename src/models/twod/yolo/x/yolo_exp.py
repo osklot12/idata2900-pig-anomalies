@@ -1,11 +1,18 @@
+from typing import TypeVar
+
+from src.data.dataset.streams.factories.stream_factory import ClosableStreamFactory
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
 from yolox.exp import Exp as BaseExp
 from torch.utils.data import DataLoader
 
+# stream data type
+T = TypeVar("T")
+
+
 class YoloExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
-    def __init__(self, train_set: YOLOXDataset, val_set: YOLOXDataset):
+    def __init__(self, train_stream_factory: ClosableStreamFactory[T], val_stream_factory: ClosableStreamFactory[T]):
         """
         Initializes an Exp instance.
 
@@ -14,8 +21,8 @@ class YoloExp(BaseExp):
             val_set (YOLOXDataset): the dataset to use for evaluation
         """
         super().__init__()
-        self._train_set = train_set
-        self._val_set = val_set
+        self._train_stream_factory = train_stream_factory
+        self._val_stream_factory = val_stream_factory
 
         self.num_classes = 4
         self.depth = 0.33
@@ -31,16 +38,26 @@ class YoloExp(BaseExp):
         self.exp_name = "streaming_yolox"
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
+        dataset = YOLOXDataset(
+            stream_factory=self._train_stream_factory,
+            batch_size=8,
+            n_batches=10
+        )
         return DataLoader(
-            dataset=self._train_set,
+            dataset=dataset,
             batch_size=None,
             num_workers=0,
             pin_memory=True,
         )
 
     def get_eval_loader(self, batch_size, is_distributed, **kwargs):
+        dataset = YOLOXDataset(
+            stream_factory=self._val_stream_factory,
+            batch_size=8,
+            n_batches=16
+        )
         return DataLoader(
-            dataset=self._val_set,
+            dataset=dataset,
             batch_size=None,
             num_workers=0,
             pin_memory=True,
