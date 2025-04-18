@@ -1,19 +1,12 @@
-from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
-from src.data.dataset.dataset_split import DatasetSplit
+import traceback
+
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
-from src.data.dataset.streams.pipeline_stream import PipelineStream
-from src.data.dataset.streams.prefetcher import Prefetcher
-from src.data.dataset.streams.stream import Stream
-from src.data.pipeline.pipeline import Pipeline
-from src.data.pipeline.preprocessor import Preprocessor
-from src.data.processing.zlib_decompressor import ZlibDecompressor
+from src.data.dataset.dataset_split import DatasetSplit
+from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.models.twod.yolo.x.yolo_exp import YoloExp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-from src.network.client.simple_network_client import SimpleNetworkClient
-from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
-from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
-from src.data.dataset.streams.network_stream import NetworkStream
+import argparse
+
 
 SERVER_IP = "10.0.0.1"
 
