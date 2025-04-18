@@ -9,6 +9,7 @@ from yolox.evaluators.voc_eval import voc_ap
 
 EPSILON = 1e-6
 
+
 class StreamingEvaluator:
     """A custom evaluator for YOLOX models that supports streaming evaluation."""
 

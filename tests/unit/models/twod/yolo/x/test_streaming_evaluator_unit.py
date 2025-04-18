@@ -19,10 +19,12 @@ def targets():
 @pytest.fixture
 def outputs():
     """Fixture to provide dummy outputs."""
-    return [torch.tensor([
-        [10, 10, 10, 10, 0.9, 0],  # matches first GT (IoU = 1.0)
-        [30, 30, 10, 10, 0.8, 1],  # matches second GT (IoU = 1.0)
-    ])]
+    return torch.tensor([
+        [
+            [10, 10, 10, 10, 0.9, 1.0, 0.0],  # matches first GT (IoU = 1.0)
+            [30, 30, 10, 10, 0.8, 0.0, 1.0],  # matches second GT (IoU = 1.0)
+        ]
+    ])
 
 
 class DummyDataset(IterableDataset):
@@ -32,22 +34,23 @@ class DummyDataset(IterableDataset):
         self.targets = targets
 
     def __iter__(self):
-        yield {
-            "image": torch.rand(1, 3, 64, 64),
-            "target": self.targets
-        }
+        yield (
+            torch.rand(1, 3, 64, 64),
+            self.targets,
+            None,
+            None
+        )
 
     def __len__(self):
         return 1
 
 
 class DummyModel(torch.nn.Module):
+    """Dummy model for testing."""
 
     def __init__(self, outputs):
         super().__init__()
         self.outputs = outputs
-
-    """Dummy model for testing."""
 
     def forward(self, x):
         return self.outputs
@@ -107,11 +110,13 @@ def test_streaming_evaluator_mixed_predictions():
          [1, 30, 30, 10, 10]]
     ])
 
-    outputs = [torch.tensor([
-        [10, 10, 10, 10, 0.9, 0],
-        [30, 30, 10, 10, 0.8, 1],
-        [50, 50, 10, 10, 0.7, 2],
-    ])]
+    outputs = torch.tensor([
+        [
+            [10, 10, 10, 10, 0.9, 0.8, 0.0, 0.0],
+            [30, 30, 10, 10, 0.7, 0.7, 0.9, 0.2],
+            [50, 50, 10, 10, 0.7, 0.6, 0.3, 0.9],
+        ]
+    ])
 
     dataset = DummyDataset(targets=targets)
     dataloader = DataLoader(dataset, batch_size=None)
