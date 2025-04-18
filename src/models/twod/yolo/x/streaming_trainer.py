@@ -69,4 +69,5 @@ class StreamingTrainer(Trainer):
 
         if self.args.logger == "tensorboard":
             for k, v in results.items():
-                self.tblogger.add_scalar(f"val/{k}", v, self.epoch + 1)
+                if isinstance(v, float):
+                    self.tblogger.add_scalar(f"val/{k}", v, self.epoch + 1)
