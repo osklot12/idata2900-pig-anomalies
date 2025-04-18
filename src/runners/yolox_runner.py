@@ -14,8 +14,8 @@ def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
     val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
 
-    train_set = YOLOXDataset(stream_factory=train_factory, batch_size=8, n_batches=6125)
-    val_set = YOLOXDataset(stream_factory=val_factory, batch_size=8, n_batches=10)
+    train_set = YOLOXDataset(stream_factory=train_factory, batch_size=8, n_batches=10) # 6125
+    val_set = YOLOXDataset(stream_factory=val_factory, batch_size=8, n_batches=430)
 
     exp = YoloExp(train_set=train_set, val_set=val_set)
 
