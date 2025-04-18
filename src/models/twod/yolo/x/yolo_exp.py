@@ -35,13 +35,19 @@ class YoloExp(BaseExp):
         self.tensorboard_writer = True
         self.save_history_ckpt = True
 
+        self.mosaic_prob = 0.0
+        self.mixup_prob = 0.0
+        self.hsv_prob = 0.0
+        self.flip_prob = 0.0
+        self.enable_mixup = False
+
         self.exp_name = "streaming_yolox"
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = YOLOXDataset(
             stream_factory=self._train_stream_factory,
             batch_size=8,
-            n_batches=10
+            n_batches=6125
         )
         return DataLoader(
             dataset=dataset,
@@ -54,7 +60,7 @@ class YoloExp(BaseExp):
         dataset = YOLOXDataset(
             stream_factory=self._val_stream_factory,
             batch_size=8,
-            n_batches=16
+            n_batches=431
         )
         return DataLoader(
             dataset=dataset,
@@ -62,3 +68,6 @@ class YoloExp(BaseExp):
             num_workers=0,
             pin_memory=True,
         )
+
+    def random_resize(self, data_loader, epoch, rank, is_distributed):
+        return self.input_size
