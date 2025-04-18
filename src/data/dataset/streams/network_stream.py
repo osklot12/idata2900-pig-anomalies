@@ -45,7 +45,7 @@ class NetworkStream(Generic[T], ClosableStream[T]):
             raise RuntimeError("Got unexpected response from server")
 
         if not response.status == ResponseStatus.SUCCESS:
-            raise RuntimeError("Could not get batch")
+            raise RuntimeError("Could not read stream")
 
         if response.instance is not None and not isinstance(response.instance, self._data_type):
             raise RuntimeError("Response contains unexpected data type")

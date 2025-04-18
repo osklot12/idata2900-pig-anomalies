@@ -4,6 +4,7 @@ from typing import TypeVar, List, Optional
 
 from typing_extensions import Generic
 
+from src.data.dataset.streams.closable_stream import ClosableStream
 from src.data.dataset.streams.stream import Stream
 from src.data.structures.atomic_bool import AtomicBool
 
@@ -12,15 +13,15 @@ T = TypeVar("T")
 
 WORKER_LOOP_TIMEOUT = 0.1
 
-class Prefetcher(Generic[T], Stream[T]):
+class Prefetcher(Generic[T], ClosableStream[T]):
     """Simple data prefetcher."""
 
-    def __init__(self, stream: Stream[T], buffer_size: int = 10):
+    def __init__(self, stream: ClosableStream[T], buffer_size: int = 10):
         """
         Initializes a BatchPrefetcher instance.
 
         Args:
-            stream (Stream[T]): stream to fetch from
+            stream (ClosableStream[T]): stream to fetch from
             buffer_size (int): the size of the buffer
         """
         if buffer_size < 1:
@@ -60,9 +61,10 @@ class Prefetcher(Generic[T], Stream[T]):
                 except queue.Full:
                     pass
 
-    def stop(self) -> None:
-        """Stops the prefetcher."""
+    def close(self) -> None:
         with self._run_lock:
             self._running.set(False)
             self._thread.join()
             self._thread = None
+
+        self._stream.close()

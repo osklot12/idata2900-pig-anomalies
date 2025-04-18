@@ -39,7 +39,7 @@ class NetworkDatasetStreamFactory(ClosableStreamFactory[T]):
         network_stream = NetworkStream(client=client, split=self._split, data_type=CompressedAnnotatedFrame)
         prefetcher = Prefetcher(network_stream)
         pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
-        stream = PipelineStream(source=prefetcher, pipeline=pipeline, resources=[network_stream])
+        stream = PipelineStream(source=prefetcher, pipeline=pipeline)
 
         prefetcher.run()
         return stream
