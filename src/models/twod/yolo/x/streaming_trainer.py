@@ -40,8 +40,12 @@ class StreamingTrainer(Trainer):
             )
             results = evaluator.evaluate()
 
+        print(f"Finished evaluation")
         if self.rank == 0:
+            print(f"Showing results")
             self._show_evaluation_results(results=results)
+
+        print(f"Finished showing evaluation results")
 
         if torch.distributed.is_initialized():
             print(f"[StreamingTrainer] IT IS DISTRIBUTED!")
