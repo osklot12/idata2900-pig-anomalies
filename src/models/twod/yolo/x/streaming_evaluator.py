@@ -98,17 +98,26 @@ class StreamingEvaluator:
             List[np.ndarray]: list of annotations per sample
         """
         annotations = []
+        image_size = 640
+
         for image_targets in targets:
             valid = image_targets[:, 0] >= 0
             boxes = image_targets[valid]
 
             converted = []
             for box in boxes:
-                cls, cx, cy, w, h = box.tolist()
-                x1 = cx - w / 2
-                y1 = cy - h / 2
-                x2 = cx + w / 2
-                y2 = cy + h / 2
+                cls, x, y, w, h = box.tolist()
+
+                x *= image_size
+                y *= image_size
+                w *= image_size
+                h *= image_size
+
+                x1 = x
+                y1 = y
+                x2 = x + w
+                y2 = y + h
+
                 converted.append([x1, y1, x2, y2, cls])
 
             annotations.append(np.array(converted, dtype=np.float32))
