@@ -58,8 +58,8 @@ class StreamingEvaluator:
             max_probs = probs.max(dim=1).values.mean(dim=0)
             print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            all_detections.extend(self.postprocess_custom(outputs))
-            all_annotations.extend(all_detections.extend(self.postprocess_custom(outputs, self._num_classes, POST_PROCESS_CONF_THRE)))
+            all_detections.extend(self.postprocess_custom(outputs, self._num_classes, POST_PROCESS_CONF_THRE))
+            all_annotations.extend(self._convert_targets(targets))
 
         metrics = self._compute_metrics(all_detections, all_annotations)
 
@@ -89,7 +89,6 @@ class StreamingEvaluator:
 
         return detections
 
-    @staticmethod
     def postprocess_custom(
             outputs: torch.Tensor,
             num_classes: int,
