@@ -63,7 +63,7 @@ def main():
         split=DatasetSplit.TRAIN,
         selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=2000),
+        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=500),
         pipeline_factory=NorsvinTrainPipelineFactory()
     )
 

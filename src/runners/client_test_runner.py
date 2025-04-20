@@ -25,9 +25,7 @@ def run_train_stream():
         while True:
             batch = []
             while len(batch) < batch_size:
-                instance = stream.read()
-                decompressed = decompressor.process(instance)
-                batch.append(decompressed)
+                batch.append(stream.read())
             images, targets, _, _ = converter.convert(batch)
             print(f"[Test] Targets: {targets}")
             batch.clear()
