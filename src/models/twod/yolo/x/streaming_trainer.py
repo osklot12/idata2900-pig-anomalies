@@ -27,11 +27,7 @@ class StreamingTrainer(Trainer):
             self.after_epoch()
 
     def get_train_loader(self):
-        return self.exp.get_data_loader(
-            self.args.batch_size,
-            is_distributed=False,
-            no_aug=False
-        )
+        return self.train_loader
 
     def get_eval_loader(self):
         return self.exp.get_eval_loader(
