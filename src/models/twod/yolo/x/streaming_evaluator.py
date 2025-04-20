@@ -89,6 +89,7 @@ class StreamingEvaluator:
 
         return detections
 
+    @staticmethod
     def postprocess_custom(
             outputs: torch.Tensor,
             num_classes: int,
