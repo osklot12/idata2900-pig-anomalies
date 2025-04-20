@@ -6,7 +6,6 @@ from tqdm import tqdm
 
 from yolox.data import DataLoader
 from yolox.evaluators.voc_eval import voc_ap
-from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
@@ -58,7 +57,7 @@ class StreamingEvaluator:
             max_probs = probs.max(dim=1).values.mean(dim=0)
             print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            all_detections.extend(self.postprocess_custom(outputs, self._num_classes, POST_PROCESS_CONF_THRE))
+            all_detections.extend(self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE))
             all_annotations.extend(self._convert_targets(targets))
 
         metrics = self._compute_metrics(all_detections, all_annotations)
@@ -90,7 +89,7 @@ class StreamingEvaluator:
         return detections
 
     @staticmethod
-    def postprocess_custom(
+    def postprocess(
             outputs: torch.Tensor,
             num_classes: int,
             conf_thresh: float = 0.01,
@@ -196,14 +195,15 @@ class StreamingEvaluator:
         for i, (pred, gt) in enumerate(zip(detections, annotations)):
             detected_gt_indices = set()
 
-            print(f"\n[Image {i}]")
-            print(f"Ground Truths ({len(gt)}):")
-            for g in gt:
-                print(f"  cls={int(g[4])}, box=({g[0]:.1f}, {g[1]:.1f}, {g[2]:.1f}, {g[3]:.1f})")
+            if len(gt) > 0 or len(pred) > 0:
+                print(f"\n[Image {i}]")
+                print(f"Ground Truths ({len(gt)}):")
+                for g in gt:
+                    print(f"  cls={int(g[4])}, box=({g[0]:.1f}, {g[1]:.1f}, {g[2]:.1f}, {g[3]:.1f})")
 
-            print(f"Predictions ({len(pred)}):")
-            for p in pred:
-                print(f"  cls={int(p[5])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
+                print(f"Predictions ({len(pred)}):")
+                for p in pred:
+                    print(f"  cls={int(p[5])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
 
             # iterate over each prediction
             for pred_box in pred:
