@@ -47,7 +47,7 @@ class YoloExp(BaseExp):
         dataset = YOLOXDataset(
             stream_factory=self._train_stream_factory,
             batch_size=8,
-            n_batches=200 # 6125
+            n_batches=6125 # 6125
         )
         return DataLoader(
             dataset=dataset,
