@@ -54,8 +54,9 @@ class StreamingEvaluator:
                 outputs = self._model(images)
 
             raw_logits = outputs[..., 5:]  # (B, N, num_classes)
-            max_per_class = raw_logits.max(dim=1).values.mean(dim=0)
-            print(f"[StreamingEvaluator] Average max raw logits per class:", max_per_class.cpu().numpy())
+            probs = torch.sigmoid(raw_logits)
+            max_probs = probs.max(dim=1).values.mean(dim=0)
+            print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
             all_detections.extend(self._convert_outputs(outputs))
             all_annotations.extend(self._convert_targets(targets))

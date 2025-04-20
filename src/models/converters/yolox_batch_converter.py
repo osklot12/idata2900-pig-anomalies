@@ -17,9 +17,6 @@ class YOLOXBatchConverter:
         img_info = []
         img_ids = []
 
-        for b in batch:
-            print(f"[YOLOXBatchConverter] Received frame {b.index} from {b.source.source_id}")
-
         for idx, annotated_frame in enumerate(batch):
             img = annotated_frame.frame
             height, width = img.shape[:2]
@@ -50,7 +47,7 @@ class YOLOXBatchConverter:
             img_info.append(torch.tensor([height, width, 1.0], dtype=torch.float32))
             img_ids.append(torch.tensor(idx, dtype=torch.int64))
 
-        print(f"[YOLOXBatchConverter] Targets: {YOLOXBatchConverter.pad_targets(targets)}")
+        # print(f"[YOLOXBatchConverter] Targets: {YOLOXBatchConverter.pad_targets(targets)}")
         return (
             torch.stack(images, dim=0),
             YOLOXBatchConverter.pad_targets(targets),
