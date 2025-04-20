@@ -23,9 +23,9 @@ def test_norsvin_train_stream():
         gcs_creds=NORSVIN_GCS_CREDS,
         split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TRAIN,
-        selector_factory=DetermStringSelectorFactory(),
+        selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=DockStreamFactory(buffer_size=3, dock_size=1000),
+        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=2000),
         pipeline_factory=NorsvinTrainPipelineFactory()
     )
 
