@@ -98,7 +98,6 @@ class StreamingEvaluator:
             List[np.ndarray]: list of annotations per sample
         """
         annotations = []
-        image_size = 640
 
         for image_targets in targets:
             valid = image_targets[:, 0] >= 0
