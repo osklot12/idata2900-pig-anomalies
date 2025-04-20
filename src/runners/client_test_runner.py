@@ -27,7 +27,8 @@ def run_train_stream():
             while len(batch) < batch_size:
                 batch.append(stream.read())
             images, targets, _, _ = converter.convert(batch)
-            print(f"[Test] Targets: {targets}")
+            print(f"[Test] Actual targets: {[d.annotations for d in batch]}")
+            print(f"[Test] Converted targets: {targets}")
             batch.clear()
     except KeyboardInterrupt:
         pass
