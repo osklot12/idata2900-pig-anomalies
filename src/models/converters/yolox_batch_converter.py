@@ -11,7 +11,7 @@ class YOLOXBatchConverter:
     """Converts batches into the expected format for YOLOX.s"""
 
     @staticmethod
-    def convert(batch: List[AnnotatedFrame]) -> Tuple[torch.Tensor, List[torch.Tensor], torch.Tensor, torch.Tensor]:
+    def convert(batch: List[AnnotatedFrame]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         images = []
         targets = []
         img_info = []
@@ -49,7 +49,7 @@ class YOLOXBatchConverter:
 
         return (
             torch.stack(images, dim=0),
-            targets,
+            YOLOXBatchConverter.pad_targets(targets),
             torch.stack(img_info, dim=0),
             torch.stack(img_ids, dim=0)
         )
@@ -62,7 +62,7 @@ class YOLOXBatchConverter:
         batch_size = len(targets)
         max_boxes = max(t.shape[0] for t in targets)
 
-        padded = torch.zeros((batch_size, max_boxes, 5), dtype=torch.float32)
+        padded = torch.full((batch_size, max_boxes, 5), fill_value=-1.0, dtype=torch.float32)
         for i, t in enumerate(targets):
             if t.shape[0] > 0:
                 padded[i, :t.shape[0], :] = t
