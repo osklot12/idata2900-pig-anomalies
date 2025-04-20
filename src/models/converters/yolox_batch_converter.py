@@ -25,14 +25,16 @@ class YOLOXBatchConverter:
             img = np.transpose(img, (2, 0, 1))
             images.append(torch.tensor(img, dtype=torch.float32))
 
+            bbox_scaler = StaticBBoxScaler(width, height)
+
             frame_targets = []
             for ann in annotated_frame.annotations:
-                bbox = ann.bbox
+                scaled_bbox = bbox_scaler.scale(ann.bbox)
 
-                cx = bbox.x + bbox.width / 2
-                cy = bbox.y + bbox.height / 2
-                w = bbox.width
-                h = bbox.height
+                cx = scaled_bbox.x + scaled_bbox.width / 2
+                cy = scaled_bbox.y + scaled_bbox.height / 2
+                w = scaled_bbox.width
+                h = scaled_bbox.height
                 cls = ann.cls.value
 
                 frame_targets.append([cls, cx, cy, w, h])

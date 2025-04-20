@@ -145,6 +145,15 @@ class StreamingEvaluator:
         for i, (pred, gt) in enumerate(zip(detections, annotations)):
             detected_gt_indices = set()
 
+            print(f"\n[Image {i}]")
+            print(f"Ground Truths ({len(gt)}):")
+            for g in gt:
+                print(f"  cls={int(g[4])}, box=({g[0]:.1f}, {g[1]:.1f}, {g[2]:.1f}, {g[3]:.1f})")
+
+            print(f"Predictions ({len(pred)}):")
+            for p in pred:
+                print(f"  cls={int(p[5])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
+
             # iterate over each prediction
             for pred_box in pred:
                 # predicted class

@@ -34,10 +34,10 @@ class YOLOXBatchVisualizer:
                 print(f"Box: class={cls}, cx={cx}, cy={cy}, w={w}, h={h}")
                 if cls >= 0:
                     cls = int(cls)
-                    x1 = int((cx - w / 2) * width)
-                    y1 = int((cy - h / 2) * height)
-                    x2 = int((cx + w / 2) * width)
-                    y2 = int((cy + h / 2) * height)
+                    x1 = int(cx - w / 2)
+                    y1 = int(cy - h / 2)
+                    x2 = int(cx + w / 2)
+                    y2 = int(cy + h / 2)
 
                     label = class_names[cls] if cls < len(class_names) else f"class_{cls}"
 
