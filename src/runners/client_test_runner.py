@@ -35,14 +35,15 @@ def run_train_stream():
             images, targets, _, _ = converter.convert(batch)
             for instance in batch:
                 print(f"[Test] Got frame {instance.index} from {instance.source.source_id}")
-                if instance.cls == NorsvinBehaviorClass.TAIL_BITING:
-                    tail_biting += 1
-                if instance.cls == NorsvinBehaviorClass.TAIL_DOWN:
-                    tail_down += 1
-                if instance.cls == NorsvinBehaviorClass.BELLY_NOSING:
-                    belly_nosing += 1
-                if instance.cls == NorsvinBehaviorClass.EAR_BITING:
-                    ear_biting += 1
+                for anno in instance.annotations:
+                    if anno.cls == NorsvinBehaviorClass.TAIL_BITING:
+                        tail_biting += 1
+                    if anno.cls == NorsvinBehaviorClass.TAIL_DOWN:
+                        tail_down += 1
+                    if anno.cls == NorsvinBehaviorClass.BELLY_NOSING:
+                        belly_nosing += 1
+                    if anno.cls == NorsvinBehaviorClass.EAR_BITING:
+                        ear_biting += 1
             total += 1
             print(f"[Test] Total instances: {total}")
             print(f"[Test] Bellynosing: {belly_nosing} ({belly_nosing / total * 100:.2f}%)")
