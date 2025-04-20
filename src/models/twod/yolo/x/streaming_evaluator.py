@@ -53,6 +53,10 @@ class StreamingEvaluator:
             with torch.no_grad():
                 outputs = self._model(images)
 
+            raw_logits = outputs[..., 5:]  # (B, N, num_classes)
+            max_per_class = raw_logits.max(dim=1).values.mean(dim=0)
+            print(f"[StreamingEvaluator] Average max raw logits per class:", max_per_class.cpu().numpy())
+
             all_detections.extend(self._convert_outputs(outputs))
             all_annotations.extend(self._convert_targets(targets))
 
@@ -87,12 +91,12 @@ class StreamingEvaluator:
         return detections
 
     @staticmethod
-    def _convert_targets(targets: List[torch.Tensor]) -> List[np.ndarray]:
+    def _convert_targets(targets: torch.Tensor) -> List[np.ndarray]:
         """
         Converts ground truth targets to NumPy arrays.
 
         Args:
-            targets (List[torch.Tensor]): list of ground truth annotations
+            targets (torch.Tensor): tensor of shape (B, max_boxes, 5)
 
         Returns:
             List[np.ndarray]: list of annotations per sample
