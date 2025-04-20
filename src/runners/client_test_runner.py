@@ -1,42 +1,38 @@
-import time
-
-from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
-from src.data.dataset.streams.network_stream import NetworkStream
-from src.data.dataset.streams.pipeline_stream import PipelineStream
-from src.data.dataset.streams.prefetcher import Prefetcher
-from src.data.pipeline.pipeline import Pipeline
-from src.data.pipeline.preprocessor import Preprocessor
 from src.data.processing.zlib_decompressor import ZlibDecompressor
+from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-from src.network.client.simple_network_client import SimpleNetworkClient
-from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
-from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
 
 SERVER_IP = "10.0.0.1"
 
 
 def run_train_stream():
-    client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
-    client.connect(SERVER_IP)
+    factory = NetworkDatasetStreamFactory(
+        server_ip=SERVER_IP,
+        split=DatasetSplit.TRAIN
+    )
 
-    network_stream = NetworkStream(client=client, split=DatasetSplit.TRAIN, data_type=CompressedAnnotatedFrame)
-    prefetcher = Prefetcher(network_stream)
-    pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
-    stream = PipelineStream(source=prefetcher, pipeline=pipeline)
+    stream = factory.create_stream()
 
-    prefetcher.run()
-    instance = stream.read()
+    decompressor = ZlibDecompressor()
+    converter = YOLOXBatchConverter()
+
+    batch_size = 8
+
+    # act
     try:
-        while instance:
-            print(f"[Test] Read instance {instance}")
-            time.sleep(1)
-
-            instance = stream.read()
-
+        while True:
+            batch = []
+            while len(batch) < batch_size:
+                instance = stream.read()
+                decompressed = decompressor.process(instance)
+                batch.append(decompressed)
+            images, targets, _, _ = converter.convert(batch)
+            print(f"[Test] Targets: {targets}")
+            batch.clear()
     except KeyboardInterrupt:
-        print("[Test] Stopping...")
+        pass
 
 
 def run_val_stream():
@@ -52,6 +48,5 @@ def run_val_stream():
         print("[Test] Stopping...")
 
 
-
 if __name__ == "__main__":
-    run_val_stream()
+    run_train_stream()
