@@ -1,13 +1,19 @@
+import numpy as np
+
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
+from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory
 from src.data.dataset.streams.factories.dock_stream_factory import DockStreamFactory
+from src.data.dataset.streams.factories.pool_stream_factory import PoolStreamFactory
 from src.data.dataset.streams.managed.factories.gcs_stream_factory import GCSStreamFactory
 from src.data.pipeline.factories.norsvin_eval_pipeline_factory import NorsvinEvalPipelineFactory
 from src.data.pipeline.factories.norsvin_train_pipeline_factory import NorsvinTrainPipelineFactory
 from src.data.processing.zlib_decompressor import ZlibDecompressor
+from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 from src.utils.norsvin_dataset_config import NORSVIN_GCS_CREDS, NORSVIN_SPLIT_RATIOS
 from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
+from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 
 
 def test_norsvin_train_stream():
@@ -52,6 +58,47 @@ def test_norsvin_train_stream():
             print(f"[Test] Earbiting: {ear_biting} ({ear_biting/total*100:.2f}%)")
             print(f"[Test] Taildown: {tail_down} ({tail_down/total*100:.2f}%)")
             instance = stream.read()
+    except KeyboardInterrupt:
+        stream.stop()
+
+
+def test_visualize_yolox_converted_batches():
+    """Visualizes the coverted YOLOX batches for manual inspection."""
+    # arrange
+    stream_factory = GCSStreamFactory(
+        gcs_creds=NORSVIN_GCS_CREDS,
+        split_ratios=NORSVIN_SPLIT_RATIOS,
+        split=DatasetSplit.TRAIN,
+        selector_factory=RandomStringSelectorFactory(),
+        label_map=NorsvinBehaviorClass.get_label_map(),
+        stream_factory=PoolStreamFactory(pool_size=2000, min_ready=300),
+        pipeline_factory=NorsvinTrainPipelineFactory()
+    )
+
+    stream = stream_factory.create_stream()
+    decompressor = ZlibDecompressor()
+    converter = YOLOXBatchConverter()
+    labels = [
+        "TAIL BITING",
+        "EAR BITING",
+        "BELLY NOSING",
+        "TAIL DOWN"
+    ]
+
+    batch_size = 8
+
+    # act
+    try:
+        stream.run()
+        while True:
+            batch = []
+            while len(batch) < batch_size:
+                instance = stream.read()
+                decompressed = decompressor.process(instance)
+                batch.append(decompressed)
+            images, targets, _, _ = converter.convert(batch)
+            YOLOXBatchVisualizer.visualize(images=images, targets=targets, class_names=labels)
+            batch.clear()
     except KeyboardInterrupt:
         stream.stop()
 
