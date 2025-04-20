@@ -15,7 +15,6 @@ def run_train_stream():
 
     stream = factory.create_stream()
 
-    decompressor = ZlibDecompressor()
     converter = YOLOXBatchConverter()
 
     batch_size = 8
