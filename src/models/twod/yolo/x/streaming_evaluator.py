@@ -58,8 +58,8 @@ class StreamingEvaluator:
             max_probs = probs.max(dim=1).values.mean(dim=0)
             print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            all_detections.extend(self._convert_outputs(outputs))
-            all_annotations.extend(self._convert_targets(targets))
+            all_detections.extend(self.postprocess_custom(outputs))
+            all_annotations.extend(all_detections.extend(self.postprocess_custom(outputs, self._num_classes, POST_PROCESS_CONF_THRE)))
 
         metrics = self._compute_metrics(all_detections, all_annotations)
 
@@ -77,11 +77,9 @@ class StreamingEvaluator:
         """
         detections = []
 
-        processed_outputs = postprocess(
-            outputs, self._num_classes, conf_thre=POST_PROCESS_CONF_THRE, nms_thre=POST_PROCESS_NMS_THRE
-        )
 
-        for preds in processed_outputs:
+
+        for preds in outputs:
             if preds is None or preds.shape[0] == 0:
                 detections.append(np.zeros((0, 6), dtype=np.float32))
 
@@ -90,6 +88,60 @@ class StreamingEvaluator:
                 detections.append(preds_np)
 
         return detections
+
+    @staticmethod
+    def postprocess_custom(
+            outputs: torch.Tensor,
+            num_classes: int,
+            conf_thresh: float = 0.01,
+    ) -> List[np.ndarray]:
+        """
+        Custom postprocessing for YOLO-style predictions.
+
+        Args:
+            outputs (torch.Tensor): model predictions of shape (B, N, 5 + num_classes)
+            num_classes (int): number of classes
+            conf_thresh (float): confidence threshold for filtering
+
+        Returns:
+            List[np.ndarray]: list of detections per image in format [x1, y1, x2, y2, conf, cls]
+        """
+        results = []
+
+        for pred in outputs:  # shape (N, 5 + num_classes)
+            if pred is None or pred.shape[0] == 0:
+                results.append(np.zeros((0, 6), dtype=np.float32))
+                continue
+
+            boxes = pred[:, :4]
+            obj_conf = pred[:, 4:5]
+            cls_logits = pred[:, 5:]
+
+            # Convert box (cx, cy, w, h) -> (x1, y1, x2, y2)
+            x1 = boxes[:, 0] - boxes[:, 2] / 2
+            y1 = boxes[:, 1] - boxes[:, 3] / 2
+            x2 = boxes[:, 0] + boxes[:, 2] / 2
+            y2 = boxes[:, 1] + boxes[:, 3] / 2
+            boxes = torch.stack([x1, y1, x2, y2], dim=1)
+
+            # Compute class probs
+            cls_probs = torch.sigmoid(cls_logits)
+            cls_conf, cls_id = cls_probs.max(dim=1)
+            total_conf = cls_conf * obj_conf.squeeze()
+
+            keep = total_conf >= conf_thresh
+            if keep.sum() == 0:
+                results.append(np.zeros((0, 6), dtype=np.float32))
+                continue
+
+            boxes = boxes[keep]
+            scores = total_conf[keep]
+            classes = cls_id[keep].float()
+
+            detections = torch.cat([boxes, scores.unsqueeze(1), classes.unsqueeze(1)], dim=1)
+            results.append(detections.cpu().numpy().astype(np.float32))
+
+        return results
 
     @staticmethod
     def _convert_targets(targets: torch.Tensor) -> List[np.ndarray]:
