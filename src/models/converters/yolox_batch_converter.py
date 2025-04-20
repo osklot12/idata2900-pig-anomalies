@@ -17,6 +17,9 @@ class YOLOXBatchConverter:
         img_info = []
         img_ids = []
 
+        for b in batch:
+            print(f"[YOLOXBatchConverter] Received frame {b.index} from {b.source.source_id}")
+
         for idx, annotated_frame in enumerate(batch):
             img = annotated_frame.frame
             height, width = img.shape[:2]

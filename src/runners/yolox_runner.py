@@ -1,4 +1,3 @@
-import math
 import traceback
 
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
@@ -8,8 +7,6 @@ from src.models.twod.yolo.x.yolo_exp import YoloExp
 import argparse
 
 SERVER_IP = "10.0.0.1"
-
-LEN_VAL_SET = 3442
 
 
 def main():
