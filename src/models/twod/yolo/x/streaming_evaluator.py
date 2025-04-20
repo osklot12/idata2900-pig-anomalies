@@ -108,11 +108,6 @@ class StreamingEvaluator:
             for box in boxes:
                 cls, x, y, w, h = box.tolist()
 
-                x *= image_size
-                y *= image_size
-                w *= image_size
-                h *= image_size
-
                 x1 = x
                 y1 = y
                 x2 = x + w
