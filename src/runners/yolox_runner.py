@@ -3,7 +3,7 @@ import traceback
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.dataset.dataset_split import DatasetSplit
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
-from src.models.twod.yolo.x.yolo_exp import YoloExp
+from src.models.twod.yolo.x.streaming_exp import StreamingExp
 import argparse
 
 SERVER_IP = "10.0.0.1"
@@ -13,18 +13,18 @@ def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
     val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
 
-    exp = YoloExp(train_stream_factory=train_factory, val_stream_factory=val_factory)
+    exp = StreamingExp(train_stream_factory=train_factory, val_stream_factory=val_factory)
 
     args = argparse.Namespace(
         batch_size=8,
         devices=1,
-        resume=False,
-        start_epoch=0,
+        resume=True,
+        start_epoch=None,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_weights/yolox_s.pth",
+        ckpt="YOLOX_outputs/streaming_yolox_2025_04_21/epoch_15_ckpt.pth",
         fp16=False,
         fuse=False,
         cache=False,
