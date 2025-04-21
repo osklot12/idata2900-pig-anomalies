@@ -54,7 +54,7 @@ class YOLOXBatchVisualizer:
     @staticmethod
     def visualize_with_predictions(images: torch.Tensor, targets: torch.Tensor,
                                    predictions: List[np.ndarray], class_names: List[str],
-                                   save_dir: str = "./eval_visuals"):
+                                   start_idx: int = 0, save_dir: str = "./eval_visuals"):
         """
         Saves visualizations with both ground truth and predicted boxes to image files.
 
@@ -63,6 +63,7 @@ class YOLOXBatchVisualizer:
             targets (torch.Tensor): (B, max_boxes, 5)
             predictions (List[np.ndarray]): each entry is (N, 6) [x1, y1, x2, y2, conf, cls]
             class_names (List[str]): list of class names
+            start_idx (int): index of the first image to visualize
             save_dir (str): directory to save images
         """
         import os
@@ -100,6 +101,6 @@ class YOLOXBatchVisualizer:
                 cv2.putText(img, f"P: {label} ({conf:.2f})", (int(x1), int(y2) + 15), cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
-            save_path = os.path.join(save_dir, f"eval_image_{i}.jpg")
+            save_path = os.path.join(save_dir, f"eval_image_{start_idx + i}.jpg")
             cv2.imwrite(save_path, img)
             print(f"Saved visualization to: {save_path}")
