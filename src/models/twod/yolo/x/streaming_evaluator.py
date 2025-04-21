@@ -7,6 +7,7 @@ from tqdm import tqdm
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 from yolox.data import DataLoader
 from yolox.evaluators.voc_eval import voc_ap
+from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
@@ -46,6 +47,7 @@ class StreamingEvaluator:
         all_detections: List[np.ndarray] = []
         all_annotations: List[np.ndarray] = []
 
+        global_image_idx = 0
         for batch in tqdm(self._dataloader, desc="Evaluating"):
             images, targets, _, _ = batch
             images = images.to(self._device)
@@ -58,7 +60,16 @@ class StreamingEvaluator:
             max_probs = probs.max(dim=1).values.mean(dim=0)
             # print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            detections = self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE)
+            # detections = self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE)
+            detections_tensor = postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE, POST_PROCESS_NMS_THRE)
+
+            # Convert each Tensor (or None) to numpy array
+            detections = []
+            for det in detections_tensor:
+                if det is None:
+                    detections.append(np.zeros((0, 6), dtype=np.float32))
+                else:
+                    detections.append(det.cpu().numpy())
             annotations = self._convert_targets(targets)
 
             all_detections.extend(detections)
@@ -79,8 +90,10 @@ class StreamingEvaluator:
                     targets=pred_targets,
                     predictions=pred_detections,
                     class_names=["belly_nosing", "tail_biting", "ear_biting", "manipulation"],
+                    start_idx=global_image_idx,
                     save_dir="./eval_visuals"
                 )
+                global_image_idx += len(pred_detections)
 
         metrics = self._compute_metrics(all_detections, all_annotations)
 
