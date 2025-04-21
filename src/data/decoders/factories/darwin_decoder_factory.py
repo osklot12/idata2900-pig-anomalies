@@ -1,7 +1,7 @@
 from src.data.decoders.annotation_decoder import AnnotationDecoder
 from src.data.decoders.darwin_decoder import DarwinDecoder
 from src.data.decoders.factories.annotation_decoder_factory import AnnotationDecoderFactory
-from src.data.label.factories.label_parser_factory import LabelParserFactory
+from src.data.dataset.label.factories.label_parser_factory import LabelParserFactory
 
 
 class DarwinDecoderFactory(AnnotationDecoderFactory):

@@ -1,21 +1,12 @@
 from typing import List
 
-from src.data.dataset.selectors.factories.string_selector_factory import StringSelectorFactory
+from src.data.dataset.selectors.factories.selector_factory import SelectorFactory, T
 from src.data.dataset.selectors.random_string_selector import RandomStringSelector
-from src.data.dataset.selectors.string_selector import StringSelector
+from src.data.dataset.selectors.selector import Selector
 
 
-class RandomStringSelectorFactory(StringSelectorFactory):
+class RandomStringSelectorFactory(SelectorFactory[str]):
     """Factory for creating RandomStringSelector instances."""
 
-    def __init__(self, strings: List[str]):
-        """
-        Initializes a RandomStringSelectorFactory instance.
-
-        Args:
-            strings (List[str]): list of strings to select from
-        """
-        self._strings = strings
-
-    def create_selector(self) -> StringSelector:
-        return RandomStringSelector(list(self._strings))
+    def create_selector(self, candidates: List[str]) -> Selector[str]:
+        return RandomStringSelector(strings=candidates)

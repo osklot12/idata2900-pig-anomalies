@@ -3,25 +3,22 @@ from typing import Optional
 
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataset.entities.video_annotations import VideoAnnotations
-from src.data.preprocessing.normalization.normalizers.bbox_normalizer import BBoxNormalizer
-from src.data.streaming.feedables.feedable import Feedable
-from src.data.streaming.streamers.annotation_streamer import AnnotationStreamer
+from src.data.pipeline.consumer import Consumer
+from src.data.streaming.streamers.annotations_streamer import AnnotationsStreamer
 
 
-class VideoAnnotationsStreamer(AnnotationStreamer):
+class VideoAnnotationsStreamer(AnnotationsStreamer):
     """A streamer for streaming video annotations data."""
 
-    def __init__(self, annotations: VideoAnnotations, consumer: Feedable[FrameAnnotations],
-                 bbox_normalizer: BBoxNormalizer):
+    def __init__(self, annotations: VideoAnnotations, consumer: Optional[Consumer[FrameAnnotations]] = None):
         """
         Initializes an VideoAnnotationStreamer instance.
 
         Args:
             annotations (VideoAnnotations): the video annotation data
-            consumer (Feedable[Frame]): the consumer of the streaming data
-            bbox_normalizer (BBoxNormalizer): the bounding box normalization strategy
+            consumer (Optional[Consumer[Frame]]): optional consumer of the streaming data
         """
-        super().__init__(consumer, bbox_normalizer)
+        super().__init__(consumer)
         self._annotations = annotations
         self._frame_queue = queue.Queue()
 

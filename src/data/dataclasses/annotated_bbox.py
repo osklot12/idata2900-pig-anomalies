@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.data.dataclasses.bbox import BBox
-from src.typevars.enum_type import T_Enum
+from src.data.typevars.enum_type import T_Enum
 
 
 @dataclass(frozen=True)

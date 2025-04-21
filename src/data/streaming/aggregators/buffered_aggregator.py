@@ -1,68 +1,91 @@
 from typing import Optional
 from threading import Lock
 
+from src.data.pipeline.producer import Producer
 from src.data.streaming.aggregators.aggregator import Aggregator
-from src.data.streaming.feedables.feedable import Feedable
+from src.data.pipeline.consumer import Consumer
+from src.data.structures.atomic_var import AtomicVar
 from src.data.structures.hash_buffer import HashBuffer
 from src.data.dataclasses.frame_annotations import FrameAnnotations
 from src.data.dataclasses.frame import Frame
-from src.data.dataclasses.streamed_annotated_frame import StreamedAnnotatedFrame
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 
 END_OF_STREAM_INDEX = -1
 
-class BufferedAggregator(Aggregator):
+class BufferedAggregator(Aggregator, Producer[AnnotatedFrame]):
     """Buffers incoming frames and annotations and feeds forward an aggregated instance once matched."""
 
-    def __init__(self, consumer: Feedable[StreamedAnnotatedFrame], buffer_size: int = 1000):
+    def __init__(self, buffer_size: int = 1000, consumer: Optional[Consumer[AnnotatedFrame]] = None):
         """
         Initializes aBufferedInstanceAggregator instance.
 
         Args:
-            consumer (Feedable[StreamedAnnotatedFrame]): the consumer of the aggregated data
             buffer_size (int): The maximum capacity of the buffer.
+            consumer (Optional[Consumer[AnnotatedFrame]]): optional consumer of the aggregated data
         """
-        self._consumer = consumer
+        self._consumer = AtomicVar[Consumer[AnnotatedFrame]](consumer)
         self._lock = Lock()
 
         self._frame_buffer = HashBuffer[int, Optional[Frame]](max_size=buffer_size)
         self._annotation_buffer = HashBuffer[int, Optional[FrameAnnotations]](max_size=buffer_size)
 
-    def feed_frame(self, frame: Optional[Frame]) -> None:
-        with self._lock:
-            if frame is not None:
-                if self._annotation_buffer.has(frame.index):
-                    self._feed_consumer(frame, self._annotation_buffer.pop(frame.index))
+    def feed_frame(self, frame: Optional[Frame]) -> bool:
+        success = False
+        print(f"[BufferedAggregator] Got frame {frame.index} for {frame.source.source_id}")
+        consumer = self._consumer.get()
+        if consumer is not None:
+            with self._lock:
+                if frame is not None:
+                    if self._annotation_buffer.has(frame.index):
+                        success = self._feed_consumer(frame, self._annotation_buffer.pop(frame.index), consumer)
+                    else:
+                        self._frame_buffer.add(frame.index, frame)
+                        success = True
+
                 else:
-                    self._frame_buffer.add(frame.index, frame)
+                    if self._annotation_buffer.has(END_OF_STREAM_INDEX):
+                        success = consumer.consume(self._annotation_buffer.pop(END_OF_STREAM_INDEX))
+                    else:
+                        self._frame_buffer.add(END_OF_STREAM_INDEX, None)
+                        success = True
 
-            else:
-                if self._annotation_buffer.has(END_OF_STREAM_INDEX):
-                    self._consumer.feed(self._annotation_buffer.pop(END_OF_STREAM_INDEX))
+        return success
+
+    def feed_annotations(self, annotations: Optional[FrameAnnotations]) -> bool:
+        success = False
+        print(f"[BufferedAggregator] Got annotations {annotations.index} for {annotations.source.source_id}")
+        consumer = self._consumer.get()
+        if consumer is not None:
+            with self._lock:
+                if annotations is not None:
+                    if self._frame_buffer.has(annotations.index):
+                        success = self._feed_consumer(self._frame_buffer.pop(annotations.index), annotations, consumer)
+                    else:
+                        self._annotation_buffer.add(annotations.index, annotations)
+                        success = True
+
                 else:
-                    self._frame_buffer.add(END_OF_STREAM_INDEX, None)
+                    if self._frame_buffer.has(END_OF_STREAM_INDEX):
+                        success = consumer.consume(self._frame_buffer.pop(END_OF_STREAM_INDEX))
+                    else:
+                        self._annotation_buffer.add(END_OF_STREAM_INDEX, None)
+                        success = True
+
+        return success
 
 
-    def feed_annotations(self, annotations: Optional[FrameAnnotations]) -> None:
-        with self._lock:
-            if annotations is not None:
-                if self._frame_buffer.has(annotations.index):
-                    self._feed_consumer(self._frame_buffer.pop(annotations.index), annotations)
-                else:
-                    self._annotation_buffer.add(annotations.index, annotations)
-
-            else:
-                if self._frame_buffer.has(END_OF_STREAM_INDEX):
-                    self._consumer.feed(self._frame_buffer.pop(END_OF_STREAM_INDEX))
-                else:
-                    self._annotation_buffer.add(END_OF_STREAM_INDEX, None)
-
-    def _feed_consumer(self, frame: Frame, anno: FrameAnnotations) -> None:
+    @staticmethod
+    def _feed_consumer(frame: Frame, anno: FrameAnnotations, consumer: Consumer[AnnotatedFrame]) -> bool:
         """Feeds the consumer with a StreamedAnnotatedFrame instance."""
-        self._consumer.feed(
-            StreamedAnnotatedFrame(
+        print(f"[BufferedAggregator] Forwarding to {consumer}")
+        return consumer.consume(
+            AnnotatedFrame(
                 source=frame.source,
                 index=frame.index,
                 frame=frame.data,
                 annotations=anno.annotations
             )
         )
+
+    def connect(self, consumer: Consumer[AnnotatedFrame]) -> None:
+        self._consumer.set(consumer)

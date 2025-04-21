@@ -50,7 +50,7 @@ def manifest_instance_provider(manifest, selector):
 def test_next_returns_the_next_instance(manifest_instance_provider):
     """Tests that calling next returns the next expected instance."""
     # act
-    instances = [manifest_instance_provider.next() for _ in range(10)]
+    instances = [manifest_instance_provider.get() for _ in range(10)]
 
     # assert
     for i in range(len(instances)):
@@ -65,7 +65,7 @@ def test_next_returns_none_when_selector_returns_none(manifest):
     """Tests that calling next returns None when the internal selector returns None."""
     # arrange
     selector = Mock()
-    selector.next.return_value = None
+    selector.select.return_value = None
 
     provider = ManifestInstanceProvider(
         manifest=manifest,
@@ -73,7 +73,7 @@ def test_next_returns_none_when_selector_returns_none(manifest):
     )
 
     # act
-    instance = provider.next()
+    instance = provider.get()
 
     # assert
     assert instance is None
@@ -93,4 +93,4 @@ def test_next_raises_when_manifest_returns_none(selector):
 
     # act & assert
     with pytest.raises(RuntimeError):
-        provider.next()
+        provider.get()

@@ -4,10 +4,9 @@ import pytest
 
 from src.data.dataclasses.frame import Frame
 from src.data.dataset.entities.lazy_video_file import LazyVideoFile
-from src.data.preprocessing.resizing.resizers.static_frame_resizer import StaticFrameResizer
+from src.data.processing.frame_resizer import StaticFrameResizer
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 from src.utils.path_finder import PathFinder
-from tests.utils.dummies.dummy_frame_resize_strategy import DummyFrameResizeStrategy
 from tests.utils.dummies.dummy_video_loader import DummyVideoLoader
 
 

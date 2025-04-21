@@ -3,7 +3,7 @@ from unittest.mock import create_autospec
 import concurrent.futures
 
 from src.data.streaming.managers.concurrent_streamer_manager import ConcurrentStreamerManager
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 
 
 class ConcreteConcurrentStreamerManager(ConcurrentStreamerManager):
@@ -12,7 +12,7 @@ class ConcreteConcurrentStreamerManager(ConcurrentStreamerManager):
     def _setup(self) -> None:
         self.setup_called = True
 
-    def _run_streamer(self, streamer: Streamer, streamer_id: str) -> None:
+    def _run_streamer(self, streamer: ProducerStreamer, streamer_id: str) -> None:
         self.streamer_ran = streamer
 
     def _handle_done_streamer(self, streamer_id: str) -> None:
@@ -54,7 +54,7 @@ def test_run_twice_raises_error(manager):
 def test_launch_streamer_raises_when_not_running(manager):
     """Tests that launching a streamer when not running raises an error."""
     # arrange
-    mock_streamer = create_autospec(Streamer)
+    mock_streamer = create_autospec(ProducerStreamer)
 
     # act & assert
     with pytest.raises(RuntimeError, match="Cannot launch streamer when manager is not running"):
@@ -77,7 +77,7 @@ def test_launch_streamer_adds_and_starts_streamer(manager):
     """Tests that launching a streamer correctly adds and starts it."""
     # arrange
     manager.run()
-    mock_streamer = create_autospec(Streamer)
+    mock_streamer = create_autospec(ProducerStreamer)
 
     # act
     manager._launch_streamer(mock_streamer)
@@ -126,8 +126,8 @@ def test_stop_shuts_down_all_streamers(manager):
     """Tests that calling stop will shut down all streamers."""
     # arrange
     manager.run()
-    s1 = create_autospec(Streamer)
-    s2 = create_autospec(Streamer)
+    s1 = create_autospec(ProducerStreamer)
+    s2 = create_autospec(ProducerStreamer)
 
     manager._add_streamer(s1)
     manager._add_streamer(s2)

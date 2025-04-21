@@ -27,7 +27,7 @@ def test_next_is_random(selector, strings):
     for _ in range(runs):
         picked_files = []
         for _ in range(iterations):
-            picked_files.append(selector.next())
+            picked_files.append(selector.select())
 
         result.append(picked_files)
 

@@ -1,10 +1,10 @@
 import random
 from typing import List, Optional
 
-from src.data.dataset.selectors.string_selector import StringSelector
+from src.data.dataset.selectors.selector import Selector
 
 
-class RandomStringSelector(StringSelector):
+class RandomStringSelector(Selector):
     """Randomly selects a file with a valid suffix from the available list."""
 
     def __init__(self, strings: List[str]):
@@ -16,5 +16,5 @@ class RandomStringSelector(StringSelector):
         """
         self._strings = strings
 
-    def next(self) -> Optional[str]:
+    def select(self) -> Optional[str]:
         return random.choice(self._strings)
