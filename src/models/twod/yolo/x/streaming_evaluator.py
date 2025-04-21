@@ -243,9 +243,9 @@ class StreamingEvaluator:
             # iterate over each prediction
             for pred_box in pred:
                 # predicted class
-                pred_class = int(pred_box[5])
+                pred_class = int(pred_box[6])
                 # append confidence
-                scores = np.append(scores, pred_box[4])
+                scores = np.append(scores, pred_box[4] * pred_box[5])
                 # append predicated class
                 labels = np.append(labels, pred_class)
 
