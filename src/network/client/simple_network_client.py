@@ -32,6 +32,7 @@ class SimpleNetworkClient(NetworkClient):
             self._sock = socket.create_connection((server_ip, NETWORK_SERVER_PORT))
             self._reader = StreamMessageReader(self._sock.makefile("rb"), NETWORK_MSG_LEN_FORMAT)
             self._writer = StreamMessageWriter(self._sock.makefile("wb"), NETWORK_MSG_LEN_FORMAT)
+            print(f"[SimpleNetworkClient] Connected to {server_ip}")
         except socket.error as e:
             raise ConnectionError(f"Failed to connect to {server_ip}: {e}")
 

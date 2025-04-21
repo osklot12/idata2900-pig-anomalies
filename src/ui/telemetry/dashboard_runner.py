@@ -4,7 +4,7 @@ import random
 from src.schemas.converters.pressure_metric_schema_converter import PressureMetricSchemaConverter
 from src.schemas.schemas.pressure_schema import PressureSchema
 from src.schemas.schemas.signed_schema import SignedSchema
-from src.ui.telemetry.rich_dashboard import RichDashboard
+from src.ui.dashboard.rich_dashboard import RichDashboard
 
 
 def run():

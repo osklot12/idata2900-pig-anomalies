@@ -29,12 +29,12 @@ class YOLOXBatchConverter:
 
             frame_targets = []
             for ann in annotated_frame.annotations:
-                scaled = bbox_scaler.scale(ann.bbox)
+                scaled_bbox = bbox_scaler.scale(ann.bbox)
 
-                cx = scaled.x + scaled.width / 2
-                cy = scaled.y + scaled.height / 2
-                w = scaled.width
-                h = scaled.height
+                cx = scaled_bbox.x + scaled_bbox.width / 2
+                cy = scaled_bbox.y + scaled_bbox.height / 2
+                w = scaled_bbox.width
+                h = scaled_bbox.height
                 cls = ann.cls.value
 
                 frame_targets.append([cls, cx, cy, w, h])
@@ -47,6 +47,7 @@ class YOLOXBatchConverter:
             img_info.append(torch.tensor([height, width, 1.0], dtype=torch.float32))
             img_ids.append(torch.tensor(idx, dtype=torch.int64))
 
+        # print(f"[YOLOXBatchConverter] Targets: {YOLOXBatchConverter.pad_targets(targets)}")
         return (
             torch.stack(images, dim=0),
             YOLOXBatchConverter.pad_targets(targets),
@@ -62,7 +63,7 @@ class YOLOXBatchConverter:
         batch_size = len(targets)
         max_boxes = max(t.shape[0] for t in targets)
 
-        padded = torch.zeros((batch_size, max_boxes, 5), dtype=torch.float32)
+        padded = torch.full((batch_size, max_boxes, 5), fill_value=-1.0, dtype=torch.float32)
         for i, t in enumerate(targets):
             if t.shape[0] > 0:
                 padded[i, :t.shape[0], :] = t

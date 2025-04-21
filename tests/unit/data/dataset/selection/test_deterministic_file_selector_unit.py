@@ -23,9 +23,9 @@ def test_select_file_returns_none_on_full_cycle(files):
 
     # act
     for _ in range(4):
-        initial_selections.append(selector.next())
+        initial_selections.append(selector.select())
 
-    last_selection = selector.next()
+    last_selection = selector.select()
 
     # assert
     for file in initial_selections:
@@ -43,7 +43,7 @@ def test_files_are_selected_once(files):
 
     # act
     for _ in range(4):
-        selections.append(selector.next())
+        selections.append(selector.select())
 
     # assert
     assert len(set(selections)) == len(selections)
@@ -60,8 +60,8 @@ def test_seed_ensures_reproducibility(files):
 
     # act
     for _ in range(4):
-        first_selections.append(selector_one.next())
-        second_selections.append(selector_two.next())
+        first_selections.append(selector_one.select())
+        second_selections.append(selector_two.select())
 
     # assert
     assert first_selections == second_selections

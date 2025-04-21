@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, List, Optional
+from typing import TypeVar, Generic, Optional
 
 T = TypeVar("T")
 
-
 class Stream(Generic[T], ABC):
-    """A streams of data."""
+    """Interface for data streams."""
 
     @abstractmethod
     def read(self) -> Optional[T]:

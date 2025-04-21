@@ -2,10 +2,10 @@ from typing import Tuple
 
 import numpy as np
 
-from src.data.preprocessing.resizing.resizers.frame_resize_strategy import FrameResizeStrategy
+from src.data.processing.frame_resizer import FrameResizer
 
 
-class DummyFrameResizeStrategy(FrameResizeStrategy):
+class DummyFrameResizeStrategy(FrameResizer):
     """A dummy frame resize strategy for testing purposes."""
 
     def __init__(self, resize_shape: Tuple[int, int]):

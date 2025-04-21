@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 
 from src.data.streaming.streamers.streamer_status import StreamerStatus
+from src.data.structures.atomic_bool import AtomicBool
 
 
 class Streamer(ABC):
-    """An interface for streamers."""
+    """Streams data."""
 
     @abstractmethod
     def start_streaming(self) -> None:

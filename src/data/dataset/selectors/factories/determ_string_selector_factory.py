@@ -1,21 +1,12 @@
 from typing import List
 
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
-from src.data.dataset.selectors.factories.string_selector_factory import StringSelectorFactory
-from src.data.dataset.selectors.string_selector import StringSelector
+from src.data.dataset.selectors.factories.selector_factory import SelectorFactory
+from src.data.dataset.selectors.selector import Selector
 
 
-class DetermStringSelectorFactory(StringSelectorFactory):
+class DetermStringSelectorFactory(SelectorFactory[str]):
     """Factory for creating DetermStringSelector instances."""
 
-    def __init__(self, strings: List[str]):
-        """
-        Initializes a DetermStringSelectorFactory instance.
-
-        Args:
-            strings (List[str]): list of strings to select from
-        """
-        self._strings = strings
-
-    def create_selector(self) -> StringSelector:
-        return DetermStringSelector(list(self._strings))
+    def create_selector(self, candidates: List[str]) -> Selector[str]:
+        return DetermStringSelector(strings=candidates)

@@ -1,7 +1,7 @@
 import threading
 
 from src.data.streaming.managers.streamer_registry import StreamerRegistry
-from src.data.streaming.streamers.streamer import Streamer
+from src.data.streaming.streamers.producer_streamer import ProducerStreamer
 from src.data.streaming.streamers.concurrent_streamer import ConcurrentStreamer
 from src.data.streaming.streamers.streamer_status import StreamerStatus
 
@@ -9,7 +9,7 @@ from src.data.streaming.streamers.streamer_status import StreamerStatus
 class EnsembleStreamer(StreamerRegistry, ConcurrentStreamer):
     """A streamer consisting of other streamers, abstracting them as one single streamer."""
 
-    def __init__(self, *streamers: Streamer):
+    def __init__(self, *streamers: ProducerStreamer):
         """
         Initializes an instance of EnsembleStreamer.
 

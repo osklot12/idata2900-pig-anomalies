@@ -1,22 +1,16 @@
 import traceback
-import argparse
 
-import torch
-
+from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
-from src.data.streaming.prefetchers.batch_prefetcher import BatchPrefetcher
+from src.data.dataset.streams.prefetcher import Prefetcher
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.network.client.simple_network_client import SimpleNetworkClient
 from src.network.messages.serialization.pickle_message_deserializer import PickleMessageDeserializer
 from src.network.messages.serialization.pickle_message_serializer import PickleMessageSerializer
-from src.network.network_dataset_stream import NetworkDatasetStream
-from src.network.network_frame_instance_provider import NetworkFrameInstanceProvider
-from src.models.twod.yolo.x.exp import Exp
+from src.data.dataset.streams.network_stream import NetworkStream
+from src.models.twod.yolo.x.streaming_exp import StreamingExp
 from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
-
-# ✅ Custom evaluation import
-from src.models.training_metrics_calculator import TrainingMetricsCalculator
-from src.schemas.schemas.metric_schema import MetricSchema
+import argparse
 
 
 def main():
@@ -28,30 +22,40 @@ def main():
     val_client = SimpleNetworkClient(PickleMessageSerializer(), PickleMessageDeserializer())
     val_client.connect(server_ip)
 
-    train_stream = NetworkDatasetStream(client=train_client, split=DatasetSplit.TRAIN)
-    val_stream = NetworkDatasetStream(client=val_client, split=DatasetSplit.VAL)
+    train_stream = NetworkStream(
+        client=train_client,
+        split=DatasetSplit.TRAIN,
+        data_type=AnnotatedFrame,
+        batch_size=8
+    )
+    val_stream = NetworkStream(
+        client=val_client,
+        split=DatasetSplit.VAL,
+        data_type=AnnotatedFrame,
+        batch_size=8
+    )
 
-    train_prefetcher = BatchPrefetcher(train_stream, 8, 8, fetch_timeout=200)
-    val_prefetcher = BatchPrefetcher(val_stream, DatasetSplit.VAL, 8, fetch_timeout=200)
+    train_prefetcher = Prefetcher(stream=train_stream, buffer_size=10)
+    val_prefetcher = Prefetcher(stream=val_stream, buffer_size=10)
 
     train_prefetcher.run()
     val_prefetcher.run()
 
-    train_set = YOLOXDataset(train_prefetcher)
-    val_set = YOLOXDataset(val_prefetcher)
+    train_set = YOLOXDataset(train_prefetcher, 6125) # 6125
+    val_set = YOLOXDataset(val_prefetcher, 430)
 
-    exp = Exp(train_set=train_set, val_set=val_set)
+    exp = StreamingExp(train_set=train_set, val_set=val_set)
 
     args = argparse.Namespace(
         batch_size=8,
         devices=1,
-        resume=True,
-        start_epoch=None,
+        resume=False,
+        start_epoch=0,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_outputs/streaming_yolox/latest_ckpt.pth",
+        ckpt="YOLOX_weights/yolox_s.pth",
         fp16=False,
         fuse=False,
         cache=False,
@@ -59,34 +63,12 @@ def main():
         logger="tensorboard"
     )
 
-    print(f"Using exp of type {type(exp)}")
     trainer = StreamingTrainer(exp, args)
-
-    print("🚀 TRAINING...")
     try:
         trainer.train()
     except Exception as e:
         print("\n❌ Exception caught during training:")
         traceback.print_exc()
-
-    # ✅ Custom evaluation starts here
-    print("\n🔍 EVALUATING ON IN-MEMORY VALIDATION SET...")
-    evaluator = TrainingMetricsCalculator()
-    all_predictions = []
-    all_targets = []
-
-    trainer.model.eval()
-    with torch.no_grad():
-        for batch in val_set:
-            predictions = trainer.model(batch["img"])
-            all_predictions.append(predictions)
-            all_targets.append(batch)
-
-    metrics = evaluator.calculate(all_predictions, all_targets)
-
-    print("✅ Evaluation complete. Metrics:")
-    for k, v in metrics.metrics.items():
-        print(f"{k}: {v:.4f}")
 
 
 if __name__ == '__main__':
