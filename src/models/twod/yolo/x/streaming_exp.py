@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 T = TypeVar("T")
 
 
-class YoloExp(BaseExp):
+class StreamingExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
     def __init__(self, train_stream_factory: ClosableStreamFactory[T], val_stream_factory: ClosableStreamFactory[T]):
@@ -47,7 +47,7 @@ class YoloExp(BaseExp):
         dataset = YOLOXDataset(
             stream_factory=self._train_stream_factory,
             batch_size=8,
-            n_batches=6125 # 6125
+            n_batches=10 # 6125
         )
         return DataLoader(
             dataset=dataset,
