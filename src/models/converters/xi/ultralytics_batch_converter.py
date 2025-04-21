@@ -13,12 +13,13 @@ class UltralyticsBatchConverter:
         Assumes bounding boxes are already normalized.
         """
         results = []
+
         for i, frame in enumerate(batch):
             img = torch.from_numpy(frame.frame).permute(2, 0, 1).float() / 255.0  # HWC -> CHW
 
-            # No extra normalization here, just pass the values directly
             cls_list = []
             bbox_list = []
+
             for ann in frame.annotations:
                 cx = ann.bbox.x + ann.bbox.width / 2
                 cy = ann.bbox.y + ann.bbox.height / 2
@@ -30,12 +31,15 @@ class UltralyticsBatchConverter:
 
                 print(f"[Converter] class={ann.cls.value}, bbox=({cx}, {cy}, {bw}, {bh})")
 
-            if len(cls_list) == 0:
-                cls_tensor = torch.empty((0,), dtype=torch.long)
-                bbox_tensor = torch.empty((0, 5), dtype=torch.float32)
-            else:
+            # Ensure tensors are always at least 1D
+            if cls_list:
                 cls_tensor = torch.tensor(cls_list, dtype=torch.long)
                 bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
+                batch_idx_tensor = torch.full((len(cls_tensor),), i, dtype=torch.long)
+            else:
+                cls_tensor = torch.empty((0,), dtype=torch.long)
+                bbox_tensor = torch.empty((0, 5), dtype=torch.float32)
+                batch_idx_tensor = torch.empty((0,), dtype=torch.long)
 
             results.append({
                 "img": img,
@@ -43,8 +47,8 @@ class UltralyticsBatchConverter:
                     "cls": cls_tensor,
                     "bboxes": bbox_tensor,
                 },
-                "batch_idx": torch.full((len(cls_tensor),), i, dtype=torch.long),
-                "im_file": [f"frame_{i}.jpg"],
+                "batch_idx": batch_idx_tensor,
+                "im_file": [f"frame_{i}.jpg"],  # Optional but keeps logger happy
                 "ori_shape": [torch.tensor([frame.frame.shape[0], frame.frame.shape[1]])],
                 "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],
             })
