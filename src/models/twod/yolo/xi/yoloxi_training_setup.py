@@ -78,6 +78,7 @@ class TrainingSetup:
             "save": True,
             "verbose": True,
             "val": True,
+            "device": 0 if torch.cuda.is_available() else "cpu",
         }
 
         trainer = OBBTrainer(overrides=overrides)
