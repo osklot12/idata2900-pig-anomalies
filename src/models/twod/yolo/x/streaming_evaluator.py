@@ -89,7 +89,7 @@ class StreamingEvaluator:
                     images=pred_images,
                     targets=pred_targets,
                     predictions=pred_detections,
-                    class_names=["belly_nosing", "tail_biting", "ear_biting", "manipulation"],
+                    class_names=["tail_biting", "ear_biting", "belly_nosing", "tail down"],
                     start_idx=global_image_idx,
                     save_dir="./eval_visuals"
                 )
