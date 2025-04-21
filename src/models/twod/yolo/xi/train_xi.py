@@ -16,8 +16,8 @@ def main():
     val_stream = NetworkDatasetStreamFactory(server_ip, DatasetSplit.VAL).create_stream()
 
     print("🧠 Building Ultralytics-compatible datasets...")
-    train_dataset = UltralyticsDataset(cast(Prefetcher, train_stream), batch_size=8, num_batches=6495)
-    val_dataset = EvalUltralyticsDataset(cast(Prefetcher, val_stream), batch_size=8, num_batches=430)
+    train_dataset = UltralyticsDataset(cast(Prefetcher, train_stream), batch_size=8, num_batches=100)
+    val_dataset = EvalUltralyticsDataset(cast(Prefetcher, val_stream), batch_size=8, num_batches=100)
 
     trainer = TrainingSetup(train_dataset, val_dataset)
     trainer.train()
