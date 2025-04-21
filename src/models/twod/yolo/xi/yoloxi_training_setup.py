@@ -95,10 +95,20 @@ class TrainingSetup:
             }
 
         def patched_get_dataloader(_, dataset_path, batch_size, rank=0, mode="train"):
-            dataset = self.dataset if mode == "train" else self.eval_dataset
+            stream = self.dataset if mode == "train" else self.eval_dataset
+
+            from torch.utils.data import IterableDataset
+
+            class StreamIterableDataset(IterableDataset):
+                def __init__(self, stream):
+                    self.stream = stream
+
+                def __iter__(self):
+                    return iter(self.stream)
+
             print(f"📥 Creating DataLoader for mode={mode}, batch_size={batch_size}")
             loader = DataLoader(
-                dataset,
+                StreamIterableDataset(stream),
                 batch_size=batch_size,
                 shuffle=False,
                 num_workers=0,
