@@ -4,6 +4,7 @@ import numpy as np
 import torch.nn
 from tqdm import tqdm
 
+from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 from yolox.data import DataLoader
 from yolox.evaluators.voc_eval import voc_ap
 
@@ -57,8 +58,29 @@ class StreamingEvaluator:
             max_probs = probs.max(dim=1).values.mean(dim=0)
             # print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            all_detections.extend(self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE))
-            all_annotations.extend(self._convert_targets(targets))
+            detections = self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE)
+            annotations = self._convert_targets(targets)
+
+            all_detections.extend(detections)
+            all_annotations.extend(annotations)
+
+            # Visualize only images with predictions
+            has_predictions = [len(pred) > 0 for pred in detections]
+            if any(has_predictions):
+
+                # Filter relevant elements
+                mask = torch.tensor(has_predictions, dtype=torch.bool)
+                pred_images = images[mask].cpu()
+                pred_targets = targets[mask].cpu()
+                pred_detections = [d for d, keep in zip(detections, has_predictions) if keep]
+
+                YOLOXBatchVisualizer.visualize_with_predictions(
+                    images=pred_images,
+                    targets=pred_targets,
+                    predictions=pred_detections,
+                    class_names=["belly_nosing", "tail_biting", "ear_biting", "manipulation"],
+                    save_dir="./eval_visuals"
+                )
 
         metrics = self._compute_metrics(all_detections, all_annotations)
 
