@@ -94,8 +94,9 @@ class YOLOXBatchVisualizer:
                                 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
             for pred in pred_boxes:
-                x1, y1, x2, y2, conf, cls = pred.tolist()
+                x1, y1, x2, y2, obj_conf, cls_conf, cls = pred.tolist()
                 cls = int(cls)
+                conf = obj_conf * cls_conf
                 label = class_names[cls] if cls < len(class_names) else f"class_{cls}"
                 cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
                 cv2.putText(img, f"P: {label} ({conf:.2f})", (int(x1), int(y2) + 15), cv2.FONT_HERSHEY_SIMPLEX,
