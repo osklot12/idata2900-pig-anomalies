@@ -106,8 +106,12 @@ class TrainingSetup:
                 def __iter__(self):
                     return iter(self.stream)
 
+                def __len__(self):
+                    # This is crucial — Ultralytics uses len(dataset)
+                    return len(self.stream)
+
             print(f"📥 Creating DataLoader for mode={mode}, batch_size={batch_size}")
-            loader = DataLoader(
+            dataloader = DataLoader(
                 StreamIterableDataset(stream),
                 batch_size=batch_size,
                 shuffle=False,
@@ -115,7 +119,23 @@ class TrainingSetup:
                 drop_last=False,
                 collate_fn=variable_length_collate
             )
-            return ResettableDataLoader(loader)
+
+            class PatchedLoader:
+                def __init__(self, dataloader):
+                    self.dataloader = dataloader
+                    self.dataset = dataloader.dataset  # Let Ultralytics see it has __len__()
+                    self.num_workers = dataloader.num_workers
+
+                def __iter__(self):
+                    return iter(self.dataloader)
+
+                def __len__(self):
+                    return len(self.dataloader)
+
+                def reset(self):
+                    pass  # For Ultralytics compatibility
+
+            return PatchedLoader(dataloader)
 
         trainer.get_dataloader = patched_get_dataloader.__get__(trainer)
 
