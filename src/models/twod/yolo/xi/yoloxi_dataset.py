@@ -17,3 +17,6 @@ class UltralyticsDataset(IterableDataset):
             batch = self._stream.read()
             for sample in UltralyticsBatchConverter.convert(batch):
                 yield sample
+
+    def __len__(self):  # <- This is the critical fix
+        return self._num_batches
