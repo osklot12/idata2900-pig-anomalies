@@ -6,7 +6,7 @@ from typing import List
 
 
 class UltralyticsDataset(IterableDataset):
-    def __init__(self, prefetcher: Prefetcher[AnnotatedFrame], batch_size: int = 8, num_batches: int = 6495):
+    def __init__(self, prefetcher: Prefetcher[AnnotatedFrame], batch_size: int = 8, num_batches: int = 100):
         super().__init__()
         self._prefetcher = prefetcher
         self._batch_size = batch_size
