@@ -34,9 +34,13 @@ class YOLOXDataset(IterableDataset):
         stream = self._stream_factory.create_stream()
 
         i = 0
+        frame_idx = 0
         eos = False
         while i < len(self) and not eos:
             batch = self._fetch_batch(stream)
+            for b in batch:
+                print(f"[YOLOXDataset] Frame index {frame_idx} is frame {b.index} from {b.source.source_id}")
+                frame_idx += 1
             if len(batch) > 0:
                 yield YOLOXBatchConverter.convert(batch)
                 i += 1
