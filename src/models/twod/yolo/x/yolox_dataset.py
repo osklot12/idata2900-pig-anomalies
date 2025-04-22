@@ -44,6 +44,8 @@ class YOLOXDataset(IterableDataset):
             if len(batch) < self._batch_size:
                 eos = True
 
+            print(f"[YOLOXDataset] Got batch size {len(batch)}")
+
         stream.close()
 
     def _fetch_batch(self, stream: ClosableStream[T]) -> List[T]:
