@@ -21,7 +21,8 @@ class StreamingOBBValidator(OBBValidator):
         self.metrics = {}
         self.stats = []
         self.confusion_matrix = ConfusionMatrix(nc=self.nc)
-        self.pbar = range(len(self.dataloader))
+        self.pbar = enumerate(self.dataloader)
+
 
         for i, batch in enumerate(self.dataloader):
             print(f"🔍 Evaluating batch {i + 1}/{len(self.dataloader)}")

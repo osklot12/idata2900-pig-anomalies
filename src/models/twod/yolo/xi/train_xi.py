@@ -26,4 +26,5 @@ def main():
     trainer.trainer.validator = StreamingOBBValidator(val_dataset, class_names=trainer.trainer.names)
 
     # 🔥 Start training
+    print("🔥 About to start training...")
     trainer.train()
