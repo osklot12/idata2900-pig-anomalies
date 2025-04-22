@@ -10,6 +10,7 @@ from src.models.twod.yolo.xi.yoloxi_training_setup import TrainingSetup
 
 
 def main():
+    print("[INFO] Started training setup")
     server_ip = "10.0.0.1"
 
     print("📡 Creating streaming pipelines...")
