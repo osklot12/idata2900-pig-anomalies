@@ -35,15 +35,17 @@ class UltralyticsBatchConverter:
                 bbox_list.append([cx, cy, bw, bh, 0.0])
                 print(f"[Converter] class={ann.cls.value}, bbox=({cx}, {cy}, {bw}, {bh})")
 
+            # ✅ Clean malformed bboxes (e.g., [[]])
+            bbox_list = [b for b in bbox_list if len(b) == 5]
+
             # 🛡 Ensure correct tensor format (incl. edge cases)
             cls_tensor = torch.tensor(cls_list, dtype=torch.long)
             if cls_tensor.ndim == 0:
                 cls_tensor = cls_tensor.unsqueeze(0)
 
-            bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
-            if bbox_tensor.ndim == 1:
-                bbox_tensor = bbox_tensor.unsqueeze(0)
-            elif bbox_tensor.numel() == 0:
+            if bbox_list:
+                bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
+            else:
                 bbox_tensor = torch.empty((0, 5), dtype=torch.float32)
 
             batch_idx_tensor = torch.full((cls_tensor.shape[0],), i, dtype=torch.long)
