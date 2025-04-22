@@ -16,16 +16,16 @@ def main():
     exp = StreamingExp(train_stream_factory=train_factory, val_stream_factory=val_factory)
 
     args = argparse.Namespace(
-        batch_size=8,
+        batch_size=28,
         devices=1,
-        resume=False,
-        start_epoch=0,
+        resume=True,
+        start_epoch=None,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="yolox_weights/yolox_s.pth",
-        fp16=False,
+        ckpt="YOLOX_outputs/streaming_yolox/epoch_31_ckpt.pth",
+        fp16=True,
         fuse=False,
         cache=False,
         occupy=False,

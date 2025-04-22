@@ -46,8 +46,8 @@ class StreamingExp(BaseExp):
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = YOLOXDataset(
             stream_factory=self._train_stream_factory,
-            batch_size=8,
-            n_batches=10 # 6125
+            batch_size=28,
+            n_batches=1750
         )
         return DataLoader(
             dataset=dataset,

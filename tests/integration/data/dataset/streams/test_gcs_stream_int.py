@@ -125,7 +125,7 @@ def test_norsvin_val_stream():
     i = 1
     videos = {}
     while instance:
-        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         if not instance.source.source_id in videos:
             videos[instance.source.source_id] = 0
         else:
