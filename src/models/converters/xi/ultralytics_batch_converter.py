@@ -31,22 +31,22 @@ class UltralyticsBatchConverter:
 
                 print(f"[Converter] class={ann.cls.value}, bbox=({cx}, {cy}, {bw}, {bh})")
 
-            # 🛡 Ensure correct shape even when empty
-            if cls_list:
-                cls_tensor = torch.tensor(cls_list, dtype=torch.long)
-            else:
-                cls_tensor = torch.empty((0,), dtype=torch.long)
+            # 🛡 Ensure correct tensor format (incl. edge cases)
+            cls_tensor = torch.tensor(cls_list, dtype=torch.long)
+            if cls_tensor.ndim == 0:
+                cls_tensor = cls_tensor.unsqueeze(0)
 
-            if bbox_list:
-                bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
-            else:
+            bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
+            if bbox_tensor.ndim == 1:
+                bbox_tensor = bbox_tensor.unsqueeze(0)
+            elif bbox_tensor.numel() == 0:
                 bbox_tensor = torch.empty((0, 5), dtype=torch.float32)
 
             batch_idx_tensor = torch.full((cls_tensor.shape[0],), i, dtype=torch.long)
 
-            # ✅ Validation-safe check
+            # ✅ Safety checks
             assert cls_tensor.ndim == 1, f"[Converter] Invalid cls_tensor shape: {cls_tensor.shape}"
-            assert bbox_tensor.ndim == 2, f"[Converter] Invalid bbox_tensor shape: {bbox_tensor.shape}"
+            assert bbox_tensor.ndim == 2 and bbox_tensor.shape[1] == 5, f"[Converter] Invalid bbox_tensor shape: {bbox_tensor.shape}"
 
             results.append({
                 "img": img,
@@ -55,9 +55,9 @@ class UltralyticsBatchConverter:
                     "bboxes": bbox_tensor,
                 },
                 "batch_idx": batch_idx_tensor,
-                "im_file": [f"frame_{i}.jpg"],  # Logger-friendly
-                "ori_shape": [torch.tensor([frame.frame.shape[0], frame.frame.shape[1]])],
-                "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],
+                "im_file": f"frame_{i}.jpg",  # not a list
+                "ori_shape": torch.tensor([frame.frame.shape[0], frame.frame.shape[1]]),
+                "ratio_pad": (torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0])),
             })
 
             print(f"[Converter] Frame shape: {frame.frame.shape}, converted {len(cls_tensor)} bboxes")
