@@ -29,3 +29,7 @@ def main():
 
     print("🔥 About to start training...")
     trainer.train()
+
+
+if __name__ == "__main__":
+    main()
