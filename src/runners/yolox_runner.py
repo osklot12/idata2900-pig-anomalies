@@ -16,7 +16,7 @@ def main():
     exp = StreamingExp(train_stream_factory=train_factory, val_stream_factory=val_factory)
 
     args = argparse.Namespace(
-        batch_size=16,
+        batch_size=14,
         devices=1,
         resume=True,
         start_epoch=None,
