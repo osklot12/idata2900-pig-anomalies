@@ -30,13 +30,14 @@ class ResettableDataLoader:
 
 
 class TrainingSetup:
-    def __init__(self, dataset, eval_dataset=None, model_path="yolo11m-obb.pt", log_dir="runs", epochs=300, imgsz=640):
+    def __init__(self, dataset, eval_dataset=None, model_path="yolo11m-obb.pt", log_dir="runs", epochs=300, imgsz=640, validator=None):
         self.metrics = None
         self.dataset = dataset
         self.model_path = model_path
         self.epochs = epochs
         self.imgsz = imgsz
         self.eval_dataset = eval_dataset or dataset
+        self.validator = validator
 
         # TensorBoard logging
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -163,11 +164,9 @@ class TrainingSetup:
         print(f"🧭 Run: tensorboard --logdir {self.log_dir}")
 
         try:
-            trainer.validator = StreamingOBBValidator(
-                self.eval_dataset,
-                class_names=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
-                writer=self.writer
-            )
+            if self.validator:
+                trainer.validator = self.validator
+
             trainer.train()
         except Exception as e:
             print("\n💥 Training crashed with an exception:")

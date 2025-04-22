@@ -20,11 +20,11 @@ def main():
     train_dataset = UltralyticsDataset(cast(Prefetcher, train_stream), batch_size=8, num_batches=100)
     val_dataset = EvalUltralyticsDataset(cast(Prefetcher, val_stream), batch_size=8, num_batches=100)
 
-    trainer = TrainingSetup(train_dataset, val_dataset)
+    # ✅ Inject custom validator now
+    validator = StreamingOBBValidator(val_dataset, class_names=["tail-biting", "ear-biting", "belly-nosing", "tail-down"])
 
-    # ✅ Inject custom validator
-    trainer.trainer.validator = StreamingOBBValidator(val_dataset, class_names=trainer.trainer.names)
+    # ✅ Pass it to the setup
+    trainer = TrainingSetup(train_dataset, val_dataset, validator=validator)
 
-    # 🔥 Start training
     print("🔥 About to start training...")
     trainer.train()
