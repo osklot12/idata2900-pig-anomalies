@@ -3,6 +3,7 @@ from typing import cast
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.dataset.streams.prefetcher import Prefetcher
+from src.models.twod.yolo.xi.streaming_obb_evaluator import StreamingOBBValidator
 from src.models.twod.yolo.xi.yoloxi_dataset import UltralyticsDataset
 from src.models.twod.yolo.xi.yoloxi_eval_dataset import EvalUltralyticsDataset
 from src.models.twod.yolo.xi.yoloxi_training_setup import TrainingSetup
@@ -20,8 +21,9 @@ def main():
     val_dataset = EvalUltralyticsDataset(cast(Prefetcher, val_stream), batch_size=8, num_batches=100)
 
     trainer = TrainingSetup(train_dataset, val_dataset)
+
+    # ✅ Inject custom validator
+    trainer.trainer.validator = StreamingOBBValidator(val_dataset, class_names=trainer.trainer.names)
+
+    # 🔥 Start training
     trainer.train()
-
-
-if __name__ == "__main__":
-    main()

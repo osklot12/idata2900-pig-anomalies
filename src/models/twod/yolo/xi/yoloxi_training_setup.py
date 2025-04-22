@@ -9,6 +9,8 @@ from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.obb import OBBTrainer
 import torch
 
+from src.models.twod.yolo.xi.streaming_obb_evaluator import StreamingOBBValidator
+
 
 class ResettableDataLoader:
     def __init__(self, dataloader):
@@ -82,6 +84,7 @@ class TrainingSetup:
         }
 
         trainer = OBBTrainer(overrides=overrides)
+        self.trainer = trainer
 
         def variable_length_collate(batch):
             return {
@@ -156,7 +159,15 @@ class TrainingSetup:
 
         trainer.add_callback("on_fit_epoch_end", self._log_epoch_metrics)
 
+        print(f"📉 TensorBoard logs saved to: {self.log_dir}")
+        print(f"🧭 Run: tensorboard --logdir {self.log_dir}")
+
         try:
+            trainer.validator = StreamingOBBValidator(
+                self.eval_dataset,
+                class_names=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
+                writer=self.writer
+            )
             trainer.train()
         except Exception as e:
             print("\n💥 Training crashed with an exception:")
