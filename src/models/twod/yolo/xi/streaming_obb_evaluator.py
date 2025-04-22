@@ -6,28 +6,37 @@ import torch
 
 
 class StreamingOBBValidator(OBBValidator):
-    def __init__(self, dataloader, class_names):
+    def __init__(self, dataloader, class_names, writer=None):
         super().__init__()
         self.dataloader = dataloader
         self.names = class_names
         self.nc = len(class_names)
-        self.writer = None
+        self.writer = writer
         self.device = None
         self.model = None
 
-    def __call__(self, trainer):
-        print("🧪 Starting custom streaming evaluation...")
-        self.device = trainer.device
-        self.model = trainer.model
+    def __call__(self, trainer=None, model=None):
+        print("🧪 Custom validator triggered!")
+
+        # This is how Ultralytics calls the validator
+        if trainer:
+            self.device = trainer.device
+            self.model = trainer.model
+            self.epoch = getattr(trainer, "epoch", 0)
+        elif model:
+            self.device = next(model.parameters()).device
+            self.model = model
+            self.epoch = 0
+        else:
+            raise ValueError("StreamingOBBValidator needs either trainer or model.")
+
         self.training = False
         self.metrics = {}
         self.stats = []
         self.confusion_matrix = ConfusionMatrix(nc=self.nc)
-        self.pbar = enumerate(self.dataloader)
-
 
         for i, batch in enumerate(self.dataloader):
-            print(f"🔍 Evaluating batch {i + 1}/{len(self.dataloader)}")
+            print(f"🔍 Eval batch {i+1}/{len(self.dataloader)}")
             with torch.no_grad():
                 imgs = batch["img"].to(self.device, non_blocking=True)
                 preds = self.model(imgs)
@@ -41,14 +50,12 @@ class StreamingOBBValidator(OBBValidator):
                 self.update_metrics(preds, imgs, targets)
 
         self.metrics = self.get_stats()
-        print("✅ Evaluation done. Metrics:", self.metrics)
+        print("✅ Done evaluating. Metrics:", self.metrics)
 
-        # 📈 Optional TensorBoard logging
         if self.writer:
-            epoch = trainer.epoch
             for key, value in self.metrics.items():
-                if isinstance(value, (float, int)):
-                    self.writer.add_scalar(f"eval/{key}", value, epoch)
+                if isinstance(value, (int, float)):
+                    self.writer.add_scalar(f"eval/{key}", value, self.epoch)
             self.writer.flush()
 
         return self.metrics
@@ -62,7 +69,7 @@ class StreamingOBBValidator(OBBValidator):
             gt_boxes = targets["bboxes"][gt_mask]
 
             if gt_boxes.numel() == 0 or pred_i.numel() == 0:
-                print(f"⚠️ Skipping batch {i} — empty predictions or targets")
+                print(f"⚠️ Skipping empty batch {i}")
                 continue
 
             pred_boxes = pred_i[:, :5]
