@@ -76,14 +76,14 @@ class StreamingEvaluator:
             all_annotations.extend(annotations)
 
             # Visualize only images with predictions
-            has_gt_or_pred = [(gt.shape[0] > 0 or pred.shape[0] > 0) for gt, pred in zip(annotations, detections)]
-            if any(has_gt_or_pred):
+            has_predictions = [len(pred) > 0 for pred in detections]
+            if any(has_predictions):
 
                 # Filter relevant elements
-                mask = torch.tensor(has_gt_or_pred, dtype=torch.bool)
+                mask = torch.tensor(has_predictions, dtype=torch.bool)
                 pred_images = images[mask].cpu()
                 pred_targets = targets[mask].cpu()
-                pred_detections = [d for d, keep in zip(detections, has_gt_or_pred) if keep]
+                pred_detections = [d for d, keep in zip(detections, has_predictions) if keep]
 
                 YOLOXBatchVisualizer.visualize_with_predictions(
                     images=pred_images,
