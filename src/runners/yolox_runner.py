@@ -16,7 +16,7 @@ def main():
     exp = StreamingExp(train_stream_factory=train_factory, val_stream_factory=val_factory)
 
     args = argparse.Namespace(
-        batch_size=14,
+        batch_size=20,
         devices=1,
         resume=True,
         start_epoch=None,
@@ -25,7 +25,7 @@ def main():
         dist_url="auto",
         experiment_name=exp.exp_name,
         ckpt="YOLOX_outputs/streaming_yolox/epoch_31_ckpt.pth",
-        fp16=False,
+        fp16=True,
         fuse=False,
         cache=False,
         occupy=False,
