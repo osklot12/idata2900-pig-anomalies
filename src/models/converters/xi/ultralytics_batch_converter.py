@@ -26,9 +26,13 @@ class UltralyticsBatchConverter:
                 bw = ann.bbox.width
                 bh = ann.bbox.height
 
-                cls_list.append(ann.cls.value)
-                bbox_list.append([cx, cy, bw, bh, 0.0])  # angle = 0.0
+                # ✅ Filter out degenerate boxes
+                if bw <= 0 or bh <= 0:
+                    print(f"[Converter] ⚠️ Skipping invalid bbox: w={bw}, h={bh}")
+                    continue
 
+                cls_list.append(ann.cls.value)
+                bbox_list.append([cx, cy, bw, bh, 0.0])
                 print(f"[Converter] class={ann.cls.value}, bbox=({cx}, {cy}, {bw}, {bh})")
 
             # 🛡 Ensure correct tensor format (incl. edge cases)
