@@ -11,7 +11,7 @@ from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
-POST_PROCESS_CONF_THRE = 0.01
+POST_PROCESS_CONF_THRE = 0.001
 POST_PROCESS_NMS_THRE = 0.65
 
 
@@ -238,7 +238,7 @@ class StreamingEvaluator:
 
                 print(f"Predictions ({len(pred)}):")
                 for p in pred:
-                    print(f"  cls={int(p[5])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
+                    print(f"  cls={int(p[6])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
 
             # iterate over each prediction
             for pred_box in pred:
