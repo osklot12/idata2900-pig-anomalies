@@ -31,11 +31,20 @@ class UltralyticsBatchConverter:
 
                 print(f"[Converter] class={ann.cls.value}, bbox=({cx}, {cy}, {bw}, {bh})")
 
-            # Ensure valid shapes even when empty
-            cls_tensor = torch.tensor(cls_list, dtype=torch.long) if cls_list else torch.empty((0,), dtype=torch.long)
-            bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32) if bbox_list else torch.empty((0, 5), dtype=torch.float32)
-            batch_idx_tensor = torch.full((len(cls_tensor),), i, dtype=torch.long)
+            # 🛡 Ensure correct shape even when empty
+            if cls_list:
+                cls_tensor = torch.tensor(cls_list, dtype=torch.long)
+            else:
+                cls_tensor = torch.empty((0,), dtype=torch.long)
 
+            if bbox_list:
+                bbox_tensor = torch.tensor(bbox_list, dtype=torch.float32)
+            else:
+                bbox_tensor = torch.empty((0, 5), dtype=torch.float32)
+
+            batch_idx_tensor = torch.full((cls_tensor.shape[0],), i, dtype=torch.long)
+
+            # ✅ Validation-safe check
             assert cls_tensor.ndim == 1, f"[Converter] Invalid cls_tensor shape: {cls_tensor.shape}"
             assert bbox_tensor.ndim == 2, f"[Converter] Invalid bbox_tensor shape: {bbox_tensor.shape}"
 
@@ -46,7 +55,7 @@ class UltralyticsBatchConverter:
                     "bboxes": bbox_tensor,
                 },
                 "batch_idx": batch_idx_tensor,
-                "im_file": [f"frame_{i}.jpg"],  # Keeps logger happy
+                "im_file": [f"frame_{i}.jpg"],  # Logger-friendly
                 "ori_shape": [torch.tensor([frame.frame.shape[0], frame.frame.shape[1]])],
                 "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],
             })
