@@ -29,6 +29,13 @@ class ResettableDataLoader:
         pass
 
 
+# Subclassing OBBTrainer to patch in custom evaluator BEFORE training starts
+class PatchedOBBTrainer(OBBTrainer):
+    def __init__(self, validator=None, **kwargs):
+        super().__init__(**kwargs)
+        if validator is not None:
+            self.validator = validator  # 💉 Custom evaluator injection
+
 class TrainingSetup:
     def __init__(self, dataset, eval_dataset=None, model_path="yolo11m-obb.pt", log_dir="runs", epochs=300, imgsz=640, validator=None):
         self.metrics = None
@@ -84,7 +91,10 @@ class TrainingSetup:
             "device": 0 if torch.cuda.is_available() else "cpu",
         }
 
-        trainer = OBBTrainer(overrides=overrides)
+        trainer = PatchedOBBTrainer(
+            validator=self.validator,
+            overrides=overrides
+        )
         self.trainer = trainer
 
         def variable_length_collate(batch):
