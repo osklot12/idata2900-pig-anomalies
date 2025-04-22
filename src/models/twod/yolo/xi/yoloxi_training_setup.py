@@ -165,6 +165,9 @@ class TrainingSetup:
 
         try:
             if self.validator:
+                self.validator.device = trainer.device
+                self.validator.model = trainer.model
+                self.validator.writer = self.writer
                 trainer.validator = self.validator
 
             trainer.train()

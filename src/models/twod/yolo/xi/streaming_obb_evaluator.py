@@ -6,12 +6,14 @@ import torch
 
 
 class StreamingOBBValidator(OBBValidator):
-    def __init__(self, dataloader, class_names, writer=None):
+    def __init__(self, dataloader, class_names):
         super().__init__()
         self.dataloader = dataloader
         self.names = class_names
         self.nc = len(class_names)
-        self.writer = writer  # TensorBoard SummaryWriter
+        self.writer = None
+        self.device = None
+        self.model = None
 
     def __call__(self, trainer):
         print("🧪 Starting custom streaming evaluation...")
