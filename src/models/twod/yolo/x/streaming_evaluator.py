@@ -4,12 +4,14 @@ import numpy as np
 import torch.nn
 from tqdm import tqdm
 
+from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 from yolox.data import DataLoader
 from yolox.evaluators.voc_eval import voc_ap
+from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
-POST_PROCESS_CONF_THRE = 0.01
+POST_PROCESS_CONF_THRE = 0.001
 POST_PROCESS_NMS_THRE = 0.65
 
 
@@ -45,6 +47,7 @@ class StreamingEvaluator:
         all_detections: List[np.ndarray] = []
         all_annotations: List[np.ndarray] = []
 
+        global_image_idx = 0
         for batch in tqdm(self._dataloader, desc="Evaluating"):
             images, targets, _, _ = batch
             images = images.to(self._device)
@@ -52,13 +55,45 @@ class StreamingEvaluator:
             with torch.no_grad():
                 outputs = self._model(images)
 
-            raw_logits = outputs[..., 5:]  # (B, N, num_classes)
-            probs = torch.sigmoid(raw_logits)
-            max_probs = probs.max(dim=1).values.mean(dim=0)
+            #raw_logits = outputs[..., 5:]  # (B, N, num_classes)
+            #probs = torch.sigmoid(raw_logits)
+            #max_probs = probs.max(dim=1).values.mean(dim=0)
             # print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
-            all_detections.extend(self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE))
-            all_annotations.extend(self._convert_targets(targets))
+            # detections = self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE)
+            detections_tensor = postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE, POST_PROCESS_NMS_THRE)
+
+            # Convert each Tensor (or None) to numpy array
+            detections = []
+            for det in detections_tensor:
+                if det is None:
+                    detections.append(np.zeros((0, 6), dtype=np.float32))
+                else:
+                    detections.append(det.cpu().numpy())
+            annotations = self._convert_targets(targets)
+
+            all_detections.extend(detections)
+            all_annotations.extend(annotations)
+
+            # Visualize only images with predictions
+            has_predictions = [len(pred) > 0 for pred in detections]
+            if any(has_predictions):
+
+                # Filter relevant elements
+                mask = torch.tensor(has_predictions, dtype=torch.bool)
+                pred_images = images[mask].cpu()
+                pred_targets = targets[mask].cpu()
+                pred_detections = [d for d, keep in zip(detections, has_predictions) if keep]
+
+                YOLOXBatchVisualizer.visualize_with_predictions(
+                    images=pred_images,
+                    targets=pred_targets,
+                    predictions=pred_detections,
+                    class_names=["tail_biting", "ear_biting", "belly_nosing", "tail down"],
+                    start_idx=global_image_idx,
+                    save_dir="./eval_visuals"
+                )
+                global_image_idx += len(pred_detections)
 
         metrics = self._compute_metrics(all_detections, all_annotations)
 
@@ -89,7 +124,7 @@ class StreamingEvaluator:
         return detections
 
     @staticmethod
-    def postprocess(
+    def old_postprocess(
             outputs: torch.Tensor,
             num_classes: int,
             conf_thresh: float = 0.01,
@@ -203,14 +238,14 @@ class StreamingEvaluator:
 
                 print(f"Predictions ({len(pred)}):")
                 for p in pred:
-                    print(f"  cls={int(p[5])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
+                    print(f"  cls={int(p[6])}, conf={p[4]:.2f}, box=({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f}, {p[3]:.1f})")
 
             # iterate over each prediction
             for pred_box in pred:
                 # predicted class
-                pred_class = int(pred_box[5])
+                pred_class = int(pred_box[6])
                 # append confidence
-                scores = np.append(scores, pred_box[4])
+                scores = np.append(scores, pred_box[4] * pred_box[5])
                 # append predicated class
                 labels = np.append(labels, pred_class)
 
