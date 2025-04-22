@@ -61,9 +61,9 @@ class UltralyticsBatchConverter:
                     "bboxes": bbox_tensor,
                 },
                 "batch_idx": batch_idx_tensor,
-                "im_file": f"frame_{i}.jpg",  # not a list
-                "ori_shape": torch.tensor([frame.frame.shape[0], frame.frame.shape[1]]),
-                "ratio_pad": (torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0])),
+                "im_file": [f"frame_{i}.jpg"],  # ✅ list of 1 string
+                "ori_shape": [torch.tensor([frame.frame.shape[0], frame.frame.shape[1]])],  # ✅ list of 1 tensor
+                "ratio_pad": [(torch.tensor([1.0, 1.0]), torch.tensor([0.0, 0.0]))],  # ✅ list of 1 tuple of tensors
             })
 
             print(f"[Converter] Frame shape: {frame.frame.shape}, converted {len(cls_tensor)} bboxes")
