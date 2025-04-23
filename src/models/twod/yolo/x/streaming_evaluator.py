@@ -11,7 +11,7 @@ from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
-POST_PROCESS_CONF_THRE = 0.001
+POST_PROCESS_CONF_THRE = 0.1
 POST_PROCESS_NMS_THRE = 0.65
 
 
