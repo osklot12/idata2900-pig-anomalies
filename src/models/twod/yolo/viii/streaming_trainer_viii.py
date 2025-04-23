@@ -121,3 +121,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                 for i, name in enumerate(loss_names):
                     self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
                 self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
+
+    def plot_training_labels(self):
+            print("⚠️ Skipping plot_training_labels — streaming dataset has no `.labels` attribute.")
