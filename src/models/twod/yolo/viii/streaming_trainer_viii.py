@@ -77,9 +77,8 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             def metrics(self, value):
                 self._metrics = value
 
-            # 👇 this fixes the crash in Ultralytics’ internal code
             @property
-            def metrics_keys(self):
+            def keys(self):
                 return list(self._metrics.keys())
 
             def __call__(self, *args, **kwargs):
