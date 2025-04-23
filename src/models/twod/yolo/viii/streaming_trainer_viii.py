@@ -3,10 +3,8 @@
 import tempfile
 import yaml
 import os
-
 from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.detect import DetectionTrainer
-
 from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
 
 
@@ -15,7 +13,8 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         self.exp = exp
         self.train_dl, self.val_dl = exp.get_dataloaders()
         self.dummy_data_yaml = self._create_dummy_data_yaml()
-        log_dir = str(os.path.join(exp.save_dir, exp.name, "custom_logs"))
+
+        log_dir = os.path.join(exp.save_dir, exp.name, "custom_logs")
         self.writer = SummaryWriter(log_dir=log_dir)
 
         overrides = {
@@ -28,7 +27,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "save_period": exp.eval_interval,
             "save": True,
             "data": self.dummy_data_yaml,
-            "val": False,
+            "val": False,  # disable internal validator
             "exist_ok": True,
         }
 
@@ -55,17 +54,9 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
     def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
         return self.train_dl if mode == "train" else self.val_dl
 
-    def plot_training_labels(self):
-        print("⚠️ Skipping label plotting — streaming dataset has no static `.labels`")
-
-    def plot_training_samples(self, batch, ni):
-        print("⚠️ Skipping sample image plotting — no file paths in streaming mode")
-
-    def train(self):
-        print("🚀 Starting YOLOv8 streaming training...")
-        super().train()  # runs the main training loop
-        print("✅ Training complete. Running final evaluation...")
-        self.validate()
+    def get_validator(self):
+        # Disable built-in validator completely
+        return None
 
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
@@ -76,9 +67,21 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             num_classes=self.exp.num_classes
         )
         self.metrics = evaluator.evaluate()
-        print(f"📊 Evaluation metrics: {self.metrics}")
 
+        # 🟢 Log evaluation metrics
         if self.writer:
             for k, v in self.metrics.items():
                 if isinstance(v, (int, float)):
                     self.writer.add_scalar(f"val/{k}", v, self.epoch)
+
+    def run_callbacks(self, event: str):
+        """Hook into Ultralytics' training callbacks to add our custom evaluator."""
+        super().run_callbacks(event)
+        if event == "on_train_epoch_end":
+            self.validate()
+            # Log training losses
+            if self.writer and hasattr(self, "loss_items"):
+                loss_names = ["box", "cls", "dfl"]  # Update if needed
+                for i, name in enumerate(loss_names):
+                    self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
+                self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
