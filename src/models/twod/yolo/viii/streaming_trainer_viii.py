@@ -33,7 +33,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
         if exp.resume_ckpt:
             overrides["resume"] = True
-            overrides["weights"] = exp.resume_ckpt
+            overrides["model"] = exp.resume_ckpt
 
         super().__init__(overrides=overrides)
 
