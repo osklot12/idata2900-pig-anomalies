@@ -1,6 +1,7 @@
 # src/runners/yoloviii_runner.py
 
 import argparse
+import os
 import traceback
 
 from src.data.dataset.dataset_split import DatasetSplit
@@ -25,7 +26,7 @@ def main():
     exp = YOLOv8StreamingExp(train_factory, val_factory, batch_size=args.batch, epochs=args.epochs, device=args.device)
 
     if args.resume:
-        exp.resume_ckpt = args.ckpt
+        exp.resume_ckpt = os.path.join(exp.save_dir, "weights", "last.pt")
         print(f"🔁 Resuming from checkpoint: {args.ckpt}")
 
     print("🚀 Starting trainer...")
