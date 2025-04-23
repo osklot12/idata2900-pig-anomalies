@@ -45,6 +45,7 @@ class YOLOv8StreamingTrainer:
 
         print("🧠 Launching YOLOv8 training with custom dataloaders...")
         overrides = {
+            "model": self.exp.model,  # ✅ REQUIRED so it doesn't try to load None
             "imgsz": self.exp.input_size[0],
             "epochs": self.exp.epochs,
             "save_period": self.exp.eval_interval,
@@ -52,8 +53,9 @@ class YOLOv8StreamingTrainer:
             "project": self.exp.save_dir,
             "name": self.exp.name,
             "device": getattr(self.exp, "device", "cuda:0"),
-            "data": self.dummy_data_yaml,  # 🛠 Point to valid dummy yaml
+            "data": self.dummy_data_yaml,
         }
 
         trainer = StreamingTrainer(overrides=overrides)
         trainer.train()
+
