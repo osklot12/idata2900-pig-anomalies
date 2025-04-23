@@ -1,6 +1,6 @@
+import tempfile
 import os
 import yaml
-import tempfile
 from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
 
@@ -11,29 +11,39 @@ class YOLOv8StreamingTrainer:
         self.train_dl = train_dl
         self.val_dl = val_dl
 
+        # Create a dummy data.yaml just to satisfy Ultralytics
+        self.dummy_data_yaml = self._create_dummy_data_yaml()
+
         if exp.resume_ckpt:
             print(f"🔁 Resuming from checkpoint: {exp.resume_ckpt}")
             self.model = YOLO(exp.resume_ckpt)
         else:
             self.model = YOLO(exp.model)
 
-    def train(self):
-        # ✅ Write dummy data.yaml
+    def _create_dummy_data_yaml(self):
+        dummy_root = tempfile.mkdtemp(prefix="yolo_streaming_")
+        os.makedirs(os.path.join(dummy_root, "fake", "images"), exist_ok=True)
+        os.makedirs(os.path.join(dummy_root, "fake", "labels"), exist_ok=True)
+
         dummy_data = {
-            "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
+            "train": os.path.join(dummy_root, "fake"),
+            "val": os.path.join(dummy_root, "fake"),
             "nc": self.exp.num_classes,
-            "train": "fake/train",
-            "val": "fake/val"
+            "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
         }
-        dummy_path = os.path.join(tempfile.mkdtemp(), "data.yaml")
-        with open(dummy_path, "w") as f:
+
+        yaml_path = os.path.join(dummy_root, "data.yaml")
+        with open(yaml_path, "w") as f:
             yaml.safe_dump(dummy_data, f)
 
-        # 🧠 Internal subclass that injects our custom dataloaders
+        return yaml_path
+
+    def train(self):
         class StreamingTrainer(DetectionTrainer):
             def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
                 return self.exp.train_dl if mode == "train" else self.exp.val_dl
 
+        print("🧠 Launching YOLOv8 training with custom dataloaders...")
         overrides = {
             "imgsz": self.exp.input_size[0],
             "epochs": self.exp.epochs,
@@ -42,12 +52,8 @@ class YOLOv8StreamingTrainer:
             "project": self.exp.save_dir,
             "name": self.exp.name,
             "device": getattr(self.exp, "device", "cuda:0"),
-            "data": dummy_path  # ✅ path, not dict
+            "data": self.dummy_data_yaml,  # 🛠 Point to valid dummy yaml
         }
 
-        if self.exp.resume_ckpt:
-            overrides["resume"] = self.exp.resume_ckpt
-
-        print("🧠 Launching YOLOv8 training with custom dataloaders...")
         trainer = StreamingTrainer(overrides=overrides)
         trainer.train()
