@@ -9,7 +9,6 @@ class YOLOv8StreamingDataset(IterableDataset):
         self.batch_size = batch_size
         self.max_batches = max_batches
         self.eval_mode = eval_mode
-        self.stream.start()
 
     def __iter__(self):
         batch = []
