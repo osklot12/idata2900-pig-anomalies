@@ -1,3 +1,7 @@
+import os
+import yaml
+import tempfile
+from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
 
 
@@ -7,13 +11,30 @@ class YOLOv8StreamingTrainer:
         self.train_dl = train_dl
         self.val_dl = val_dl
 
+        if exp.resume_ckpt:
+            print(f"🔁 Resuming from checkpoint: {exp.resume_ckpt}")
+            self.model = YOLO(exp.resume_ckpt)
+        else:
+            self.model = YOLO(exp.model)
+
     def train(self):
+        # ✅ Write dummy data.yaml
+        dummy_data = {
+            "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
+            "nc": self.exp.num_classes,
+            "train": "fake/train",
+            "val": "fake/val"
+        }
+        dummy_path = os.path.join(tempfile.mkdtemp(), "data.yaml")
+        with open(dummy_path, "w") as f:
+            yaml.safe_dump(dummy_data, f)
+
+        # 🧠 Internal subclass that injects our custom dataloaders
         class StreamingTrainer(DetectionTrainer):
             def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
-                return self.train_dl if mode == "train" else self.val_dl
+                return self.exp.train_dl if mode == "train" else self.exp.val_dl
 
         overrides = {
-            "model": self.exp.model,
             "imgsz": self.exp.input_size[0],
             "epochs": self.exp.epochs,
             "save_period": self.exp.eval_interval,
@@ -21,10 +42,7 @@ class YOLOv8StreamingTrainer:
             "project": self.exp.save_dir,
             "name": self.exp.name,
             "device": getattr(self.exp, "device", "cuda:0"),
-            "data": {
-                "names": ["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
-                "nc": self.exp.num_classes
-            },
+            "data": dummy_path  # ✅ path, not dict
         }
 
         if self.exp.resume_ckpt:
