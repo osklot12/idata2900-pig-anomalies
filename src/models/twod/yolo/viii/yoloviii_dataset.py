@@ -5,7 +5,8 @@ from src.models.converters.viii.yoloviii_batch_converter import YOLOv8BatchConve
 
 class YOLOv8StreamingDataset(IterableDataset):
     def __init__(self, stream_factory, batch_size, max_batches, eval_mode=False):
-        self.stream = stream_factory.create_stream()
+        pipeline = stream_factory.create_stream()
+        self.stream = pipeline.stream  # ✅ Fix: unwrap the iterable Prefetcher
         self.batch_size = batch_size
         self.max_batches = max_batches
         self.eval_mode = eval_mode
