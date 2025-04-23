@@ -22,21 +22,14 @@ def main():
     val_factory = NetworkDatasetStreamFactory("10.0.0.1", DatasetSplit.VAL)
 
     print("🧪 Preparing YOLOv8 experiment...")
-    exp = YOLOv8StreamingExp(train_factory, val_factory)
-    exp.epochs = args.epochs
-    exp.input_size = (640, 640)
-    exp.device = args.device
-    exp.batch_size = args.batch
+    exp = YOLOv8StreamingExp(train_factory, val_factory, batch_size=args.batch, epochs=args.epochs, device=args.device)
 
     if args.resume:
         exp.resume_ckpt = args.ckpt
         print(f"🔁 Resuming from checkpoint: {args.ckpt}")
 
-    print("📦 Building dataloaders...")
-    train_dl, val_dl = exp.get_dataloaders()
-
     print("🚀 Starting trainer...")
-    trainer = YOLOv8StreamingTrainer(exp, train_dl, val_dl)
+    trainer = YOLOv8StreamingTrainer(exp)
 
     try:
         trainer.train()
