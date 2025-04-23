@@ -13,17 +13,17 @@ T = TypeVar("T")
 class YOLOXDataset(IterableDataset):
     """A dataset for YOLOX."""
 
-    def __init__(self, stream_factory: ClosableStreamFactory[T], batch_size: int, n_batches: int):
+    def __init__(self, stream: ClosableStream[T], batch_size: int, n_batches: int):
         """
         Initializes a YOLOXDataset instance.
 
         Args:
-            stream_factory (ClosableStreamFactory[T]): factory for creating dataset streams
+            stream (ClosableStream[T]): stream to read data from
             batch_size (int): the batch size
             n_batches (int): the number of total batches
         """
         super().__init__()
-        self._stream_factory = stream_factory
+        self._stream = stream
         self._batch_size = batch_size
         self._n_batches = n_batches
 
@@ -31,20 +31,16 @@ class YOLOXDataset(IterableDataset):
         self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
 
     def __iter__(self):
-        stream = self._stream_factory.create_stream()
-
         i = 0
         eos = False
         while i < len(self) and not eos:
-            batch = self._fetch_batch(stream)
+            batch = self._fetch_batch(self._stream)
             if len(batch) > 0:
                 yield YOLOXBatchConverter.convert(batch)
                 i += 1
 
             if len(batch) < self._batch_size:
                 eos = True
-
-        stream.close()
 
     def _fetch_batch(self, stream: ClosableStream[T]) -> List[T]:
         """Fetches the next batch."""
@@ -62,3 +58,6 @@ class YOLOXDataset(IterableDataset):
 
     def __len__(self):
         return self._n_batches
+
+    def close(self) -> None:
+        """Closes the dataset."""
