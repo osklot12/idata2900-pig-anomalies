@@ -40,6 +40,10 @@ class YOLOv8StreamingTrainer:
 
     def train(self):
         class StreamingTrainer(DetectionTrainer):
+            def __init__(self, exp, **kwargs):
+                self.exp = exp  # ✅ store it!
+                super().__init__(**kwargs)
+
             def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
                 return self.exp.train_dl if mode == "train" else self.exp.val_dl
 
@@ -56,6 +60,6 @@ class YOLOv8StreamingTrainer:
             "data": self.dummy_data_yaml,
         }
 
-        trainer = StreamingTrainer(overrides=overrides)
+        trainer = StreamingTrainer(overrides=overrides, exp=self)
         trainer.train()
 
