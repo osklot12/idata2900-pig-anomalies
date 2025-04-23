@@ -20,4 +20,8 @@ class ReadStreamResponse(Generic[T], Response):
     instance: Optional[T]
 
     def __repr__(self) -> str:
-        return f"ReadStreamResponse(status={self.status}, end_of_stream={self.instance is None})"
+        annotated = False
+        if self.instance:
+            annotated = len(self.instance.annotations) > 0
+
+        return f"ReadStreamResponse(status={self.status}, annotated={annotated} end_of_stream={self.instance is None})"

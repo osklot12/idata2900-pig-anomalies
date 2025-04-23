@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 
 from src.data.dataset.dataset_split import DatasetSplit
@@ -19,17 +21,22 @@ from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 def test_norsvin_train_stream():
     """Tests that creating the Norsvin training set stream with GCSStreamFactory gives the correct stream."""
     # arrange
+    def has_annotations(meta: Dict[str, int]) -> bool:
+        return any(count > 0 for count in meta.values())
+
     stream_factory = GCSStreamFactory(
         gcs_creds=NORSVIN_GCS_CREDS,
         split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TRAIN,
         selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=2000),
-        pipeline_factory=NorsvinTrainPipelineFactory()
+        stream_factory=PoolStreamFactory(pool_size=4000, min_ready=3000),
+        pipeline_factory=NorsvinTrainPipelineFactory(),
+        filter_func=has_annotations,
     )
 
     stream = stream_factory.create_stream()
+    decompressor = ZlibDecompressor()
 
     # act
     stream.run()
@@ -51,12 +58,14 @@ def test_norsvin_train_stream():
                     belly_nosing += 1
                 if annotation.cls == NorsvinBehaviorClass.EAR_BITING:
                     ear_biting += 1
-            total += 1
+                total += 1
             print(f"[Test] Total instances: {total}")
             print(f"[Test] Bellynosing: {belly_nosing} ({belly_nosing/total*100:.2f}%)")
             print(f"[Test] Tailbiting: {tail_biting} ({tail_biting/total*100:.2f}%)")
             print(f"[Test] Earbiting: {ear_biting} ({ear_biting/total*100:.2f}%)")
             print(f"[Test] Taildown: {tail_down} ({tail_down/total*100:.2f}%)")
+
+            AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
             instance = stream.read()
     except KeyboardInterrupt:
         stream.stop()

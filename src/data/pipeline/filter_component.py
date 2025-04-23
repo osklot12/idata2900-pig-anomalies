@@ -10,7 +10,7 @@ I = TypeVar("I")
 O = TypeVar("O")
 
 
-class FilterComponent(Generic[I, O], BaseComponent):
+class FilterComponent(Generic[I, O], BaseComponent[I, O]):
     """Filters data based on a condition."""
 
     def __init__(self, condition: Callable[[I], bool]):
