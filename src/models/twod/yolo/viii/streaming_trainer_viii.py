@@ -58,7 +58,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         class CustomValidatorWrapper:
             def __init__(self, trainer):
                 self.trainer = trainer
-                self.metrics = {
+                self._metrics = {
                     "precision": 0.0,
                     "recall": 0.0,
                     "mAP": 0.0,
@@ -68,6 +68,19 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                     "total_loss": 0.0,
                     "fitness": 0.0,
                 }
+
+            @property
+            def metrics(self):
+                return self._metrics
+
+            @metrics.setter
+            def metrics(self, value):
+                self._metrics = value
+
+            # 👇 this fixes the crash in Ultralytics’ internal code
+            @property
+            def metrics_keys(self):
+                return list(self._metrics.keys())
 
             def __call__(self, *args, **kwargs):
                 print("🔍 Running custom StreamingEvaluatorVIII from overridden validator...")
