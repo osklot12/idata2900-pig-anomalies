@@ -1,7 +1,9 @@
 # src/models/twod/yolo/viii/streaming_trainer_viii.py
 
+import tempfile
+import yaml
+import os
 from ultralytics.models.yolo.detect import DetectionTrainer
-import tempfile, yaml, os
 
 from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
 
@@ -11,6 +13,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         self.exp = exp
         self.train_dl, self.val_dl = exp.get_dataloaders()
         self.dummy_data_yaml = self._create_dummy_data_yaml()
+
         overrides = {
             "model": exp.model,
             "imgsz": exp.input_size[0],
@@ -21,7 +24,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "save_period": exp.eval_interval,
             "save": True,
             "data": self.dummy_data_yaml,
-            "val": False,
+            "val": False,  # disables built-in validator
         }
 
         if exp.resume_ckpt:
@@ -51,6 +54,12 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def plot_training_samples(self, batch, ni):
         print("⚠️ Skipping sample image plotting — no file paths in streaming mode")
+
+    def train(self):
+        print("🚀 Starting YOLOv8 streaming training...")
+        super().train()  # runs the main training loop
+        print("✅ Training complete. Running final evaluation...")
+        self.validate()
 
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
