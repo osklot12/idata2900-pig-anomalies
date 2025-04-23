@@ -46,7 +46,8 @@ class StreamingEvaluatorVIII:
                     targets.append(np.zeros((0, 5)))
 
             with torch.no_grad():
-                preds = self._model(imgs)[0]
+                out = self._model(imgs)
+                preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
 
             detections = []
