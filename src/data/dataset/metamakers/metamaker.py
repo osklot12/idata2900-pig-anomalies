@@ -8,7 +8,7 @@ K = TypeVar("K")
 L = TypeVar("L")
 
 
-class MetaMaker(Generic[K, L], ABC):
+class Metamaker(Generic[K, L], ABC):
     """Generates metadata for a dataset."""
 
     @abstractmethod
