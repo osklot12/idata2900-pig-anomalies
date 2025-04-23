@@ -1,9 +1,8 @@
 # src/models/converters/viii/yoloviii_batch_converter.py
 
-from typing import List, Tuple
+from typing import List
 import numpy as np
 import torch
-
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.models.converters.static_bbox_scaler import StaticBBoxScaler
 
@@ -16,8 +15,9 @@ class YOLOv8BatchConverter:
         images = []
         bboxes = []
         classes = []
+        batch_indices = []
 
-        for frame in batch:
+        for idx, frame in enumerate(batch):
             img = frame.frame
             height, width = img.shape[:2]
             img_tensor = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
@@ -34,14 +34,17 @@ class YOLOv8BatchConverter:
                 cy = (scaled_bbox.y + scaled_bbox.height / 2) / height
                 w = scaled_bbox.width / width
                 h = scaled_bbox.height / height
+
                 frame_bboxes.append([cx, cy, w, h])
                 frame_classes.append(ann.cls.value)
+                batch_indices.append(idx)  # ✨ one index per annotation
 
-            bboxes.append(torch.tensor(frame_bboxes, dtype=torch.float32))
-            classes.append(torch.tensor(frame_classes, dtype=torch.long))
+            bboxes.extend(frame_bboxes)
+            classes.extend(frame_classes)
 
         return {
             "img": torch.stack(images),
-            "bboxes": bboxes,
-            "cls": classes,
+            "bboxes": torch.tensor(bboxes, dtype=torch.float32),
+            "cls": torch.tensor(classes, dtype=torch.float32),
+            "batch_idx": torch.tensor(batch_indices, dtype=torch.int64),
         }
