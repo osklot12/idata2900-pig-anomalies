@@ -3,6 +3,7 @@ from typing import List
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.compressed_annotated_frame import CompressedAnnotatedFrame
 from src.data.pipeline.field_transformer import FieldTransformer
+from src.data.pipeline.filter_component import FilterComponent
 from src.data.pipeline.norsvin_pipeline_config import RESIZE_SHAPE, NORMALIZE_RANGE, CLASS_COUNTS
 from src.data.pipeline.pipeline import Pipeline
 from src.data.pipeline.factories.pipeline_factory import PipelineFactory
@@ -32,6 +33,8 @@ class NorsvinTrainPipelineFactory(PipelineFactory[AnnotatedFrame, CompressedAnno
             return len(frame.annotations) > 0
 
         return Pipeline(
+            FilterComponent(is_annotated)
+        ).then(
             FieldTransformer.of("frame").using(FrameResizer(RESIZE_SHAPE))
         ).then(
             Preprocessor(BBoxNormalizerProcessor(SimpleBBoxNormalizer(NORMALIZE_RANGE)))

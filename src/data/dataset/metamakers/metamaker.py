@@ -1,22 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Dict, TypeVar, Generic
 
-# key type for instance
-K = TypeVar("K")
-
-# label class type
-L = TypeVar("L")
-
-
-class Metamaker(Generic[K, L], ABC):
+class Metamaker(ABC):
     """Generates metadata for a dataset."""
 
     @abstractmethod
-    def make_metadata(self) -> Dict[K, Dict[L, int]]:
+    def make_metadata(self) -> Dict[str, Dict[str, int]]:
         """
         Creates metadata for this dataset.
 
         Returns:
-            Dict[K, Dict[L, int]]: the metadata
+            Dict[str, Dict[str, int]]: the metadata
         """
         raise NotImplementedError

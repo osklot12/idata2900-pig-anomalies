@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Dict, Iterable, Optional
+from typing import TypeVar, Generic, List, Dict, Iterable, Optional, Callable
 
 from src.auth.factories.auth_service_factory import AuthServiceFactory
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
@@ -7,6 +7,7 @@ from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.dataset.manifests.manifest import Manifest
 from src.data.dataset.manifests.matching_manifest import MatchingManifest
+from src.data.dataset.metamakers.file_metamaker import FileMetamaker
 from src.data.dataset.providers.entity_factory import EntityFactory
 from src.data.dataset.providers.instance_provider import InstanceProvider
 from src.data.dataset.providers.lazy_entity_factory import LazyEntityFactory
@@ -55,7 +56,10 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
                  selector_factory: SelectorFactory[str],
                  label_map: Dict[str, T_Enum],
                  stream_factory: WritableStreamFactory[B],
-                 pipeline_factory: Optional[PipelineFactory[A, B]] = None):
+                 pipeline_factory: Optional[PipelineFactory[A, B]] = None,
+                 filter_func: Optional[Callable[[Dict[str, int]], bool]] = None,
+                 meta_cache_dir: str = "cache/metadata.json"
+                 ):
         """
         Initializes a GCSStreamFactory instance.
 
@@ -67,6 +71,8 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             label_map (Dict[str, T_Enum]): label map for annotation classes
             stream_factory (WritableStreamFactory[B]): factory for creating stream instances
             pipeline_factory (Optional[PipelineFactory[T]]): optional pipeline provider
+            filter_func (Optional[Callable[[Dict[str, int]], bool]]): optional filter function
+            meta_cache_dir (Optional[str]): cache directory for metadata
         """
         self._gcs_creds = gcs_creds
         self._split_ratios = split_ratios
@@ -75,6 +81,8 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
         self._label_map = label_map
         self._stream_factory = stream_factory
         self._pipeline_factory: Optional[PipelineFactory[A, B]] = pipeline_factory
+        self._filter_func = filter_func
+        self._meta_cache_dir = meta_cache_dir
 
     def create_stream(self) -> ManagedStream[T]:
         auth_factory = self._create_auth_service_factory(self._gcs_creds.service_account_path)
@@ -84,7 +92,18 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
 
         manifest = self._create_manifest(loader_factory.create_file_registry())
         splitter = self._create_splitter(manifest.ids, self._split_ratios)
-        selector = self._create_selector(splitter.splits, self._split)
+        split = splitter.splits[self._split.value]
+        if self._filter_func is not None:
+            metamaker = FileMetamaker(loader_factory, cache=True, cache_dir=self._meta_cache_dir)
+            metadata = metamaker.make_metadata()
+            filtered = [
+                id_ for id_, label_counts in metadata.items()
+                if self._filter_func(label_counts)
+            ]
+            filtered_set = set(filtered)
+            split = [id_ for id_ in split if id_ in filtered_set]
+
+        selector = self._create_selector(split)
         instance_provider = self._create_instance_provider(manifest, selector)
         entity_provider = self._create_entity_provider(loader_factory)
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
@@ -100,6 +119,10 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             manager = self._create_streamer_manager(streamer_factory, stream, [stream])
 
         return ManagedStream[T](stream=stream, manager=manager)
+
+    @staticmethod
+    def has_annotations(data: Dict[str, int]) -> bool:
+        return any(count > 0 for count in data.values())
 
     @staticmethod
     def _create_auth_service_factory(service_account_path: str) -> AuthServiceFactory:
@@ -146,9 +169,9 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             ]
         )
 
-    def _create_selector(self, splits: List[List[str]], split: DatasetSplit) -> Selector[str]:
+    def _create_selector(self, candidates: List[str]) -> Selector[str]:
         """Creates a selector for selecting dataset instances."""
-        return self._selector_factory.create_selector(candidates=splits[split.value])
+        return self._selector_factory.create_selector(candidates=candidates)
 
     @staticmethod
     def _create_instance_provider(manifest: Manifest, selector: Selector[str]) -> InstanceProvider:
@@ -180,5 +203,5 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
             streamer_factory=streamer_factory,
             provider=consumer_provider,
             closables=closables,
-            max_streamers=3
+            max_streamers=4
         )

@@ -1,4 +1,5 @@
 import time
+from typing import Dict
 
 from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
 from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory
@@ -32,14 +33,18 @@ def main():
     gcs_creds = GCSCredentials(bucket_name=TestBucket.BUCKET_NAME, service_account_path=TestBucket.SERVICE_ACCOUNT_FILE)
     split_ratios = NORSVIN_SPLIT_RATIOS
 
+    def has_annotations(meta: Dict[str, int]) -> bool:
+        return any(count > 0 for count in meta.values())
+
     train_stream_factory = GCSStreamFactory(
         gcs_creds=gcs_creds,
         split_ratios=split_ratios,
         split=DatasetSplit.TRAIN,
         selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=7000, min_ready=6500),
-        pipeline_factory=NorsvinTrainPipelineFactory()
+        stream_factory=PoolStreamFactory(pool_size=4000, min_ready=3000),
+        pipeline_factory=NorsvinTrainPipelineFactory(),
+        filter_func=has_annotations,
     )
 
     val_stream_factory = GCSStreamFactory(

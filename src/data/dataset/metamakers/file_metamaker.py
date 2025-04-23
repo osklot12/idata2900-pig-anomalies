@@ -2,20 +2,13 @@ import json
 from typing import Dict, List
 from tqdm import tqdm
 
-from src.data.dataset.metamakers.metamaker import Metamaker, K, L
+from src.data.dataset.metamakers.metamaker import Metamaker
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.determ_string_selector import DetermStringSelector
 from src.data.dataset.selectors.selector import Selector
 from src.data.loading.loaders.factories.loader_factory import LoaderFactory
 from src.data.parsing.base_name_parser import BaseNameParser
 from src.utils.path_finder import PathFinder
-
-
-# key type for instance
-# K = TypeVar("K")
-
-# label class type
-# L = TypeVar("L")
 
 
 class FileMetamaker(Metamaker):
@@ -35,12 +28,12 @@ class FileMetamaker(Metamaker):
         self._cache_dir = cache_dir
         self._parser = BaseNameParser()
 
-    def make_metadata(self) -> Dict[K, Dict[L, int]]:
+    def make_metadata(self) -> Dict[str, Dict[str, int]]:
         return self._get_cached_metadata() if self._cache else self._generate_metadata()
 
-    def _get_cached_metadata(self) -> Dict[K, Dict[L, int]]:
+    def _get_cached_metadata(self) -> Dict[str, Dict[str, int]]:
         """Tries to fetch cached metadata, or creates it if it does not exist."""
-        metadata: Dict[K, Dict[L, int]] = {}
+        metadata: Dict[str, Dict[str, int]] = {}
 
         output_path = PathFinder.get_abs_path(self._cache_dir)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -61,9 +54,9 @@ class FileMetamaker(Metamaker):
 
         return metadata
 
-    def _generate_metadata(self) -> Dict[K, Dict[L, int]]:
+    def _generate_metadata(self) -> Dict[str, Dict[str, int]]:
         """Generates metadata."""
-        metadata: Dict[K, Dict[L, int]] = {}
+        metadata: Dict[str, Dict[str, int]] = {}
 
         registry = self._loader_factory.create_file_registry()
         anno_registry = SuffixFileRegistry(source=registry, suffixes=("json",))
@@ -83,7 +76,7 @@ class FileMetamaker(Metamaker):
 
             for ans in annotations:
                 for a in ans.annotations:
-                    label = a.cls
+                    label = str(a.cls)
                     if label not in label_counts:
                         label_counts[label] = 0
 
