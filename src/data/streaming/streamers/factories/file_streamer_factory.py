@@ -15,7 +15,7 @@ from src.data.streaming.streamers.video_annotations_streamer import VideoAnnotat
 from src.data.streaming.streamers.video_file_streamer import VideoFileStreamer
 
 
-class InstanceStreamerFactory(StreamerFactory[AnnotatedFrame]):
+class FileStreamerFactory(StreamerFactory[AnnotatedFrame]):
     """Factory for creating dataset instance streamers."""
 
     def __init__(self, instance_provider: InstanceProvider, entity_factory: EntityFactory):

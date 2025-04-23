@@ -31,7 +31,7 @@ from src.data.pipeline.factories.pipeline_factory import PipelineFactory
 from src.data.pipeline.pipeline_to_sink_provider import PipelineToSinkProvider
 from src.data.streaming.managers.throttled_streamer_manager import ThrottledStreamerManager
 from src.data.streaming.managers.streamer_manager import StreamerManager
-from src.data.streaming.streamers.factories.instance_streamer_factory import InstanceStreamerFactory
+from src.data.streaming.streamers.factories.file_streamer_factory import FileStreamerFactory
 from src.data.streaming.streamers.factories.streamer_factory import StreamerFactory
 from src.data.typevars.enum_type import T_Enum
 from src.utils.gcs_credentials import GCSCredentials
@@ -165,9 +165,9 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
 
     @staticmethod
     def _create_streamer_factory(instance_provider: InstanceProvider,
-                                 entity_factory: EntityFactory) -> InstanceStreamerFactory:
+                                 entity_factory: EntityFactory) -> FileStreamerFactory:
         """Creates an AggregatedStreamerFactory instance."""
-        return InstanceStreamerFactory(
+        return FileStreamerFactory(
             instance_provider=instance_provider,
             entity_factory=entity_factory
         )
