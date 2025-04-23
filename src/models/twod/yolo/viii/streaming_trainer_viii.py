@@ -1,5 +1,3 @@
-# src/models/twod/yolo/viii/streaming_trainer_viii.py
-
 import tempfile
 import yaml
 import os
@@ -71,19 +69,18 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
             @property
             def metrics(self):
-                return self._metrics
+                class MetricDict(dict):
+                    @property
+                    def keys(self_inner):  # Ultralytics expects `.metrics.keys` to be a list
+                        return list(super(MetricDict, self_inner).keys())
+                return MetricDict(self._metrics)
 
             @metrics.setter
             def metrics(self, value):
                 self._metrics = value
 
-            @property
-            def keys(self):
-                return list(self._metrics.keys())
-
             def __call__(self, *args, **kwargs):
                 print("🔍 Running custom StreamingEvaluatorVIII from overridden validator...")
-
                 evaluator = StreamingEvaluatorVIII(
                     model=self.trainer.model.model,
                     dataloader=self.trainer.val_dl,
@@ -110,21 +107,17 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             num_classes=self.exp.num_classes
         )
         self.metrics = evaluator.evaluate()
-
-        # 🟢 Log evaluation metrics
         if self.writer:
             for k, v in self.metrics.items():
                 if isinstance(v, (int, float)):
                     self.writer.add_scalar(f"val/{k}", v, self.epoch)
 
     def run_callbacks(self, event: str):
-        """Hook into Ultralytics' training callbacks to add our custom evaluator."""
         super().run_callbacks(event)
         if event == "on_train_epoch_end":
             self.validate()
-            # Log training losses
             if self.writer and hasattr(self, "loss_items"):
-                loss_names = ["box", "cls", "dfl"]  # Update if needed
+                loss_names = ["box", "cls", "dfl"]
                 for i, name in enumerate(loss_names):
                     self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
                 self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
