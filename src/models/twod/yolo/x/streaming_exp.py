@@ -47,7 +47,7 @@ class StreamingExp(BaseExp):
         dataset = YOLOXDataset(
             stream_factory=self._train_stream_factory,
             batch_size=28,
-            n_batches=1750
+            n_batches=267
         )
         return DataLoader(
             dataset=dataset,

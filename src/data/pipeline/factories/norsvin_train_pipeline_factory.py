@@ -41,8 +41,6 @@ class NorsvinTrainPipelineFactory(PipelineFactory[AnnotatedFrame, CompressedAnno
         ).then(
             SplittingPreprocessor(ClassBalancer(class_counts=CLASS_COUNTS, max_samples_per=3))
         ).then(
-            SplittingPreprocessor(CondMultiplier(n=2, condition=is_annotated))
-        ).then(
             Preprocessor(Augmentor(plan_factory=AugmentationPlanFactory(), filters=self._create_filters()))
         ).then(
             Preprocessor(ZlibCompressor())

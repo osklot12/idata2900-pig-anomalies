@@ -24,3 +24,6 @@ class CompressedAnnotatedFrame:
     shape: Tuple[int, int, int]
     dtype: str
     annotations: List[AnnotatedBBox]
+
+    def __repr__(self) -> str:
+        return f"CompressedAnnotatedFrame(source={self.source.source_id}, index={self.index}, num_annotations={len(self.annotations)})"
