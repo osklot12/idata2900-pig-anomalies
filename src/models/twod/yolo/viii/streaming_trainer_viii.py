@@ -24,11 +24,14 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "save_period": exp.eval_interval,
             "save": True,
             "data": self.dummy_data_yaml,
-            "val": False,  # disables built-in validator
+            "val": False,
+            "exist_ok": True,
+            "logger": True,
         }
 
         if exp.resume_ckpt:
-            overrides["resume"] = exp.resume_ckpt
+            overrides["resume"] = True
+            overrides["weights"] = exp.resume_ckpt
 
         super().__init__(overrides=overrides)
 
@@ -64,10 +67,16 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
         evaluator = StreamingEvaluatorVIII(
-            model=self.model.model,  # unwrap from YOLO wrapper
+            model=self.model.model,
             dataloader=self.val_dl,
             device=self.exp.device,
             num_classes=self.exp.num_classes
         )
         self.metrics = evaluator.evaluate()
         print(f"📊 Evaluation metrics: {self.metrics}")
+
+        # ✅ Add TensorBoard logging
+        if self.writer:
+            for k, v in self.metrics.items():
+                if isinstance(v, (int, float)):
+                    self.writer.add_scalar(f"val/{k}", v, self.epoch)
