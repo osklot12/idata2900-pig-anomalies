@@ -44,3 +44,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def plot_training_labels(self):
         print("⚠️ Skipping label plotting — streaming dataset has no static `.labels`")
+
+    def plot_training_samples(self, batch, ni):
+        print("⚠️ Skipping sample image plotting — no file paths in streaming mode")
