@@ -41,11 +41,14 @@ class YOLOv8StreamingTrainer:
     def train(self):
         class StreamingTrainer(DetectionTrainer):
             def __init__(self, exp, **kwargs):
-                self.exp = exp  # ✅ store it!
+                self.exp = exp
                 super().__init__(**kwargs)
 
             def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
                 return self.exp.train_dl if mode == "train" else self.exp.val_dl
+
+            def plot_training_labels(self):
+                print("⚠️ Skipping label plotting — streaming dataset has no static `.labels`")
 
         print("🧠 Launching YOLOv8 training with custom dataloaders...")
         overrides = {
