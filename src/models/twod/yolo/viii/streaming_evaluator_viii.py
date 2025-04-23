@@ -23,10 +23,14 @@ class StreamingEvaluatorVIII:
         all_annotations: List[np.ndarray] = []
 
         for batch in tqdm(self._dataloader, desc="Evaluating"):
-            imgs = batch["img"].to(self._device, non_blocking=True).float()
+            imgs = batch["img"].float().to(self._device, non_blocking=True)
+            if imgs.ndim == 3:
+                imgs = imgs.unsqueeze(0)
             cls = batch["cls"]
             bboxes = batch["bboxes"]
             batch_idx = batch["batch_idx"]
+
+            print("✅ BATCH IMG SHAPE:", imgs.shape)
 
             targets = []
             for i in range(len(imgs)):
