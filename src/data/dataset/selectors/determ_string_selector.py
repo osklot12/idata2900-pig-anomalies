@@ -35,6 +35,7 @@ class DetermStringSelector(Selector):
 
         if file is None:
             print(f"[DetermStringSelector] End of stream")
+
         return file
 
     def reset(self) -> None:
