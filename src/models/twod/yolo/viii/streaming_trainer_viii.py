@@ -55,8 +55,39 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         return self.train_dl if mode == "train" else self.val_dl
 
     def get_validator(self):
-        # Disable built-in validator completely
-        return None
+        class CustomValidatorWrapper:
+            def __init__(self, trainer):
+                self.trainer = trainer
+                self.metrics = {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "mAP": 0.0,
+                    "iou_loss": 0.0,
+                    "conf_loss": 0.0,
+                    "cls_loss": 0.0,
+                    "total_loss": 0.0,
+                    "fitness": 0.0,
+                }
+
+            def __call__(self, *args, **kwargs):
+                print("🔍 Running custom StreamingEvaluatorVIII from overridden validator...")
+
+                evaluator = StreamingEvaluatorVIII(
+                    model=self.trainer.model.model,
+                    dataloader=self.trainer.val_dl,
+                    device=self.trainer.exp.device,
+                    num_classes=self.trainer.exp.num_classes
+                )
+                self.metrics = evaluator.evaluate()
+
+                if self.trainer.writer:
+                    for k, v in self.metrics.items():
+                        if isinstance(v, (int, float)):
+                            self.trainer.writer.add_scalar(f"val/{k}", v, self.trainer.epoch)
+
+                return self.metrics
+
+        return CustomValidatorWrapper(self)
 
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
