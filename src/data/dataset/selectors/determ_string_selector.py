@@ -32,6 +32,7 @@ class DetermStringSelector(Selector):
         if not self._index >= len(self._shuffled_files):
             file = self._shuffled_files[self._index]
             self._index += 1
+            print(f"[DetermStringSelector] Selected {file}")
 
         if file is None:
             print(f"[DetermStringSelector] End of stream")
