@@ -3,6 +3,9 @@
 from ultralytics.models.yolo.detect import DetectionTrainer
 import tempfile, yaml, os
 
+from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
+
+
 class YOLOv8StreamingTrainer(DetectionTrainer):
     def __init__(self, exp):
         self.exp = exp
@@ -18,6 +21,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "save_period": exp.eval_interval,
             "save": True,
             "data": self.dummy_data_yaml,
+            "val": False,
         }
 
         if exp.resume_ckpt:
@@ -47,3 +51,14 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def plot_training_samples(self, batch, ni):
         print("⚠️ Skipping sample image plotting — no file paths in streaming mode")
+
+    def validate(self):
+        print("🔍 Running custom StreamingEvaluatorVIII...")
+        evaluator = StreamingEvaluatorVIII(
+            model=self.model.model,  # unwrap from YOLO wrapper
+            dataloader=self.val_dl,
+            device=self.exp.device,
+            num_classes=self.exp.num_classes
+        )
+        self.metrics = evaluator.evaluate()
+        print(f"📊 Evaluation metrics: {self.metrics}")
