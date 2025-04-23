@@ -3,6 +3,8 @@
 import tempfile
 import yaml
 import os
+
+from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.detect import DetectionTrainer
 
 from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
@@ -13,6 +15,8 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         self.exp = exp
         self.train_dl, self.val_dl = exp.get_dataloaders()
         self.dummy_data_yaml = self._create_dummy_data_yaml()
+        log_dir = str(os.path.join(exp.save_dir, exp.name, "custom_logs"))
+        self.writer = SummaryWriter(log_dir=log_dir)
 
         overrides = {
             "model": exp.model,
@@ -26,7 +30,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "data": self.dummy_data_yaml,
             "val": False,
             "exist_ok": True,
-            "logger": True,
         }
 
         if exp.resume_ckpt:
@@ -75,7 +78,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         self.metrics = evaluator.evaluate()
         print(f"📊 Evaluation metrics: {self.metrics}")
 
-        # ✅ Add TensorBoard logging
         if self.writer:
             for k, v in self.metrics.items():
                 if isinstance(v, (int, float)):
