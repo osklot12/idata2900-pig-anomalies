@@ -5,7 +5,7 @@ from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluato
 
 def main():
     # Load your trained YOLOv8 model (update this path!)
-    model = YOLO('path/to/your/model.pt')  # e.g., 'runs/train/exp/weights/best.pt'
+    model = YOLO('yolov8s.pt')  # e.g., 'runs/train/exp/weights/best.pt'
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
     # Dummy image: [B, C, H, W] = [1, 3, 640, 640]
