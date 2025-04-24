@@ -124,3 +124,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def plot_training_labels(self):
             print("⚠️ Skipping plot_training_labels — streaming dataset has no `.labels` attribute.")
+
+    def plot_training_samples(self, batch, ni):
+        print("⚠️ Skipping plot_training_samples — streaming dataset has no `im_file` field.")
