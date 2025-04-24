@@ -3,6 +3,8 @@ import yaml
 import os
 from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.detect import DetectionTrainer
+from ultralytics.utils.torch_utils import model_info
+
 from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
 
 
@@ -33,6 +35,8 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             overrides["model"] = exp.resume_ckpt
 
         super().__init__(overrides=overrides)
+
+        model_info(self.model.model, detailed=True)
 
     def _create_dummy_data_yaml(self):
         tmp_dir = tempfile.mkdtemp(prefix="streaming_yolov8_")
