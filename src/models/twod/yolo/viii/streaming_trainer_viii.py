@@ -5,6 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 from ultralytics.models.yolo.detect import DetectionTrainer
 from ultralytics.utils.torch_utils import model_info
 
+from src.models.twod.yolo.viii.batch_visualizer import visualize_batch_input
 from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluatorVIII
 
 
@@ -13,9 +14,10 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         self.exp = exp
         self.train_dl, self.val_dl = exp.get_dataloaders()
         self.dummy_data_yaml = self._create_dummy_data_yaml()
+        self._step_counter = 0
 
         log_dir = os.path.join(exp.save_dir, exp.name, "custom_logs")
-        self.writer = SummaryWriter(log_dir=log_dir)
+        self.writer  = SummaryWriter(log_dir=log_dir)
 
         overrides = {
             "model": exp.model,
@@ -104,6 +106,16 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
         model_info(self.model.model, detailed=True)
 
+        val_batch = next(iter(self.val_dl))
+        visualize_batch_input(
+            images=val_batch["img"],
+            bboxes=val_batch["bboxes"],
+            cls=val_batch["cls"],
+            batch_idx=val_batch["batch_idx"],
+            save_dir="./input_visuals/val",
+            prefix=f"val_epoch{self.epoch}"
+        )
+
         evaluator = StreamingEvaluatorVIII(
             model=self.model,
             dataloader=self.val_dl,
@@ -133,6 +145,22 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                 for i, name in enumerate(loss_names):
                     self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
                 self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
+
+    def loss(self, batch, pred):
+        # 🔍 Visualize training batch input once per few steps (optional)
+        if self._step_counter % 10 == 0:
+            visualize_batch_input(
+                images=batch["img"],
+                bboxes=batch["bboxes"],
+                cls=batch["cls"],
+                batch_idx=batch["batch_idx"],
+                save_dir="./input_visuals/train",
+                prefix=f"train_epoch{self.epoch}_step{self._step_counter}"
+            )
+
+        self._step_counter += 1
+        return super().loss(batch, pred)
+
 
     def plot_training_labels(self):
             print("⚠️ Skipping plot_training_labels — streaming dataset has no `.labels` attribute.")
