@@ -4,11 +4,14 @@ from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluato
 
 
 def main():
-    # Load your trained YOLOv8 model (update this path!)
-    model = YOLO('yolov8s.pt')  # e.g., 'runs/train/exp/weights/best.pt'
+    # Load YOLOv8 model
+    model = YOLO('yolov8s.pt')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-    # Dummy image: [B, C, H, W] = [1, 3, 640, 640]
+    # Move model to correct device
+    model.model.to(device)
+
+    # Dummy image
     dummy_img = torch.randn(1, 3, 640, 640).to(device)
 
     print("✅ Wrapping model with StreamingEvaluatorVIII just for Concat debugging...")
@@ -16,18 +19,16 @@ def main():
         model=model.model,
         dataloader=None,
         device=device,
-        num_classes=4  # ← use your actual number of classes
+        num_classes=4
     )
-    # Only calling _wrap_concat_debug(), not evaluate()
 
     print("🚀 Running one forward pass on dummy input")
     try:
         with torch.no_grad():
-            model.model(dummy_img)  # Directly hit .model, bypass Ultralytics trainer
+            model.model(dummy_img)
     except Exception as e:
         print("💥 Caught crash during inference:")
         print(e)
-
 
 if __name__ == "__main__":
     main()
