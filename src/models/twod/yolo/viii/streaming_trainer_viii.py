@@ -25,7 +25,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             "save_period": exp.eval_interval,
             "save": True,
             "data": self.dummy_data_yaml,
-            "val": False,  # disable internal validator
             "exist_ok": True,
         }
 
