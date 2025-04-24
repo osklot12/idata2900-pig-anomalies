@@ -6,6 +6,7 @@ import traceback
 
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
+from src.models.twod.yolo.viii.patches_viii import patch_concat_modules
 from src.models.twod.yolo.viii.streaming_exp_viii import YOLOv8StreamingExp
 from src.models.twod.yolo.viii.streaming_trainer_viii import YOLOv8StreamingTrainer
 
@@ -32,6 +33,8 @@ def main():
     print("🚀 Starting trainer...")
     trainer = YOLOv8StreamingTrainer(exp)
 
+    patch_concat_modules(trainer.model)
+    
     try:
         trainer.train()
     except Exception:
