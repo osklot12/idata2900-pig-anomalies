@@ -7,7 +7,7 @@ def strict_safe_concat_forward(self, x):
         x = [x]  # wrap single tensor in list to avoid torch.cat error
     elif not isinstance(x, (list, tuple)):
         raise TypeError(f"Concat input must be Tensor, list, or tuple, got {type(x)}")
-    return torch.cat(tuple(x), self.d)
+    return torch.cat(tuple(x), dim=self.d)  # ✅ Use self.d
 
 def patch_concat_modules(model: nn.Module):
     for module in model.modules():
