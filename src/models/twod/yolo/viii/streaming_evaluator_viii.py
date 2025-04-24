@@ -46,7 +46,9 @@ class StreamingEvaluatorVIII:
                     targets.append(np.zeros((0, 5)))
 
             with torch.no_grad():
-                out = self._model(imgs)  # <-- NOT a dict
+                print(f"✅ BATCH IMG TYPE: {type(imgs)}")
+                print(f"✅ BATCH IMG SHAPE: {imgs.shape}")
+                out = self._model((imgs,))  # wrap in a tuple
                 preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
 
