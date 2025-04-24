@@ -22,10 +22,10 @@ class StreamingEvaluatorVIII:
         def wrap_forward(module):
             orig_forward = module.forward
 
-            def new_forward(x):
+            def new_forward(*args, **kwargs):
                 if module.__class__.__name__ == "Concat":
-                    print(f"\n🧩 Concat at {module}: input = {x if isinstance(x, (list, tuple)) else type(x)}")
-                return orig_forward(x)
+                    print(f"🧩 Concat at {module}: input = {args[0] if args else 'NO ARGS'}")
+                return orig_forward(*args, **kwargs)
 
             return new_forward
 
