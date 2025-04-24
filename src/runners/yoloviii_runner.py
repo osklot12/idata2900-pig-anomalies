@@ -33,8 +33,6 @@ def main():
     print("🚀 Starting trainer...")
     trainer = YOLOv8StreamingTrainer(exp)
 
-    patch_concat_modules(trainer.model)
-    
     try:
         trainer.train()
     except Exception:
