@@ -16,6 +16,26 @@ class StreamingEvaluatorVIII:
         self._num_classes = num_classes
         self._iou_thresh = iou_thresh
 
+        self._wrap_concat_debug()
+
+    def _wrap_concat_debug(self):
+        def wrap_forward(module):
+            orig_forward = module.forward
+
+            def new_forward(x):
+                if module.__class__.__name__ == "Concat":
+                    print(f"\n🧩 Concat at {module}: input = {x if isinstance(x, (list, tuple)) else type(x)}")
+                return orig_forward(x)
+
+            return new_forward
+
+        for m in self._model.modules():
+            if hasattr(m, 'forward') and callable(m.forward):
+                try:
+                    m.forward = wrap_forward(m)
+                except Exception as e:
+                    print(f"⚠️ Could not wrap: {m} — {e}")
+
     def evaluate(self) -> Dict[str, Any]:
         self._model.eval()
         all_detections: List[np.ndarray] = []
