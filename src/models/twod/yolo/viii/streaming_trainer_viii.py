@@ -101,7 +101,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
-        
+
         model_info(self.model.model, detailed=True)
 
         evaluator = StreamingEvaluatorVIII(
