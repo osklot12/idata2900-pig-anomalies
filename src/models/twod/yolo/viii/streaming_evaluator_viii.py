@@ -21,10 +21,10 @@ class StreamingEvaluatorVIII:
 
             def new_forward(*args, **kwargs):
                 if module.__class__.__name__ == "Concat":
-                    # 🚨 Safely inspect type without breaking
-                    print(f"🧩 Concat DEBUG — type(args[0]): {type(args[0])}, len: {len(args[0]) if isinstance(args[0], (list, tuple)) else 'N/A'}")
-                    if not isinstance(args[0], (list, tuple)):
-                        raise TypeError(f"Concat received invalid input type: {type(args[0])}")
+                    if args and isinstance(args[0], list):
+                        print(f"🧩 Concat DEBUG — type(args[0]): {type(args[0])}, len: {len(args[0])}")
+                    else:
+                        print(f"🧩 Concat DEBUG — unexpected input: {args}")
                 return orig_forward(*args, **kwargs)
 
             return new_forward
