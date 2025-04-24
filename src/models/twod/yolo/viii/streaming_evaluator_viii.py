@@ -6,6 +6,8 @@ from tqdm import tqdm
 from typing import Dict, List, Any
 
 from ultralytics.utils.ops import non_max_suppression
+
+from src.models.twod.yolo.viii.viii_pred_visualizer import YOLOv8BatchVisualizer
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer  # Use your visualizer
 
 POSTPROCESS_CONF_THRESH = 0.001
@@ -60,15 +62,17 @@ class StreamingEvaluatorVIII:
             # ✅ Visualize predictions
             has_predictions = [len(p) > 0 for p in detections]
             if any(has_predictions):
-                YOLOXBatchVisualizer.visualize_with_predictions(
-                    images=imgs[has_predictions].cpu(),
-                    targets=torch.tensor(targets)[has_predictions],
+                mask = torch.tensor(has_predictions, dtype=torch.bool, device=imgs.device)
+
+                YOLOv8BatchVisualizer.visualize_with_predictions(
+                    images=imgs[mask].cpu(),
+                    targets=[targets[i] for i, keep in enumerate(has_predictions) if keep],
                     predictions=[p for i, p in enumerate(detections) if has_predictions[i]],
                     class_names=["tail_biting", "ear_biting", "belly_nosing", "tail down"],
                     start_idx=global_image_idx,
                     save_dir="./eval_visuals"
                 )
-                global_image_idx += sum(has_predictions)
+                global_image_idx += mask.sum().item()
 
             all_detections.extend(detections)
             all_annotations.extend(targets)
