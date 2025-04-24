@@ -11,7 +11,7 @@ from src.models.twod.yolo.viii.streaming_trainer_viii import YOLOv8StreamingTrai
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
+    #parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
     parser.add_argument("--ckpt", type=str, default="runs/streaming_yolov8/weights/last.pt", help="Path to checkpoint")
     parser.add_argument("--epochs", type=int, default=300, help="Number of training epochs")
     parser.add_argument("--batch", type=int, default=8, help="Batch size")
@@ -25,9 +25,9 @@ def main():
     print("🧪 Preparing YOLOv8 experiment...")
     exp = YOLOv8StreamingExp(train_factory, val_factory, batch_size=args.batch, epochs=args.epochs, device=args.device)
 
-    if args.resume:
-        exp.resume_ckpt = os.path.join(exp.save_dir, "weights", "last.pt")
-        print(f"🔁 Resuming from checkpoint: {args.ckpt}")
+   # if args.resume:
+   #     exp.resume_ckpt = os.path.join(exp.save_dir, "weights", "last.pt")
+   #     print(f"🔁 Resuming from checkpoint: {args.ckpt}")
 
     print("🚀 Starting trainer...")
     trainer = YOLOv8StreamingTrainer(exp)
