@@ -7,7 +7,7 @@ from typing import Dict, List, Any
 
 from ultralytics.utils.ops import non_max_suppression
 
-from src.models.twod.yolo.viii.patches_viii import patch_concat_modules
+from src.models.twod.yolo.viii.patches_viii import maybe_wrap_for_yolo
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 
 
@@ -21,7 +21,6 @@ class StreamingEvaluatorVIII:
 
     def evaluate(self) -> Dict[str, Any]:
         self._model.eval()
-        patch_concat_modules(self._model)
         all_detections: List[np.ndarray] = []
         all_annotations: List[np.ndarray] = []
 
@@ -51,7 +50,7 @@ class StreamingEvaluatorVIII:
             with torch.no_grad():
                 print(f"✅ BATCH IMG TYPE: {type(imgs)}")
                 print(f"✅ BATCH IMG SHAPE: {imgs.shape}")
-                out = self._model(imgs)
+                out = self._model(maybe_wrap_for_yolo(imgs))
                 preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
 

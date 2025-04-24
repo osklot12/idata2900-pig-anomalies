@@ -1,16 +1,8 @@
-import types
 import torch
-import torch.nn as nn
 
-def safe_concat_forward(self, x):
+def maybe_wrap_for_yolo(x):
+    # Only wrap in tuple if model expects a list-like input
     if isinstance(x, torch.Tensor):
-        return x  # already a single tensor
-    return torch.cat(x, self.d)  # expected case: list/tuple of tensors
+        return (x,)  # match YOLOv8 expected input shape
+    return x
 
-def patch_concat_modules(model: nn.Module):
-    """
-    Monkey-patches all Concat layers in the given model to prevent torch.cat errors.
-    """
-    for module in model.modules():
-        if module.__class__.__name__ == "Concat":
-            module.forward = types.MethodType(safe_concat_forward, module)
