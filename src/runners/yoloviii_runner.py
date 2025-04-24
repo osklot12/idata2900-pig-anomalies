@@ -12,7 +12,7 @@ from src.models.twod.yolo.viii.streaming_trainer_viii import YOLOv8StreamingTrai
 def main():
     parser = argparse.ArgumentParser()
     #parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
-    parser.add_argument("--ckpt", type=str, default="runs/streaming_yolov8/weights/last.pt", help="Path to checkpoint")
+    # parser.add_argument("--ckpt", type=str, default="runs/streaming_yolov8/weights/last.pt", help="Path to checkpoint")
     parser.add_argument("--epochs", type=int, default=300, help="Number of training epochs")
     parser.add_argument("--batch", type=int, default=8, help="Batch size")
     parser.add_argument("--device", type=str, default="cuda:0", help="Training device")
