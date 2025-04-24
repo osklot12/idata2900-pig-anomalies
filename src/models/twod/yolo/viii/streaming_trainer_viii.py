@@ -36,8 +36,6 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
         super().__init__(overrides=overrides)
 
-        model_info(self.model.model, detailed=True)
-
     def _create_dummy_data_yaml(self):
         tmp_dir = tempfile.mkdtemp(prefix="streaming_yolov8_")
         os.makedirs(os.path.join(tmp_dir, "fake"), exist_ok=True)
@@ -103,6 +101,9 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
 
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
+        
+        model_info(self.model.model, detailed=True)
+
         evaluator = StreamingEvaluatorVIII(
             model=self.model.model,
             dataloader=self.val_dl,
