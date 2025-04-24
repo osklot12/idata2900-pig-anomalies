@@ -83,7 +83,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             def __call__(self, *args, **kwargs):
                 print("🔍 Running custom StreamingEvaluatorVIII from overridden validator...")
                 evaluator = StreamingEvaluatorVIII(
-                    model=self.trainer.model.model,
+                    model=self.trainer.model,
                     dataloader=self.trainer.val_dl,
                     device=self.trainer.exp.device,
                     num_classes=self.trainer.exp.num_classes
@@ -105,7 +105,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         model_info(self.model.model, detailed=True)
 
         evaluator = StreamingEvaluatorVIII(
-            model=self.model.model,
+            model=self.model,
             dataloader=self.val_dl,
             device=self.exp.device,
             num_classes=self.exp.num_classes
