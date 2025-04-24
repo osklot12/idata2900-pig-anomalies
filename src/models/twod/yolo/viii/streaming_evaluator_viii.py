@@ -12,7 +12,6 @@ from src.models.twod.yolo.viii.patches_viii import patch_concat_modules
 
 class StreamingEvaluatorVIII:
     def __init__(self, model, dataloader, device, num_classes, iou_thresh=0.5):
-        patch_concat_modules(model)
         self._model = model
         self._dataloader = dataloader
         self._device = device

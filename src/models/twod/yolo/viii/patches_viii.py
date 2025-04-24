@@ -10,6 +10,13 @@ def strict_safe_concat_forward(self, x):
 
     shapes = [t.shape for t in x if isinstance(t, torch.Tensor)]
     print(f"🧩 Concat at {getattr(self, 'name', 'unknown')} — inputs: {shapes}, dim={self.d}")
+
+    # Show WHERE these inputs came from (optional but powerful)
+    import inspect
+    for i, t in enumerate(x):
+        frame = inspect.stack()[1]
+        print(f"   ↳ input[{i}] from {frame.filename}:{frame.lineno}")
+
     return torch.cat(tuple(x), self.d)
 
 
