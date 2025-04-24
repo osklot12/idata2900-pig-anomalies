@@ -7,10 +7,11 @@ from typing import Dict, List, Any
 
 from ultralytics.utils.ops import non_max_suppression
 
+from src.models.twod.yolo.viii.viii_postprocess import postprocess
 from src.models.twod.yolo.viii.viii_pred_visualizer import YOLOv8BatchVisualizer
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer  # Use your visualizer
 
-POSTPROCESS_CONF_THRESH = 0.001
+POSTPROCESS_CONF_THRESH = 0.01
 POSTPROCESS_IOU_THRESH = 0.65
 
 
@@ -53,9 +54,9 @@ class StreamingEvaluatorVIII:
                     targets.append(np.zeros((0, 5)))
 
             with torch.no_grad():
-                preds = self._model(imgs)  # NO `augment=False` here!
-                preds = preds[0] if isinstance(preds, (tuple, list)) else preds
-                preds = non_max_suppression(preds, conf_thres=POSTPROCESS_CONF_THRESH, iou_thres=POSTPROCESS_IOU_THRESH)
+                outputs = self._model(imgs)
+                outputs = outputs[0] if isinstance(outputs, (list, tuple)) else outputs
+                preds = postprocess(outputs, self._num_classes, POSTPROCESS_CONF_THRESH, POSTPROCESS_IOU_THRESH)
 
             detections = [p.cpu().numpy() if p is not None else np.zeros((0, 6), dtype=np.float32) for p in preds]
 
