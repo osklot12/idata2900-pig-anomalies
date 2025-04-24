@@ -55,11 +55,11 @@ class StreamingEvaluatorVIII:
             for i in range(len(imgs)):
                 boxes = bboxes[batch_idx == i]
                 labels = cls[batch_idx == i].float()
-                if len(boxes):
+                if len(boxes) and len(labels):
                     boxes = boxes.clone()
-                    boxes[:, :2] -= boxes[:, 2:] / 2  # xy_center → top-left
-                    boxes[:, 2:] += boxes[:, :2]      # width/height → bottom-right
-                    merged = torch.cat([labels.unsqueeze(1), boxes], dim=1)  # (cls, x1, y1, x2, y2)
+                    boxes[:, :2] -= boxes[:, 2:] / 2
+                    boxes[:, 2:] += boxes[:, :2]
+                    merged = torch.cat([labels.unsqueeze(1), boxes], dim=1)
                     targets.append(merged.cpu().numpy())
                 else:
                     targets.append(np.zeros((0, 5)))
@@ -69,7 +69,10 @@ class StreamingEvaluatorVIII:
                 print(f"✅ BATCH IMG SHAPE: {imgs.shape}")
                 assert isinstance(imgs, torch.Tensor) and imgs.ndim == 4, f"Invalid image batch shape: {imgs.shape}"
 
-                out = self._model(imgs, augment=False)
+                try:
+                    out = self._model(imgs, augment=False)
+                except TypeError:
+                    out = self._model(imgs)
                 preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
 
