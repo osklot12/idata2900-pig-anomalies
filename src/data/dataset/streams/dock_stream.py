@@ -11,6 +11,7 @@ T = TypeVar("T")
 
 GET_ENTRY_LOOP_TIMEOUT = 0.1
 
+
 class DockStream(Generic[T], WritableStream[T]):
     """Sequential streams of data, where input streams are ordered sequentially."""
 
