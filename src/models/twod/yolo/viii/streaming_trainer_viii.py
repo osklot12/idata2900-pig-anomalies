@@ -111,15 +111,23 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             num_classes=self.exp.num_classes
         )
         self.metrics = evaluator.evaluate()
+
+        metrics = self.metrics or {}
+        fitness = (
+                0.1 * metrics.get("recall", 0.0) +
+                0.9 * metrics.get("mAP", 0.0)
+        )
+
         if self.writer:
             for k, v in self.metrics.items():
                 if isinstance(v, (int, float)):
                     self.writer.add_scalar(f"val/{k}", v, self.epoch)
 
+        return self.metrics, fitness
+
     def run_callbacks(self, event: str):
         super().run_callbacks(event)
         if event == "on_train_epoch_end":
-            self.validate()
             if self.writer and hasattr(self, "loss_items"):
                 loss_names = ["box", "cls", "dfl"]
                 for i, name in enumerate(loss_names):
