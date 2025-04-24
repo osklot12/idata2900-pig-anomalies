@@ -7,8 +7,6 @@ from typing import Dict, List, Any
 
 from ultralytics.utils.ops import non_max_suppression
 
-from src.models.twod.yolo.viii.patches_viii import patch_concat_modules
-
 
 class StreamingEvaluatorVIII:
     def __init__(self, model, dataloader, device, num_classes, iou_thresh=0.5):
@@ -49,6 +47,8 @@ class StreamingEvaluatorVIII:
             with torch.no_grad():
                 print(f"✅ BATCH IMG TYPE: {type(imgs)}")
                 print(f"✅ BATCH IMG SHAPE: {imgs.shape}")
+                assert isinstance(imgs, torch.Tensor) and imgs.ndim == 4, f"Invalid image batch shape: {imgs.shape}"
+
                 out = self._model(imgs)
                 preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
