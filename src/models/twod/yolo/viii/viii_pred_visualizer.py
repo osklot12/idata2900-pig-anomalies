@@ -53,7 +53,9 @@ class YOLOv8BatchVisualizer:
         os.makedirs(save_dir, exist_ok=True)
 
         for i, (image_tensor, target_boxes, pred_boxes) in enumerate(zip(images, targets, predictions)):
-            img = (image_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
+            img = np.ascontiguousarray(
+                (image_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
+            )
 
             # Draw GT boxes
             for box in target_boxes:
