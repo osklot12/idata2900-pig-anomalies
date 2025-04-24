@@ -30,7 +30,7 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
         }
 
         if exp.resume_ckpt:
-            overrides["resume"] = True
+            overrides["resume"] = False
             overrides["model"] = exp.resume_ckpt
 
         super().__init__(overrides=overrides)
