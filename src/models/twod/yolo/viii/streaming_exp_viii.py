@@ -23,7 +23,7 @@ class YOLOv8StreamingExp:
         self.name = "streaming_yolov8"
         self.save_dir = f"runs/{self.name}"
         self.eval_interval = 1
-        self.resume_ckpt = "runs/streaming_yolov8/streaming_yolo814/weights/epoch5.pt"  # You can set this externally before training
+        self.resume_ckpt = None  # You can set this externally before training
 
     def get_dataloaders(self):
         print("📥 Building dataloaders...")
