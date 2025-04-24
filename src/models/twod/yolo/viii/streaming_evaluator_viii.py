@@ -69,7 +69,7 @@ class StreamingEvaluatorVIII:
                 print(f"✅ BATCH IMG SHAPE: {imgs.shape}")
                 assert isinstance(imgs, torch.Tensor) and imgs.ndim == 4, f"Invalid image batch shape: {imgs.shape}"
 
-                out = self._model(imgs)
+                out = self._model(imgs, augment=False)
                 preds = out[0] if isinstance(out, (tuple, list)) else out
                 preds = non_max_suppression(preds, conf_thres=0.001, iou_thres=0.65)
 
