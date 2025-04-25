@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
@@ -29,11 +30,18 @@ class NorsvinTrainPipelineFactory(PipelineFactory[AnnotatedFrame, CompressedAnno
     """Factory for creating training set pipelines for the Norsvin dataset."""
 
     def create_pipeline(self) -> PipelineTail[AnnotatedFrame, CompressedAnnotatedFrame]:
-        def is_annotated(frame: AnnotatedFrame) -> bool:
-            return len(frame.annotations) > 0
+        def filter_func(frame: AnnotatedFrame) -> bool:
+            result = False
+
+            if random.random() < 0.2:
+                result = True
+            else:
+                result = len(frame.annotations) > 0
+
+            return result
 
         return Pipeline(
-            FilterComponent(is_annotated)
+            FilterComponent(filter_func)
         ).then(
             FieldTransformer.of("frame").using(FrameResizer(RESIZE_SHAPE))
         ).then(

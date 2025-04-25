@@ -83,7 +83,7 @@ def test_count_train_set_instances():
         split=DatasetSplit.TRAIN,
         selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=DockStreamFactory(buffer_size=5, dock_size=500),
+        stream_factory=PoolStreamFactory(pool_size=500, min_ready=100),
         pipeline_factory=NorsvinTrainPipelineFactory(),
         filter_func=has_annotations,
     )
@@ -114,7 +114,7 @@ def test_count_train_set_instances():
                     ear_biting += 1
                 anno_total += 1
             total += 1
-            # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+            AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
             instance = stream.read()
     except KeyboardInterrupt:
         stream.stop()
