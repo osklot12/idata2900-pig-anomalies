@@ -5,11 +5,11 @@ class Metamaker(ABC):
     """Generates metadata for a dataset."""
 
     @abstractmethod
-    def make_metadata(self) -> Dict[str, Dict[str, int]]:
+    def make_metadata(self) -> Dict[int, Dict[str, Dict[str, int]]]:
         """
         Creates metadata for this dataset.
 
         Returns:
-            Dict[str, Dict[str, int]]: the metadata
+            Dict[int, Dict[str, Dict[str, int]]]: the metadata
         """
         raise NotImplementedError

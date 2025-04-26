@@ -44,17 +44,14 @@ class StringSetSplitter(Splitter[str]):
             thresholds.append(cumulative)
         return thresholds
 
-    def add(self, s: str) -> None:
-        """
-        Adds a string.
-
-        Args:
-            s (str): the string to add
-        """
+    def add(self, s: str) -> int:
         if not s:
             raise ValueError("string cannot be empty or None")
 
-        self._get_split_for_str(s).append(s)
+        split_idx = self._get_split_index(s)
+        self._splits[split_idx].append(s)
+
+        return split_idx
 
     def remove(self, s: str) -> None:
         """

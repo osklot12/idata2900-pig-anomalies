@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 from src.auth.factories.gcp_auth_service_factory import GCPAuthServiceFactory
 from src.data.dataset.label.factories.simple_label_parser_factory import SimpleLabelParserFactory
 from src.data.dataset.metamakers.file_metamaker import FileMetamaker
+from src.data.dataset.splitters.factories.string_set_splitter_factory import StringSetSplitterFactory
 from src.data.decoders.factories.darwin_decoder_factory import DarwinDecoderFactory
 from src.data.loading.loaders.factories.gcs_loader_factory import GCSLoaderFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
@@ -21,7 +19,7 @@ def main():
         auth_factory=auth_factory,
         decoder_factory=decoder_factory
     )
-    maker = FileMetamaker(loader_factory, cache=True)
+    maker = FileMetamaker(loader_factory, splitter_factory=StringSetSplitterFactory(weights=[0.8, 0.1, 0.1]), cache=True)
     metadata = maker.make_metadata()
     print(metadata)
 
