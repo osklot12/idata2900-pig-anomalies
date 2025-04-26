@@ -43,6 +43,10 @@ class StreamingExp(BaseExp):
 
         self.exp_name = "streaming_yolox"
 
+        self.use_focal_loss = True
+        self.focal_loss_gamma = 2.0
+        self.focal_loss_alpha = 0.25
+
 
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):

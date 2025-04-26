@@ -20,25 +20,18 @@ from src.data.processing.augmentation.photometric.photometric_filter import Phot
 from src.data.processing.augmentor import Augmentor
 from src.data.processing.bbox_normalizer_processor import BBoxNormalizerProcessor
 from src.data.processing.class_balancer import ClassBalancer
-from src.data.processing.cond_multiplier import CondMultiplier
 from src.data.processing.frame_resizer import FrameResizer
 from src.data.processing.normalization.simple_bbox_normalizer import SimpleBBoxNormalizer
 from src.data.processing.zlib_compressor import ZlibCompressor
 from src.data.structures.random_float import RandomFloat
+
 
 class NorsvinTrainPipelineFactory(PipelineFactory[AnnotatedFrame, CompressedAnnotatedFrame]):
     """Factory for creating training set pipelines for the Norsvin dataset."""
 
     def create_pipeline(self) -> PipelineTail[AnnotatedFrame, CompressedAnnotatedFrame]:
         def filter_func(frame: AnnotatedFrame) -> bool:
-            result = False
-
-            if random.random() < 0.2:
-                result = True
-            else:
-                result = len(frame.annotations) > 0
-
-            return result
+            return len(frame.annotations) > 0
 
         return Pipeline(
             FilterComponent(filter_func)

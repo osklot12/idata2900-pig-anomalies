@@ -16,6 +16,7 @@ from src.data.dataset.registries.file_registry import FileRegistry
 from src.data.dataset.registries.suffix_file_registry import SuffixFileRegistry
 from src.data.dataset.selectors.factories.selector_factory import SelectorFactory
 from src.data.dataset.selectors.selector import Selector
+from src.data.dataset.splitters.factories.string_set_splitter_factory import StringSetSplitterFactory
 from src.data.dataset.splitters.string_set_splitter import StringSetSplitter
 from src.data.dataset.streams.closable import Closable
 from src.data.dataset.streams.factories.writable_stream_factory import WritableStreamFactory
@@ -90,20 +91,18 @@ class GCSStreamFactory(Generic[T, A, B], ManagedStreamFactory[T]):
         decoder_factory = self._create_decoder_factory(label_parser_factory)
         loader_factory = self._create_loader_factory(self._gcs_creds.bucket_name, auth_factory, decoder_factory)
 
-        manifest = self._create_manifest(loader_factory.create_file_registry())
-        splitter = self._create_splitter(manifest.ids, self._split_ratios)
-        split = splitter.splits[self._split.value]
-        if self._filter_func is not None:
-            metamaker = FileMetamaker(loader_factory, cache=True, cache_dir=self._meta_cache_dir)
-            metadata = metamaker.make_metadata()
-            filtered = [
-                id_ for id_, label_counts in metadata.items()
-                if self._filter_func(label_counts)
-            ]
-            filtered_set = set(filtered)
-            split = [id_ for id_ in split if id_ in filtered_set]
+        ratios = self._split_ratios
+        splitter_factory = StringSetSplitterFactory(weights=[ratios.train, ratios.val, ratios.test])
+        metamaker = FileMetamaker(
+            loader_factory=loader_factory,
+            splitter_factory=splitter_factory,
+            cache=True,
+            cache_dir=self._meta_cache_dir
+        )
+        metadata = metamaker.make_metadata()
 
-        selector = self._create_selector(split)
+        manifest = self._create_manifest(loader_factory.create_file_registry())
+        selector = self._create_selector(list(metadata[self._split.value].keys()))
         instance_provider = self._create_instance_provider(manifest, selector)
         entity_provider = self._create_entity_provider(loader_factory)
         streamer_factory = self._create_streamer_factory(instance_provider, entity_provider)
