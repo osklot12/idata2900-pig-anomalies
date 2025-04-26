@@ -81,9 +81,9 @@ def test_count_train_set_instances():
         gcs_creds=NORSVIN_GCS_CREDS,
         split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TRAIN,
-        selector_factory=DetermStringSelectorFactory(),
+        selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=500, min_ready=100),
+        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=100),
         pipeline_factory=NorsvinTrainPipelineFactory(),
         filter_func=has_annotations,
     )
@@ -189,7 +189,7 @@ def test_norsvin_val_stream():
     i = 1
     videos = {}
     while instance:
-        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         if not instance.source.source_id in videos:
             videos[instance.source.source_id] = 0
         else:
@@ -224,9 +224,9 @@ def test_norsvin_test_stream():
     instance = stream.read()
     i = 1
     while instance:
-        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         print(f"Frames read: {i}")
-        print(f"[YOLOXDataset] Read frame {instance.index} for {instance.source.source_id}")
+        print(f"[Test] Read frame {instance.index} for {instance.source.source_id}")
         instance = stream.read()
         i += 1
 

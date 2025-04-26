@@ -56,7 +56,8 @@ class FileMetamaker(Metamaker):
 
         else:
             with open(output_path, "r", encoding="utf-8") as f:
-                metadata: Dict[str, Dict[str, int]] = json.load(f)
+                loaded_metadata: Dict[str, Dict[str, int]] = json.load(f)
+                metadata = {int(k): v for k, v in loaded_metadata.items()}
 
         return metadata
 
