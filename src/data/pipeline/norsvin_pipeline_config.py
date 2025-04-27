@@ -1,6 +1,6 @@
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
-RESIZE_SHAPE = (1920, 1080)
+RESIZE_SHAPE = (640, 640)
 
 NORMALIZE_RANGE = (0, 1)
 

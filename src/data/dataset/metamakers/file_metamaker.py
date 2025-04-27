@@ -12,6 +12,7 @@ from src.data.parsing.base_name_parser import BaseNameParser
 from src.utils.path_finder import PathFinder
 
 ANNOTATION_FILE_SUFFIXES = ["json"]
+FILE_EXCEPTIONS = ["metadata"]
 
 
 class FileMetamaker(Metamaker):
@@ -56,7 +57,7 @@ class FileMetamaker(Metamaker):
 
         else:
             with open(output_path, "r", encoding="utf-8") as f:
-                loaded_metadata: Dict[str, Dict[str, int]] = json.load(f)
+                loaded_metadata: Dict[int, Dict[str, Dict[str, int]]] = json.load(f)
                 metadata = {int(k): v for k, v in loaded_metadata.items()}
 
         return metadata
@@ -72,11 +73,15 @@ class FileMetamaker(Metamaker):
         files = anno_registry.get_file_paths()
         selector = DetermStringSelector(files)
         ids = self._get_annotations_ids(selector)
+        valid_ids = [
+            id_ for id_ in ids
+            if self._parser.parse_string(id_) not in FILE_EXCEPTIONS
+        ]
 
         for i, _ in enumerate(self._splitter.splits):
             metadata[i] = {}
 
-        for id_ in tqdm(ids, desc="Generating metadata"):
+        for id_ in tqdm(valid_ids, desc="Generating metadata"):
             annotations = annotation_loader.load_video_annotations(id_)
 
             id_ = self._parser.parse_string(id_)
