@@ -81,7 +81,7 @@ def test_count_train_set_instances():
         gcs_creds=NORSVIN_GCS_CREDS,
         split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TRAIN,
-        selector_factory=RandomStringSelectorFactory(),
+        selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
         stream_factory=PoolStreamFactory(pool_size=3000, min_ready=100),
         pipeline_factory=NorsvinTrainPipelineFactory(),
