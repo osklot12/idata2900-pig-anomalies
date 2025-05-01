@@ -19,11 +19,11 @@ class YOLOv8StreamingExp:
 
         self.num_classes = 4
         self.input_size = (640, 640)
-        self.model = "best.pt"
+        self.model = "/home/chris/code/idata2900-pig-anomalies/src/models/twod/yolo/viii/best.pt"
         self.name = "streaming_yolov8"
         self.save_dir = f"runs/{self.name}"
         self.eval_interval = 1
-        self.resume_ckpt = "best.pt"  # You can set this externally before training
+        self.resume_ckpt = "/home/chris/code/idata2900-pig-anomalies/src/models/twod/yolo/viii/best.pt"  # You can set this externally before training
 
     def get_dataloaders(self):
         print("📥 Building dataloaders...")
