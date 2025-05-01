@@ -64,6 +64,11 @@ class StreamingEvaluatorVIII:
                     boxes = result.boxes
                     if boxes is not None and boxes.shape[0] > 0:
                         xyxy = boxes.xyxy.cpu().numpy()
+
+                        # 🔧 Scale BEFORE forming det
+                        xyxy[:, [0, 2]] *= imgs.shape[3]  # width
+                        xyxy[:, [1, 3]] *= imgs.shape[2]  # height
+
                         conf = boxes.conf.cpu().numpy().reshape(-1, 1)
                         cls = boxes.cls.cpu().numpy().reshape(-1, 1)
                         det = np.hstack((xyxy, conf, cls))  # [x1, y1, x2, y2, conf, class]
@@ -71,12 +76,6 @@ class StreamingEvaluatorVIII:
                     else:
                         preds.append(torch.zeros((0, 6)))
 
-                # 🔧 Scale predictions from [0,1] to image size
-                img_h, img_w = imgs.shape[2], imgs.shape[3]
-                for p in preds:
-                    if p is not None and len(p):
-                        p[:, [0, 2]] *= img_w  # x1, x2
-                        p[:, [1, 3]] *= img_h  # y1, y2
 
             detections = [p.cpu().numpy() if p is not None else np.zeros((0, 6), dtype=np.float32) for p in preds]
 
