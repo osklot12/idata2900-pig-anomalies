@@ -13,7 +13,8 @@ from src.models.twod.yolo.viii.streaming_evaluator_viii import StreamingEvaluato
 class YOLOv8StreamingTrainer(DetectionTrainer):
     def __init__(self, exp):
         self.exp = exp
-        self.train_dl, self.val_dl = exp.get_dataloaders()
+        self.train_dl  = exp.get_train_loader()
+        self.val_dl = exp.get_val_loader()
         self.dummy_data_yaml = self._create_dummy_data_yaml()
         self._step_counter = 0
 
