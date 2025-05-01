@@ -5,7 +5,7 @@ from src.models.twod.yolo.viii.yoloviii_dataset import YOLOv8StreamingDataset
 T = TypeVar("T")
 
 class YOLOv8StreamingExp:
-    def __init__(self, train_stream_factory, val_stream_factory, batch_size=8, epochs=300, device="cuda:0"):
+    def __init__(self, train_stream_factory, val_stream_factory, batch_size=16, epochs=300, device="cuda:0"):
         print("🔧 YOLOv8StreamingExp setup:")
         print(f"  ├─ Batch size: {batch_size}")
         print(f"  ├─ Epochs: {epochs}")

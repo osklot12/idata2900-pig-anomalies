@@ -16,12 +16,14 @@ POSTPROCESS_IOU_THRESH = 0.65
 
 
 class StreamingEvaluatorVIII:
-    def __init__(self, model, dataloader, device, num_classes, iou_thresh=0.5):
+    def __init__(self, model, dataloader, device, num_classes, iou_thresh=0.5, writer=None, epoch=0):
         self._model = model
         self._dataloader = dataloader
         self._device = device
         self._num_classes = num_classes
         self._iou_thresh = iou_thresh
+        self._writer = writer
+        self._epoch = epoch
 
     def evaluate(self) -> Dict[str, Any]:
         self._model.eval()
@@ -79,4 +81,12 @@ class StreamingEvaluatorVIII:
             all_annotations.extend(targets)
 
         from src.utils.eval_metrics import compute_stats_from_dets
-        return compute_stats_from_dets(all_detections, all_annotations, self._num_classes, self._iou_thresh)
+        metrics = compute_stats_from_dets(all_detections, all_annotations, self._num_classes, self._iou_thresh)
+
+        # ✅ Write scalar metrics to TensorBoard
+        if self._writer:
+            for k, v in metrics.items():
+                if isinstance(v, (int, float)):
+                    self._writer.add_scalar(f"val/{k}", v, self._epoch)
+
+        return metrics
