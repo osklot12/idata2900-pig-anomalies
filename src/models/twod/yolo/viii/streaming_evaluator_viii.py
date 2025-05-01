@@ -56,9 +56,20 @@ class StreamingEvaluatorVIII:
                     targets.append(np.zeros((0, 5)))
 
             with torch.no_grad():
-                outputs = self._model(imgs)
-                outputs = outputs[0] if isinstance(outputs, (list, tuple)) else outputs
-                preds = postprocess(outputs, self._num_classes, POSTPROCESS_CONF_THRESH, POSTPROCESS_IOU_THRESH)
+                results = self._model.predict(imgs, conf=POSTPROCESS_CONF_THRESH, iou=POSTPROCESS_IOU_THRESH)
+                results = results if isinstance(results, list) else [results]
+
+                preds = []
+                for result in results:
+                    boxes = result.boxes
+                    if boxes is not None and boxes.shape[0] > 0:
+                        xyxy = boxes.xyxy.cpu().numpy()
+                        conf = boxes.conf.cpu().numpy().reshape(-1, 1)
+                        cls = boxes.cls.cpu().numpy().reshape(-1, 1)
+                        det = np.hstack((xyxy, conf, cls))  # [x1, y1, x2, y2, conf, class]
+                        preds.append(torch.from_numpy(det).float())
+                    else:
+                        preds.append(torch.zeros((0, 6)))
 
                 # 🔧 Scale predictions from [0,1] to image size
                 img_h, img_w = imgs.shape[2], imgs.shape[3]
