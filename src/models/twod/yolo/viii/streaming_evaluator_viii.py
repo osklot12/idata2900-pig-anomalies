@@ -11,7 +11,7 @@ from src.models.twod.yolo.viii.viii_postprocess import postprocess
 from src.models.twod.yolo.viii.viii_pred_visualizer import YOLOv8BatchVisualizer
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer  # Use your visualizer
 
-POSTPROCESS_CONF_THRESH = 0.3
+POSTPROCESS_CONF_THRESH = 0.4
 POSTPROCESS_IOU_THRESH = 0.65
 
 
@@ -86,7 +86,7 @@ class StreamingEvaluatorVIII:
                     images=imgs[mask].cpu(),
                     targets=[targets[i] for i, keep in enumerate(has_predictions) if keep],
                     predictions=[p for i, p in enumerate(detections) if has_predictions[i]],
-                    class_names=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+                    class_names=["belly_nosing", "ear_biting", "tail_biting", "tail_down"],
                     start_idx=global_image_idx,
                     save_dir="./eval_visuals"
                 )
