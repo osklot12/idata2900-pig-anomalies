@@ -16,4 +16,4 @@ class PrecisionCalculator:
         tp = confuse[cls][cls]
         fp = np.sum(confuse[:, cls]) - confuse[cls, cls]
 
-        return tp / (tp + fp)
+        return tp / (tp + fp) if tp + fp > 0.0 else 0.0
