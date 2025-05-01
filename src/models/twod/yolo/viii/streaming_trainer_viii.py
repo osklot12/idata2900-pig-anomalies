@@ -111,6 +111,8 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
             print(f"📦 Loading model from checkpoint: {self.model}")
             self.model = YOLO(self.model)
 
+            print(self.model.names)
+
         val_batch = next(iter(self.val_dl))
         visualize_batch_input(
             images=val_batch["img"],
