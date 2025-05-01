@@ -1,5 +1,8 @@
+from typing import Dict, Tuple
+
 import torch
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from tqdm import tqdm
 
@@ -9,16 +12,27 @@ from src.utils.logging import console
 class Trainer:
     """Trainer for faster-RCNN."""
 
-    def __init__(self, dataloader: DataLoader, n_classes: int):
+    def __init__(self, dataloader: DataLoader, n_classes: int, lr: float = 0.005, momentum: float = 0.9,
+                 weight_decay: float = 5e-4, log_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a Trainer instance.
 
         Args:
             dataloader (torch.utils.data.DataLoader): data loader for loading training data
             n_classes (int): number of classes
+            lr (float): learning rate to use for training
+            momentum (float): momentum factor for optimizer
+            weight_decay (float): weight decay factor for optimizer
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
+        self._lr = lr
+        self._momentum = momentum
+        self._weight_decay = weight_decay
+
+        self._writer = SummaryWriter(log_dir=log_dir)
+
+
 
     def train(self, n_epochs: int = 300) -> None:
         """
@@ -57,20 +71,17 @@ class Trainer:
                     loss_dict = model(images, targets)
                     loss = sum(loss for loss in loss_dict.values())
 
-                    loss_classifier = loss_dict.get("loss_classifier", torch.tensor(0.0)).item()
-                    loss_box_reg = loss_dict.get("loss_box_reg", torch.tensor(0.0)).item()
-                    loss_objectness = loss_dict.get("loss_objectness", torch.tensor(0.0)).item()
-                    loss_rpn_box_reg = loss_dict.get("loss_rpn_box_reg", torch.tensor(0.0)).item()
-
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
 
+                    cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
+
                     total_loss += loss.item()
-                    total_cls += loss_classifier
-                    total_box += loss_box_reg
-                    total_obj += loss_objectness
-                    total_rpn += loss_rpn_box_reg
+                    total_cls += cls_loss
+                    total_box += box_loss
+                    total_obj += obj_loss
+                    total_rpn += rpn_loss
                     n_batches += 1
 
             avg_loss = total_loss / n_batches
@@ -78,6 +89,12 @@ class Trainer:
             avg_box = total_box / n_batches
             avg_obj = total_obj / n_batches
             avg_rpn = total_rpn / n_batches
+
+            self._writer.add_scalar("train/loss_total", avg_loss, epoch + 1)
+            self._writer.add_scalar("train/loss_cls", avg_cls, epoch + 1)
+            self._writer.add_scalar("train/loss_box_reg", avg_box, epoch + 1)
+            self._writer.add_scalar("train/loss_obj", avg_obj, epoch + 1)
+            self._writer.add_scalar("train/loss_rpn_box_reg", avg_rpn, epoch + 1)
 
             console.log(
                 f"[bold green]Epoch {epoch + 1}/{n_epochs}[/bold green] "
@@ -92,3 +109,13 @@ class Trainer:
     def _get_device() -> torch.device:
         """Returns the device to use for training."""
         return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    @staticmethod
+    def _get_losses(loss_dict: Dict[str, float]) -> Tuple[float, float, float, float]:
+        """Extracts individual losses from the loss dictionary."""
+        loss_classifier = loss_dict.get("loss_classifier", torch.tensor(0.0)).item()
+        loss_box_reg = loss_dict.get("loss_box_reg", torch.tensor(0.0)).item()
+        loss_objectness = loss_dict.get("loss_objectness", torch.tensor(0.0)).item()
+        loss_rpn_box_reg = loss_dict.get("loss_rpn_box_reg", torch.tensor(0.0)).item()
+
+        return loss_classifier, loss_box_reg, loss_objectness, loss_rpn_box_reg
