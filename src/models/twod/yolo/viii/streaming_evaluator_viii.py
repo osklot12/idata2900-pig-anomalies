@@ -11,8 +11,8 @@ from src.models.twod.yolo.viii.viii_postprocess import postprocess
 from src.models.twod.yolo.viii.viii_pred_visualizer import YOLOv8BatchVisualizer
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer  # Use your visualizer
 
-POSTPROCESS_CONF_THRESH = 0.01
-POSTPROCESS_IOU_THRESH = 0.65
+POSTPROCESS_CONF_THRESH = 0.001
+POSTPROCESS_IOU_THRESH = 0.065
 
 
 class StreamingEvaluatorVIII:
