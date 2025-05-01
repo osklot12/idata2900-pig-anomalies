@@ -60,6 +60,13 @@ class StreamingEvaluatorVIII:
                 outputs = outputs[0] if isinstance(outputs, (list, tuple)) else outputs
                 preds = postprocess(outputs, self._num_classes, POSTPROCESS_CONF_THRESH, POSTPROCESS_IOU_THRESH)
 
+                # 🔧 Scale predictions from [0,1] to image size
+                img_h, img_w = imgs.shape[2], imgs.shape[3]
+                for p in preds:
+                    if p is not None and len(p):
+                        p[:, [0, 2]] *= img_w  # x1, x2
+                        p[:, [1, 3]] *= img_h  # y1, y2
+
             detections = [p.cpu().numpy() if p is not None else np.zeros((0, 6), dtype=np.float32) for p in preds]
 
             # ✅ Visualize predictions
