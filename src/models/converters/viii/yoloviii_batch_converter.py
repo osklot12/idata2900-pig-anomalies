@@ -42,10 +42,6 @@ class YOLOv8BatchConverter:
             bboxes.extend(frame_bboxes)
             classes.extend(frame_classes)
 
-            for ann in frame.annotations:
-                if ann.bbox.width < 1 or ann.bbox.height < 1:
-                    print(f"⚠️ Suspicious bbox (very small or 0): {ann.bbox}")
-
         return {
             "img": torch.stack(images),
             "bboxes": torch.tensor(bboxes, dtype=torch.float32),
