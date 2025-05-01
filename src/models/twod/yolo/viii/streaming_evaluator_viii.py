@@ -89,4 +89,6 @@ class StreamingEvaluatorVIII:
                 if isinstance(v, (int, float)):
                     self._writer.add_scalar(f"val/{k}", v, self._epoch)
 
+        metrics = {k: v for k, v in metrics.items() if isinstance(v, (int, float))}
+
         return metrics
