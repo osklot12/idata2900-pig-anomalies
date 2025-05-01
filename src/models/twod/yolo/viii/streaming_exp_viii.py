@@ -19,7 +19,7 @@ class YOLOv8StreamingExp:
 
         self.num_classes = 4
         self.input_size = (640, 640)
-        self.model = "best.pt"
+        self.model = "yolo11n.pt"
         self.name = "streaming_yolov8"
         self.save_dir = f"runs/{self.name}"
         self.eval_interval = 1
