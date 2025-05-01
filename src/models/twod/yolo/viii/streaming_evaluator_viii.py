@@ -48,8 +48,10 @@ class StreamingEvaluatorVIII:
                 labels = cls[batch_idx == i].float()
                 if len(boxes):
                     boxes = boxes.clone()
-                    boxes[:, :2] -= boxes[:, 2:] / 2  # cxcywh → xyxy
+                    boxes[:, :2] -= boxes[:, 2:] / 2
                     boxes[:, 2:] += boxes[:, :2]
+                    boxes[:, [0, 2]] *= imgs.shape[3]  # x1, x2
+                    boxes[:, [1, 3]] *= imgs.shape[2]  # y1, y2
                     merged = torch.cat([labels.unsqueeze(1), boxes], dim=1)
                     targets.append(merged.cpu().numpy())
                 else:

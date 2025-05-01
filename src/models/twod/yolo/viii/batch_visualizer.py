@@ -19,10 +19,15 @@ def visualize_batch_input(images: torch.Tensor, bboxes: torch.Tensor, cls: torch
 
         for box, label in zip(boxes, labels):
             x_center, y_center, w, h = box
-            x1 = int((x_center - w / 2))
-            y1 = int((y_center - h / 2))
-            x2 = int((x_center + w / 2))
-            y2 = int((y_center + h / 2))
+            x_center *= W
+            y_center *= H
+            w *= W
+            h *= H
+
+            x1 = int(x_center - w / 2)
+            y1 = int(y_center - h / 2)
+            x2 = int(x_center + w / 2)
+            y2 = int(y_center + h / 2)
 
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(img, f"{int(label)}", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX,
