@@ -58,8 +58,7 @@ class StreamingEvaluatorVIII:
                     targets.append(np.zeros((0, 5)))
 
             with torch.no_grad():
-                results = self._model.predict(imgs, conf=POSTPROCESS_CONF_THRESH, iou=POSTPROCESS_IOU_THRESH)
-                results = results if isinstance(results, list) else [results]
+                results = self._model(imgs)
 
                 preds = []
                 for result in results:
