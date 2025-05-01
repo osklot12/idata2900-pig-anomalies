@@ -6,6 +6,8 @@ import traceback
 
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
+from src.data.dataset.streams.providers.closing_stream_provider import ClosingStreamProvider
+from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
 from src.models.twod.yolo.viii.streaming_exp_viii import YOLOv8StreamingExp
 from src.models.twod.yolo.viii.streaming_trainer_viii import YOLOv8StreamingTrainer
 
@@ -22,8 +24,11 @@ def main():
     train_factory = NetworkDatasetStreamFactory("10.0.0.1", DatasetSplit.TRAIN)
     val_factory = NetworkDatasetStreamFactory("10.0.0.1", DatasetSplit.VAL)
 
+    train_provider = ReusableStreamProvider(train_factory.create_stream())
+    val_provider = ClosingStreamProvider(val_factory)
+
     print("🧪 Preparing YOLOv8 experiment...")
-    exp = YOLOv8StreamingExp(train_factory, val_factory, batch_size=args.batch, epochs=args.epochs, device=args.device)
+    exp = YOLOv8StreamingExp(train_provider, val_provider, batch_size=args.batch, epochs=args.epochs, device=args.device)
 
    # if args.resume:
    #     exp.resume_ckpt = os.path.join(exp.save_dir, "weights", "last.pt")

@@ -97,6 +97,7 @@ class StreamingEvaluatorVIII:
 
         from src.utils.eval_metrics import compute_stats_from_dets
         metrics = compute_stats_from_dets(all_detections, all_annotations, self._num_classes, self._iou_thresh)
+        print("📊 Confusion Matrix:\n", metrics["confusion_matrix"])
 
         if self._writer:
             for k, v in metrics.items():
