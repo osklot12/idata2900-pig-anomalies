@@ -14,11 +14,16 @@ class BatchConverter(BatchToTupleConverter):
                 torch.tensor(frame.frame, dtype=torch.float32, device=self.device).permute(2, 0, 1) / 255.0
             )
             boxes = torch.tensor([
-                [ann.bbox[0], ann.bbox[1], ann.bbox[0] + ann.bbox[2], ann.bbox[1] + ann.bbox[3]]
+                [
+                    ann.bbox.x,
+                    ann.bbox.y,
+                    ann.bbox.x + ann.bbox.width,
+                    ann.bbox.y + ann.bbox.height
+                ]
                 for ann in frame.annotations
             ], dtype=torch.float32, device=self.device)
             labels = torch.tensor(
-                [ann.category_id for ann in frame.annotations],
+                [ann.cls.value for ann in frame.annotations],  # ✅ fix here
                 dtype=torch.int64,
                 device=self.device
             )
