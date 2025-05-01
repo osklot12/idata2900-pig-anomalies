@@ -37,7 +37,7 @@ def main():
 
     num_epochs = 10
     for epoch in range(num_epochs):
-        model.train(epoch)
+        model.train()
         total_loss = 0.0
 
         for images, targets in dataloader:
