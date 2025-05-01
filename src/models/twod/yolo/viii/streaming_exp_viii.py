@@ -29,7 +29,7 @@ class YOLOv8StreamingExp:
     def get_train_loader(self):
         print("📥 Building dataloaders...")
         train_ds = StreamingDataset(
-            self.train_stream_provider, batch_size=8, n_batches=937
+            self.train_stream_provider, batch_size=8, n_batches=10  #937
         )
 
         return DataLoader(train_ds, batch_size=None, num_workers=0, pin_memory=True)
@@ -39,7 +39,7 @@ class YOLOv8StreamingExp:
         print("Building val loader...")
 
         val_ds = StreamingDataset(
-            self.val_stream_provider, batch_size=8, n_batches=430
+            self.val_stream_provider, batch_size=8, n_batches=10 #430
         )
 
         return DataLoader(val_ds, batch_size=None, num_workers=0, pin_memory=True)
