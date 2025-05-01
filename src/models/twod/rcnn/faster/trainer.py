@@ -13,7 +13,7 @@ class Trainer:
     """Trainer for faster-RCNN."""
 
     def __init__(self, dataloader: DataLoader, n_classes: int, lr: float = 0.005, momentum: float = 0.9,
-                 weight_decay: float = 5e-4, log_dir: str = "faster_rcnn_outputs"):
+                 weight_decay: float = 5e-4, output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a Trainer instance.
 
@@ -30,7 +30,7 @@ class Trainer:
         self._momentum = momentum
         self._weight_decay = weight_decay
 
-        self._writer = SummaryWriter(log_dir=log_dir)
+        self._writer = SummaryWriter(log_dir=f"{output_dir}/tensorboard")
 
 
 
@@ -90,20 +90,7 @@ class Trainer:
             avg_obj = total_obj / n_batches
             avg_rpn = total_rpn / n_batches
 
-            self._writer.add_scalar("train/loss_total", avg_loss, epoch + 1)
-            self._writer.add_scalar("train/loss_cls", avg_cls, epoch + 1)
-            self._writer.add_scalar("train/loss_box_reg", avg_box, epoch + 1)
-            self._writer.add_scalar("train/loss_obj", avg_obj, epoch + 1)
-            self._writer.add_scalar("train/loss_rpn_box_reg", avg_rpn, epoch + 1)
-
-            console.log(
-                f"[bold green]Epoch {epoch + 1}/{n_epochs}[/bold green] "
-                f"| [cyan]Total[/cyan]: {avg_loss:.4f} "
-                f"| [magenta]Class[/magenta]: {avg_cls:.4f} "
-                f"| [yellow]Box[/yellow]: {avg_box:.4f} "
-                f"| [blue]Obj[/blue]: {avg_obj:.4f} "
-                f"| [red]RPN[/red]: {avg_rpn:.4f}"
-            )
+            self._log_losses(avg_loss, avg_cls, avg_box, avg_obj, avg_rpn, epoch + 1)
 
     @staticmethod
     def _get_device() -> torch.device:
@@ -119,3 +106,20 @@ class Trainer:
         loss_rpn_box_reg = loss_dict.get("loss_rpn_box_reg", torch.tensor(0.0)).item()
 
         return loss_classifier, loss_box_reg, loss_objectness, loss_rpn_box_reg
+
+    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch: int) -> None:
+        """Logs the losses from training."""
+        self._writer.add_scalar("train/loss_total", total, epoch)
+        self._writer.add_scalar("train/loss_cls", cls, epoch)
+        self._writer.add_scalar("train/loss_box_reg", box, epoch)
+        self._writer.add_scalar("train/loss_obj", obj, epoch)
+        self._writer.add_scalar("train/loss_rpn_box_reg", rpn, epoch)
+
+        console.log(
+            f"[bold green]Epoch {epoch + 1}[/bold green] "
+            f"| [cyan]Total[/cyan]: {total:.4f} "
+            f"| [magenta]Class[/magenta]: {cls:.4f} "
+            f"| [yellow]Box[/yellow]: {box:.4f} "
+            f"| [blue]Obj[/blue]: {obj:.4f} "
+            f"| [red]RPN[/red]: {rpn:.4f}"
+        )
