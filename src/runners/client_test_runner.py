@@ -1,6 +1,5 @@
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
-from src.data.processing.zlib_decompressor import ZlibDecompressor
 from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
 from src.models.twod.yolo.x.streaming_dataset import StreamingDataset
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
