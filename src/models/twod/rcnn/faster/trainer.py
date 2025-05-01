@@ -9,18 +9,16 @@ from src.utils.logging import console
 class Trainer:
     """Trainer for faster-RCNN."""
 
-    def __init__(self, dataloader: DataLoader, n_classes: int, optimizer: torch.optim.Optimizer):
+    def __init__(self, dataloader: DataLoader, n_classes: int):
         """
         Initializes a Trainer instance.
 
         Args:
             dataloader (torch.utils.data.DataLoader): data loader for loading training data
             n_classes (int): number of classes
-            optimizer (torch.optim.Optimizer): the optimizer to use for training
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
-        self._optimizer = optimizer
 
     def train(self, n_epochs: int = 300) -> None:
         """
@@ -33,6 +31,10 @@ class Trainer:
             raise ValueError("n_epochs must be greater than 0")
 
         model = fasterrcnn_resnet50_fpn(num_classes=self._n_classes)
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005
+        )
+
         device = self._get_device()
         model.to(device)
 
@@ -67,9 +69,9 @@ class Trainer:
                         "rpn": loss_rpn_box_reg
                     })
 
-                    self._optimizer.zero_grad()
+                    optimizer.zero_grad()
                     loss.backward()
-                    self._optimizer.step()
+                    optimizer.step()
 
                     total_loss += loss.item()
                     total_cls += loss_classifier
