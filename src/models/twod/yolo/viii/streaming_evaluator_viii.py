@@ -11,8 +11,8 @@ from src.models.twod.yolo.viii.viii_postprocess import postprocess
 from src.models.twod.yolo.viii.viii_pred_visualizer import YOLOv8BatchVisualizer
 from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer  # Use your visualizer
 
-POSTPROCESS_CONF_THRESH = 0.001
-POSTPROCESS_IOU_THRESH = 0.065
+POSTPROCESS_CONF_THRESH = 0.01
+POSTPROCESS_IOU_THRESH = 0.65
 
 
 class StreamingEvaluatorVIII:
@@ -86,6 +86,8 @@ class StreamingEvaluatorVIII:
 
             all_detections.extend(detections)
             all_annotations.extend(targets)
+
+            print("🧪 Prediction counts:", [len(p) if p is not None else 0 for p in preds])
 
         from src.utils.eval_metrics import compute_stats_from_dets
         metrics = compute_stats_from_dets(all_detections, all_annotations, self._num_classes, self._iou_thresh)
