@@ -1,38 +1,64 @@
-# src/models/twod/yolo/viii/yoloviii_dataset.py
+from typing import TypeVar, List
 
 from torch.utils.data import IterableDataset
+
+from src.data.dataset.streams.closable_stream import ClosableStream
+from src.data.dataset.streams.factories.stream_factory import ClosableStreamFactory
+from src.data.dataset.streams.providers.stream_provider import StreamProvider
 from src.models.converters.viii.yoloviii_batch_converter import YOLOv8BatchConverter
+from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
+
+# data type for the data
+T = TypeVar("T")
 
 
-class YOLOv8StreamingDataset(IterableDataset):
-    def __init__(self, stream_factory, batch_size, max_batches, eval_mode=False):
-        self._stream_factory = stream_factory
+class StreamingDataset(IterableDataset):
+    """A dataset wrapper for a stream."""
+
+    def __init__(self, stream_provider: StreamProvider[T], batch_size: int, n_batches: int):
+        """
+        Initializes a StreamingDataset instance.
+
+        Args:
+            stream_provider (StreamProvider[T]): provider of streams
+            batch_size (int): the batch size
+            n_batches (int): the number of total batches
+        """
+        super().__init__()
+        self._stream_provider = stream_provider
         self._batch_size = batch_size
-        self._max_batches = max_batches
-        self.eval_mode = eval_mode
+        self._n_batches = n_batches
+
+        self.class_ids = [0, 1, 2, 3]
+        self.class_names = ["tail_biting", "ear_biting", "belly_nosing", "tail_down"]
 
     def __iter__(self):
-        stream = self._stream_factory.create_stream()
-        i = 0
+        stream = self._stream_provider.get_stream()
 
-        while i < len(self):
+        i = 0
+        eos = False
+        while i < len(self) and not eos:
             batch = self._fetch_batch(stream)
             if len(batch) > 0:
                 yield YOLOv8BatchConverter.convert(batch)
                 i += 1
-            elif batch is None:
-                break  # true EOS
 
-        stream.close()
+            if len(batch) < self._batch_size:
+                eos = True
 
-    def _fetch_batch(self, stream):
+    def _fetch_batch(self, stream: ClosableStream[T]) -> List[T]:
+        """Fetches the next batch."""
         batch = []
-        while len(batch) < self._batch_size:
-            frame = stream.read()
-            if frame is None:
-                return None  # end of stream
-            batch.append(frame)
+
+        eos = False
+        while len(batch) < self._batch_size and not eos:
+            instance = stream.read()
+            if instance is not None:
+                batch.append(instance)
+            else:
+                eos = True
+
         return batch
 
     def __len__(self):
-        return self._max_batches
+        return self._n_batches
