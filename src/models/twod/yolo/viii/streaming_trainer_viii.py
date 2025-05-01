@@ -2,6 +2,7 @@ import tempfile
 import yaml
 import os
 from torch.utils.tensorboard import SummaryWriter
+from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
 from ultralytics.utils.torch_utils import model_info
 
@@ -106,7 +107,9 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
     def validate(self):
         print("🔍 Running custom StreamingEvaluatorVIII...")
 
-        model_info(self.model.model, detailed=True)
+        if isinstance(self.model, str):
+            print(f"📦 Loading model from checkpoint: {self.model}")
+            self.model = YOLO(self.model)
 
         val_batch = next(iter(self.val_dl))
         visualize_batch_input(
