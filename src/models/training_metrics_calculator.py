@@ -52,7 +52,27 @@ class TrainingMetricsCalculator:
 
     def _calculate_map(self, predictions: List[Dict], targets: List[Dict]) -> Dict[str, float]:
         self._map_metric.reset()
-        self._map_metric.update(preds=predictions, target=targets)
+
+        def strip_angle(boxes):
+            if boxes.shape[1] == 5:
+                return boxes[:, :4]
+            return boxes
+
+        # Convert both predictions and targets to valid mAP format (xyxy, no angle)
+        clean_preds = []
+        clean_targets = []
+        for pred, target in zip(predictions, targets):
+            clean_preds.append({
+                "boxes": strip_angle(pred["boxes"]),
+                "scores": pred["scores"],
+                "labels": pred["labels"]
+            })
+            clean_targets.append({
+                "boxes": strip_angle(target["boxes"]),
+                "labels": target["labels"]
+            })
+
+        self._map_metric.update(preds=clean_preds, target=clean_targets)
         result = self._map_metric.compute()
 
         precision = result.get("map_50", 0.0)
