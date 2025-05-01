@@ -28,10 +28,10 @@ class YOLOv8StreamingExp:
     def get_dataloaders(self):
         print("📥 Building dataloaders...")
         train_ds = YOLOv8StreamingDataset(
-            self.train_stream_factory, batch_size=self.batch_size, max_batches=934
+            self.train_stream_factory, batch_size=self.batch_size, max_batches=50
         )
         val_ds = YOLOv8StreamingDataset(
-            self.val_stream_factory, batch_size=self.batch_size, max_batches=430, eval_mode=True
+            self.val_stream_factory, batch_size=self.batch_size, max_batches=50, eval_mode=True
         )
 
         train_dl = DataLoader(train_ds, batch_size=None, num_workers=0, pin_memory=True)
