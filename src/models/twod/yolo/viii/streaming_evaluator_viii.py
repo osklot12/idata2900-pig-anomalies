@@ -86,7 +86,7 @@ class StreamingEvaluatorVIII:
                     images=imgs[mask].cpu(),
                     targets=[targets[i] for i, keep in enumerate(has_predictions) if keep],
                     predictions=[p for i, p in enumerate(detections) if has_predictions[i]],
-                    class_names=["belly_nosing", "ear_biting", "tail_biting", "tail_down"],
+                    class_names=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
                     start_idx=global_image_idx,
                     save_dir="./eval_visuals"
                 )
