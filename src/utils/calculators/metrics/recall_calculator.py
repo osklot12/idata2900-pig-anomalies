@@ -12,6 +12,9 @@ class RecallCalculator:
         Args:
             confuse (np.ndarray): the confusion matrix
             cls (int): the class to calculate recall for
+
+        Returns:
+            float: the recall
         """
         tp = confuse[cls, cls]
         fn = np.sum(confuse[cls, :]) - tp
