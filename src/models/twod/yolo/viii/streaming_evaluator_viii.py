@@ -57,30 +57,29 @@ class StreamingEvaluatorVIII:
                 else:
                     targets.append(np.zeros((0, 5)))
 
+            # 🔧 YOLOv11 raw output postprocess
             with torch.no_grad():
-                results = self._model(imgs)
+                raw_preds = self._model(imgs)
+                results = non_max_suppression(
+                    prediction=raw_preds,
+                    conf_thres=POSTPROCESS_CONF_THRESH,
+                    iou_thres=POSTPROCESS_IOU_THRESH,
+                    multi_label=False
+                )
 
-                preds = []
-                for result in results:
-                    boxes = result.boxes
-                    if boxes is not None and boxes.shape[0] > 0:
-                        xyxy = boxes.xyxy.cpu().numpy()
+            preds = []
+            for det in results:
+                if det is not None and len(det):
+                    preds.append(det.cpu())
+                else:
+                    preds.append(torch.zeros((0, 6)))
 
-                        conf = boxes.conf.cpu().numpy().reshape(-1, 1)
-                        cls = boxes.cls.cpu().numpy().reshape(-1, 1)
-                        det = np.hstack((xyxy, conf, cls))  # [x1, y1, x2, y2, conf, class]
-                        preds.append(torch.from_numpy(det).float())
-                    else:
-                        preds.append(torch.zeros((0, 6)))
-
-
-            detections = [p.cpu().numpy() if p is not None else np.zeros((0, 6), dtype=np.float32) for p in preds]
+            detections = [p.numpy() if p is not None else np.zeros((0, 6), dtype=np.float32) for p in preds]
 
             # ✅ Visualize predictions
             has_predictions = [len(p) > 0 for p in detections]
             if any(has_predictions):
                 mask = torch.tensor(has_predictions, dtype=torch.bool, device=imgs.device)
-
                 YOLOv8BatchVisualizer.visualize_with_predictions(
                     images=imgs[mask].cpu(),
                     targets=[targets[i] for i, keep in enumerate(has_predictions) if keep],
@@ -99,12 +98,9 @@ class StreamingEvaluatorVIII:
         from src.utils.eval_metrics import compute_stats_from_dets
         metrics = compute_stats_from_dets(all_detections, all_annotations, self._num_classes, self._iou_thresh)
 
-        # ✅ Write scalar metrics to TensorBoard
         if self._writer:
             for k, v in metrics.items():
                 if isinstance(v, (int, float)):
                     self._writer.add_scalar(f"val/{k}", v, self._epoch)
 
-        metrics = {k: v for k, v in metrics.items() if isinstance(v, (int, float))}
-
-        return metrics
+        return {k: v for k, v in metrics.items() if isinstance(v, (int, float))}
