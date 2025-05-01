@@ -14,28 +14,24 @@ class YOLOv8StreamingDataset(IterableDataset):
     def __iter__(self):
         stream = self._stream_factory.create_stream()
         i = 0
-        eos = False
 
-        while i < len(self) and not eos:
+        while i < len(self):
             batch = self._fetch_batch(stream)
             if len(batch) > 0:
                 yield YOLOv8BatchConverter.convert(batch)
                 i += 1
-
-            if len(batch) < self._batch_size:
-                eos = True
+            elif batch is None:
+                break  # true EOS
 
         stream.close()
 
     def _fetch_batch(self, stream):
         batch = []
-        eos = False
-        while len(batch) < self._batch_size and not eos:
+        while len(batch) < self._batch_size:
             frame = stream.read()
-            if frame and frame.annotations:
-                batch.append(frame)
-            elif frame is None:
-                eos = True
+            if frame is None:
+                return None  # end of stream
+            batch.append(frame)
         return batch
 
     def __len__(self):
