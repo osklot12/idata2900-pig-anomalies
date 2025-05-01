@@ -2,7 +2,7 @@ from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.processing.zlib_decompressor import ZlibDecompressor
 from src.models.converters.yolox_batch_converter import YOLOXBatchConverter
-from src.models.twod.yolo.x.yolox_dataset import YOLOXDataset
+from src.models.twod.yolo.x.streaming_dataset import StreamingDataset
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
 
 SERVER_IP = "10.0.0.1"
@@ -60,7 +60,7 @@ def run_train_stream():
 
 def run_val_stream():
     factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
-    dataset = YOLOXDataset(stream_factory=factory, batch_size=8, n_batches=430)
+    dataset = StreamingDataset(stream_factory=factory, batch_size=8, n_batches=430)
 
     try:
         while True:

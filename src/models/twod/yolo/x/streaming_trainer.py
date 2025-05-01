@@ -52,6 +52,8 @@ class StreamingTrainer(Trainer):
             )
             results = evaluator.evaluate()
 
+
+
         if self.rank == 0:
             self._show_evaluation_results(results=results)
 

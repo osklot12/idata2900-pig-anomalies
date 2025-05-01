@@ -23,13 +23,12 @@ class DarwinDecoder(AnnotationDecoder):
         """
         self._label_parser = label_parser
 
-    def decode_annotations(self, raw_data: bytes) -> List[FrameAnnotations]:
-        json_data = DarwinDecoder._get_json(raw_data)
+    def decode_annotations(self, json_data: dict) -> List[FrameAnnotations]:
         annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
         return self._create_frame_annotation_list(
             annotations,
             self._create_source_metadata(json_data),
-            DarwinDecoder.get_frame_count(raw_data)
+            DarwinDecoder.get_frame_count(json_data)
         )
 
     @staticmethod
@@ -76,36 +75,37 @@ class DarwinDecoder(AnnotationDecoder):
         return self._label_parser.enum_from_str(label)
 
     @staticmethod
-    def get_frame_count(raw_bytes: bytes) -> int:
+    def get_frame_count(json_data: dict) -> int:
         """
         Returns the total number of frames for the annotations file.
 
         Args:
-            raw_bytes (bytes): the Darwin JSON data in raw bytes
+            json_data (dict): the Darwin JSON data in raw bytes
 
         Returns:
             int: the total number of frames
         """
         result = -1
 
-        slots = DarwinDecoder._extract_metadata_slots(DarwinDecoder._get_json(raw_bytes))
+        slots = DarwinDecoder._extract_metadata_slots(json_data)
         if slots and "frame_count" in slots[0]:
             result = slots[0]["frame_count"]
 
         return result
 
     @staticmethod
-    def get_frame_dimensions(raw_bytes: bytes) -> Tuple[int, int]:
+    def get_frame_dimensions(json_data: dict) -> Tuple[int, int]:
         """
         Returns the frame dimensions (height, width) for the annotated frames.
 
         Args:
-            raw_bytes (bytes): the Darwin JSON data in raw bytes
+            json_data (dict): the Darwin JSON data in raw bytes
 
         Returns:
             Tuple[int, int]: the frame dimensions (height, width)
         """
-        dimensions = DarwinDecoder._extract_frame_dimensions(DarwinDecoder._get_json(raw_bytes))
+        dimensions = DarwinDecoder._extract_frame_dimensions(json_data)
+
         if not dimensions:
             raise RuntimeError("Could not extract frame dimensions")
 
