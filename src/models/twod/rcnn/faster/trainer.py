@@ -62,13 +62,6 @@ class Trainer:
                     loss_objectness = loss_dict.get("loss_objectness", torch.tensor(0.0)).item()
                     loss_rpn_box_reg = loss_dict.get("loss_rpn_box_reg", torch.tensor(0.0)).item()
 
-                    pbar.set_postfix({
-                        "cls": loss_classifier,
-                        "box": loss_box_reg,
-                        "obj": loss_objectness,
-                        "rpn": loss_rpn_box_reg
-                    })
-
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
