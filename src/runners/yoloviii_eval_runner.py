@@ -16,10 +16,10 @@ def main():
     args = parser.parse_args()
 
     print("📡 Setting up data streams...")
-    val_factory = NetworkDatasetStreamFactory("127.0.0.1", DatasetSplit.VAL)
+    val_factory = NetworkDatasetStreamFactory("10.0.0.1", DatasetSplit.VAL)
 
     print("🧪 Preparing YOLOv8 experiment (eval only)...")
-    dummy_train_factory = NetworkDatasetStreamFactory("127.0.0.1", DatasetSplit.TRAIN)  # not used
+    dummy_train_factory = NetworkDatasetStreamFactory("10.0.0.1", DatasetSplit.TRAIN)  # not used
     exp = YOLOv8StreamingExp(dummy_train_factory, val_factory, batch_size=args.batch, epochs=1, device=args.device)
     exp.resume_ckpt = args.ckpt
 
