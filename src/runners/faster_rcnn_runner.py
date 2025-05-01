@@ -18,7 +18,7 @@ def collate_fn(batch):
 def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
     train_provider = ReusableStreamProvider(train_factory.create_stream())
-    dataset = StreamingDataset(train_provider, n_batches=400)
+    dataset = StreamingDataset(train_provider, n_batches=100)
     dataloader = DataLoader(
         dataset=dataset,
         batch_size=5,
