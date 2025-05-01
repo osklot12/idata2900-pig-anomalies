@@ -88,7 +88,9 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                     model=self.trainer.model,
                     dataloader=self.trainer.val_dl,
                     device=self.trainer.exp.device,
-                    num_classes=self.trainer.exp.num_classes
+                    num_classes=self.trainer.exp.num_classes,
+                    writer=self.trainer.writer,
+                    epoch=self.trainer.epoch
                 )
                 self.metrics = evaluator.evaluate()
 
@@ -146,8 +148,10 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                     self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
                 self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
 
-    def loss(self, batch, pred):
-        # 🔍 Visualize training batch input once per few steps (optional)
+    def train_batch(self, batch):
+        # 🔍 Visualize input
+        if not hasattr(self, "_step_counter"):
+            self._step_counter = 0
         if self._step_counter % 10 == 0:
             visualize_batch_input(
                 images=batch["img"],
@@ -157,9 +161,10 @@ class YOLOv8StreamingTrainer(DetectionTrainer):
                 save_dir="./input_visuals/train",
                 prefix=f"train_epoch{self.epoch}_step{self._step_counter}"
             )
-
         self._step_counter += 1
-        return super().loss(batch, pred)
+
+        # 🚀 Continue with training logic
+        return super().train_batch(batch)
 
 
     def plot_training_labels(self):
