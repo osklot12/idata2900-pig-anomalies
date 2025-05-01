@@ -21,7 +21,7 @@ def main():
     dataset = StreamingDataset(train_provider, n_batches=400)
     dataloader = DataLoader(
         dataset=dataset,
-        batch_size=5,
+        batch_size=6,
         collate_fn=collate_fn,
         num_workers=0,
         pin_memory=True
