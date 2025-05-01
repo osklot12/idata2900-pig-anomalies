@@ -1,6 +1,10 @@
 from typing import Dict, Tuple
 
 import torch
+import os
+
+from torch.nn import Module
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
@@ -23,23 +27,24 @@ class Trainer:
             lr (float): learning rate to use for training
             momentum (float): momentum factor for optimizer
             weight_decay (float): weight decay factor for optimizer
+            output_dir (str): directory for writing outputs
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
         self._lr = lr
         self._momentum = momentum
         self._weight_decay = weight_decay
+        self._output_dir = output_dir
 
-        self._writer = SummaryWriter(log_dir=f"{output_dir}/tensorboard")
+        self._writer = SummaryWriter(log_dir=f"{self._output_dir}/tensorboard")
 
-
-
-    def train(self, n_epochs: int = 300) -> None:
+    def train(self, n_epochs: int = 300, ckpt_path: str = None) -> None:
         """
         Trains the model.
 
         Args:
             n_epochs (int): number of epochs
+            ckpt_path (str): path to checkpoint file to train from
         """
         if n_epochs < 1:
             raise ValueError("n_epochs must be greater than 0")
@@ -52,9 +57,13 @@ class Trainer:
         device = self._get_device()
         model.to(device)
 
+        start_epoch = 0
+        if ckpt_path is not None:
+            start_epoch = self._load_ckpt(model, optimizer, device, ckpt_path)
+
         console.log("[bold cyan]Starting training...[/bold cyan]")
 
-        for epoch in range(n_epochs):
+        for epoch in range(start_epoch, n_epochs):
             model.train()
             n_batches = 0
             total_loss = 0.0
@@ -91,6 +100,38 @@ class Trainer:
             avg_rpn = total_rpn / n_batches
 
             self._log_losses(avg_loss, avg_cls, avg_box, avg_obj, avg_rpn, epoch + 1)
+            self._save_ckpt(epoch, model, optimizer)
+
+    @staticmethod
+    def _load_ckpt(model: Module, optimizer: Optimizer, device: torch.device, ckpt_path: str) -> int:
+        """Loads checkpoint from path."""
+        start_epoch = 0
+
+        if os.path.exists(ckpt_path):
+            ckpt = torch.load(ckpt_path, map_location=device)
+            model.load_state_dict(ckpt["model_state_dict"])
+            optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+            start_epoch = ckpt["epoch"]
+            console.log(f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}[/bold yellow]")
+
+        return start_epoch
+
+    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer) -> None:
+        """Saves a checkpoint for the current state of the model."""
+        epoch_ckpt_path = os.path.join(self._output_dir, f"epoch{epoch + 1}.pth")
+        last_ckpt_path = os.path.join(self._output_dir, f"last_ckpt.pth")
+
+        torch.save({
+            "epoch": epoch + 1,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict()
+        }, epoch_ckpt_path)
+
+        torch.save({
+            "epoch": epoch + 1,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict()
+        }, last_ckpt_path)
 
     @staticmethod
     def _get_device() -> torch.device:
