@@ -12,7 +12,7 @@ T = TypeVar("T")
 
 
 class StreamingDataset(IterableDataset):
-    """A dataset wrapper for a stream."""
+    """An IterableDataset wrapper for streaming datasets."""
 
     def __init__(self, stream_provider: StreamProvider[T], batch_size: int, n_batches: int):
         """
