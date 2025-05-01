@@ -12,6 +12,9 @@ class PrecisionCalculator:
         Args:
             confuse (np.ndarray): confusion matrix
             cls (int): class to calculate precision for
+
+        Returns:
+            float: the precision
         """
         tp = confuse[cls][cls]
         fp = np.sum(confuse[:, cls]) - confuse[cls, cls]
