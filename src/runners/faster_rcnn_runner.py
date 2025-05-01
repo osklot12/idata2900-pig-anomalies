@@ -14,7 +14,7 @@ def collate_fn(batch):
 
 
 def main():
-    device = torch.device("cuda" if torch.cude.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
