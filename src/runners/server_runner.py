@@ -1,11 +1,5 @@
 import time
-import zlib
-
-import numpy as np
-from pympler import muppy, summary
-
-import os
-import psutil
+from typing import Dict
 
 from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
 from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory
@@ -22,30 +16,12 @@ from src.network.messages.serialization.factories.pickle_serializer_factory impo
 from src.network.server.network_server import NetworkServer
 from src.network.server.session.factories.clean_session_factory import CleanSessionFactory
 from src.utils.norsvin_behavior_class import NorsvinBehaviorClass
-from tests.utils.annotated_frame_visualizer import AnnotatedFrameVisualizer
-
-proc = psutil.Process(os.getpid())
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataset.dataset_split import DatasetSplit
 from src.utils.gcs_credentials import GCSCredentials
 from src.utils.norsvin_dataset_config import NORSVIN_SPLIT_RATIOS
 from tests.utils.gcs.test_bucket import TestBucket
-
-import tracemalloc
-import threading
-
-
-def report_memory():
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"[Memory] Current = {current / 1024 ** 2:.2f} MB; Peak = {peak / 1024 ** 2:.2f} MB")
-    print(f"[Threads] Active threads: {threading.active_count()}")
-
-
-def report_objects():
-    all_objects = muppy.get_objects()
-    sum1 = summary.summarize(all_objects)
-    summary.print_(sum1)
 
 
 def is_annotated(instance: AnnotatedFrame) -> bool:
@@ -57,14 +33,18 @@ def main():
     gcs_creds = GCSCredentials(bucket_name=TestBucket.BUCKET_NAME, service_account_path=TestBucket.SERVICE_ACCOUNT_FILE)
     split_ratios = NORSVIN_SPLIT_RATIOS
 
+    def has_annotations(meta: Dict[str, int]) -> bool:
+        return any(count > 0 for count in meta.values())
+
     train_stream_factory = GCSStreamFactory(
         gcs_creds=gcs_creds,
         split_ratios=split_ratios,
         split=DatasetSplit.TRAIN,
         selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=5000, min_ready=100),
-        pipeline_factory=NorsvinTrainPipelineFactory()
+        stream_factory=PoolStreamFactory(pool_size=7000, min_ready=6000),
+        pipeline_factory=NorsvinTrainPipelineFactory(),
+        filter_func=has_annotations,
     )
 
     val_stream_factory = GCSStreamFactory(

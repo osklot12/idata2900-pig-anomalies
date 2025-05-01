@@ -33,8 +33,6 @@ class DetermStringSelector(Selector):
             file = self._shuffled_files[self._index]
             self._index += 1
 
-        if file is None:
-            print(f"[DetermStringSelector] End of stream")
         return file
 
     def reset(self) -> None:

@@ -11,7 +11,7 @@ from yolox.utils import postprocess
 
 EPSILON = 1e-6
 
-POST_PROCESS_CONF_THRE = 0.001
+POST_PROCESS_CONF_THRE = 0.1
 POST_PROCESS_NMS_THRE = 0.65
 
 
@@ -55,9 +55,9 @@ class StreamingEvaluator:
             with torch.no_grad():
                 outputs = self._model(images)
 
-            #raw_logits = outputs[..., 5:]  # (B, N, num_classes)
-            #probs = torch.sigmoid(raw_logits)
-            #max_probs = probs.max(dim=1).values.mean(dim=0)
+            # raw_logits = outputs[..., 5:]  # (B, N, num_classes)
+            # probs = torch.sigmoid(raw_logits)
+            # max_probs = probs.max(dim=1).values.mean(dim=0)
             # print(f"[StreamingEvaluator] Avg max sigmoid probs per class:", max_probs.cpu().numpy())
 
             # detections = self.postprocess(outputs, self._num_classes, POST_PROCESS_CONF_THRE)
@@ -78,7 +78,6 @@ class StreamingEvaluator:
             # Visualize only images with predictions
             has_predictions = [len(pred) > 0 for pred in detections]
             if any(has_predictions):
-
                 # Filter relevant elements
                 mask = torch.tensor(has_predictions, dtype=torch.bool)
                 pred_images = images[mask].cpu()
@@ -110,8 +109,6 @@ class StreamingEvaluator:
             List[np.ndarray]: list of detections per sample
         """
         detections = []
-
-
 
         for preds in outputs:
             if preds is None or preds.shape[0] == 0:

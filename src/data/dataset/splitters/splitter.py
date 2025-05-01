@@ -7,12 +7,15 @@ class Splitter(Generic[T], ABC):
     """Interface for splitters."""
 
     @abstractmethod
-    def add(self, item: T) -> None:
+    def add(self, item: T) -> int:
         """
         Adds an item to the splitter.
 
         Args:
             item (T): the item to add
+
+        Returns:
+            int: the index of the split the item was assigned to
         """
         raise NotImplementedError
 

@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 
 from src.data.dataset.dataset_split import DatasetSplit
@@ -19,17 +21,22 @@ from tests.utils.yolox_batch_visualizer import YOLOXBatchVisualizer
 def test_norsvin_train_stream():
     """Tests that creating the Norsvin training set stream with GCSStreamFactory gives the correct stream."""
     # arrange
+    def has_annotations(meta: Dict[str, int]) -> bool:
+        return any(count > 0 for count in meta.values())
+
     stream_factory = GCSStreamFactory(
         gcs_creds=NORSVIN_GCS_CREDS,
         split_ratios=NORSVIN_SPLIT_RATIOS,
         split=DatasetSplit.TRAIN,
         selector_factory=RandomStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=2000),
-        pipeline_factory=NorsvinTrainPipelineFactory()
+        stream_factory=PoolStreamFactory(pool_size=4000, min_ready=3000),
+        pipeline_factory=NorsvinTrainPipelineFactory(),
+        filter_func=has_annotations,
     )
 
     stream = stream_factory.create_stream()
+    decompressor = ZlibDecompressor()
 
     # act
     stream.run()
@@ -51,16 +58,73 @@ def test_norsvin_train_stream():
                     belly_nosing += 1
                 if annotation.cls == NorsvinBehaviorClass.EAR_BITING:
                     ear_biting += 1
-            total += 1
+                total += 1
             print(f"[Test] Total instances: {total}")
             print(f"[Test] Bellynosing: {belly_nosing} ({belly_nosing/total*100:.2f}%)")
             print(f"[Test] Tailbiting: {tail_biting} ({tail_biting/total*100:.2f}%)")
             print(f"[Test] Earbiting: {ear_biting} ({ear_biting/total*100:.2f}%)")
             print(f"[Test] Taildown: {tail_down} ({tail_down/total*100:.2f}%)")
+
+            AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
             instance = stream.read()
     except KeyboardInterrupt:
         stream.stop()
 
+def test_count_train_set_instances():
+    """Test to count the number of instances in the training set."""
+
+    # arrange
+    def has_annotations(meta: Dict[str, int]) -> bool:
+        return any(count > 0 for count in meta.values())
+
+    stream_factory = GCSStreamFactory(
+        gcs_creds=NORSVIN_GCS_CREDS,
+        split_ratios=NORSVIN_SPLIT_RATIOS,
+        split=DatasetSplit.TRAIN,
+        selector_factory=DetermStringSelectorFactory(),
+        label_map=NorsvinBehaviorClass.get_label_map(),
+        stream_factory=PoolStreamFactory(pool_size=3000, min_ready=100),
+        pipeline_factory=NorsvinTrainPipelineFactory(),
+        filter_func=has_annotations,
+    )
+
+    stream = stream_factory.create_stream()
+    decompressor = ZlibDecompressor()
+
+    # act
+    stream.run()
+
+    total = 0
+    anno_total = 0
+    tail_biting = 0
+    ear_biting = 0
+    belly_nosing = 0
+    tail_down = 0
+    try:
+        instance = stream.read()
+        while instance:
+            for annotation in instance.annotations:
+                if annotation.cls == NorsvinBehaviorClass.TAIL_BITING:
+                    tail_biting += 1
+                if annotation.cls == NorsvinBehaviorClass.TAIL_DOWN:
+                    tail_down += 1
+                if annotation.cls == NorsvinBehaviorClass.BELLY_NOSING:
+                    belly_nosing += 1
+                if annotation.cls == NorsvinBehaviorClass.EAR_BITING:
+                    ear_biting += 1
+                anno_total += 1
+            total += 1
+            AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+            instance = stream.read()
+    except KeyboardInterrupt:
+        stream.stop()
+
+    print(f"[Test] Total instances: {total}")
+    print(f"[Test] Total annotations: {anno_total}")
+    print(f"[Test] Bellynosing: {belly_nosing} ({belly_nosing / anno_total * 100:.2f}%)")
+    print(f"[Test] Tailbiting: {tail_biting} ({tail_biting / anno_total * 100:.2f}%)")
+    print(f"[Test] Earbiting: {ear_biting} ({ear_biting / anno_total * 100:.2f}%)")
+    print(f"[Test] Taildown: {tail_down} ({tail_down / anno_total * 100:.2f}%)")
 
 def test_visualize_yolox_converted_batches():
     """Visualizes the coverted YOLOX batches for manual inspection."""
@@ -160,9 +224,9 @@ def test_norsvin_test_stream():
     instance = stream.read()
     i = 1
     while instance:
-        # AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
+        AnnotatedFrameVisualizer.visualize(decompressor.process(instance))
         print(f"Frames read: {i}")
-        print(f"[YOLOXDataset] Read frame {instance.index} for {instance.source.source_id}")
+        print(f"[Test] Read frame {instance.index} for {instance.source.source_id}")
         instance = stream.read()
         i += 1
 
