@@ -57,25 +57,37 @@ class YOLOv8BatchVisualizer:
                 (image_tensor.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
             )
 
-            # Draw GT boxes
+            debug_size = 30
+            H, W = img.shape[:2]
+            cx, cy = W // 2, H // 2
+            cv2.rectangle(img, (cx - debug_size, cy - debug_size), (cx + debug_size, cy + debug_size), (255, 255, 0), 2)
+            cv2.putText(img, "DEBUG", (cx - debug_size, cy - debug_size - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, (255, 255, 0), 1, cv2.LINE_AA)
+
+            # Draw GT boxes (green)
             for box in target_boxes:
-                cls, x1, y1, x2, y2 = box.astype(int)
+                if len(box) < 5:
+                    continue
+                cls, x1, y1, x2, y2 = box
+                cls = int(cls)
+                x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
                 label = class_names[cls] if cls < len(class_names) else f"class_{cls}"
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(img, f"GT: {label}", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.putText(img, f"GT: {label}", (x1, max(10, y1 - 7)), cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-            # Draw predicted boxes
+            # Draw predicted boxes (red)
             for pred in pred_boxes:
                 if len(pred) < 6:
-                    continue  # skip malformed predictions
+                    continue
                 x1, y1, x2, y2, conf, cls = pred[:6]
                 cls = int(cls)
+                x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
                 label = class_names[cls] if cls < len(class_names) else f"class_{cls}"
-                cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
-                cv2.putText(img, f"P: {label} ({conf:.2f})", (int(x1), int(y2) + 15),
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                cv2.putText(img, f"P: {label} ({conf:.2f})", (x1, y2 + 15),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
             save_path = os.path.join(save_dir, f"eval_image_{start_idx + i}.jpg")
             cv2.imwrite(save_path, img)
-            print(f"Saved visualization to: {save_path}")
+            print(f"🖼️ Saved visualization to: {save_path}")
