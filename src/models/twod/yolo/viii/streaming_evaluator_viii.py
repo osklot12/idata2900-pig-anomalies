@@ -67,10 +67,6 @@ class StreamingEvaluatorVIII:
                     if boxes is not None and boxes.shape[0] > 0:
                         xyxy = boxes.xyxy.cpu().numpy()
 
-                        # 🔧 Scale BEFORE forming det
-                        xyxy[:, [0, 2]] *= imgs.shape[3]  # width
-                        xyxy[:, [1, 3]] *= imgs.shape[2]  # height
-
                         conf = boxes.conf.cpu().numpy().reshape(-1, 1)
                         cls = boxes.cls.cpu().numpy().reshape(-1, 1)
                         det = np.hstack((xyxy, conf, cls))  # [x1, y1, x2, y2, conf, class]
