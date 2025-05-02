@@ -54,7 +54,7 @@ class YOLOXIStreamingExp:
         """
         print("Building training DataLoader...")
         train_ds = StreamingDataset(
-            self.train_stream_provider, batch_size=self.batch_size, n_batches=10  # Can be changed as needed
+            self.train_stream_provider, batch_size=self.batch_size, n_batches=900  # Can be changed as needed
         )
         return DataLoader(train_ds, batch_size=None, num_workers=0, pin_memory=True)
 
@@ -67,6 +67,6 @@ class YOLOXIStreamingExp:
         """
         print("Building validation DataLoader...")
         val_ds = StreamingDataset(
-            self.val_stream_provider, batch_size=self.batch_size, n_batches=10  # Can be changed as needed
+            self.val_stream_provider, batch_size=self.batch_size, n_batches=450  # Can be changed as needed
         )
         return DataLoader(val_ds, batch_size=None, num_workers=0, pin_memory=True)
