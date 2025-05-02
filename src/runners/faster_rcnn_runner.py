@@ -28,7 +28,7 @@ def main():
     train_provider = ReusableStreamProvider(train_factory.create_stream())
     val_provider = ClosingStreamProvider(val_factory)
 
-    dataset = StreamingDataset(train_provider, n_batches=math.ceil(10)) #NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE
+    dataset = StreamingDataset(train_provider, n_batches=math.ceil(400)) #NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE
     dataloader = DataLoader(
         dataset=dataset,
         batch_size=BATCH_SIZE,
@@ -45,7 +45,7 @@ def main():
 
     trainer = Trainer(
         dataloader=dataloader,
-        n_classes=5,
+        n_classes=4,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR
     )
