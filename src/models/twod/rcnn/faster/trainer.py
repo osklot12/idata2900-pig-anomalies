@@ -34,6 +34,7 @@ class Trainer:
             weight_decay (float): weight decay factor for optimizer
             output_dir (str): directory for writing outputs
             log_interval (int): the interval for logging
+            eval_interval (int): the interval for evaluating the model
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
