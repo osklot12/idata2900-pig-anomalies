@@ -1,8 +1,6 @@
 import math
 
-import torch
 from torch.utils.data import DataLoader
-from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
