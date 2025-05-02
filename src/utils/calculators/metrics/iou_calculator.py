@@ -1,9 +1,10 @@
 import numpy as np
 
-class IoUCalculator(object):
+class IoUCalculator:
+    """Calculates IoU between predictions and ground truths."""
 
     @staticmethod
-    def compute_iou_matrix(pred_boxes: np.ndarray, gt_boxes: np.ndarray) -> np.ndarray:
+    def calculate(pred_boxes: np.ndarray, gt_boxes: np.ndarray) -> np.ndarray:
         """
         Compute IoU matrix between predicted boxes and ground truth boxes.
 

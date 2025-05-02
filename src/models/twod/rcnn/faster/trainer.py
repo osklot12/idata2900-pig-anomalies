@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 import torch
 import os
@@ -8,22 +8,27 @@ from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from tqdm import tqdm
 
+from src.models.streaming_evaluator import StreamingEvaluator
+from src.models.twod.rcnn.faster.faster_rcnn_predictor import FasterRCNNPredictor
 from src.utils.logging import console
 
 
 class Trainer:
     """Trainer for faster-RCNN."""
 
-    def __init__(self, dataloader: DataLoader, n_classes: int, lr: float = 0.005, momentum: float = 0.9,
-                 weight_decay: float = 5e-4, output_dir: str = "faster_rcnn_outputs"):
+    def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
+                 lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
+                 output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a Trainer instance.
 
         Args:
             dataloader (torch.utils.data.DataLoader): data loader for loading training data
             n_classes (int): number of classes
+            evaluator (Optional[StreamingEvaluator]): evaluator for evaluating the model
             lr (float): learning rate to use for training
             momentum (float): momentum factor for optimizer
             weight_decay (float): weight decay factor for optimizer
@@ -31,10 +36,13 @@ class Trainer:
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
+        self._evaluator = evaluator
         self._lr = lr
         self._momentum = momentum
         self._weight_decay = weight_decay
         self._output_dir = output_dir
+
+        self._model = self._create_model()
 
         self._writer = SummaryWriter(log_dir=f"{self._output_dir}/tensorboard")
 
@@ -49,22 +57,23 @@ class Trainer:
         if n_epochs < 1:
             raise ValueError("n_epochs must be greater than 0")
 
-        model = fasterrcnn_resnet50_fpn(num_classes=self._n_classes)
+        os.makedirs(self._output_dir, exist_ok=True)
+
         optimizer = torch.optim.SGD(
-            model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005
+            self._model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005
         )
 
         device = self._get_device()
-        model.to(device)
+        self._model.to(device)
 
         start_epoch = 0
         if ckpt_path is not None:
-            start_epoch = self._load_ckpt(model, optimizer, device, ckpt_path)
+            start_epoch = self._load_ckpt(self._model, optimizer, device, ckpt_path)
 
-        console.log("[bold cyan]Starting training...[/bold cyan]")
+        console.log("[bold]Starting training...[/bold]")
 
         for epoch in range(start_epoch, n_epochs):
-            model.train()
+            self._model.train()
             n_batches = 0
             total_loss = 0.0
             total_cls = 0.0
@@ -77,11 +86,12 @@ class Trainer:
                     images = [img.to(device) for img in images]
                     targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-                    loss_dict = model(images, targets)
+                    loss_dict = self._model(images, targets)
                     loss = sum(loss for loss in loss_dict.values())
 
                     optimizer.zero_grad()
                     loss.backward()
+                    torch.nn.utils.clip_grad_norm_(self._model.parameters(), max_norm=1.0)
                     optimizer.step()
 
                     cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
@@ -100,7 +110,30 @@ class Trainer:
             avg_rpn = total_rpn / n_batches
 
             self._log_losses(avg_loss, avg_cls, avg_box, avg_obj, avg_rpn, epoch + 1)
-            self._save_ckpt(epoch, model, optimizer)
+            self._save_ckpt(epoch, self._model, optimizer)
+
+            self._evaluate(device, epoch)
+
+    def _evaluate(self, device: torch.device, epoch: int) -> None:
+        """Evaluates the model if an evaluator is given."""
+        if self._evaluator:
+            console.log("[bold]Evaluating...[/bold]")
+            was_training = self._model.training
+            self._model.eval()
+
+            predictor = FasterRCNNPredictor(self._model, device=device)
+            self._evaluator.evaluate(predictor, epoch=epoch)
+
+            if was_training:
+                self._model.train()
+
+    def _create_model(self) -> Module:
+        """Creates a faster-RCNN model."""
+        model = fasterrcnn_resnet50_fpn(pretrained=True)
+        in_features = model.roi_heads.box_predictor.cls_score.in_features
+        model.roi_heads.box_predictor = FastRCNNPredictor(in_features, self._n_classes)
+
+        return model
 
     @staticmethod
     def _load_ckpt(model: Module, optimizer: Optimizer, device: torch.device, ckpt_path: str) -> int:
