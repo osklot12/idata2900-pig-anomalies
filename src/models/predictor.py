@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 import numpy as np
 
@@ -9,14 +10,14 @@ class Predictor(ABC):
     """Predicts bounding boxes for images."""
 
     @abstractmethod
-    def predict(self, image: np.ndarray) -> Prediction:
+    def predict(self, image: np.ndarray) -> List[Prediction]:
         """
-        Makes a prediction for an image.
+        Makes predictions for an image.
 
         Args:
             image (np.ndarray): the image to make a prediction for
 
         Returns:
-            Prediction: the prediction
+            List[Prediction]: list of predictions
         """
         raise NotImplementedError
