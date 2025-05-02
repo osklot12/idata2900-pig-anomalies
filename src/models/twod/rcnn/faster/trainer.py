@@ -81,27 +81,25 @@ class Trainer:
         for epoch in range(start_epoch, n_epochs):
             self._model.train()
 
-            with tqdm(self._dataloader, desc=f"Epoch {epoch + 1}/{n_epochs}") as pbar:
-                for images, targets in pbar:
-                    images = [img.to(device) for img in images]
-                    targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+            for images, targets in self._dataloader:
+                images = [img.to(device) for img in images]
+                targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-                    loss_dict = self._model(images, targets)
-                    loss = sum(loss for loss in loss_dict.values())
+                loss_dict = self._model(images, targets)
+                loss = sum(loss for loss in loss_dict.values())
 
-                    optimizer.zero_grad()
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(self._model.parameters(), max_norm=1.0)
-                    optimizer.step()
+                optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self._model.parameters(), max_norm=1.0)
+                optimizer.step()
 
-                    cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
+                cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
 
-                    global_step += 1
-                    if global_step % self._log_interval == 0:
-                        self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, global_step)
+                global_step += 1
+                if global_step % self._log_interval == 0:
+                    self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, global_step)
 
             self._save_ckpt(epoch, self._model, optimizer, global_step)
-
             self._evaluate(device, epoch + 1)
 
     def _evaluate(self, device: torch.device, epoch: int) -> None:
@@ -183,7 +181,8 @@ class Trainer:
         self._writer.add_scalar("train/loss_rpn_box_reg", rpn, step)
 
         console.log(
-            f"[bold green]Step {step}/{self._total_epoch_steps}, Epoch {epoch}[/bold green] "
+            f"[bold green]Epoch {epoch}[/bold green] "
+            f"[bold green]Step {step}/{self._total_epoch_steps}[/bold green] "
             f"| [cyan]Total[/cyan]: {total:.4f} "
             f"| [magenta]Class[/magenta]: {cls:.4f} "
             f"| [yellow]Box[/yellow]: {box:.4f} "
