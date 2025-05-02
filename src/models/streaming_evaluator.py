@@ -57,6 +57,7 @@ class StreamingEvaluator:
 
         img_idx = 0
         while instance := stream.read():
+            self._denormalize(instance)
             predictions = predictor.predict(instance.frame)
             gts = instance.annotations
             matches = self._get_gt_for_pred(predictions, gts)
@@ -77,7 +78,14 @@ class StreamingEvaluator:
             conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes)
 
             # save image
-            self._save_image(image=instance.frame, predictions=predictions, gts=gts, image_idx=img_idx, epoch=epoch)
+            folder_name = f"epoch_{epoch}" if epoch is not None else f"run_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            self._save_image(
+                image=instance.frame,
+                predictions=predictions,
+                gts=gts,
+                image_idx=img_idx,
+                folder_name=folder_name
+            )
 
             img_idx += 1
 
@@ -87,16 +95,20 @@ class StreamingEvaluator:
         map_result = self._map_calculator.compute()
         self._write_map(map_result["mAP"], map_result["per_class_ap"])
 
-    def _save_image(self, image: np.ndarray, predictions: List[Prediction], gts: List[AnnotatedBBox],
-                     image_idx: int, epoch: Optional[int] = None) -> None:
-        """Saves visualizations of predictions and ground truths on the images."""
-        base_dir = os.path.join(self._output_dir, "eval_images")
+    @staticmethod
+    def _denormalize(instance) -> None:
+        """Denormalizes the bounding box for the instance."""
+        height, width = instance.frame.shape[:2]
+        for ann in instance.annotations:
+            ann.bbox.x *= width
+            ann.bbox.y *= height
+            ann.bbox.width *= width
+            ann.bbox.height *= height
 
-        if epoch is not None:
-            output_dir = os.path.join(base_dir, f"epoch_{epoch}")
-        else:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            output_dir = os.path.join(base_dir, f"run_{timestamp}")
+    def _save_image(self, image: np.ndarray, predictions: List[Prediction], gts: List[AnnotatedBBox],
+                     image_idx: int, folder_name: str) -> None:
+        """Saves visualizations of predictions and ground truths on the images."""
+        output_dir = os.path.join(self._output_dir, f"eval_images/{folder_name}")
 
         os.makedirs(output_dir, exist_ok=True)
         save_path = os.path.join(output_dir, f"frame_{image_idx}.jpg")
