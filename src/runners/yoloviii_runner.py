@@ -8,8 +8,8 @@ from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.dataset.streams.providers.closing_stream_provider import ClosingStreamProvider
 from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
-from src.models.twod.yolo.viii.streaming_exp_viii import YOLOv8StreamingExp
-from src.models.twod.yolo.viii.streaming_trainer_viii import YOLOv8StreamingTrainer
+from src.models.twod.yolo.ultralytics.streaming_exp import YOLOXIStreamingExp
+from src.models.twod.yolo.ultralytics.streaming_trainer_xi import YOLOXIStreamingTrainer
 
 def main():
     parser = argparse.ArgumentParser()
@@ -28,14 +28,14 @@ def main():
     val_provider = ClosingStreamProvider(val_factory)
 
     print("🧪 Preparing YOLOv8 experiment...")
-    exp = YOLOv8StreamingExp(train_provider, val_provider, batch_size=args.batch, epochs=args.epochs, device=args.device)
+    exp = YOLOXIStreamingExp(train_provider, val_provider, batch_size=args.batch, epochs=args.epochs, device=args.device)
 
    # if args.resume:
    #     exp.resume_ckpt = os.path.join(exp.save_dir, "weights", "last.pt")
    #     print(f"🔁 Resuming from checkpoint: {args.ckpt}")
 
     print("🚀 Starting trainer...")
-    trainer = YOLOv8StreamingTrainer(exp)
+    trainer = YOLOXIStreamingTrainer(exp)
 
     try:
         trainer.train()

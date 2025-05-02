@@ -6,7 +6,7 @@ import torch
 from matplotlib import pyplot as plt
 
 
-class YOLOv8BatchVisualizer:
+class PredVisualizer:
     """Visualizer for YOLOv8 batches with GT and predictions."""
 
     @staticmethod
