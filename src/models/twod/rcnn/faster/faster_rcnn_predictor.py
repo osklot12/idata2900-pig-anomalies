@@ -11,7 +11,7 @@ from src.models.predictor import Predictor
 class FasterRCNNPredictor(Predictor):
     """Predictor wrapper for faster-RCNN model."""
 
-    def __init__(self, model: Module, device: torch.device):
+    def __init__(self, model: Module, device: torch.device, conf_thresh: float = 0.5):
         """
         Initializes a FasterRCNNPredictor instance.
 
@@ -21,6 +21,7 @@ class FasterRCNNPredictor(Predictor):
         """
         self._model = model
         self._device = device
+        self._conf_thresh = conf_thresh
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
         with torch.no_grad():
@@ -32,4 +33,5 @@ class FasterRCNNPredictor(Predictor):
                     x1=float(b[0]), y1=float(b[1]), x2=float(b[2]), y2=float(b[3]), cls=int(c), conf=float(s)
                 )
                 for b, c, s in zip(outputs["boxes"], outputs["labels"], outputs["scores"])
+                if float(s) >= self._conf_thresh
             ]
