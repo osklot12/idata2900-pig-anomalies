@@ -72,44 +72,6 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         """Return training or validation dataloader based on mode."""
         return self.train_dl if mode == "train" else self.val_dl
 
-    def get_validator(self):
-        """
-        Returns a callable validator that wraps the StreamingEvaluator.
-
-        This validator wraps the model in a YOLOXIPredictor before evaluation.
-        """
-        class CustomValidatorWrapper:
-            def __init__(self, trainer):
-                self.trainer = trainer
-                self._metrics = {}
-
-            @property
-            def metrics(self):
-                class MetricDict(dict):
-                    @property
-                    def keys(self_inner):
-                        return list(super(MetricDict, self_inner).keys())
-                return MetricDict(self._metrics)
-
-            @metrics.setter
-            def metrics(self, value):
-                self._metrics = value
-
-            def __call__(self, *args, **kwargs):
-                predictor = YOLOXIPredictor(self.trainer.model, device=self.trainer.exp.device)
-                evaluator = StreamingEvaluator(
-                    model=predictor,
-                    dataloader=self.trainer.val_dl,
-                    device=self.trainer.exp.device,
-                    num_classes=self.trainer.exp.num_classes,
-                    writer=self.trainer.writer,
-                    epoch=self.trainer.epoch
-                )
-                self.metrics = evaluator.evaluate()
-                return self.metrics
-
-        return CustomValidatorWrapper(self)
-
     def validate(self):
         """Runs validation using the StreamingEvaluator."""
         if isinstance(self.model, str):
@@ -126,22 +88,18 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             prefix=f"val_epoch{self.epoch}"
         )
 
-        predictor = YOLOXIPredictor(self.model, device=self.exp.device)
         evaluator = StreamingEvaluator(
-            model=predictor,
-            dataloader=self.val_dl,
-            device=self.exp.device,
-            num_classes=self.exp.num_classes,
-            writer=self.writer,
-            epoch=self.epoch
-        )
-        self.metrics = evaluator.evaluate()
-        fitness = (
-            0.1 * self.metrics.get("recall", 0.0) +
-            0.9 * self.metrics.get("mAP", 0.0)
+            stream_provider=self.exp.val_stream_provider,
+            classes=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
+            iou_thresh=0.5,
+            output_dir="yoloxi_outputs"
         )
 
-        return self.metrics, fitness
+        predictor = YOLOXIPredictor(self.model, device=self.exp.device)
+        evaluator.evaluate(predictor, epoch=self.epoch)
+
+        # No metrics returned from evaluate(), so just return dummy
+        return {}, 0.0
 
     def run_callbacks(self, event: str):
         """Logs losses to TensorBoard at the end of each training epoch."""
