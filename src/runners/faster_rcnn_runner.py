@@ -1,3 +1,5 @@
+import math
+
 import torch
 from torch.utils.data import DataLoader
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
@@ -7,21 +9,22 @@ from src.data.dataset.streams.factories.network_dataset_stream_factory import Ne
 from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
 from src.models.twod.rcnn.faster.streaming_dataset import StreamingDataset
 from src.models.twod.rcnn.faster.trainer import Trainer
+from src.utils.norsvin_dataset_config import NORSVIN_TRAIN_SET_SIZE
 
 SERVER_IP = "10.0.0.1"
 
+BATCH_SIZE = 5
 
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-
 def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
     train_provider = ReusableStreamProvider(train_factory.create_stream())
-    dataset = StreamingDataset(train_provider, n_batches=100)
+    dataset = StreamingDataset(train_provider, n_batches=math.ceil(NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE))
     dataloader = DataLoader(
         dataset=dataset,
-        batch_size=5,
+        batch_size=BATCH_SIZE,
         collate_fn=collate_fn,
         num_workers=0,
         pin_memory=True
