@@ -4,18 +4,19 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
-from ultralytics.utils.torch_utils import model_info
 
 from src.models.twod.yolo.ultralytics.batch_visualizer import visualize_batch_input
 from src.models.twod.yolo.ultralytics.yoloxi_evaluator import StreamingEvaluatorXI
+from src.models.twod.yolo.ultralytics.yoloxi_predictor import YOLOXIPredictor
 
 
 class YOLOXIStreamingTrainer(DetectionTrainer):
     """
     A custom trainer class for YOLOv11 (XI) using a streaming dataset.
 
-    This class overrides the Ultralytics DetectionTrainer to integrate
-    a streaming evaluation setup and TensorBoard logging.
+    This class extends Ultralytics' DetectionTrainer and replaces the default validator
+    with a custom streaming evaluation setup. It also integrates TensorBoard logging
+    and input visualization for both training and validation batches.
     """
 
     def __init__(self, exp):
@@ -23,7 +24,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         Initializes the streaming trainer with the given experiment configuration.
 
         Args:
-            exp: Experiment configuration object containing dataloaders, model info, etc.
+            exp: Experiment configuration object containing dataloaders, model path, and training settings.
         """
         self.exp = exp
         self.train_dl = exp.get_train_loader()
@@ -119,9 +120,9 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                 self._metrics = value
 
             def __call__(self, *args, **kwargs):
-                print("Running custom StreamingEvaluator...")
+                print("Running custom StreamingEvaluatorXI with Predictor wrapper...")
                 evaluator = StreamingEvaluatorXI(
-                    model=self.trainer.model,
+                    model=YOLOXIPredictor(self.trainer.model),
                     dataloader=self.trainer.val_dl,
                     device=self.trainer.exp.device,
                     num_classes=self.trainer.exp.num_classes,
@@ -161,7 +162,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         )
 
         evaluator = StreamingEvaluatorXI(
-            model=self.model,
+            model=YOLOXIPredictor(self.model),
             dataloader=self.val_dl,
             device=self.exp.device,
             num_classes=self.exp.num_classes
