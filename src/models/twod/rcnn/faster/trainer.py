@@ -9,7 +9,6 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.transforms.functional import normalize
 
 from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.rcnn.faster.faster_rcnn_predictor import FasterRCNNPredictor
@@ -189,7 +188,7 @@ class Trainer:
 
         console.log(
             f"[bold green]Epoch[/bold green] {epoch}/{total_epochs} "
-            f"| [bold green]Step[/bold green] {step}/{self._total_epoch_steps} "
+            f"| [bold green]Step[/bold green] {step % self._total_epoch_steps}/{self._total_epoch_steps} "
             f"| [cyan]Total[/cyan]: {total:.4f} "
             f"| [magenta]Class[/magenta]: {cls:.4f} "
             f"| [yellow]Box[/yellow]: {box:.4f} "
