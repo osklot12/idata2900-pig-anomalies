@@ -6,25 +6,24 @@ from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
 
 from src.models.twod.yolo.ultralytics.batch_visualizer import visualize_batch_input
-from src.models.twod.yolo.ultralytics.yoloxi_evaluator import StreamingEvaluatorXI
 from src.models.twod.yolo.ultralytics.yoloxi_predictor import YOLOXIPredictor
+from src.models.streaming_evaluator import StreamingEvaluator
 
 
 class YOLOXIStreamingTrainer(DetectionTrainer):
     """
-    A custom trainer class for YOLOv11 (XI) using a streaming dataset.
+    A custom trainer for YOLOv11 (XI) using a streaming dataset.
 
-    This class extends Ultralytics' DetectionTrainer and replaces the default validator
-    with a custom streaming evaluation setup. It also integrates TensorBoard logging
-    and input visualization for both training and validation batches.
+    This class extends the Ultralytics DetectionTrainer and uses a custom StreamingEvaluator
+    with a predictor interface. It logs losses to TensorBoard and saves training inputs.
     """
 
     def __init__(self, exp):
         """
-        Initializes the streaming trainer with the given experiment configuration.
+        Initialize the trainer with experiment config.
 
         Args:
-            exp: Experiment configuration object containing dataloaders, model path, and training settings.
+            exp: An experiment object providing model path, dataloaders, and training settings.
         """
         self.exp = exp
         self.train_dl = exp.get_train_loader()
@@ -55,12 +54,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         super().__init__(overrides=overrides)
 
     def _create_dummy_data_yaml(self):
-        """
-        Creates a temporary dummy data.yaml file to satisfy the Ultralytics config format.
-
-        Returns:
-            str: Path to the created YAML file.
-        """
+        """Creates a fake data.yaml file required by Ultralytics training loop."""
         tmp_dir = tempfile.mkdtemp(prefix="streaming_yolov11")
         os.makedirs(os.path.join(tmp_dir, "fake"), exist_ok=True)
         yaml_data = {
@@ -75,37 +69,19 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         return yaml_path
 
     def get_dataloader(self, dataset_path=None, batch_size=None, rank=0, mode="train"):
-        """
-        Returns the dataloader depending on the training or validation mode.
-
-        Args:
-            mode (str): Either "train" or "val".
-
-        Returns:
-            DataLoader: The appropriate dataloader.
-        """
+        """Return training or validation dataloader based on mode."""
         return self.train_dl if mode == "train" else self.val_dl
 
     def get_validator(self):
         """
-        Returns a custom validator wrapper that integrates the streaming evaluation.
+        Returns a callable validator that wraps the StreamingEvaluator.
 
-        Returns:
-            Callable: Validator callable that computes metrics.
+        This validator wraps the model in a YOLOXIPredictor before evaluation.
         """
         class CustomValidatorWrapper:
             def __init__(self, trainer):
                 self.trainer = trainer
-                self._metrics = {
-                    "precision": 0.0,
-                    "recall": 0.0,
-                    "mAP": 0.0,
-                    "iou_loss": 0.0,
-                    "conf_loss": 0.0,
-                    "cls_loss": 0.0,
-                    "total_loss": 0.0,
-                    "fitness": 0.0,
-                }
+                self._metrics = {}
 
             @property
             def metrics(self):
@@ -120,9 +96,9 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                 self._metrics = value
 
             def __call__(self, *args, **kwargs):
-                print("Running custom StreamingEvaluatorXI with Predictor wrapper...")
-                evaluator = StreamingEvaluatorXI(
-                    model=YOLOXIPredictor(self.model, device=self.exp.device),
+                predictor = YOLOXIPredictor(self.trainer.model, device=self.trainer.exp.device)
+                evaluator = StreamingEvaluator(
+                    model=predictor,
                     dataloader=self.trainer.val_dl,
                     device=self.trainer.exp.device,
                     num_classes=self.trainer.exp.num_classes,
@@ -130,23 +106,12 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                     epoch=self.trainer.epoch
                 )
                 self.metrics = evaluator.evaluate()
-
-                if self.trainer.writer:
-                    for k, v in self.metrics.items():
-                        if isinstance(v, (int, float)):
-                            self.trainer.writer.add_scalar(f"val/{k}", v, self.trainer.epoch)
-
                 return self.metrics
 
         return CustomValidatorWrapper(self)
 
     def validate(self):
-        """
-        Runs validation using the custom streaming evaluator.
-
-        Returns:
-            Tuple[Dict[str, float], float]: Metrics dictionary and fitness score.
-        """
+        """Runs validation using the StreamingEvaluator."""
         if isinstance(self.model, str):
             print(f"Loading model from checkpoint: {self.model}")
             self.model = YOLO(self.model)
@@ -161,52 +126,34 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             prefix=f"val_epoch{self.epoch}"
         )
 
-        evaluator = StreamingEvaluatorXI(
-            model=YOLOXIPredictor(self.model, device=self.exp.device),
+        predictor = YOLOXIPredictor(self.model, device=self.exp.device)
+        evaluator = StreamingEvaluator(
+            model=predictor,
             dataloader=self.val_dl,
             device=self.exp.device,
-            num_classes=self.exp.num_classes
+            num_classes=self.exp.num_classes,
+            writer=self.writer,
+            epoch=self.epoch
         )
         self.metrics = evaluator.evaluate()
-
-        metrics = self.metrics or {}
         fitness = (
-            0.1 * metrics.get("recall", 0.0) +
-            0.9 * metrics.get("mAP", 0.0)
+            0.1 * self.metrics.get("recall", 0.0) +
+            0.9 * self.metrics.get("mAP", 0.0)
         )
-
-        if self.writer:
-            for k, v in self.metrics.items():
-                if isinstance(v, (int, float)):
-                    self.writer.add_scalar(f"val/{k}", v, self.epoch)
 
         return self.metrics, fitness
 
     def run_callbacks(self, event: str):
-        """
-        Extends the default callback behavior to log training loss to TensorBoard.
-
-        Args:
-            event (str): Callback event name.
-        """
+        """Logs losses to TensorBoard at the end of each training epoch."""
         super().run_callbacks(event)
-        if event == "on_train_epoch_end":
-            if self.writer and hasattr(self, "loss_items"):
-                loss_names = ["box", "cls", "dfl"]
-                for i, name in enumerate(loss_names):
-                    self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
-                self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
+        if event == "on_train_epoch_end" and self.writer and hasattr(self, "loss_items"):
+            loss_names = ["box", "cls", "dfl"]
+            for i, name in enumerate(loss_names):
+                self.writer.add_scalar(f"train/loss_{name}", self.loss_items[i], self.epoch)
+            self.writer.add_scalar("train/loss_total", sum(self.loss_items), self.epoch)
 
     def train_batch(self, batch):
-        """
-        Trains a single batch and optionally logs the input images.
-
-        Args:
-            batch (dict): A single training batch.
-
-        Returns:
-            dict: Loss values.
-        """
+        """Logs training inputs every 10 steps and trains the batch."""
         if not hasattr(self, "_step_counter"):
             self._step_counter = 0
         if self._step_counter % 10 == 0:
@@ -222,17 +169,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         return super().train_batch(batch)
 
     def plot_training_labels(self):
-        """
-        Disabled: Streaming dataset does not contain label files.
-        """
         print("Skipping plot_training_labels — streaming dataset has no `.labels` attribute.")
 
     def plot_training_samples(self, batch, ni):
-        """
-        Disabled: Streaming dataset does not contain image file metadata.
-
-        Args:
-            batch (dict): A training batch.
-            ni (int): Image index.
-        """
         print("Skipping plot_training_samples — streaming dataset has no `im_file` field.")
