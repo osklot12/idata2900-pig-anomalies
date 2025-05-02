@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from tqdm import tqdm
+from torchvision.transforms.functional import normalize
 
 from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.rcnn.faster.faster_rcnn_predictor import FasterRCNNPredictor
@@ -21,7 +21,7 @@ class Trainer:
 
     def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
                  lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
-                 output_dir: str = "faster_rcnn_outputs", log_interval: int = 10):
+                 output_dir: str = "faster_rcnn_outputs", log_interval: int = 10, eval_interval: int = 2):
         """
         Initializes a Trainer instance.
 
@@ -43,6 +43,7 @@ class Trainer:
         self._weight_decay = weight_decay
         self._output_dir = output_dir
         self._log_interval = log_interval
+        self._eval_interval = eval_interval
 
         self._model = self._create_model()
 
@@ -97,10 +98,14 @@ class Trainer:
 
                 global_step += 1
                 if global_step % self._log_interval == 0:
-                    self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, global_step)
+                    self._log_losses(
+                        loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step
+                                     )
 
             self._save_ckpt(epoch, self._model, optimizer, global_step)
-            self._evaluate(device, epoch + 1)
+
+            if (epoch + 1) % self._eval_interval == 0:
+                self._evaluate(device, epoch + 1)
 
     def _evaluate(self, device: torch.device, epoch: int) -> None:
         """Evaluates the model if an evaluator is given."""
@@ -172,7 +177,8 @@ class Trainer:
 
         return loss_classifier, loss_box_reg, loss_objectness, loss_rpn_box_reg
 
-    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch:int, step: int) -> None:
+    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch:int, total_epochs:int,
+                    step: int) -> None:
         """Logs the losses from training."""
         self._writer.add_scalar("train/loss_total", total, step)
         self._writer.add_scalar("train/loss_cls", cls, step)
@@ -181,8 +187,8 @@ class Trainer:
         self._writer.add_scalar("train/loss_rpn_box_reg", rpn, step)
 
         console.log(
-            f"[bold green]Epoch {epoch}[/bold green] "
-            f"[bold green]Step {step}/{self._total_epoch_steps}[/bold green] "
+            f"[bold green]Epoch[/bold green] {epoch}/{total_epochs} "
+            f"| [bold green]Step[/bold green] {step}/{self._total_epoch_steps} "
             f"| [cyan]Total[/cyan]: {total:.4f} "
             f"| [magenta]Class[/magenta]: {cls:.4f} "
             f"| [yellow]Box[/yellow]: {box:.4f} "
