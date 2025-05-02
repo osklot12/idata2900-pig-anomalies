@@ -122,7 +122,7 @@ class Trainer:
             self._model.eval()
 
             predictor = FasterRCNNPredictor(self._model, device=device)
-            self._evaluator.evaluate(predictor, epoch=)
+            self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
                 self._model.train()
