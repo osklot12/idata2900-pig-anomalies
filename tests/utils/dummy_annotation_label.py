@@ -4,6 +4,6 @@ from enum import Enum, auto
 class DummyAnnotationLabel(Enum):
     """An enumeration used for testing."""
 
-    CODING = auto()
+    CODING = 0
 
-    DEBUGGING = auto()
+    DEBUGGING = 1
