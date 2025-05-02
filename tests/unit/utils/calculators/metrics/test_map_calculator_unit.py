@@ -2,19 +2,19 @@ import numbers
 
 import numpy as np
 import pytest
-from src.utils.calculators.metrics.map_calculator import mapCalculator
+from src.utils.calculators.metrics.map_calculator import MAPCalculator
 
 
 @pytest.mark.unit
 def test_creation():
-    calculator = mapCalculator(num_classes=4, iou_threshold=0.5)
+    calculator = MAPCalculator(num_classes=4, iou_threshold=0.5)
     assert calculator.num_classes == 4
     assert calculator.iou_threshold == 0.5
     assert hasattr(calculator.metric, "add")
 
 @pytest.mark.unit
 def test_update_adds_data_successfully():
-    calculator = mapCalculator(num_classes=2)
+    calculator = MAPCalculator(num_classes=2)
 
     # Simple valid prediction and ground truth
     gt = np.array([[10, 10, 50, 50, 1]], dtype=np.float32)
@@ -29,7 +29,7 @@ def test_update_adds_data_successfully():
 
 @pytest.mark.unit
 def test_map_computes_with_valid_data():
-    calculator = mapCalculator(num_classes=2, iou_threshold=0.5)
+    calculator = MAPCalculator(num_classes=2, iou_threshold=0.5)
 
     gt = []
     pred = []
@@ -55,7 +55,7 @@ def test_map_computes_with_valid_data():
 
 @pytest.mark.unit
 def test_reset():
-    calculator = mapCalculator(num_classes=1)
+    calculator = MAPCalculator(num_classes=1)
 
     # Add sample data
     gt = np.array([[0, 0, 10, 10, 0]], dtype=np.float32)
