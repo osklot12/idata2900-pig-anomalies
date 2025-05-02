@@ -59,6 +59,10 @@ class StreamingEvaluator:
         while instance := stream.read():
             self._denormalize(instance)
             predictions = predictor.predict(instance.frame)
+            for pred in predictions:
+                console.log(
+                    f"Got prediction: [cyan bold]{pred}[/cyan bold]"
+                )
             gts = instance.annotations
             matches = self._get_gt_for_pred(predictions, gts)
 

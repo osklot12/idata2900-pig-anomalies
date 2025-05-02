@@ -6,6 +6,7 @@ from torch.nn import Module
 
 from src.models.prediction import Prediction
 from src.models.predictor import Predictor
+from torchvision.transforms.functional import normalize
 
 
 class FasterRCNNPredictor(Predictor):
@@ -25,7 +26,12 @@ class FasterRCNNPredictor(Predictor):
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
         with torch.no_grad():
-            img_tensor = torch.from_numpy(image).permute(2, 0, 1).float().to(self._device)
+            img_tensor = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
+            img_tensor = normalize(
+                img_tensor,
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            ).to(self._device)
             outputs = self._model([img_tensor])[0]
 
             return [
