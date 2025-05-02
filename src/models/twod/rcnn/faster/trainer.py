@@ -21,7 +21,7 @@ class Trainer:
 
     def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
                  lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
-                 output_dir: str = "faster_rcnn_outputs"):
+                 output_dir: str = "faster_rcnn_outputs", log_interval: int = 10):
         """
         Initializes a Trainer instance.
 
@@ -33,6 +33,7 @@ class Trainer:
             momentum (float): momentum factor for optimizer
             weight_decay (float): weight decay factor for optimizer
             output_dir (str): directory for writing outputs
+            log_interval (int): the interval for logging
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
@@ -41,10 +42,13 @@ class Trainer:
         self._momentum = momentum
         self._weight_decay = weight_decay
         self._output_dir = output_dir
+        self._log_interval = log_interval
 
         self._model = self._create_model()
 
         self._writer = SummaryWriter(log_dir=f"{self._output_dir}/tensorboard")
+
+        self._total_epoch_steps = len(dataloader)
 
     def train(self, n_epochs: int = 300, ckpt_path: str = None) -> None:
         """
@@ -67,19 +71,15 @@ class Trainer:
         self._model.to(device)
 
         start_epoch = 0
+        global_step = 0
         if ckpt_path is not None:
-            start_epoch = self._load_ckpt(self._model, optimizer, device, ckpt_path)
+            start_epoch, global_step = self._load_ckpt(self._model, optimizer, device, ckpt_path)
 
         console.log("[bold]Starting training...[/bold]")
 
+
         for epoch in range(start_epoch, n_epochs):
             self._model.train()
-            n_batches = 0
-            total_loss = 0.0
-            total_cls = 0.0
-            total_box = 0.0
-            total_obj = 0.0
-            total_rpn = 0.0
 
             with tqdm(self._dataloader, desc=f"Epoch {epoch + 1}/{n_epochs}") as pbar:
                 for images, targets in pbar:
@@ -96,23 +96,13 @@ class Trainer:
 
                     cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
 
-                    total_loss += loss.item()
-                    total_cls += cls_loss
-                    total_box += box_loss
-                    total_obj += obj_loss
-                    total_rpn += rpn_loss
-                    n_batches += 1
+                    global_step += 1
+                    if global_step % self._log_interval == 0:
+                        self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, global_step)
 
-            avg_loss = total_loss / n_batches
-            avg_cls = total_cls / n_batches
-            avg_box = total_box / n_batches
-            avg_obj = total_obj / n_batches
-            avg_rpn = total_rpn / n_batches
+            self._save_ckpt(epoch, self._model, optimizer, global_step)
 
-            self._log_losses(avg_loss, avg_cls, avg_box, avg_obj, avg_rpn, epoch + 1)
-            self._save_ckpt(epoch, self._model, optimizer)
-
-            self._evaluate(device, epoch)
+            self._evaluate(device, epoch + 1)
 
     def _evaluate(self, device: torch.device, epoch: int) -> None:
         """Evaluates the model if an evaluator is given."""
@@ -136,32 +126,35 @@ class Trainer:
         return model
 
     @staticmethod
-    def _load_ckpt(model: Module, optimizer: Optimizer, device: torch.device, ckpt_path: str) -> int:
-        """Loads checkpoint from path."""
+    def _load_ckpt(model: Module, optimizer: Optimizer, device: torch.device, ckpt_path: str) -> Tuple[int, int]:
         start_epoch = 0
+        global_step = 0
 
         if os.path.exists(ckpt_path):
             ckpt = torch.load(ckpt_path, map_location=device)
             model.load_state_dict(ckpt["model_state_dict"])
             optimizer.load_state_dict(ckpt["optimizer_state_dict"])
-            start_epoch = ckpt["epoch"]
-            console.log(f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}[/bold yellow]")
+            start_epoch = ckpt.get("epoch", 0)
+            global_step = ckpt.get("global_step", 0)
+            console.log(f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}, step {global_step}[/bold yellow]")
 
-        return start_epoch
+        return start_epoch, global_step
 
-    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer) -> None:
+    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer, global_step: int) -> None:
         """Saves a checkpoint for the current state of the model."""
         epoch_ckpt_path = os.path.join(self._output_dir, f"epoch{epoch + 1}.pth")
         last_ckpt_path = os.path.join(self._output_dir, f"last_ckpt.pth")
 
         torch.save({
             "epoch": epoch + 1,
+            "global_step": global_step,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict()
         }, epoch_ckpt_path)
 
         torch.save({
             "epoch": epoch + 1,
+            "global_step": global_step,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict()
         }, last_ckpt_path)
@@ -181,16 +174,16 @@ class Trainer:
 
         return loss_classifier, loss_box_reg, loss_objectness, loss_rpn_box_reg
 
-    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch: int) -> None:
+    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch:int, step: int) -> None:
         """Logs the losses from training."""
-        self._writer.add_scalar("train/loss_total", total, epoch)
-        self._writer.add_scalar("train/loss_cls", cls, epoch)
-        self._writer.add_scalar("train/loss_box_reg", box, epoch)
-        self._writer.add_scalar("train/loss_obj", obj, epoch)
-        self._writer.add_scalar("train/loss_rpn_box_reg", rpn, epoch)
+        self._writer.add_scalar("train/loss_total", total, step)
+        self._writer.add_scalar("train/loss_cls", cls, step)
+        self._writer.add_scalar("train/loss_box_reg", box, step)
+        self._writer.add_scalar("train/loss_obj", obj, step)
+        self._writer.add_scalar("train/loss_rpn_box_reg", rpn, step)
 
         console.log(
-            f"[bold green]Epoch {epoch + 1}[/bold green] "
+            f"[bold green]Step {step}/{self._total_epoch_steps}, Epoch {epoch}[/bold green] "
             f"| [cyan]Total[/cyan]: {total:.4f} "
             f"| [magenta]Class[/magenta]: {cls:.4f} "
             f"| [yellow]Box[/yellow]: {box:.4f} "
