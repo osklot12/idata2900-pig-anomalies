@@ -38,6 +38,8 @@ class YOLOXIPredictor(Predictor):
         predictions = []
         if preds is not None and len(preds) > 0:
             for det in preds.cpu():
+                det = det[:6]
                 x1, y1, x2, y2, conf, cls = det.tolist()
                 predictions.append(Prediction(x1, y1, x2, y2, conf, int(cls)))
+
         return predictions
