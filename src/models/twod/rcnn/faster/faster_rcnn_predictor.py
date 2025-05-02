@@ -24,7 +24,7 @@ class FasterRCNNPredictor(Predictor):
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
         with torch.no_grad():
-            img_tensor = torch.from_numpy(image).permute(2, 0, 1).float()
+            img_tensor = torch.from_numpy(image).permute(2, 0, 1).float().to(self._device)
             outputs = self._model([img_tensor])[0]
 
             return [
