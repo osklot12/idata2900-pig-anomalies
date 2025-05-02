@@ -1,7 +1,7 @@
 from typing import List
 import numpy as np
 import torch
-from ultralytics.utils.ops import non_max_suppression
+from ultralytics import YOLO
 
 from src.models.prediction import Prediction
 from src.models.predictor import Predictor
@@ -9,19 +9,17 @@ from src.models.predictor import Predictor
 
 class YOLOXIPredictor(Predictor):
     """
-    A Predictor interface implementation for Ultralytics YOLOv11 (XI).
-
-    Wraps a YOLOv11 model to return structured predictions via `predict(image)`.
-    Applies postprocessing (NMS, conf threshold) to filter outputs.
+    A Predictor interface for Ultralytics YOLOv11 (XI), using high-level `predict()` API.
+    Applies confidence and IoU threshold filtering automatically.
     """
 
-    def __init__(self, model, device: torch.device, conf_thres: float = 0.4, iou_thres: float = 0.65):
+    def __init__(self, model: YOLO, device: str = "cuda", conf_thres: float = 0.4, iou_thres: float = 0.65):
         """
         Args:
-            model: Ultralytics YOLOv11 model (e.g. `YOLO(...)` or `.model`)
-            device: The torch device to run inference on (e.g., cuda or cpu)
-            conf_thres: Confidence threshold for filtering predictions
-            iou_thres: IoU threshold for non-max suppression
+            model (YOLO): The Ultralytics YOLO object (not .model)
+            device (str): Device for inference ('cuda' or 'cpu')
+            conf_thres (float): Confidence threshold for filtering
+            iou_thres (float): IoU threshold for NMS
         """
         self.model = model
         self.device = device
@@ -30,13 +28,13 @@ class YOLOXIPredictor(Predictor):
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
         """
-        Runs inference on a single image and returns structured predictions.
+        Runs inference on a single image and returns filtered predictions.
 
         Args:
-            image (np.ndarray): Input image (HWC, uint8) in range [0, 255]
+            image (np.ndarray): Input image in HWC uint8 format (0–255)
 
         Returns:
-            List[Prediction]: Filtered predictions with bounding boxes, confidence, and class
+            List[Prediction]: List of structured predictions
         """
         tensor_img = (
             torch.from_numpy(image)
@@ -47,21 +45,26 @@ class YOLOXIPredictor(Predictor):
         )
 
         with torch.no_grad():
-            outputs = self.model(tensor_img)  # returns (preds,)
-            preds = outputs[0] if isinstance(outputs, (tuple, list)) else outputs
-            nms_preds = non_max_suppression(preds, conf_thres=self.conf_thres, iou_thres=self.iou_thres)[0]
+            results = self.model.predict(
+                source=tensor_img,
+                device=self.device,
+                conf=self.conf_thres,
+                iou=self.iou_thres,
+                verbose=False
+            )
+            boxes = results[0].boxes
 
-        if nms_preds is None or len(nms_preds) == 0:
+        if boxes is None or boxes.data.numel() == 0:
             return []
 
         return [
             Prediction(
-                x1=float(det[0]),
-                y1=float(det[1]),
-                x2=float(det[2]),
-                y2=float(det[3]),
-                conf=float(det[4]),
-                cls=int(det[5])
+                x1=float(b[0]),
+                y1=float(b[1]),
+                x2=float(b[2]),
+                y2=float(b[3]),
+                conf=float(b[4]),
+                cls=int(b[5])
             )
-            for det in nms_preds.cpu()
+            for b in boxes.data.cpu().numpy()
         ]
