@@ -112,9 +112,9 @@ class Trainer:
             self._log_losses(avg_loss, avg_cls, avg_box, avg_obj, avg_rpn, epoch + 1)
             self._save_ckpt(epoch, self._model, optimizer)
 
-            self._evaluate(device)
+            self._evaluate(device, epoch)
 
-    def _evaluate(self, device: torch.device) -> None:
+    def _evaluate(self, device: torch.device, epoch: int) -> None:
         """Evaluates the model if an evaluator is given."""
         if self._evaluator:
             console.log("[bold]Evaluating...[/bold]")
@@ -122,7 +122,7 @@ class Trainer:
             self._model.eval()
 
             predictor = FasterRCNNPredictor(self._model, device=device)
-            self._evaluator.evaluate(predictor)
+            self._evaluator.evaluate(predictor, epoch=)
 
             if was_training:
                 self._model.train()
