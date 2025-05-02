@@ -78,16 +78,6 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             print(f"Loading model from checkpoint: {self.model}")
             self.model = YOLO(self.model)
 
-        val_batch = next(iter(self.val_dl))
-        visualize_batch_input(
-            images=val_batch["img"],
-            bboxes=val_batch["bboxes"],
-            cls=val_batch["cls"],
-            batch_idx=val_batch["batch_idx"],
-            save_dir="./input_visuals/val",
-            prefix=f"val_epoch{self.epoch}"
-        )
-
         evaluator = StreamingEvaluator(
             stream_provider=self.exp.val_stream_provider,
             classes=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
