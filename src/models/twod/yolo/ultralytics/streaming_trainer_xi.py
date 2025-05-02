@@ -122,7 +122,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             def __call__(self, *args, **kwargs):
                 print("Running custom StreamingEvaluatorXI with Predictor wrapper...")
                 evaluator = StreamingEvaluatorXI(
-                    model=YOLOXIPredictor(self.trainer.model),
+                    model=YOLOXIPredictor(self.model, device=self.exp.device),
                     dataloader=self.trainer.val_dl,
                     device=self.trainer.exp.device,
                     num_classes=self.trainer.exp.num_classes,
@@ -162,7 +162,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         )
 
         evaluator = StreamingEvaluatorXI(
-            model=YOLOXIPredictor(self.model),
+            model=YOLOXIPredictor(self.model, device=self.exp.device),
             dataloader=self.val_dl,
             device=self.exp.device,
             num_classes=self.exp.num_classes
