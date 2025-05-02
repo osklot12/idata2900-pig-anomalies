@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 from typing import List, Optional
+import datetime
 
 import numpy as np
 from rich.table import Table
@@ -26,22 +26,22 @@ class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
     def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
-                 image_output_dir: str = None, summary_writer: Optional[SummaryWriter] = None):
+                 output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
 
         Args:
-            stream_provider (StreamProvider[AnnotatedFrame): provider of evaluation stream
+            stream_provider (StreamProvider[AnnotatedFrame]): provider of evaluation stream
             classes (List[str]): the class names in order
             iou_thresh (float): the iou threshold for predictions
-            summary_writer (Optional[SummaryWriter]): optional summary writer for writing metrics to tensorboard
+            output_dir (str): output directory
         """
         self._stream_provider = stream_provider
         self._iou_thresh = iou_thresh
         self._classes: List[str] = classes
         self._map_calculator = MAPCalculator(num_classes=len(self._classes), iou_threshold=self._iou_thresh)
-        self._image_output_dir = image_output_dir
-        self._summary_writer = summary_writer
+        self._output_dir = output_dir
+        self._summary_writer = SummaryWriter(log_dir=f"{self._output_dir}/tensorboard")
 
     def evaluate(self, predictor: Predictor, epoch: Optional[int] = None) -> None:
         """
@@ -90,22 +90,24 @@ class StreamingEvaluator:
     def _save_image(self, image: np.ndarray, predictions: List[Prediction], gts: List[AnnotatedBBox],
                      image_idx: int, epoch: Optional[int] = None) -> None:
         """Saves visualizations of predictions and ground truths on the images."""
-        if self._image_output_dir:
-            if epoch is not None:
-                output_dir = f"{self._image_output_dir}/epoch_{epoch}"
-            else:
-                output_dir = self._image_output_dir
+        base_dir = os.path.join(self._output_dir, "eval_images")
 
-            os.makedirs(output_dir, exist_ok=True)
-            save_path = os.path.join(output_dir, f"frame_{image_idx}.jpg")
+        if epoch is not None:
+            output_dir = os.path.join(base_dir, f"epoch_{epoch}")
+        else:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            output_dir = os.path.join(base_dir, f"run_{timestamp}")
 
-            EvaluatorVisualizer.save_image(
-                image=image,
-                predictions=predictions,
-                ground_truths=gts,
-                class_names=self._classes,
-                save_path=save_path
-            )
+        os.makedirs(output_dir, exist_ok=True)
+        save_path = os.path.join(output_dir, f"frame_{image_idx}.jpg")
+
+        EvaluatorVisualizer.save_image(
+            image=image,
+            predictions=predictions,
+            ground_truths=gts,
+            class_names=self._classes,
+            save_path=save_path
+        )
 
     def _write_confusion_matrix(self, matrix: np.ndarray, background_label: str = "background") -> None:
         """Prints a confusion matrix to the console."""
