@@ -8,7 +8,8 @@ from src.models.predictor import Predictor
 
 class YOLOXIPredictor(Predictor):
     """
-    Predictor wrapper for Ultralytics YOLOv11 (XI). Uses `.predict()` to run inference.
+    Predictor wrapper for Ultralytics YOLOv11 (XI).
+    Uses the built-in .predict() method and parses Results into Prediction objects.
     """
 
     def __init__(self, model: YOLO, device: str = "cuda"):
@@ -25,7 +26,10 @@ class YOLOXIPredictor(Predictor):
         )
 
         with torch.no_grad():
-            results = self.model.predict(tensor_img, verbose=False)[0]  # <- no conf/iou args
+            results = self.model.predict(tensor_img)[0]
+
+        if not hasattr(results, "boxes") or results.boxes.data.numel() == 0:
+            return []
 
         return [
             Prediction(
