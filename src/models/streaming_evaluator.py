@@ -59,6 +59,10 @@ class StreamingEvaluator:
         while instance := stream.read():
             self._denormalize(instance)
             predictions = predictor.predict(instance.frame)
+            for pred in predictions:
+                console.log(
+                    f"Got prediction: [cyan bold]{pred}[/cyan bold]"
+                )
             gts = instance.annotations
             matches = self._get_gt_for_pred(predictions, gts)
 
@@ -78,16 +82,17 @@ class StreamingEvaluator:
             conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes)
 
             # save image
-            folder_name = f"epoch_{epoch}" if epoch is not None else f"run_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-            self._save_image(
-                image=instance.frame,
-                predictions=predictions,
-                gts=gts,
-                image_idx=img_idx,
-                folder_name=folder_name
-            )
+            if predictions:
+                folder_name = f"epoch_{epoch}" if epoch is not None else f"run_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+                self._save_image(
+                    image=instance.frame,
+                    predictions=predictions,
+                    gts=gts,
+                    image_idx=img_idx,
+                    folder_name=folder_name
+                )
 
-            img_idx += 1
+                img_idx += 1
 
         self._write_confusion_matrix(conf_mat)
         self._write_f1(conf_mat)
