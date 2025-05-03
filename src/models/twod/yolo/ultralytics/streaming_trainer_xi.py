@@ -83,18 +83,16 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         if detect_layer is None:
             raise RuntimeError("❌ Detect head not found")
 
-        # Now inspect the actual input channels from the layers it draws from
+        # Use the actual source layers' output channels
         ch = []
-        for layer_idx in detect_layer.f:
-            conv = self.model.model[layer_idx]
-            try:
-                ch.append(conv.conv.in_channels)
-            except AttributeError:
-                raise RuntimeError(f"❌ Could not access in_channels of layer {layer_idx}. Layer: {conv}")
+        for idx in detect_layer.f:
+            out_ch = self.model.model[idx].forward(
+                torch.randn(1, 3, 640, 640).to(self.device if hasattr(self, "device") else "cpu")).shape[1]
+            ch.append(out_ch)
 
         print(f"[DEBUG] Inferred channel dimensions: {ch}")
 
-        # Replace Detect head using correct channels
+        # Replace head
         new_head = Detect(nc=4, ch=ch)
         new_head.f = detect_layer.f
         new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
