@@ -17,12 +17,14 @@ class YOLOXIPredictor(Predictor):
         self.device = device
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
+        if image.dtype == np.uint8:
+            image = image.astype(np.float32) / 255.0
         tensor_img = (
             torch.from_numpy(image)
             .permute(2, 0, 1)
             .unsqueeze(0)
             .float()
-            .to(self.device) / 255.0
+            .to(self.device)
         )
 
         with torch.no_grad():
