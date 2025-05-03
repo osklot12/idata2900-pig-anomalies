@@ -4,6 +4,7 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
+from ultralytics.nn import DetectionModel
 
 from src.models.twod.yolo.ultralytics.batch_visualizer import visualize_batch_input
 from src.models.twod.yolo.ultralytics.yoloxi_predictor import YOLOXIPredictor
@@ -57,17 +58,18 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         super().setup_model()
 
         try:
-            detect_layer = getattr(self.model, "head", None)
-            if detect_layer is None:
-                raise RuntimeError("Model does not have a 'head' attribute")
-
-            detect_layer.nc = 4
-            detect_layer.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-            detect_layer.initialize_biases()
-            print(f"[Trainer] ✅ Patched model head to {detect_layer.nc} classes.")
+            # Completely rebuild the model with correct nc
+            if isinstance(self.model, DetectionModel):
+                print("[Trainer] Rebuilding model head with nc=4")
+                self.model.model.args["nc"] = 4
+                self.model.model.args["names"] = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+                self.model.model.build(self.model.model.args)  # rebuild head + classifier
+                self.model.model.initialize_weights()
+            else:
+                print("[Trainer] Warning: Model is not a DetectionModel — skipping rebuild")
 
         except Exception as e:
-            print(f"[Trainer] ❌ Failed to patch model head: {e}")
+            print(f"[Trainer] ❌ Failed to rebuild model head: {e}")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
