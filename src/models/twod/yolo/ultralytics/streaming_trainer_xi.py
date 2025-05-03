@@ -77,18 +77,14 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                 print("[DEBUG] Found Detect head.")
 
                 try:
-                    # Safely extract input channels for each head input
-                    ch = []
-                    for branch in m.cv2:
-                        for layer in branch.modules():
-                            if isinstance(layer, torch.nn.Conv2d):
-                                ch.append(layer.in_channels)
-                                break
-                    if len(ch) != m.nl:
-                        raise ValueError(f"[ERROR] Expected {m.nl} input branches, got {len(ch)} channels.")
+                    # ✅ Use stored channel list if available (Ultralytics sets this during model build)
+                    ch = getattr(m, "ch", None)
+                    f = getattr(m, "f", None)
 
-                    print(f"[DEBUG] Extracted head channels: {ch}, from layers: {m.f}")
-                    f = m.f
+                    if ch is None or f is None:
+                        raise AttributeError("Detect head missing required attributes 'ch' or 'f'")
+
+                    print(f"[DEBUG] Using Detect metadata: ch={ch}, f={f}")
 
                     new_head = Detect(nc=4, ch=ch)
                     new_head.f = f
@@ -99,9 +95,10 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                     break
 
                 except Exception as e:
-                    raise RuntimeError(f"❌ Failed to replace Detect head: {e}")
+                    raise RuntimeError(f"❌ Failed to replace Detect head cleanly: {e}")
+
         else:
-            raise RuntimeError("❌ Detect head not found.")
+            raise RuntimeError("❌ Detect head not found in model.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
