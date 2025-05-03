@@ -14,6 +14,8 @@ from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.rcnn.faster.faster_rcnn_predictor import FasterRCNNPredictor
 from src.utils.logging import console
 
+CONF_THRESH = 0.5
+
 
 class Trainer:
     """Trainer for faster-RCNN."""
@@ -120,7 +122,7 @@ class Trainer:
             was_training = self._model.training
             self._model.eval()
 
-            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=0.1)
+            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH)
             self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
