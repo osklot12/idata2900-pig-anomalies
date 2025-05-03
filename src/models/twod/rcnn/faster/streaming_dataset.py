@@ -2,6 +2,7 @@ from typing import TypeVar
 
 import torch
 from torch.utils.data import IterableDataset
+from torchvision.transforms.functional import normalize
 
 from src.data.dataset.streams.providers.stream_provider import StreamProvider
 
@@ -35,6 +36,7 @@ class StreamingDataset(IterableDataset):
         while i < len(self) and instance is not None:
             image = instance.frame
             image_tensor = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
+            image_tensor = normalize(image_tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
             _, h, w = image_tensor.shape
 

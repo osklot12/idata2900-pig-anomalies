@@ -14,7 +14,7 @@ from src.utils.norsvin_dataset_config import NORSVIN_TRAIN_SET_SIZE
 
 SERVER_IP = "10.0.0.1"
 
-BATCH_SIZE = 5
+BATCH_SIZE = 1
 
 OUTPUT_DIR = "faster_rcnn_outputs"
 
