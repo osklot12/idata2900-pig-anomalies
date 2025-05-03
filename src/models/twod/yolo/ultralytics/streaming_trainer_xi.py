@@ -55,31 +55,24 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         super().__init__(overrides=overrides)
 
-    def setup_model(self):
-        from ultralytics import YOLO
-        from ultralytics.nn.tasks import DetectionModel
-        from ultralytics.nn.modules.head import Detect
+        print("[Trainer] Replacing YOLOv11 head with 4-class head...")
 
-        print("[Trainer] Building custom YOLOv11 model with 4 output classes...")
+        # Get old head to extract input channels
+        old_head = self.model[-1]
+        if not isinstance(old_head, Detect):
+            raise RuntimeError("❌ The last layer of the model is not a Detect head.")
 
-        # Load pretrained YOLOv11 model
-        pretrained = YOLO("yolo11n.pt")
+        in_channels = old_head.cv2.in_channels  # List of input channels to head
 
-        # Get backbone without the head
-        backbone = pretrained.model[:-1]  # All layers except Detect
+        # Create new head with 4 classes
+        new_head = Detect(nc=4, ch=in_channels)
+        new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+        new_head.initialize_biases()
 
-        # Build new model from config (it will compute channels itself)
-        self.model = DetectionModel(cfg="yolo11_custom.yaml", nc=4)
+        # Replace in-place
+        self.model[-1] = new_head
 
-        # Load backbone weights into new model
-        self.model[:-1].load_state_dict(backbone.state_dict(), strict=False)
-
-        # Replace detection head with new head for 4 classes
-        self.model[-1] = Detect(nc=4, ch=self.model[-2].cv2.out_channels)
-        self.model[-1].names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-        self.model[-1].initialize_biases()
-
-        print("[Trainer] ✅ Model is ready with 4 output classes.")
+        print("[Trainer] ✅ Head replaced with 4-class detector.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
