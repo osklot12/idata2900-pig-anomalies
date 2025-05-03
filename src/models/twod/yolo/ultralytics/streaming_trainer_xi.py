@@ -75,16 +75,15 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-                # Fetch input channels from first Conv layer in Detect head
-                in_channels = m.cv2[0].in_channels if isinstance(m.cv2, torch.nn.Sequential) else m.cv2.in_channels
-                new_head = Detect(nc=4, ch=[in_channels] * 3)
+                existing_ch = m.stride.shape[0] if hasattr(m, "stride") else 3  # fallback if not defined
+                new_head = Detect(nc=4, ch=[256, 512, 1024])  # or just re-use m.stride if it's actually ch info
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
                 new_head.initialize_biases()
-                self.model[i] = new_head
+                self.model.model[i] = new_head
                 print("[Trainer] ✅ Head replaced with 4-class head.")
                 break
         else:
-            raise RuntimeError("❌ Detect head not found in YOLOv11 model.")
+            raise RuntimeError("❌ Detect head not found in model.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
