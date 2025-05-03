@@ -73,25 +73,23 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         return self.train_dl if mode == "train" else self.val_dl
 
     def validate(self):
-        """Runs validation using the StreamingEvaluator."""
         print(f"[Trainer] Starting evaluation at epoch {self.epoch}")
 
-        # If model is still a string path, load it
-        if isinstance(self.model, str):
-            print(f"[Trainer] Loading model from checkpoint: {self.model}")
-            loaded_yolo = YOLO(self.model)  # this is the real wrapper
-            self.model = loaded_yolo.model  # this is for internal training
-
-            predictor = YOLOXIPredictor(loaded_yolo, device=self.exp.device)  # 🔥 use the wrapper
+        # If self.model is a path, load it
+        if isinstance(self.exp.model, str):
+            print(f"[Trainer] Loading model from checkpoint: {self.exp.model}")
+            yolo_wrapper = YOLO(self.exp.model)
+            self.model = yolo_wrapper.model  # used for training
         else:
-            predictor = YOLOXIPredictor(YOLO(self.model), device=self.exp.device)
+            print("[Trainer] Using existing model object.")
+            yolo_wrapper = YOLO(self.exp.model.model) if hasattr(self.exp.model, "model") else YOLO(self.exp.model)
 
-        # Confirm model device
-        print(f"[Trainer] Model device: {self.exp.device}")
+        # ✅ Ensure eval mode
+        yolo_wrapper.eval()
 
-        self.model.eval()
+        # Use correct wrapped model for predictor
+        predictor = YOLOXIPredictor(yolo_wrapper, device=self.exp.device)
 
-        # Setup evaluator
         evaluator = StreamingEvaluator(
             stream_provider=self.exp.val_stream_provider,
             classes=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
@@ -99,12 +97,9 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             output_dir="yoloxi_outputs"
         )
 
-        # Run evaluation
         evaluator.evaluate(predictor, epoch=self.epoch)
 
         print("[Trainer] Evaluation complete.")
-
-        # No metrics returned from evaluate(), so just return dummy
         return {}, 0.0
 
     def run_callbacks(self, event: str):
