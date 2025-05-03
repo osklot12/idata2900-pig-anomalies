@@ -79,9 +79,12 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         # If model is still a string path, load it
         if isinstance(self.model, str):
             print(f"[Trainer] Loading model from checkpoint: {self.model}")
-            self.model = YOLO(self.model)
+            loaded_yolo = YOLO(self.model)  # this is the real wrapper
+            self.model = loaded_yolo.model  # this is for internal training
+
+            predictor = YOLOXIPredictor(loaded_yolo, device=self.exp.device)  # 🔥 use the wrapper
         else:
-            print(f"[Trainer] Model is already loaded.")
+            predictor = YOLOXIPredictor(YOLO(self.model), device=self.exp.device)
 
         # Confirm model device
         print(f"[Trainer] Model device: {self.exp.device}")
@@ -95,10 +98,6 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             iou_thresh=0.5,
             output_dir="yoloxi_outputs"
         )
-
-        # Wrap model in predictor
-        predictor = YOLOXIPredictor(self.model, device=self.exp.device)
-        print("[Trainer] Created predictor. Running evaluator...")
 
         # Run evaluation
         evaluator.evaluate(predictor, epoch=self.epoch)
