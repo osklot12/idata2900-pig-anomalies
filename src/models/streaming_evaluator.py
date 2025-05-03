@@ -56,7 +56,7 @@ class StreamingEvaluator:
             epoch (Optional[int]): optional epoch number
         """
         n_classes = len(self._classes)
-        conf_mat = np.zeros((n_classes + 1, n_classes + 1))
+        conf_mat = np.zeros((n_classes, n_classes))
         stream = self._stream_provider.get_stream()
 
         img_idx = 0
