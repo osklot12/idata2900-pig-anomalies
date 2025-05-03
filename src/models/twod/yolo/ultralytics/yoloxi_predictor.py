@@ -29,6 +29,8 @@ class YOLOXIPredictor(Predictor):
 
         with torch.no_grad():
             results = self.model.predict(tensor_img)[0]
+            print(f"[DEBUG] model.predict() returned type: {type(results)}")
+            print(f"[DEBUG] Full output: {results}")
 
             print(f"[YOLOXIPredictor] Raw prediction tensor:")
             print(results.boxes.data.cpu() if hasattr(results, "boxes") else "No 'boxes' attribute")

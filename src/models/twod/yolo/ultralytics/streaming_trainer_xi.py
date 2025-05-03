@@ -86,6 +86,8 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         # Confirm model device
         print(f"[Trainer] Model device: {self.exp.device}")
 
+        self.model.eval()
+
         # Setup evaluator
         evaluator = StreamingEvaluator(
             stream_provider=self.exp.val_stream_provider,
