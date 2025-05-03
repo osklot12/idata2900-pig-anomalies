@@ -75,18 +75,15 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-                ch = [m.cv2[j][0].in_channels for j in range(3)]
-                f = m.f  # source layers
 
-                print(f"[DEBUG] Detected input channels: {ch}, from layers: {f}")
-
-                # Replace head
+                # Replace detect head directly
+                ch = [256, 512, 1024]  # Known for yolo11n
                 new_head = Detect(nc=4, ch=ch)
-                new_head.f = f
+                new_head.f = m.f
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-
                 self.model.model[i] = new_head
-                print("[Trainer] ✅ Head replaced with 4-class head.")
+
+                print("[Trainer] ✅ Replaced Detect head with 4-class head (no dummy input).")
                 break
         else:
             raise RuntimeError("❌ Detect head not found in model.")
