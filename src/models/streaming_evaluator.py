@@ -25,7 +25,7 @@ BATCH_SIZE = 300
 class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
-    def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
+    def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.1,
                  output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
