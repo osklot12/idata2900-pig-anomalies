@@ -75,7 +75,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-                ch = m.in_channels  # already correct input channels
+                ch = [m.cv2[j][0].in_channels for j in range(3)]
                 f = m.f  # source layers
 
                 print(f"[DEBUG] Detected input channels: {ch}, from layers: {f}")
