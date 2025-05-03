@@ -78,7 +78,6 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
                 existing_ch = m.stride.shape[0] if hasattr(m, "stride") else 3  # fallback if not defined
                 new_head = Detect(nc=4, ch=[256, 512, 1024])  # or just re-use m.stride if it's actually ch info
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-                new_head.initialize_biases()
                 self.model.model[i] = new_head
                 print("[Trainer] ✅ Head replaced with 4-class head.")
                 break
