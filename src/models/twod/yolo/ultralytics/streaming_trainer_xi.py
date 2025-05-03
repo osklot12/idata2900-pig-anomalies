@@ -5,6 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 from ultralytics import YOLO
 from ultralytics.models.yolo.detect import DetectionTrainer
 from ultralytics.nn import DetectionModel
+from ultralytics.nn.modules import Detect
 
 from src.models.twod.yolo.ultralytics.batch_visualizer import visualize_batch_input
 from src.models.twod.yolo.ultralytics.yoloxi_predictor import YOLOXIPredictor
@@ -55,25 +56,30 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         super().__init__(overrides=overrides)
 
     def setup_model(self):
+        from ultralytics import YOLO
+        from ultralytics.nn.tasks import DetectionModel
         from ultralytics.nn.modules.head import Detect
 
-        # Let Ultralytics build the model normally
-        super().setup_model()
+        print("[Trainer] Building custom YOLOv11 model with 4 output classes...")
 
-        print("[Trainer] Replacing pretrained YOLOv11 head with 4-class head...")
+        # Load pretrained YOLOv11 model
+        pretrained = YOLO("yolo11n.pt")
 
-        # Get output channels from backbone -> head
-        ch = self.model.head.stride  # Or manually: [256, 512, 1024] if needed
+        # Get backbone without the head
+        backbone = pretrained.model[:-1]  # All layers except Detect
 
-        # Confirm it's a YOLO detection model with a head we can override
-        if hasattr(self.model, 'head'):
-            # Safely replace the head
-            self.model.head = Detect(nc=4, ch=[256, 512, 1024])  # use the right ch!
-            self.model.head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-            self.model.head.initialize_biases()
-            print("[Trainer] ✅ Head replaced successfully.")
-        else:
-            raise RuntimeError("❌ Model has no attribute 'head'. Cannot patch.")
+        # Build new model from config (it will compute channels itself)
+        self.model = DetectionModel(cfg="yolo11_custom.yaml", nc=4)
+
+        # Load backbone weights into new model
+        self.model[:-1].load_state_dict(backbone.state_dict(), strict=False)
+
+        # Replace detection head with new head for 4 classes
+        self.model[-1] = Detect(nc=4, ch=self.model[-2].cv2.out_channels)
+        self.model[-1].names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+        self.model[-1].initialize_biases()
+
+        print("[Trainer] ✅ Model is ready with 4 output classes.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
