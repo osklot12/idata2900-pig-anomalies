@@ -45,7 +45,6 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             "save": True,
             "data": self.dummy_data_yaml,
             "exist_ok": True,
-            "nc": 4,
         }
 
         if exp.resume_ckpt:
@@ -53,6 +52,22 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             overrides["model"] = exp.resume_ckpt
 
         super().__init__(overrides=overrides)
+
+    def setup_model(self):
+        super().setup_model()
+
+        try:
+            detect_layer = getattr(self.model, "head", None)
+            if detect_layer is None:
+                raise RuntimeError("Model does not have a 'head' attribute")
+
+            detect_layer.nc = 4
+            detect_layer.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+            detect_layer.initialize_biases()
+            print(f"[Trainer] ✅ Patched model head to {detect_layer.nc} classes.")
+
+        except Exception as e:
+            print(f"[Trainer] ❌ Failed to patch model head: {e}")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
