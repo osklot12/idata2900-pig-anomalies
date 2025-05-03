@@ -72,7 +72,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         from ultralytics.nn.modules.conv import Conv
 
-        for i, m in enumerate(self.model):
+        for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
                 # Fetch input channels from first Conv layer in Detect head
