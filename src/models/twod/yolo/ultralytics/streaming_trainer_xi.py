@@ -76,8 +76,10 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
 
-                # Read actual input channels and indices
-                ch = m.cv2[0].in_channels, m.cv2[1].in_channels, m.cv2[2].in_channels
+                with torch.no_grad():
+                    dummy_input = torch.randn(1, 3, 640, 640).to(self.device if hasattr(self, "device") else "cpu")
+                    features = list(m.model[:-1](dummy_input))  # Everything before the last layer
+                    ch = [f.shape[1] for f in features]
                 f = m.f
 
                 print(f"[DEBUG] Actual head channels: {ch}, from layers: {f}")
