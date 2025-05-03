@@ -55,24 +55,35 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         super().__init__(overrides=overrides)
 
+        print(f"[DEBUG] Type of self.model: {type(self.model)}")
+
+        # Ensure model is loaded if it's still a string
+        if isinstance(self.model, str):
+            from ultralytics import YOLO
+            self.model = YOLO(self.model).model
+
+        # Now it's safe to search and patch the Detect head
+        from ultralytics.nn.modules.head import Detect
+
         print("[Trainer] Replacing YOLOv11 head with 4-class head...")
 
-        # Get old head to extract input channels
-        old_head = self.model[-1]
-        if not isinstance(old_head, Detect):
-            raise RuntimeError("❌ The last layer of the model is not a Detect head.")
+        for name, module in self.model.named_modules():
+            if isinstance(module, Detect):
+                in_channels = module.cv2.in_channels
+                new_head = Detect(nc=4, ch=in_channels)
+                new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+                new_head.initialize_biases()
 
-        in_channels = old_head.cv2.in_channels  # List of input channels to head
-
-        # Create new head with 4 classes
-        new_head = Detect(nc=4, ch=in_channels)
-        new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-        new_head.initialize_biases()
-
-        # Replace in-place
-        self.model[-1] = new_head
-
-        print("[Trainer] ✅ Head replaced with 4-class detector.")
+                for i, m in enumerate(self.model):
+                    if m is module:
+                        self.model[i] = new_head
+                        print("[Trainer] ✅ Head replaced with 4-class head.")
+                        break
+                else:
+                    raise RuntimeError("❌ Couldn't replace the head even after finding it.")
+                break
+        else:
+            raise RuntimeError("❌ Detect head not found in model.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
