@@ -39,7 +39,7 @@ class YOLOXIStreamingExp:
 
         self.num_classes = 4
         self.input_size = (640, 640)
-        self.model = "yolo11_custom.yaml"
+        self.model = "yolo11n.pt"
         self.name = "streaming_yolov11"
         self.save_dir = f"runs/{self.name}"
         self.eval_interval = 1

@@ -55,21 +55,25 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         super().__init__(overrides=overrides)
 
     def setup_model(self):
+        from ultralytics.nn.modules.head import Detect
+
+        # Let Ultralytics build the model normally
         super().setup_model()
 
-        try:
-            # Completely rebuild the model with correct nc
-            if isinstance(self.model, DetectionModel):
-                print("[Trainer] Rebuilding model head with nc=4")
-                self.model.model.args["nc"] = 4
-                self.model.model.args["names"] = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-                self.model.model.build(self.model.model.args)  # rebuild head + classifier
-                self.model.model.initialize_weights()
-            else:
-                print("[Trainer] Warning: Model is not a DetectionModel — skipping rebuild")
+        print("[Trainer] Replacing pretrained YOLOv11 head with 4-class head...")
 
-        except Exception as e:
-            print(f"[Trainer] ❌ Failed to rebuild model head: {e}")
+        # Get output channels from backbone -> head
+        ch = self.model.head.stride  # Or manually: [256, 512, 1024] if needed
+
+        # Confirm it's a YOLO detection model with a head we can override
+        if hasattr(self.model, 'head'):
+            # Safely replace the head
+            self.model.head = Detect(nc=4, ch=[256, 512, 1024])  # use the right ch!
+            self.model.head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+            self.model.head.initialize_biases()
+            print("[Trainer] ✅ Head replaced successfully.")
+        else:
+            raise RuntimeError("❌ Model has no attribute 'head'. Cannot patch.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
