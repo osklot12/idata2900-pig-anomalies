@@ -45,6 +45,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             "save": True,
             "data": self.dummy_data_yaml,
             "exist_ok": True,
+            "nc": 4,
         }
 
         if exp.resume_ckpt:
