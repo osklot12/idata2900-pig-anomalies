@@ -76,7 +76,11 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
                 existing_ch = m.stride.shape[0] if hasattr(m, "stride") else 3  # fallback if not defined
-                new_head = Detect(nc=4, ch=[256, 512, 1024])  # or just re-use m.stride if it's actually ch info
+
+                f = m.f if hasattr(m, "f") else [-1, -1, -1]
+                
+                new_head = Detect(nc=4, ch=[256, 512, 1024])
+                new_head.f = f
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
                 self.model.model[i] = new_head
                 print("[Trainer] ✅ Head replaced with 4-class head.")
