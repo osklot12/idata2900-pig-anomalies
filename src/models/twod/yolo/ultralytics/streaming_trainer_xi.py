@@ -1,4 +1,6 @@
 import tempfile
+
+import torch
 import yaml
 import os
 from torch.utils.tensorboard import SummaryWriter
@@ -57,33 +59,32 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         print(f"[DEBUG] Type of self.model: {type(self.model)}")
 
-        # Ensure model is loaded if it's still a string
+        # 🧠 Step 1: Load actual model if it's still a string
         if isinstance(self.model, str):
-            from ultralytics import YOLO
+            print("[DEBUG] Loading model from path...")
             self.model = YOLO(self.model).model
+        elif hasattr(self.model, "model"):  # YOLO wrapper
+            print("[DEBUG] Unwrapping YOLO wrapper...")
+            self.model = self.model.model
 
-        # Now it's safe to search and patch the Detect head
-        from ultralytics.nn.modules.head import Detect
+        # 🧠 Step 2: Replace Detect head for 4 classes
+        print("[Trainer] Replacing YOLOv11 detect head with 4-class head...")
 
-        print("[Trainer] Replacing YOLOv11 head with 4-class head...")
+        from ultralytics.nn.modules.conv import Conv
 
-        for name, module in self.model.named_modules():
-            if isinstance(module, Detect):
-                in_channels = module.cv2.in_channels
-                new_head = Detect(nc=4, ch=in_channels)
+        for i, m in enumerate(self.model):
+            if isinstance(m, Detect):
+                print("[DEBUG] Found Detect head.")
+                # Fetch input channels from first Conv layer in Detect head
+                in_channels = m.cv2[0].in_channels if isinstance(m.cv2, torch.nn.Sequential) else m.cv2.in_channels
+                new_head = Detect(nc=4, ch=[in_channels] * 3)
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
                 new_head.initialize_biases()
-
-                for i, m in enumerate(self.model):
-                    if m is module:
-                        self.model[i] = new_head
-                        print("[Trainer] ✅ Head replaced with 4-class head.")
-                        break
-                else:
-                    raise RuntimeError("❌ Couldn't replace the head even after finding it.")
+                self.model[i] = new_head
+                print("[Trainer] ✅ Head replaced with 4-class head.")
                 break
         else:
-            raise RuntimeError("❌ Detect head not found in model.")
+            raise RuntimeError("❌ Detect head not found in YOLOv11 model.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
