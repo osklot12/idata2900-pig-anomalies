@@ -72,21 +72,35 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         from ultralytics.nn.modules.conv import Conv
 
+        detect_layer = None
+
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-
-                # Replace detect head directly
-                ch = [256, 512, 1024]  # Known for yolo11n
-                new_head = Detect(nc=4, ch=ch)
-                new_head.f = m.f
-                new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-                self.model.model[i] = new_head
-
-                print("[Trainer] ✅ Replaced Detect head with 4-class head (no dummy input).")
+                detect_layer = m
                 break
-        else:
-            raise RuntimeError("❌ Detect head not found in model.")
+
+        if detect_layer is None:
+            raise RuntimeError("❌ Detect head not found")
+
+        # Now inspect the actual input channels from the layers it draws from
+        ch = []
+        for layer_idx in detect_layer.f:
+            conv = self.model.model[layer_idx]
+            try:
+                ch.append(conv.conv.in_channels)
+            except AttributeError:
+                raise RuntimeError(f"❌ Could not access in_channels of layer {layer_idx}. Layer: {conv}")
+
+        print(f"[DEBUG] Inferred channel dimensions: {ch}")
+
+        # Replace Detect head using correct channels
+        new_head = Detect(nc=4, ch=ch)
+        new_head.f = detect_layer.f
+        new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+        self.model.model[i] = new_head
+
+        print("[Trainer] ✅ Detect head replaced with correct channels.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
