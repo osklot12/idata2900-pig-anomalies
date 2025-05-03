@@ -76,20 +76,30 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
 
-                # Use internal Detect metadata — safe and officially supported
-                ch = m.ch
-                f = m.f
+                try:
+                    # Safely extract input channels for each head input
+                    ch = []
+                    for branch in m.cv2:
+                        for layer in branch.modules():
+                            if isinstance(layer, torch.nn.Conv2d):
+                                ch.append(layer.in_channels)
+                                break
+                    if len(ch) != m.nl:
+                        raise ValueError(f"[ERROR] Expected {m.nl} input branches, got {len(ch)} channels.")
 
-                print(f"[DEBUG] ch: {ch}, f: {f}")
+                    print(f"[DEBUG] Extracted head channels: {ch}, from layers: {m.f}")
+                    f = m.f
 
-                # Replace with a new Detect head using the existing config
-                new_head = Detect(nc=4, ch=ch)
-                new_head.f = f
-                new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+                    new_head = Detect(nc=4, ch=ch)
+                    new_head.f = f
+                    new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
 
-                self.model.model[i] = new_head
-                print("[Trainer] ✅ Detect head replaced with 4-class head.")
-                break
+                    self.model.model[i] = new_head
+                    print("[Trainer] ✅ Detect head replaced with 4-class head.")
+                    break
+
+                except Exception as e:
+                    raise RuntimeError(f"❌ Failed to replace Detect head: {e}")
         else:
             raise RuntimeError("❌ Detect head not found.")
 
