@@ -75,13 +75,18 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-                existing_ch = m.stride.shape[0] if hasattr(m, "stride") else 3  # fallback if not defined
 
-                f = m.f if hasattr(m, "f") else [-1, -1, -1]
-                
-                new_head = Detect(nc=4, ch=[256, 512, 1024])
+                # Read actual input channels and indices
+                ch = m.cv2[0].in_channels, m.cv2[1].in_channels, m.cv2[2].in_channels
+                f = m.f
+
+                print(f"[DEBUG] Actual head channels: {ch}, from layers: {f}")
+
+                # Replace head with correct channels and .f
+                new_head = Detect(nc=4, ch=ch)
                 new_head.f = f
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+
                 self.model.model[i] = new_head
                 print("[Trainer] ✅ Head replaced with 4-class head.")
                 break
