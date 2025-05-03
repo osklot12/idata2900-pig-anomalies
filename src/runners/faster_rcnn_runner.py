@@ -49,6 +49,7 @@ def main():
         lr=0.0025,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR,
+        log_interval=100,
         eval_interval=1,
         class_shift=1
     )
