@@ -20,7 +20,8 @@ class Trainer:
 
     def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
                  lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
-                 output_dir: str = "faster_rcnn_outputs", log_interval: int = 10, eval_interval: int = 2):
+                 output_dir: str = "faster_rcnn_outputs", log_interval: int = 10, eval_interval: int = 2,
+                 class_shift: int = 1):
         """
         Initializes a Trainer instance.
 
@@ -34,6 +35,7 @@ class Trainer:
             output_dir (str): directory for writing outputs
             log_interval (int): the interval for logging
             eval_interval (int): the interval for evaluating the model
+            class_shift (int): the shift for the class ids, defaults to 0 (no shift)
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
@@ -44,6 +46,7 @@ class Trainer:
         self._output_dir = output_dir
         self._log_interval = log_interval
         self._eval_interval = eval_interval
+        self._class_shift = class_shift
 
         self._model = self._create_model()
 
@@ -85,6 +88,9 @@ class Trainer:
             for images, targets in self._dataloader:
                 images = [img.to(device) for img in images]
                 targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+                for target in targets:
+                    target["labels"] += self._class_shift
 
                 loss_dict = self._model(images, targets)
                 loss = sum(loss for loss in loss_dict.values())

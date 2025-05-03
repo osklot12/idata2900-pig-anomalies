@@ -12,13 +12,17 @@ class EvaluatorVisualizer:
     """Simple visualizer for evaluator outputs."""
 
     @staticmethod
-    def save_image(
-        image: np.ndarray,
-        predictions: List[Prediction],
-        ground_truths: List[AnnotatedBBox],
-        class_names: List[str],
-        save_path: str,
-    ):
+    def save_image(image: np.ndarray, predictions: List[Prediction], ground_truths: List[AnnotatedBBox],
+            class_names: List[str], save_path: str) -> None:
+        """
+        Saves an image with predicted and ground truth bounding boxes.
+
+        Args:
+            image (np.ndarray): the image to save
+            predictions (List[Prediction]): the predicted bounding boxes
+            ground_truths (List[AnnotatedBBox]): the ground truth bounding boxes
+            class_names (List[str]): list of class names
+        """
         img = image.copy()
 
         for gt in ground_truths:

@@ -39,17 +39,19 @@ def main():
 
     evaluator = StreamingEvaluator(
         stream_provider=val_provider,
-        classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+        classes=["background", "tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+        class_shift=1,
         output_dir=OUTPUT_DIR
     )
 
     trainer = Trainer(
         dataloader=dataloader,
-        n_classes=4,
+        n_classes=5,
         lr=0.0025,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR,
-        eval_interval=5
+        eval_interval=5,
+        class_shift=1
     )
     trainer.train()
 

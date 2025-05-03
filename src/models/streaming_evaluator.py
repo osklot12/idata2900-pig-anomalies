@@ -26,7 +26,7 @@ class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
     def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
-                 output_dir: str = "faster_rcnn_outputs"):
+                 class_shift: int = 0, output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
 
@@ -34,10 +34,12 @@ class StreamingEvaluator:
             stream_provider (StreamProvider[AnnotatedFrame]): provider of evaluation stream
             classes (List[str]): the class names in order
             iou_thresh (float): the iou threshold for predictions
+            class_shift (float): shifts the class ids by some number, defaults to 0 (no shifting)
             output_dir (str): output directory
         """
         self._stream_provider = stream_provider
         self._iou_thresh = iou_thresh
+        self._class_shift = class_shift
         self._classes: List[str] = classes
         self._map_calculator = MAPCalculator(num_classes=len(self._classes), iou_threshold=self._iou_thresh)
         self._output_dir = output_dir
@@ -69,7 +71,7 @@ class StreamingEvaluator:
             # compute map
             pred_np = np.array([[p.x1, p.y1, p.x2, p.y2, p.cls, p.conf] for p in predictions])
             gts_np = np.array([
-                [g.bbox.x, g.bbox.y, g.bbox.x + g.bbox.width, g.bbox.y + g.bbox.height, g.cls.value]
+                [g.bbox.x, g.bbox.y, g.bbox.x + g.bbox.width, g.bbox.y + g.bbox.height, g.cls.value + self._class_shift]
                 for g in instance.annotations
             ], dtype=np.float32)
 
@@ -77,7 +79,7 @@ class StreamingEvaluator:
 
             # compute confusion matrix
             pred_cls = [pred.cls for pred in predictions]
-            gt_cls = [match.cls.value if match is not None else n_classes for match in matches]
+            gt_cls = [match.cls.value + self._class_shift if match is not None else n_classes for match in matches]
 
             conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes)
 
