@@ -74,10 +74,19 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
     def validate(self):
         """Runs validation using the StreamingEvaluator."""
-        if isinstance(self.model, str):
-            print(f"Loading model from checkpoint: {self.model}")
-            self.model = YOLO(self.model)
+        print(f"[Trainer] Starting evaluation at epoch {self.epoch}")
 
+        # If model is still a string path, load it
+        if isinstance(self.model, str):
+            print(f"[Trainer] Loading model from checkpoint: {self.model}")
+            self.model = YOLO(self.model)
+        else:
+            print(f"[Trainer] Model is already loaded.")
+
+        # Confirm model device
+        print(f"[Trainer] Model device: {self.exp.device}")
+
+        # Setup evaluator
         evaluator = StreamingEvaluator(
             stream_provider=self.exp.val_stream_provider,
             classes=["tail-biting", "ear-biting", "belly-nosing", "tail-down"],
@@ -85,8 +94,14 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
             output_dir="yoloxi_outputs"
         )
 
+        # Wrap model in predictor
         predictor = YOLOXIPredictor(self.model, device=self.exp.device)
+        print("[Trainer] Created predictor. Running evaluator...")
+
+        # Run evaluation
         evaluator.evaluate(predictor, epoch=self.epoch)
+
+        print("[Trainer] Evaluation complete.")
 
         # No metrics returned from evaluate(), so just return dummy
         return {}, 0.0

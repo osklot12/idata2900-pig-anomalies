@@ -30,10 +30,14 @@ class YOLOXIPredictor(Predictor):
         with torch.no_grad():
             results = self.model.predict(tensor_img)[0]
 
+            print(f"[YOLOXIPredictor] Raw prediction tensor:")
+            print(results.boxes.data.cpu() if hasattr(results, "boxes") else "No 'boxes' attribute")
+
         if not hasattr(results, "boxes") or results.boxes.data.numel() == 0:
+            print("[YOLOXIPredictor] No predictions found.")
             return []
 
-        return [
+        preds = [
             Prediction(
                 x1=float(det[0]),
                 y1=float(det[1]),
@@ -44,3 +48,6 @@ class YOLOXIPredictor(Predictor):
             )
             for det in results.boxes.data.cpu()
         ]
+
+        print(f"[YOLOXIPredictor] Parsed {len(preds)} predictions.")
+        return preds
