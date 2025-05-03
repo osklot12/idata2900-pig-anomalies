@@ -16,7 +16,7 @@ class ConfusionCalculator:
             targets (List[int]): the targets
             num_classes (int): the number of classes
         """
-        A = np.zeros(shape=(num_classes + 1, num_classes + 1), dtype=int)
+        A = np.zeros(shape=(num_classes, num_classes), dtype=int)
         for gt, pred in zip(targets, predictions):
             A[gt][pred] += 1
 
