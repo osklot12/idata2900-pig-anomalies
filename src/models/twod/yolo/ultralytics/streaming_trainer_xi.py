@@ -72,33 +72,26 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
         from ultralytics.nn.modules.conv import Conv
 
-        detect_layer = None
-
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
-                detect_layer = m
+
+                # Use internal Detect metadata — safe and officially supported
+                ch = m.ch
+                f = m.f
+
+                print(f"[DEBUG] ch: {ch}, f: {f}")
+
+                # Replace with a new Detect head using the existing config
+                new_head = Detect(nc=4, ch=ch)
+                new_head.f = f
+                new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
+
+                self.model.model[i] = new_head
+                print("[Trainer] ✅ Detect head replaced with 4-class head.")
                 break
-
-        if detect_layer is None:
-            raise RuntimeError("❌ Detect head not found")
-
-        # Use the actual source layers' output channels
-        ch = []
-        for idx in detect_layer.f:
-            out_ch = self.model.model[idx].forward(
-                torch.randn(1, 3, 640, 640).to(self.device if hasattr(self, "device") else "cpu")).shape[1]
-            ch.append(out_ch)
-
-        print(f"[DEBUG] Inferred channel dimensions: {ch}")
-
-        # Replace head
-        new_head = Detect(nc=4, ch=ch)
-        new_head.f = detect_layer.f
-        new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
-        self.model.model[i] = new_head
-
-        print("[Trainer] ✅ Detect head replaced with correct channels.")
+        else:
+            raise RuntimeError("❌ Detect head not found.")
 
     def _create_dummy_data_yaml(self):
         """Creates a fake data.yaml file required by Ultralytics training loop."""
