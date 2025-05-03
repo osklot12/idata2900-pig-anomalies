@@ -53,7 +53,7 @@ def main():
         split=DatasetSplit.VAL,
         selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=DockStreamFactory(buffer_size=3, dock_size=300),
+        stream_factory=DockStreamFactory(buffer_size=3, dock_size=500),
         pipeline_factory=NorsvinEvalPipelineFactory()
     )
 
@@ -63,7 +63,7 @@ def main():
         split=DatasetSplit.TEST,
         selector_factory=DetermStringSelectorFactory(),
         label_map=NorsvinBehaviorClass.get_label_map(),
-        stream_factory=DockStreamFactory(buffer_size=3, dock_size=300),
+        stream_factory=DockStreamFactory(buffer_size=3, dock_size=500),
         pipeline_factory=NorsvinEvalPipelineFactory()
     )
 

@@ -1,7 +1,6 @@
 import math
 
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
@@ -50,7 +49,7 @@ def main():
         lr=0.0025,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR,
-        eval_interval=5,
+        eval_interval=1,
         class_shift=1
     )
     trainer.train()

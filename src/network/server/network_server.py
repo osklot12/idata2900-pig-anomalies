@@ -8,6 +8,7 @@ from src.network.messages.serialization.factories.serializer_factory import Seri
 from src.network.network_config import NETWORK_SERVER_PORT
 from src.network.server.client_handler import ClientHandler
 from src.network.server.session.factories.session_factory import SessionFactory
+from src.utils.logging import console
 
 
 class NetworkServer:
@@ -53,7 +54,7 @@ class NetworkServer:
             sock.settimeout(1.0)
             self._server_sock = sock
 
-            print(f"[NetworkServer] Listening on port {NETWORK_SERVER_PORT}...")
+            self._print(f"Listening on port [yellow]{NETWORK_SERVER_PORT}[/yellow]...")
             self._accept_clients()
 
     def _accept_clients(self) -> None:
@@ -61,7 +62,7 @@ class NetworkServer:
         while self._running:
             try:
                 client_sock, addr = self._server_sock.accept()
-                print(f"[NetworkServer] Connection from {addr}")
+                self._print(f"Connection from [yellow]{addr}[/yellow]")
                 self._handle_client(client_sock)
 
             except socket.timeout:
@@ -69,10 +70,10 @@ class NetworkServer:
 
             except OSError as e:
                 if self._running:
-                    print(f"[NetworkServer] Socket error: {e}")
+                    self._print(f"Socket error: {e}")
 
             except Exception as e:
-                print(f"[NetworkServer] Error accepting client: {e}")
+                self._print(f"Error accepting client: {e}")
 
     def _handle_client(self, client_sock: socket.socket) -> None:
         """Creates and runs a handler for a client socket."""
@@ -89,15 +90,19 @@ class NetworkServer:
 
     def stop(self) -> None:
         """Stops the server."""
-        print(f"[NetworkServer] Stopping server, please wait...")
+        self._print(f"Stopping server, please wait...")
         self._running.set(False)
 
         if self._server_sock:
             try:
                 self._server_sock.close()
             except Exception as e:
-                print(f"[NetworkServer] Error closing server socket: {e}")
+                self._print(f"Error closing server socket: {e}")
 
         if self._listen_thread:
             self._listen_thread.join()
-        print("[NetworkServer] Server stopped.")
+        self._print("Server stopped.")
+
+    def _print(self, message) -> None:
+        """Prints a message to the console."""
+        console.log(f"[bold cyan][[/bold cyan]Server[bold cyan]][/bold cyan] " + message)
