@@ -78,7 +78,7 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
 
                 with torch.no_grad():
                     dummy_input = torch.randn(1, 3, 640, 640).to(self.device if hasattr(self, "device") else "cpu")
-                    features = list(m.model[:-1](dummy_input))  # Everything before the last layer
+                    features = list(self.model.model[:-1](dummy_input))
                     ch = [f.shape[1] for f in features]
                 f = m.f
 
