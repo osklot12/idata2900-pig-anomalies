@@ -75,16 +75,12 @@ class YOLOXIStreamingTrainer(DetectionTrainer):
         for i, m in enumerate(self.model.model):
             if isinstance(m, Detect):
                 print("[DEBUG] Found Detect head.")
+                ch = m.in_channels  # already correct input channels
+                f = m.f  # source layers
 
-                with torch.no_grad():
-                    dummy_input = torch.randn(1, 3, 640, 640).to(self.device if hasattr(self, "device") else "cpu")
-                    features = list(self.model.model[:-1](dummy_input))
-                    ch = [f.shape[1] for f in features]
-                f = m.f
+                print(f"[DEBUG] Detected input channels: {ch}, from layers: {f}")
 
-                print(f"[DEBUG] Actual head channels: {ch}, from layers: {f}")
-
-                # Replace head with correct channels and .f
+                # Replace head
                 new_head = Detect(nc=4, ch=ch)
                 new_head.f = f
                 new_head.names = ["tail-biting", "ear-biting", "belly-nosing", "tail-down"]
