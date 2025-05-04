@@ -56,9 +56,10 @@ def main():
         output_dir=OUTPUT_DIR,
         log_interval=100,
         eval_interval=1,
-        class_shift=1
+        class_shift=1,
+
     )
-    trainer.train()
+    trainer.train(ckpt_path="faster_rcnn_outputs/epoch21.pth")
 
 
 if __name__ == "__main__":
