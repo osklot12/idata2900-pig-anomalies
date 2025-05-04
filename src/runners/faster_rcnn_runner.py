@@ -43,7 +43,7 @@ def main():
 
     evaluator = StreamingEvaluator(
         stream_provider=val_provider,
-        classes=["background", "tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+        classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
         class_shift=1,
         output_dir=OUTPUT_DIR
     )
