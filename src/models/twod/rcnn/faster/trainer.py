@@ -73,13 +73,17 @@ class Trainer:
             self._model.parameters(), lr=self._lr, momentum=self._momentum, weight_decay=self._weight_decay
         )
 
+        warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-3, total_iters=500)
+        cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_epochs - 1, eta_min=1e-6)
+        scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[warmup, cosine], milestones=[500])
+
         device = self._get_device()
         self._model.to(device)
 
         start_epoch = 0
         global_step = 0
         if ckpt_path is not None:
-            start_epoch, global_step = self._load_ckpt(self._model, optimizer, device, ckpt_path)
+            start_epoch, global_step = self._load_ckpt(self._model, optimizer, scheduler, device, ckpt_path)
 
         console.log("[bold]Starting training...[/bold]")
 
@@ -91,6 +95,9 @@ class Trainer:
                 images = [img.to(device) for img in images]
                 targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
+                for target in targets:
+                    target["labels"] += self._class_shift
+
                 loss_dict = self._model(images, targets)
                 loss = sum(loss for loss in loss_dict.values())
 
@@ -98,15 +105,17 @@ class Trainer:
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self._model.parameters(), max_norm=1.0)
                 optimizer.step()
+                scheduler.step()
 
                 cls_loss, box_loss, obj_loss, rpn_loss = self._get_losses(loss_dict)
 
                 global_step += 1
                 if global_step % self._log_interval == 0:
-                    self._log_losses(
-                        loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step)
+                    self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step)
+                    lr = optimizer.param_groups[0]['lr']
+                    self._log_lr(lr, step=global_step)
 
-            self._save_ckpt(epoch, self._model, optimizer, global_step)
+            self._save_ckpt(epoch, self._model, optimizer, global_step, scheduler)
 
             if (epoch + 1) % self._eval_interval == 0:
                 self._evaluate(device, epoch)
@@ -118,7 +127,7 @@ class Trainer:
             was_training = self._model.training
             self._model.eval()
 
-            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=self._class_shift)
+            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=-self._class_shift)
             self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
@@ -133,7 +142,7 @@ class Trainer:
         return model
 
     @staticmethod
-    def _load_ckpt(model: Module, optimizer: Optimizer, device: torch.device, ckpt_path: str) -> Tuple[int, int]:
+    def _load_ckpt(model: Module, optimizer: Optimizer, scheduler: torch.optim.lr_scheduler, device: torch.device, ckpt_path: str) -> Tuple[int, int]:
         start_epoch = 0
         global_step = 0
 
@@ -141,13 +150,14 @@ class Trainer:
             ckpt = torch.load(ckpt_path, map_location=device)
             model.load_state_dict(ckpt["model_state_dict"])
             optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+            scheduler.load_state_dict(ckpt["lr_scheduler_state_dict"])
             start_epoch = ckpt.get("epoch", 0)
             global_step = ckpt.get("global_step", 0)
             console.log(f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}, step {global_step}[/bold yellow]")
 
         return start_epoch, global_step
 
-    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer, global_step: int) -> None:
+    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer, global_step: int, scheduler: torch.optim.lr_scheduler) -> None:
         """Saves a checkpoint for the current state of the model."""
         epoch_ckpt_path = os.path.join(self._output_dir, f"epoch{epoch + 1}.pth")
         last_ckpt_path = os.path.join(self._output_dir, f"last_ckpt.pth")
@@ -156,14 +166,16 @@ class Trainer:
             "epoch": epoch,
             "global_step": global_step,
             "model_state_dict": model.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict()
+            "optimizer_state_dict": optimizer.state_dict(),
+            "lr_scheduler_state_dict": scheduler.state_dict()
         }, epoch_ckpt_path)
 
         torch.save({
             "epoch": epoch,
             "global_step": global_step,
             "model_state_dict": model.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict()
+            "optimizer_state_dict": optimizer.state_dict(),
+            "lr_scheduler_state_dict": scheduler.state_dict()
         }, last_ckpt_path)
 
     @staticmethod
@@ -199,3 +211,7 @@ class Trainer:
             f"| [blue]Obj[/blue]: {obj:.4f} "
             f"| [red]RPN[/red]: {rpn:.4f}"
         )
+
+    def _log_lr(self, lr: float, step: int) -> None:
+        """Logs learning rate."""
+        self._writer.add_scalar("train/learning_rate", lr, step)
