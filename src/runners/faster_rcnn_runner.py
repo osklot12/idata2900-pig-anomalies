@@ -6,6 +6,10 @@ from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.factories.network_dataset_stream_factory import NetworkDatasetStreamFactory
 from src.data.dataset.streams.providers.closing_stream_provider import ClosingStreamProvider
 from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
+from src.data.pipeline.pipeline import Pipeline
+from src.data.pipeline.preprocessor import Preprocessor
+from src.data.processing.bbox_denormalizer_processor import BBoxDenormalizerProcessor
+from src.data.processing.zlib_decompressor import ZlibDecompressor
 from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.rcnn.faster.streaming_dataset import StreamingDataset
 from src.models.twod.rcnn.faster.trainer import Trainer
@@ -21,13 +25,14 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 def main():
-    train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN)
-    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL)
+    pipeline = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
+    train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=pipeline)
+    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL, pipeline=pipeline)
 
     train_provider = ReusableStreamProvider(train_factory.create_stream())
     val_provider = ClosingStreamProvider(val_factory)
 
-    dataset = StreamingDataset(train_provider, n_batches=math.ceil(NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE))
+    dataset = StreamingDataset(train_provider, n_batches=math.ceil(10)) # NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE
     dataloader = DataLoader(
         dataset=dataset,
         batch_size=BATCH_SIZE,
