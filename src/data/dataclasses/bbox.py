@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class BBox:
     """
     Defines the spatial location of an object within a frame.

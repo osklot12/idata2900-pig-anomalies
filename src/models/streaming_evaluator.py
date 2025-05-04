@@ -61,14 +61,11 @@ class StreamingEvaluator:
 
         img_idx = 0
         while instance := stream.read():
-            self._denormalize(instance)
             predictions = predictor.predict(instance.frame)
             for pred in predictions:
                 console.log(
                     f"Got prediction: [cyan bold]{pred}[/cyan bold]"
                 )
-            gts = instance.annotations
-            matches = self._get_gt_for_pred(predictions, gts)
 
             # compute map
             pred_np = np.array([[p.x1, p.y1, p.x2, p.y2, p.cls, p.conf] for p in predictions])
@@ -80,11 +77,21 @@ class StreamingEvaluator:
             self._map_calculator.update(pred_np, gts_np)
 
             # compute confusion matrix
+            gts = instance.annotations
+            matches = self._get_gt_for_pred(predictions, gts)
+
+            matched_gts = {m for m in matches if m is not None}
+            unmatched_gts = [gt for gt in gts if gt not in matched_gts]
+
             pred_cls = [pred.cls for pred in predictions]
             gt_cls = [
                 match.cls.value + self._class_shift if match is not None else self._background_cls_idx
                 for match in matches
             ]
+
+            for gt in unmatched_gts:
+                pred_cls.append(self._background_cls_idx)
+                gt_cls.append(gt.cls.value)
 
             conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes)
 

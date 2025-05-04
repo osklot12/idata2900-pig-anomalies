@@ -1,4 +1,3 @@
-import pytest
 from typing import List, Optional
 
 import numpy as np
@@ -8,7 +7,7 @@ from src.data.dataclasses.annotated_frame import AnnotatedFrame
 from src.data.dataclasses.bbox import BBox
 from src.data.dataclasses.source_metadata import SourceMetadata
 from src.data.dataset.streams.providers.stream_provider import StreamProvider
-from src.data.dataset.streams.stream import Stream, T
+from src.data.dataset.streams.stream import Stream
 from src.models.prediction import Prediction
 from src.models.predictor import Predictor
 from src.models.streaming_evaluator import StreamingEvaluator
@@ -64,7 +63,12 @@ class DummyStreamProvider(StreamProvider[AnnotatedFrame]):
 def test_streaming_evaluator_produces_correct_confusion_matrix():
     """Tests that the StreamingEvaluator produces the expected confusion matrix."""
     # arrange
-    evaluator = StreamingEvaluator(DummyStreamProvider(), classes=["CODING", "DEBUGGING"], iou_thresh=0.5)
+    evaluator = StreamingEvaluator(
+        stream_provider=DummyStreamProvider(),
+        classes=["BACKGROUND", "CODING", "DEBUGGING"],
+        class_shift=1,
+        iou_thresh=0.5
+    )
     predictor = DummyPredictor()
 
     # act
