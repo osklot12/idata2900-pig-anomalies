@@ -16,6 +16,7 @@ from src.utils.logging import console
 
 CONF_THRESH = 0.3
 
+WARMUP_EPOCHS = 5
 
 class Trainer:
     """Trainer for faster-RCNN."""
@@ -73,9 +74,25 @@ class Trainer:
             self._model.parameters(), lr=self._lr, momentum=self._momentum, weight_decay=self._weight_decay
         )
 
-        warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-3, total_iters=500)
-        cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_epochs - 1, eta_min=1e-6)
-        scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[warmup, cosine], milestones=[500])
+        steps_per_epoch = len(self._dataloader)
+        total_steps = n_epochs * steps_per_epoch
+        warmup_steps = WARMUP_EPOCHS * steps_per_epoch
+
+        warmup = torch.optim.lr_scheduler.LinearLR(
+            optimizer,
+            start_factor=1e-3,
+            total_iters=warmup_steps
+        )
+        cosine = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=total_steps - warmup_steps,
+            eta_min=1e-6
+        )
+        scheduler = torch.optim.lr_scheduler.SequentialLR(
+            optimizer,
+            schedulers=[warmup, cosine],
+            milestones=[warmup_steps]
+        )
 
         device = self._get_device()
         self._model.to(device)
