@@ -14,6 +14,7 @@ P = TypeVar("P")
 # processed field type
 R = TypeVar("R")
 
+
 class FieldTransformer(Generic[I, P]):
     """Fluent builder for constructing field-level transformation components."""
 
@@ -39,6 +40,7 @@ class FieldTransformer(Generic[I, P]):
         Returns:
             FieldTransformer[I, Any]: the field transformer
         """
+
         def extractor(obj: I) -> Any:
             return getattr(obj, field_name)
 
