@@ -26,7 +26,7 @@ class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
     def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
-                 class_shift: int = 0, background_cls_idx: int = 0, output_dir: str = "faster_rcnn_outputs"):
+                 class_shift: int = 0, output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
 
@@ -35,14 +35,13 @@ class StreamingEvaluator:
             classes (List[str]): the class names in order
             iou_thresh (float): the iou threshold for predictions
             class_shift (float): shifts the class ids by some number, defaults to 0 (no shifting)
-            background_cls_idx (int): the class index for background objects
             output_dir (str): output directory
         """
         self._stream_provider = stream_provider
         self._iou_thresh = iou_thresh
         self._class_shift = class_shift
-        self._background_cls_idx = background_cls_idx
         self._classes: List[str] = classes
+        self._background_cls_idx = len(self._classes)
         self._map_calculator = MAPCalculator(num_classes=len(self._classes), iou_threshold=self._iou_thresh)
         self._output_dir = output_dir
         self._summary_writer = SummaryWriter(log_dir=f"{self._output_dir}/tensorboard")
@@ -56,7 +55,7 @@ class StreamingEvaluator:
             epoch (Optional[int]): optional epoch number
         """
         n_classes = len(self._classes)
-        conf_mat = np.zeros((n_classes, n_classes))
+        conf_mat = np.zeros((n_classes + 1, n_classes + 1))
         stream = self._stream_provider.get_stream()
 
         img_idx = 0
@@ -91,9 +90,9 @@ class StreamingEvaluator:
 
             for gt in unmatched_gts:
                 pred_cls.append(self._background_cls_idx)
-                gt_cls.append(gt.cls.value)
+                gt_cls.append(gt.cls.value + self._class_shift)
 
-            conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes)
+            conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes + 1)
 
             # save image
             if predictions:
@@ -114,16 +113,6 @@ class StreamingEvaluator:
         map_result = self._map_calculator.compute()
         self._write_map(map_result["mAP"], map_result["per_class_ap"], epoch=epoch)
 
-    @staticmethod
-    def _denormalize(instance) -> None:
-        """Denormalizes the bounding box for the instance."""
-        height, width = instance.frame.shape[:2]
-        for ann in instance.annotations:
-            ann.bbox.x *= width
-            ann.bbox.y *= height
-            ann.bbox.width *= width
-            ann.bbox.height *= height
-
     def _save_image(self, image: np.ndarray, predictions: List[Prediction], gts: List[AnnotatedBBox],
                      image_idx: int, folder_name: str) -> None:
         """Saves visualizations of predictions and ground truths on the images."""
@@ -142,8 +131,7 @@ class StreamingEvaluator:
 
     def _write_confusion_matrix(self, matrix: np.ndarray) -> None:
         """Prints a confusion matrix to the console."""
-        n = len(self._classes)
-        names = self._classes
+        names = self._classes + ["background"]
 
         table = Table(title="Confusion Matrix")
         table.add_column("GT \\ Pred", justify="right", style="bold")

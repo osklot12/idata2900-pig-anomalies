@@ -113,7 +113,7 @@ class Trainer:
             self._save_ckpt(epoch, self._model, optimizer, global_step)
 
             if (epoch + 1) % self._eval_interval == 0:
-                self._evaluate(device, epoch + 1)
+                self._evaluate(device, epoch)
 
     def _evaluate(self, device: torch.device, epoch: int) -> None:
         """Evaluates the model if an evaluator is given."""
@@ -157,14 +157,14 @@ class Trainer:
         last_ckpt_path = os.path.join(self._output_dir, f"last_ckpt.pth")
 
         torch.save({
-            "epoch": epoch + 1,
+            "epoch": epoch,
             "global_step": global_step,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict()
         }, epoch_ckpt_path)
 
         torch.save({
-            "epoch": epoch + 1,
+            "epoch": epoch,
             "global_step": global_step,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict()
