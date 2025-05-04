@@ -14,7 +14,7 @@ from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.rcnn.faster.faster_rcnn_predictor import FasterRCNNPredictor
 from src.utils.logging import console
 
-CONF_THRESH = 0.5
+CONF_THRESH = 0.3
 
 
 class Trainer:

@@ -32,7 +32,7 @@ def main():
     train_provider = ReusableStreamProvider(train_factory.create_stream())
     val_provider = ClosingStreamProvider(val_factory)
 
-    dataset = StreamingDataset(train_provider, n_batches=math.ceil(10)) # NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE
+    dataset = StreamingDataset(train_provider, n_batches=math.ceil(NORSVIN_TRAIN_SET_SIZE / BATCH_SIZE))
     dataloader = DataLoader(
         dataset=dataset,
         batch_size=BATCH_SIZE,
@@ -50,14 +50,14 @@ def main():
     trainer = Trainer(
         dataloader=dataloader,
         n_classes=5,
-        lr=0.0025,
+        lr=0.005,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR,
         log_interval=100,
         eval_interval=1,
         class_shift=-1,
     )
-    trainer.train(ckpt_path="faster_rcnn_outputs/epoch21.pth")
+    trainer.train()
 
 
 if __name__ == "__main__":
