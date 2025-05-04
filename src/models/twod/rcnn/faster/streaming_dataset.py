@@ -38,15 +38,13 @@ class StreamingDataset(IterableDataset):
             image_tensor = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
             image_tensor = normalize(image_tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-            _, h, w = image_tensor.shape
-
             boxes = []
             labels = []
             for ann in instance.annotations:
-                x1 = ann.bbox.x * w
-                y1 = ann.bbox.y * h
-                x2 = x1 + ann.bbox.width * w
-                y2 = y1 + ann.bbox.height * h
+                x1 = ann.bbox.x
+                y1 = ann.bbox.y
+                x2 = x1 + ann.bbox.width
+                y2 = y1 + ann.bbox.height
                 boxes.append([x1, y1, x2, y2])
                 labels.append(ann.cls.value)
 
