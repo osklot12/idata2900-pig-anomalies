@@ -44,7 +44,6 @@ def main():
     evaluator = StreamingEvaluator(
         stream_provider=val_provider,
         classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
-        class_shift=1,
         output_dir=OUTPUT_DIR
     )
 
@@ -56,8 +55,7 @@ def main():
         output_dir=OUTPUT_DIR,
         log_interval=100,
         eval_interval=1,
-        class_shift=1,
-
+        class_shift=-1,
     )
     trainer.train(ckpt_path="faster_rcnn_outputs/epoch21.pth")
 
