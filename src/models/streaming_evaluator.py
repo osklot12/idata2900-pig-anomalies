@@ -109,10 +109,10 @@ class StreamingEvaluator:
                 img_idx += 1
 
         self._write_confusion_matrix(conf_mat)
-        self._write_f1(conf_mat)
+        self._write_f1(conf_mat, epoch=epoch)
 
         map_result = self._map_calculator.compute()
-        self._write_map(map_result["mAP"], map_result["per_class_ap"])
+        self._write_map(map_result["mAP"], map_result["per_class_ap"], epoch=epoch)
 
     @staticmethod
     def _denormalize(instance) -> None:
