@@ -65,8 +65,8 @@ def test_streaming_evaluator_produces_correct_confusion_matrix():
     # arrange
     evaluator = StreamingEvaluator(
         stream_provider=DummyStreamProvider(),
-        classes=["BACKGROUND", "CODING", "DEBUGGING"],
-        class_shift=1,
+        classes=["CODING", "DEBUGGING", "BACKGROUND"],
+        background_cls_idx=2,
         iou_thresh=0.5
     )
     predictor = DummyPredictor()
