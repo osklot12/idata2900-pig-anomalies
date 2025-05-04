@@ -22,6 +22,8 @@ class EvaluatorVisualizer:
             predictions (List[Prediction]): the predicted bounding boxes
             ground_truths (List[AnnotatedBBox]): the ground truth bounding boxes
             class_names (List[str]): list of class names
+            save_path (str): path to save the image
+            class_shift (int): the amount to shift the class indices
         """
         img = image.copy()
 

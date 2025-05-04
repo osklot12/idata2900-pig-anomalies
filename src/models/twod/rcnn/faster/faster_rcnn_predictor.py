@@ -12,17 +12,19 @@ from torchvision.transforms.functional import normalize
 class FasterRCNNPredictor(Predictor):
     """Predictor wrapper for faster-RCNN model."""
 
-    def __init__(self, model: Module, device: torch.device, conf_thresh: float = 0.5):
+    def __init__(self, model: Module, device: torch.device, conf_thresh: float = 0.5, class_shift: int = 0):
         """
         Initializes a FasterRCNNPredictor instance.
 
         Args:
             model (Module): the model to use for prediction
             device (torch.device): the device to use for prediction
+            class_shift (int): shift amount for class indices
         """
         self._model = model
         self._device = device
         self._conf_thresh = conf_thresh
+        self._class_shift = class_shift
 
     def predict(self, image: np.ndarray) -> List[Prediction]:
         with torch.no_grad():
@@ -36,7 +38,7 @@ class FasterRCNNPredictor(Predictor):
 
             return [
                 Prediction(
-                    x1=float(b[0]), y1=float(b[1]), x2=float(b[2]), y2=float(b[3]), cls=int(c), conf=float(s)
+                    x1=float(b[0]), y1=float(b[1]), x2=float(b[2]), y2=float(b[3]), cls=int(c) + self._class_shift, conf=float(s)
                 )
                 for b, c, s in zip(outputs["boxes"], outputs["labels"], outputs["scores"])
                 if float(s) >= self._conf_thresh
