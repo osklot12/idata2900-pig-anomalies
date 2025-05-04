@@ -91,9 +91,6 @@ class Trainer:
                 images = [img.to(device) for img in images]
                 targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-                for target in targets:
-                    target["labels"] += self._class_shift
-
                 loss_dict = self._model(images, targets)
                 loss = sum(loss for loss in loss_dict.values())
 
@@ -107,8 +104,7 @@ class Trainer:
                 global_step += 1
                 if global_step % self._log_interval == 0:
                     self._log_losses(
-                        loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step
-                                     )
+                        loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step)
 
             self._save_ckpt(epoch, self._model, optimizer, global_step)
 
