@@ -1,7 +1,5 @@
 from typing import Dict
 
-import numpy as np
-
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.selectors.factories.determ_string_selector_factory import DetermStringSelectorFactory
 from src.data.dataset.selectors.factories.random_string_selector_factory import RandomStringSelectorFactory

@@ -14,6 +14,7 @@ B = TypeVar("B")
 # next output type
 C = TypeVar("C")
 
+
 class Pipeline(Generic[A, B, C], PipelineBuilder[A, B]):
     """Pipeline builder."""
 
