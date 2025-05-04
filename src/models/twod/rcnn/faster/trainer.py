@@ -70,7 +70,7 @@ class Trainer:
         os.makedirs(self._output_dir, exist_ok=True)
 
         optimizer = torch.optim.SGD(
-            self._model.parameters(), lr=0.005, momentum=0.9, weight_decay=0.0005
+            self._model.parameters(), lr=self._lr, momentum=self._momentum, weight_decay=self._weight_decay
         )
 
         device = self._get_device()
@@ -119,7 +119,7 @@ class Trainer:
             self._model.eval()
 
             predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=self._class_shift)
-            self._evaluator.evaluate(predictor, epoch=epoch)
+            # self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
                 self._model.train()
