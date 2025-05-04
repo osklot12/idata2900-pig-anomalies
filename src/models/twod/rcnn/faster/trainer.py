@@ -23,7 +23,7 @@ class Trainer:
     def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
                  lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
                  output_dir: str = "faster_rcnn_outputs", log_interval: int = 10, eval_interval: int = 2,
-                 class_shift: int = 1):
+                 class_shift: int = 0):
         """
         Initializes a Trainer instance.
 
@@ -122,7 +122,7 @@ class Trainer:
             was_training = self._model.training
             self._model.eval()
 
-            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=-1)
+            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=self._class_shift)
             self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
