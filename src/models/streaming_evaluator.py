@@ -26,7 +26,7 @@ class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
     def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
-                 class_shift: int = 0, output_dir: str = "faster_rcnn_outputs"):
+                 output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
 
@@ -34,12 +34,10 @@ class StreamingEvaluator:
             stream_provider (StreamProvider[AnnotatedFrame]): provider of evaluation stream
             classes (List[str]): the class names in order
             iou_thresh (float): the iou threshold for predictions
-            class_shift (float): shifts the class ids by some number, defaults to 0 (no shifting)
             output_dir (str): output directory
         """
         self._stream_provider = stream_provider
         self._iou_thresh = iou_thresh
-        self._class_shift = class_shift
         self._classes: List[str] = classes
         self._background_cls_idx = len(self._classes)
         self._map_calculator = MAPCalculator(num_classes=len(self._classes), iou_threshold=self._iou_thresh)
@@ -69,7 +67,7 @@ class StreamingEvaluator:
             # compute map
             pred_np = np.array([[p.x1, p.y1, p.x2, p.y2, p.cls, p.conf] for p in predictions])
             gts_np = np.array([
-                [g.bbox.x, g.bbox.y, g.bbox.x + g.bbox.width, g.bbox.y + g.bbox.height, g.cls.value + self._class_shift]
+                [g.bbox.x, g.bbox.y, g.bbox.x + g.bbox.width, g.bbox.y + g.bbox.height, g.cls.value]
                 for g in instance.annotations
             ], dtype=np.float32)
 
@@ -84,13 +82,13 @@ class StreamingEvaluator:
 
             pred_cls = [pred.cls for pred in predictions]
             gt_cls = [
-                match.cls.value + self._class_shift if match is not None else self._background_cls_idx
+                match.cls.value if match is not None else self._background_cls_idx
                 for match in matches
             ]
 
             for gt in unmatched_gts:
                 pred_cls.append(self._background_cls_idx)
-                gt_cls.append(gt.cls.value + self._class_shift)
+                gt_cls.append(gt.cls.value)
 
             conf_mat += ConfusionCalculator.calculate(pred_cls, gt_cls, n_classes + 1)
 
@@ -120,6 +118,8 @@ class StreamingEvaluator:
 
         os.makedirs(output_dir, exist_ok=True)
         save_path = os.path.join(output_dir, f"frame_{image_idx}.jpg")
+        if len(gts) > 0:
+            save_path = os.path.join(output_dir, f"frame_{image_idx}_gt.jpg")
 
         EvaluatorVisualizer.save_image(
             image=image,
