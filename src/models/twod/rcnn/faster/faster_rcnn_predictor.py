@@ -38,7 +38,7 @@ class FasterRCNNPredictor(Predictor):
 
             return [
                 Prediction(
-                    x1=float(b[0]), y1=float(b[1]), x2=float(b[2]), y2=float(b[3]), cls=int(c) - self._class_shift, conf=float(s)
+                    x1=float(b[0]), y1=float(b[1]), x2=float(b[2]), y2=float(b[3]), cls=int(c) + self._class_shift, conf=float(s)
                 )
                 for b, c, s in zip(outputs["boxes"], outputs["labels"], outputs["scores"])
                 if float(s) >= self._conf_thresh
