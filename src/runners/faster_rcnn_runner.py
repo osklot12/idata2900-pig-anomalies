@@ -28,7 +28,7 @@ def main():
     train_pipe = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     val_pipe = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=train_pipe)
-    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=val_pipe)
+    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL, pipeline=val_pipe)
 
     train_provider = ReusableStreamProvider(train_factory.create_stream())
     val_provider = ClosingStreamProvider(val_factory)
@@ -51,14 +51,15 @@ def main():
     trainer = Trainer(
         dataloader=dataloader,
         n_classes=5,
-        lr=0.005,
+        lr=0.001,
         evaluator=evaluator,
         output_dir=OUTPUT_DIR,
         log_interval=100,
         eval_interval=1,
-        class_shift=-1
+        class_shift=1,
+        freeze_backbone=True
     )
-    trainer.train(ckpt_path="old_faster_rcnn_outputs/epoch32.pth")
+    trainer.train()
 
 
 if __name__ == "__main__":

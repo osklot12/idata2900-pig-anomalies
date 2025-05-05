@@ -25,7 +25,7 @@ class Trainer:
     def __init__(self, dataloader: DataLoader, n_classes: int, evaluator: Optional[StreamingEvaluator] = None,
                  lr: float = 0.005, momentum: float = 0.9, weight_decay: float = 5e-4,
                  output_dir: str = "faster_rcnn_outputs", log_interval: int = 10, eval_interval: int = 2,
-                 class_shift: int = 0):
+                 class_shift: int = 0, freeze_backbone: bool = False):
         """
         Initializes a Trainer instance.
 
@@ -40,6 +40,7 @@ class Trainer:
             log_interval (int): the interval for logging
             eval_interval (int): the interval for evaluating the model
             class_shift (int): the shift for the class ids, defaults to 0 (no shift)
+            freeze_backbone (bool): whether to freeze backbone, defaults to False
         """
         self._dataloader = dataloader
         self._n_classes = n_classes
@@ -51,6 +52,7 @@ class Trainer:
         self._log_interval = log_interval
         self._eval_interval = eval_interval
         self._class_shift = class_shift
+        self._freeze_backbone = freeze_backbone
 
         self._model = self._create_model()
 
@@ -97,6 +99,12 @@ class Trainer:
 
         device = self._get_device()
         self._model.to(device)
+
+        # freeze backbone
+        if self._freeze_backbone:
+            console.log("[bold cyan]Backbone frozen — training only heads[/bold cyan]")
+            for param in self._model.backbone.body.parameters():
+                    param.requires_grad = False
 
         start_epoch = 0
         global_step = 0
