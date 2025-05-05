@@ -18,6 +18,7 @@ CONF_THRESH = 0.3
 
 WARMUP_EPOCHS = 5
 
+
 class Trainer:
     """Trainer for faster-RCNN."""
 
@@ -104,7 +105,6 @@ class Trainer:
 
         console.log("[bold]Starting training...[/bold]")
 
-
         for epoch in range(start_epoch, n_epochs):
             self._model.train()
 
@@ -128,7 +128,8 @@ class Trainer:
 
                 global_step += 1
                 if global_step % self._log_interval == 0:
-                    self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs, global_step)
+                    self._log_losses(loss.item(), cls_loss, box_loss, obj_loss, rpn_loss, epoch + 1, n_epochs,
+                                     global_step)
                     lr = optimizer.param_groups[0]['lr']
                     self._log_lr(lr, step=global_step)
 
@@ -144,7 +145,8 @@ class Trainer:
             was_training = self._model.training
             self._model.eval()
 
-            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH, class_shift=-self._class_shift)
+            predictor = FasterRCNNPredictor(self._model, device=device, conf_thresh=CONF_THRESH,
+                                            class_shift=-self._class_shift)
             self._evaluator.evaluate(predictor, epoch=epoch)
 
             if was_training:
@@ -159,7 +161,8 @@ class Trainer:
         return model
 
     @staticmethod
-    def _load_ckpt(model: Module, optimizer: Optimizer, scheduler: torch.optim.lr_scheduler, device: torch.device, ckpt_path: str) -> Tuple[int, int]:
+    def _load_ckpt(model: Module, optimizer: Optimizer, scheduler: torch.optim.lr_scheduler, device: torch.device,
+                   ckpt_path: str) -> Tuple[int, int]:
         start_epoch = 0
         global_step = 0
 
@@ -170,11 +173,13 @@ class Trainer:
             scheduler.load_state_dict(ckpt["lr_scheduler_state_dict"])
             start_epoch = ckpt.get("epoch", 0)
             global_step = ckpt.get("global_step", 0)
-            console.log(f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}, step {global_step}[/bold yellow]")
+            console.log(
+                f"[bold yellow]Resuming from checkpoint {ckpt_path} at epoch {start_epoch}, step {global_step}[/bold yellow]")
 
         return start_epoch, global_step
 
-    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer, global_step: int, scheduler: torch.optim.lr_scheduler) -> None:
+    def _save_ckpt(self, epoch: int, model: Module, optimizer: Optimizer, global_step: int,
+                   scheduler: torch.optim.lr_scheduler) -> None:
         """Saves a checkpoint for the current state of the model."""
         epoch_ckpt_path = os.path.join(self._output_dir, f"epoch{epoch + 1}.pth")
         last_ckpt_path = os.path.join(self._output_dir, f"last_ckpt.pth")
@@ -210,7 +215,7 @@ class Trainer:
 
         return loss_classifier, loss_box_reg, loss_objectness, loss_rpn_box_reg
 
-    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch:int, total_epochs:int,
+    def _log_losses(self, total: float, cls: float, box: float, obj: float, rpn: float, epoch: int, total_epochs: int,
                     step: int) -> None:
         """Logs the losses from training."""
         self._writer.add_scalar("train/loss_total", total, step)
