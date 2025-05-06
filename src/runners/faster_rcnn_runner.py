@@ -57,9 +57,9 @@ def main():
         log_interval=100,
         eval_interval=1,
         class_shift=1,
-        freeze_backbone=True
+        freeze_backbone=False
     )
-    trainer.train(ckpt_path="faster_rcnn_outputs/epoch21.pth")
+    trainer.train()
 
 
 if __name__ == "__main__":

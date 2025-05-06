@@ -78,8 +78,10 @@ class Trainer:
         )
 
         steps_per_epoch = len(self._dataloader)
-        total_steps = n_epochs * steps_per_epoch
         warmup_steps = WARMUP_EPOCHS * steps_per_epoch
+
+        faster_decay_epochs = 100
+        cosine_decay_steps = faster_decay_epochs * steps_per_epoch - warmup_steps
 
         warmup = torch.optim.lr_scheduler.LinearLR(
             optimizer,
@@ -88,7 +90,7 @@ class Trainer:
         )
         cosine = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
-            T_max=total_steps - warmup_steps,
+            T_max=cosine_decay_steps,
             eta_min=1e-6
         )
         scheduler = torch.optim.lr_scheduler.SequentialLR(
