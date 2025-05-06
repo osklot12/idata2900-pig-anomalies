@@ -3,9 +3,11 @@ from typing import List, Optional
 import datetime
 
 import numpy as np
+import torchvision.ops
 from rich.table import Table
 from scipy.optimize import linear_sum_assignment
 from torch.utils.tensorboard import SummaryWriter
+import torch
 
 from src.data.dataclasses.annotated_bbox import AnnotatedBBox
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
@@ -59,6 +61,8 @@ class StreamingEvaluator:
         img_idx = 0
         while instance := stream.read():
             predictions = predictor.predict(instance.frame)
+            predictions = self._apply_nms(predictions, iou_thresh=self._iou_thresh)
+
             for pred in predictions:
                 console.log(
                     f"Got prediction: [cyan bold]{pred}[/cyan bold]"
@@ -110,6 +114,32 @@ class StreamingEvaluator:
 
         map_result = self._map_calculator.compute()
         self._write_map(map_result["mAP"], map_result["per_class_ap"], epoch=epoch)
+
+    def _apply_nms(self, predictions: List[Prediction], iou_thresh: float) -> List[Prediction]:
+        """Performs NMS on the predictions."""
+        result = []
+
+        if predictions:
+            boxes = torch.tensor([[p.x1, p.y1, p.x2, p.y2] for p in predictions], dtype=torch.float32)
+            scores = torch.tensor([p.conf for p in predictions], dtype=torch.float32)
+            labels = torch.tensor([p.cls for p in predictions])
+
+            keep_indices = []
+
+            # applying nms per class
+            for cls in labels.unique():
+                cls_mask = labels == cls
+                cls_boxes = boxes[cls_mask]
+                cls_scores = scores[cls_mask]
+                cls_indices = torch.where(cls_mask)[0]
+
+                if cls_boxes.size(0) > 0:
+                    keep = torchvision.ops.nms(cls_boxes, cls_scores, iou_thresh)
+                    keep_indices.extend(cls_indices[keep].tolist())
+
+            result = [predictions[i] for i in keep_indices]
+
+        return result
 
     def _save_image(self, image: np.ndarray, predictions: List[Prediction], gts: List[AnnotatedBBox],
                      image_idx: int, folder_name: str) -> None:
