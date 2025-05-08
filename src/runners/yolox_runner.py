@@ -36,7 +36,8 @@ def main():
         train_stream_provider=train_provider,
         val_stream_provider=val_provider,
         evaluator=evaluator,
-        freeze_backbone=True
+        freeze_backbone=True,
+        iou_thresh=0.01
     )
 
     args = argparse.Namespace(
