@@ -18,19 +18,13 @@ def main():
     train_provider = ReusableStreamProvider(stream=train_factory.create_stream())
     val_provider = ClosingStreamProvider(stream_factory=val_factory)
 
-    exp = StreamingExp(
-        train_stream_provider=train_provider,
-        val_stream_provider=val_provider,
-        classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
-        freeze_backbone=True,
-        iou_thresh=0.1
-    )
+    exp = StreamingExp(train_stream_provider=train_provider, val_stream_provider=val_provider)
 
     args = argparse.Namespace(
         batch_size=28,
         devices=1,
-        resume=False,
-        start_epoch=0,
+        resume=True,
+        start_epoch=None,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
