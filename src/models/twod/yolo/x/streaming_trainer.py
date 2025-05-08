@@ -6,8 +6,9 @@ from torch.utils.tensorboard import SummaryWriter
 
 from yolox.core.trainer import Trainer
 from yolox.data import DataPrefetcher
-from yolox.utils import is_parallel, adjust_status, synchronize, get_model_info, logger, occupy_mem, ModelEMA, \
+from yolox.utils import is_parallel, adjust_status, synchronize, get_model_info, occupy_mem, ModelEMA, \
     WandbLogger, MlflowLogger
+from loguru import logger
 
 from src.models.twod.yolo.x.yolox_predictor import YOLOXPredictor
 
