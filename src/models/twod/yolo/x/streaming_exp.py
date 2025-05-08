@@ -47,8 +47,6 @@ class StreamingExp(BaseExp):
         self.focal_loss_gamma = 2.0
         self.focal_loss_alpha = 0.25
 
-
-
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = StreamingDataset(
             stream_provider=self._train_stream_provider,
