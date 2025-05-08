@@ -30,6 +30,7 @@ class YOLOXPredictor(Predictor):
         preds = []
         if outputs[0] is not None:
             for det in outputs[0].cpu().numpy():
+                print(f"det: {det}")
                 x1, y1, x2, y2, score, cls_id = det
                 preds.append(
                     Prediction(

@@ -1,5 +1,3 @@
-from typing import Dict
-
 import torch
 
 from src.models.twod.yolo.x.yolox_predictor import YOLOXPredictor
