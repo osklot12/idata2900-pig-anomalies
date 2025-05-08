@@ -22,7 +22,8 @@ def main():
     evaluator = StreamingEvaluator(
         stream_provider=val_provider,
         classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
-        output_dir="YOLOX_outputs/streaming_yolox"
+        output_dir="YOLOX_outputs/streaming_yolox",
+        nms=False
     )
 
     exp = StreamingExp(
