@@ -24,8 +24,7 @@ B = TypeVar("B")
 class NetworkDatasetStreamFactory(Generic[T], ClosableStreamFactory[T]):
     """Factory for creating network dataset streams."""
 
-    def __init__(self, server_ip: str, split: DatasetSplit,
-                 pipeline: PipelineBuilder[CompressedAnnotatedFrame, B] = Pipeline(Preprocessor(ZlibDecompressor()))):
+    def __init__(self, server_ip: str, split: DatasetSplit, pipeline: PipelineBuilder[CompressedAnnotatedFrame, B]):
         """
         Initializes a NetworkDatasetStreamFactory instance.
 
