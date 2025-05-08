@@ -28,7 +28,7 @@ class StreamingTrainer(Trainer):
         for name, param in model.named_parameters():
             if "backbone" in name or (freeze_neck and "neck" in name):
                 param.requires_grad = False
-                logger.info(f"  └─ [frozen] {name}")
+                console.info(f"  └─ [frozen] {name}")
 
     def train_in_epoch(self):
         for self.epoch in range(self.start_epoch, self.max_epoch):
