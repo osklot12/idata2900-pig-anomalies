@@ -61,7 +61,7 @@ class StreamingEvaluator:
         stream = self._stream_provider.get_stream()
 
         img_idx = 0
-        while instance := stream.read():
+        while (instance := stream.read()) and img_idx < 200:
             predictions = predictor.predict(instance.frame)
             if self._nms:
                 predictions = self._apply_nms(predictions, iou_thresh=self._iou_thresh)
