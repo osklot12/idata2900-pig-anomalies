@@ -14,7 +14,6 @@ class StreamingTrainer(Trainer):
     def before_train(self):
         super().before_train()
 
-        # Freeze backbone AFTER `super().before_train()` so weights are loaded first
         if getattr(self.exp, "freeze_backbone", False):
             model = self.model
             if is_parallel(model):
@@ -69,8 +68,6 @@ class StreamingTrainer(Trainer):
                 conf_thresh=self.exp.iou_thresh
             )
             self.exp.evaluator.evaluate(predictor)
-
-            #stream = self.exp._val_stream_provider.get_stream()
 
         if torch.distributed.is_initialized():
             synchronize()
