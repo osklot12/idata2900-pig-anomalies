@@ -12,13 +12,15 @@ T = TypeVar("T")
 class StreamingExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
-    def __init__(self, train_stream_provider: StreamProvider[T], val_stream_provider: StreamProvider[T]):
+    def __init__(self, train_stream_provider: StreamProvider[T], val_stream_provider: StreamProvider[T],
+                 freeze_backbone: bool = False):
         """
         Initializes an Exp instance.
 
         Args:
             train_stream_provider (StreamProvider[T]): provider of training set streams
             val_stream_provider (StreamProvider[T]): provider of validation set streams
+            freeze_backbone (bool): whether to freeze backbone while training
         """
         super().__init__()
         self._train_stream_provider = train_stream_provider
@@ -46,6 +48,8 @@ class StreamingExp(BaseExp):
         self.use_focal_loss = True
         self.focal_loss_gamma = 2.0
         self.focal_loss_alpha = 0.25
+
+        self.freeze_backbone = freeze_backbone
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = StreamingDataset(

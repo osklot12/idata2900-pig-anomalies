@@ -5,11 +5,30 @@ import torch
 from yolox.core.trainer import Trainer
 from yolox.data import DataPrefetcher
 from yolox.utils import is_parallel, adjust_status, synchronize
+from loguru import logger
 
 from src.utils.logging import console
 
 class StreamingTrainer(Trainer):
     """A custom trainer for streaming data."""
+
+    def before_train(self):
+        super().before_train()
+
+        # Freeze backbone AFTER `super().before_train()` so weights are loaded first
+        if getattr(self.exp, "freeze_backbone", False):
+            model = self.model
+            if is_parallel(model):
+                model = model.module
+            self._freeze_backbone(model)
+            logger.info("[StreamingTrainer] Backbone frozen.")
+
+    @staticmethod
+    def _freeze_backbone(model: torch.nn.Module, freeze_neck: bool = False):
+        for name, param in model.named_parameters():
+            if "backbone" in name or (freeze_neck and "neck" in name):
+                param.requires_grad = False
+                logger.info(f"  └─ [frozen] {name}")
 
     def train_in_epoch(self):
         for self.epoch in range(self.start_epoch, self.max_epoch):
