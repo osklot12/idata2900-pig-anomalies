@@ -6,7 +6,6 @@ import torch
 from ext.yolox.yolox.utils import postprocess
 from src.models.prediction import Prediction
 from src.models.predictor import Predictor
-from src.utils.logging import console
 
 
 class YOLOXPredictor(Predictor):
@@ -21,15 +20,18 @@ class YOLOXPredictor(Predictor):
     def predict(self, image: np.ndarray) -> List[Prediction]:
         img_tensor = torch.from_numpy(image).float().permute(2, 0, 1).unsqueeze(0).to(self._device) / 255.0
         outputs = self._model(img_tensor)
-        console.log(outputs)
 
         if isinstance(outputs, (list, tuple)):
             outputs = outputs[0]
 
+        outputs = postprocess(outputs, num_classes=len(self._model.head.cls_preds), conf_thre=self._conf_thresh,
+                              nms_thre=0.5)
+
+
         preds = []
-        for det in outputs[0].cpu().numpy():
-            x1, y1, x2, y2, score, cls_id = det
-            if score >= self._conf_thresh:
+        if outputs[0] is not None:
+            for det in outputs[0].cpu().numpy():
+                x1, y1, x2, y2, score, cls_id = det
                 preds.append(
                     Prediction(
                         x1=float(x1),
