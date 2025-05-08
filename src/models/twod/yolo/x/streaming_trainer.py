@@ -64,12 +64,15 @@ class StreamingTrainer(Trainer):
                 eval_model = eval_model.module
 
         with adjust_status(eval_model, training=False):
-            predictor = YOLOXPredictor(
-                model=eval_model,
-                device=torch.device(self.device),
-                conf_thresh=self.exp.iou_thresh
-            )
-            self.exp.evaluator.evaluate(predictor)
+            console.log(f"[cyan]Evaluating...[/cyan]")
+            #predictor = YOLOXPredictor(
+            #    model=eval_model,
+            #    device=torch.device(self.device),
+            #    conf_thresh=self.exp.iou_thresh
+            #)
+            #self.exp.evaluator.evaluate(predictor)
+
+            stream = self.exp._val_stream_provider.get_stream()
 
         if torch.distributed.is_initialized():
             synchronize()
