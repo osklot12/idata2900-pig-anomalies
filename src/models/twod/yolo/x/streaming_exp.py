@@ -1,3 +1,4 @@
+import os
 from typing import TypeVar, List
 
 from src.data.dataset.streams.providers.stream_provider import StreamProvider
@@ -55,12 +56,13 @@ class StreamingExp(BaseExp):
         self.classes = classes
         self.iou_thresh = iou_thresh
 
+        self.output_dir = os.path.join("YOLOX_outputs", self.exp_name)
         self.evaluator = StreamingEvaluator(
             stream_provider=self._val_stream_provider,
             classes=self.classes,
             iou_thresh=self.iou_thresh,
             nms=False,
-            output_dir=f"YOLOX_outputs"
+            output_dir=self.output_dir
         )
 
         self.freeze_backbone = freeze_backbone
