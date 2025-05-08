@@ -65,7 +65,7 @@ class StreamingEvaluator:
         while (instance := stream.read()) and counter < 100:
             counter += 1
             predictions = predictor.predict(instance.frame)
-            console.log(f"{img_idx}: Got predictions: {predictions}")
+            console.log(f"{counter}: Got predictions: {predictions}")
             if self._nms:
                 predictions = self._apply_nms(predictions, iou_thresh=self._iou_thresh)
 
