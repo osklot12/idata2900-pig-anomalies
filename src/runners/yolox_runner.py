@@ -4,6 +4,7 @@ from src.data.dataset.streams.factories.network_dataset_stream_factory import Ne
 from src.data.dataset.dataset_split import DatasetSplit
 from src.data.dataset.streams.providers.closing_stream_provider import ClosingStreamProvider
 from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
+from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
 from src.models.twod.yolo.x.streaming_exp import StreamingExp
 import argparse
@@ -18,7 +19,18 @@ def main():
     train_provider = ReusableStreamProvider(stream=train_factory.create_stream())
     val_provider = ClosingStreamProvider(stream_factory=val_factory)
 
-    exp = StreamingExp(train_stream_provider=train_provider, val_stream_provider=val_provider, freeze_backbone=True)
+    evaluator = StreamingEvaluator(
+        stream_provider=val_provider,
+        classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+        output_dir="YOLOX_outputs/streaming_yolox"
+    )
+
+    exp = StreamingExp(
+        train_stream_provider=train_provider,
+        val_stream_provider=val_provider,
+        evaluator=evaluator,
+        freeze_backbone=True
+    )
 
     args = argparse.Namespace(
         batch_size=28,

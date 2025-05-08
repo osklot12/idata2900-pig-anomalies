@@ -2,6 +2,7 @@ from typing import Dict
 
 import torch
 
+from src.models.twod.yolo.x.yolox_predictor import YOLOXPredictor
 from yolox.core.trainer import Trainer
 from yolox.data import DataPrefetcher
 from yolox.utils import is_parallel, adjust_status, synchronize
@@ -63,7 +64,12 @@ class StreamingTrainer(Trainer):
                 eval_model = eval_model.module
 
         with adjust_status(eval_model, training=False):
-            console.log(f"[cyan]Evaluating...[/cyan]")
+            predictor = YOLOXPredictor(
+                model=eval_model,
+                device=torch.device(self.device),
+                conf_thresh=self.exp.iou_thresh
+            )
+            self.exp.evaluator.evaluate(predictor)
 
         if torch.distributed.is_initialized():
             synchronize()
