@@ -18,7 +18,7 @@ def main():
     train_provider = ReusableStreamProvider(stream=train_factory.create_stream())
     val_provider = ClosingStreamProvider(stream_factory=val_factory)
 
-    exp = StreamingExp(train_stream_provider=train_provider, val_stream_provider=val_provider)
+    exp = StreamingExp(train_stream_provider=train_provider, val_stream_provider=val_provider, freeze_backbone=True)
 
     args = argparse.Namespace(
         batch_size=28,
