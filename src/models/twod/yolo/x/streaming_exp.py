@@ -60,7 +60,20 @@ class StreamingExp(BaseExp):
         dataset = StreamingDataset(
             stream_provider=self._train_stream_provider,
             batch_size=28,
-            n_batches=1 # 267
+            n_batches=267
+        )
+        return DataLoader(
+            dataset=dataset,
+            batch_size=None,
+            num_workers=0,
+            pin_memory=True,
+        )
+
+    def get_eval_loader(self, batch_size, is_distributed, **kwargs):
+        dataset = StreamingDataset(
+            stream_provider=self._val_stream_provider,
+            batch_size=8,
+            n_batches=431
         )
         return DataLoader(
             dataset=dataset,
