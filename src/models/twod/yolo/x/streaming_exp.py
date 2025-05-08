@@ -1,6 +1,7 @@
 from typing import TypeVar
 
 from src.data.dataset.streams.providers.stream_provider import StreamProvider
+from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.yolo.x.streaming_dataset import StreamingDataset
 from yolox.exp import Exp as BaseExp
 from torch.utils.data import DataLoader
@@ -13,13 +14,14 @@ class StreamingExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
     def __init__(self, train_stream_provider: StreamProvider[T], val_stream_provider: StreamProvider[T],
-                 freeze_backbone: bool = False):
+                 evaluator: StreamingEvaluator, freeze_backbone: bool = False):
         """
         Initializes an Exp instance.
 
         Args:
             train_stream_provider (StreamProvider[T]): provider of training set streams
             val_stream_provider (StreamProvider[T]): provider of validation set streams
+            evaluator (StreamingEvaluator): evaluator for evaluating model
             freeze_backbone (bool): whether to freeze backbone while training
         """
         super().__init__()
@@ -50,6 +52,8 @@ class StreamingExp(BaseExp):
         self.focal_loss_alpha = 0.25
 
         self.freeze_backbone = freeze_backbone
+        self.evaluator = evaluator
+        self.iou_thresh = 0.5
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = StreamingDataset(

@@ -27,7 +27,6 @@ class YOLOXPredictor(Predictor):
         outputs = postprocess(outputs, num_classes=len(self._model.head.cls_preds), conf_thre=self._conf_thresh,
                               nms_thre=0.5)
 
-
         preds = []
         if outputs[0] is not None:
             for det in outputs[0].cpu().numpy():
