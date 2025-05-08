@@ -1,6 +1,7 @@
-from typing import TypeVar
+from typing import TypeVar, List
 
 from src.data.dataset.streams.providers.stream_provider import StreamProvider
+from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.yolo.x.streaming_dataset import StreamingDataset
 from yolox.exp import Exp as BaseExp
 from torch.utils.data import DataLoader
@@ -12,13 +13,17 @@ T = TypeVar("T")
 class StreamingExp(BaseExp):
     """Experimental configurations for YOLOX."""
 
-    def __init__(self, train_stream_provider: StreamProvider[T], val_stream_provider: StreamProvider[T]):
+    def __init__(self, train_stream_provider: StreamProvider[T], val_stream_provider: StreamProvider[T],
+                 classes: List[str], iou_thresh: float = 0.5, freeze_backbone: bool = False):
         """
         Initializes an Exp instance.
 
         Args:
             train_stream_provider (StreamProvider[T]): provider of training set streams
             val_stream_provider (StreamProvider[T]): provider of validation set streams
+            classes (List[str]): list of class names
+            iou_thresh (float): IoU threshold for filtering predictions
+            freeze_backbone (bool): whether to freeze backbone layers
         """
         super().__init__()
         self._train_stream_provider = train_stream_provider
@@ -47,7 +52,17 @@ class StreamingExp(BaseExp):
         self.focal_loss_gamma = 2.0
         self.focal_loss_alpha = 0.25
 
+        self.classes = classes
+        self.iou_thresh = iou_thresh
 
+        self.evaluator = StreamingEvaluator(
+            stream_provider=self._val_stream_provider,
+            classes=self.classes,
+            iou_thresh=self.iou_thresh,
+            output_dir=f"YOLOX_outputs"
+        )
+
+        self.freeze_backbone = freeze_backbone
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img: str = None):
         dataset = StreamingDataset(

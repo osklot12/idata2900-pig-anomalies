@@ -23,18 +23,21 @@ def main():
     args = argparse.Namespace(
         batch_size=28,
         devices=1,
-        resume=True,
-        start_epoch=None,
+        resume=False,
+        start_epoch=0,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_outputs/streaming_yolox/epoch_74_ckpt.pth",
+        ckpt="YOLOX_weights/yolo_s.pth",
         fp16=True,
         fuse=False,
         cache=False,
         occupy=False,
-        logger="tensorboard"
+        logger="tensorboard",
+        classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
+        freeze_backbone=True,
+        iou_thresh=0.1
     )
 
     trainer = StreamingTrainer(exp, args)
