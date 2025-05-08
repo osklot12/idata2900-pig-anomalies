@@ -59,7 +59,7 @@ class StreamingExp(BaseExp):
         dataset = StreamingDataset(
             stream_provider=self._train_stream_provider,
             batch_size=28,
-            n_batches=1 # 267
+            n_batches=267
         )
         return DataLoader(
             dataset=dataset,
