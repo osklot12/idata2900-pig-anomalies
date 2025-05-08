@@ -23,8 +23,8 @@ def main():
     args = argparse.Namespace(
         batch_size=28,
         devices=1,
-        resume=True,
-        start_epoch=None,
+        resume=False,
+        start_epoch=0,
         num_machines=1,
         machine_rank=0,
         dist_url="auto",
