@@ -31,7 +31,8 @@ class YOLOXPredictor(Predictor):
         if outputs[0] is not None:
             for det in outputs[0].cpu().numpy():
                 print(f"det: {det}")
-                x1, y1, x2, y2, score, cls_id = det
+                x1, y1, x2, y2, obj_conf, cls_conf, cls_id = det
+                score = obj_conf * cls_conf
                 preds.append(
                     Prediction(
                         x1=float(x1),
