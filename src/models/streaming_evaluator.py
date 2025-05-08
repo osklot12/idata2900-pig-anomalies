@@ -61,7 +61,9 @@ class StreamingEvaluator:
         stream = self._stream_provider.get_stream()
 
         img_idx = 0
-        while (instance := stream.read()) and img_idx < 200:
+        counter = 0
+        while (instance := stream.read()) and counter < 100:
+            counter += 1
             predictions = predictor.predict(instance.frame)
             console.log(f"{img_idx}: Got predictions: {predictions}")
             if self._nms:
