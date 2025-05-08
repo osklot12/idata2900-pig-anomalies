@@ -56,7 +56,6 @@ class StreamingExp(BaseExp):
         self.classes = classes
         self.iou_thresh = iou_thresh
 
-        self.output_dir = os.path.join("YOLOX_outputs", self.exp_name)
         self.evaluator = StreamingEvaluator(
             stream_provider=self._val_stream_provider,
             classes=self.classes,
@@ -71,7 +70,7 @@ class StreamingExp(BaseExp):
         dataset = StreamingDataset(
             stream_provider=self._train_stream_provider,
             batch_size=28,
-            n_batches=1 #267
+            n_batches=20 #267
         )
         return DataLoader(
             dataset=dataset,
