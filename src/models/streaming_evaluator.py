@@ -28,7 +28,7 @@ class StreamingEvaluator:
     """Computes evaluation metrics with streaming compatibility."""
 
     def __init__(self, stream_provider: StreamProvider[AnnotatedFrame], classes: List[str], iou_thresh: float = 0.5,
-                 output_dir: str = "faster_rcnn_outputs"):
+                 nms: bool = True, output_dir: str = "faster_rcnn_outputs"):
         """
         Initializes a StreamingEvaluator instance.
 
@@ -36,11 +36,13 @@ class StreamingEvaluator:
             stream_provider (StreamProvider[AnnotatedFrame]): provider of evaluation stream
             classes (List[str]): the class names in order
             iou_thresh (float): the iou threshold for predictions
+            nms (bool): whether to apply non-maximum suppression
             output_dir (str): output directory
         """
         self._stream_provider = stream_provider
-        self._iou_thresh = iou_thresh
         self._classes: List[str] = classes
+        self._iou_thresh = iou_thresh
+        self._nms = nms
         self._background_cls_idx = len(self._classes)
         self._map_calculator = MAPCalculator(num_classes=len(self._classes), iou_threshold=self._iou_thresh)
         self._output_dir = output_dir
@@ -61,7 +63,8 @@ class StreamingEvaluator:
         img_idx = 0
         while instance := stream.read():
             predictions = predictor.predict(instance.frame)
-            predictions = self._apply_nms(predictions, iou_thresh=self._iou_thresh)
+            if self._nms:
+                predictions = self._apply_nms(predictions, iou_thresh=self._iou_thresh)
 
             for pred in predictions:
                 console.log(

@@ -59,6 +59,7 @@ class StreamingExp(BaseExp):
             stream_provider=self._val_stream_provider,
             classes=self.classes,
             iou_thresh=self.iou_thresh,
+            nms=False,
             output_dir=f"YOLOX_outputs"
         )
 
