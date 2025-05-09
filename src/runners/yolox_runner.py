@@ -49,7 +49,7 @@ def main():
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_weights/yolox_s.pth",
+        ckpt="YOLOX_outputs/streaming_yolox/epoch_37_ckpt.pth",
         fp16=True,
         fuse=False,
         cache=False,

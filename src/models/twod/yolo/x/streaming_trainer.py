@@ -67,7 +67,7 @@ class StreamingTrainer(Trainer):
                 device=torch.device(self.device),
                 conf_thresh=self.exp.iou_thresh
             )
-            self.exp.evaluator.evaluate(predictor)
+            self.exp.evaluator.evaluate(predictor, epoch=self.epoch + 1)
 
         if torch.distributed.is_initialized():
             synchronize()
