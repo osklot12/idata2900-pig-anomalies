@@ -30,25 +30,24 @@ class FrameCounter:
                 continue
         return total_frames
 
-    def count_frames_per_class(self) -> Dict[str, int]:
-        """
-        Computes number of frames each class appears in.
-        One frame may count toward multiple classes.
-        """
-        class_frame_map: Dict[str, set] = defaultdict(set)
+    def count_videos_per_class(self) -> Dict[str, int]:
+        """Counts how many videos each class appears in at least once."""
+        class_video_counter: Dict[str, int] = defaultdict(int)
 
         for raw in self._iterate_annotation_jsons():
+            classes_in_video = set()
             try:
-                annotations = raw.get("annotations", [])
-                for ann in annotations:
-                    label = ann["name"]
-                    frame_ids = ann.get("frames", {}).keys()
-                    for fid in frame_ids:
-                        class_frame_map[label].add(fid)
-            except (KeyError, TypeError):
+                for ann in raw.get("annotations", []):
+                    cls = ann.get("name")
+                    if cls:
+                        classes_in_video.add(cls)
+            except Exception:
                 continue
 
-        return {cls: len(frames) for cls, frames in class_frame_map.items()}
+            for cls in classes_in_video:
+                class_video_counter[cls] += 1
+
+        return dict(class_video_counter)
 
     def _iterate_annotation_jsons(self) -> List[dict]:
         """Yields raw JSON data for each annotation file."""

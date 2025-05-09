@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from src.auth.auth_service import AuthService
@@ -28,3 +29,16 @@ class GCSAnnotationLoader(GCSBucketClient, VideoAnnotationsLoader):
         raw_data = self._make_request(self._get_file_url(annotations_id)).content
         json_data = self._json_converter.get_json(raw_data)
         return self._decoder.decode_annotations(json_data)
+
+    def load_raw_annotation(self, annotations_id: str) -> dict:
+        """
+        Loads and parses the raw annotation JSON file from GCS.
+
+        Args:
+            annotations_id (str): path to the annotation file (e.g. .../annotations/foo.json)
+
+        Returns:
+            dict: Parsed JSON dictionary.
+        """
+        raw_data = self._make_request(self._get_file_url(annotations_id)).content
+        return json.loads(raw_data.decode("utf-8"))
