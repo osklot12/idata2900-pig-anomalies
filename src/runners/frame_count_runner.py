@@ -24,9 +24,11 @@ def main():
     total_frames = counter.count_total_frames()
     print(f"\n✅ Total frames in dataset: {total_frames}")
 
-    class_video_counts = counter.count_videos_per_class()
+    class_stats = counter.count_class_and_empty_videos()
+    print(f"\n📽 Total videos: {class_stats['total_videos']}")
+    print(f"🚫 Videos with no annotations: {class_stats['videos_with_no_annotations']}")
     print("\n📦 Number of videos each class appears in:")
-    for cls, count in sorted(class_video_counts.items()):
+    for cls, count in sorted(class_stats["videos_per_class"].items()):
         print(f"  {cls}: {count}")
 
 

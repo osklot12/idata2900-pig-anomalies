@@ -70,6 +70,40 @@ class FrameCounter:
             except Exception as e:
                 print(f"Failed to load {id_}: {e}")
 
+    def count_class_and_empty_videos(self) -> Dict[str, int]:
+        """
+        Returns:
+            - total_videos: number of annotation files
+            - videos_with_no_annotations: how many videos have 0 annotations
+            - videos_per_class: dict[class_name] = number of videos class appears in
+        """
+        total_videos = 0
+        videos_with_no_annotations = 0
+        videos_per_class: Dict[str, int] = defaultdict(int)
+
+        for raw in self._iterate_annotation_jsons():
+            total_videos += 1
+
+            annotations = raw.get("annotations", [])
+            if not annotations:
+                videos_with_no_annotations += 1
+                continue
+
+            classes_in_video = set()
+            for ann in annotations:
+                cls = ann.get("name")
+                if cls:
+                    classes_in_video.add(cls)
+
+            for cls in classes_in_video:
+                videos_per_class[cls] += 1
+
+        return {
+            "total_videos": total_videos,
+            "videos_with_no_annotations": videos_with_no_annotations,
+            "videos_per_class": dict(videos_per_class),
+        }
+
     @staticmethod
     def _get_annotation_ids(selector: Selector[str]) -> List[str]:
         ids = []
