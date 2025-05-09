@@ -6,6 +6,7 @@ from src.data.dataset.streams.providers.closing_stream_provider import ClosingSt
 from src.data.dataset.streams.providers.reusable_stream_provider import ReusableStreamProvider
 from src.data.pipeline.pipeline import Pipeline
 from src.data.pipeline.preprocessor import Preprocessor
+from src.data.processing.bbox_denormalizer_processor import BBoxDenormalizerProcessor
 from src.data.processing.zlib_decompressor import ZlibDecompressor
 from src.models.streaming_evaluator import StreamingEvaluator
 from src.models.twod.yolo.x.streaming_trainer import StreamingTrainer
@@ -16,10 +17,10 @@ SERVER_IP = "10.0.0.1"
 
 
 def main():
-    train_pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
+    train_pipeline = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=train_pipeline)
 
-    train_pipeline = Pipeline(Preprocessor(ZlibDecompressor()))
+    train_pipeline = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL, pipeline=train_pipeline)
 
     train_provider = ReusableStreamProvider(stream=train_factory.create_stream())
