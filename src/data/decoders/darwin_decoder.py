@@ -23,18 +23,14 @@ class DarwinDecoder(AnnotationDecoder):
         """
         self._label_parser = label_parser
 
-    def decode_annotations(self, json_data: dict) -> List[FrameAnnotations]:
+    def decode(self, json_data: dict) -> List[FrameAnnotations]:
         annotations = self._combine_annotations_by_frame(self._extract_annotations(json_data))
+
         return self._create_frame_annotation_list(
             annotations,
             self._create_source_metadata(json_data),
             DarwinDecoder.get_frame_count(json_data)
         )
-
-    @staticmethod
-    def _get_json(raw_bytes: bytes):
-        """Decodes raw bytes to a JSON format."""
-        return json.loads(raw_bytes.decode("utf-8"))
 
     def _combine_annotations_by_frame(self, annotations: List[Dict]) -> Dict[int, List[AnnotatedBBox]]:
         """Groups annotations by their respective frame index."""

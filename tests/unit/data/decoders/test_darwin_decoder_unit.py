@@ -74,7 +74,7 @@ def decoder(sample_json_bytes, label_parser):
 def test_get_annotations(decoder, expected_sample_annotations, sample_json_bytes,expected_frame_count):
     """Tests that get_annotations returns the expected annotations."""
     # act
-    decoded_list = decoder.decode_annotations(sample_json_bytes)
+    decoded_list = decoder.decode(sample_json_bytes)
 
     # assert
     assert decoded_list
