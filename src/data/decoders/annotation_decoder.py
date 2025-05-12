@@ -8,7 +8,7 @@ class AnnotationDecoder(ABC):
     """An interface for annotation decoders."""
 
     @abstractmethod
-    def decode_annotations(self, json_data: dict) -> List[FrameAnnotations]:
+    def decode(self, json_data: dict) -> List[FrameAnnotations]:
         """
         Decodes and returns the annotations.
 
