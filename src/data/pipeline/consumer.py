@@ -13,6 +13,6 @@ class Consumer(Generic[T], ABC):
         Consumes the given data.
 
         Args:
-            data (T): f the data to be consumed, or None if end ostream
+            data (T): the data to be consumed, or None if end ostream
         """
         raise NotImplementedError

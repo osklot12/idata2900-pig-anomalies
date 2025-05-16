@@ -20,18 +20,18 @@ class VideoAnnotationsStreamer(AnnotationsStreamer):
         """
         super().__init__(consumer)
         self._annotations = annotations
-        self._frame_queue = queue.Queue()
+        self._queue = queue.Queue()
 
     def _setup_stream(self) -> None:
         frame_annotations = self._annotations.get_data()
 
         for frame_annotation in frame_annotations:
-            self._frame_queue.put(frame_annotation)
+            self._queue.put(frame_annotation)
 
     def _get_next_annotation(self) -> Optional[FrameAnnotations]:
         annotation = None
 
-        if not self._frame_queue.empty():
-            annotation = self._frame_queue.get()
+        if not self._queue.empty():
+            annotation = self._queue.get()
 
         return annotation

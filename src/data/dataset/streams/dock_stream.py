@@ -17,7 +17,7 @@ class DockStream(Generic[T], WritableStream[T]):
 
     def __init__(self, buffer_size: int = 3, dock_size: int = 100):
         """
-        Initializes a SequentialStream instance.
+        Initializes a DockStream instance.
 
         Args:
             buffer_size (int): the size of the internal buffer
