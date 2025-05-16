@@ -4,7 +4,6 @@ import numpy as np
 import torch
 
 from src.data.dataclasses.annotated_frame import AnnotatedFrame
-from src.models.converters.static_bbox_scaler import StaticBBoxScaler
 
 
 class YOLOXBatchConverter:
