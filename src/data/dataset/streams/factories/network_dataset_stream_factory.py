@@ -21,6 +21,7 @@ T = TypeVar("T")
 # sink input data type
 B = TypeVar("B")
 
+
 class NetworkDatasetStreamFactory(Generic[T], ClosableStreamFactory[T]):
     """Factory for creating network dataset streams."""
 

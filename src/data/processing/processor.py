@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
+# input data type
 I = TypeVar("I")
+
+# output data type
 O = TypeVar("O")
 
 class Processor(Generic[I, O], ABC):

@@ -39,11 +39,11 @@ class FileStreamerFactory(StreamerFactory[AnnotatedFrame]):
             annotations = self._entity_factory.create_video_annotations(instance.annotation_file)
             if video and annotations:
                 video_streamer = VideoFileStreamer(video)
-                video_consumer = ConsumingRFunc(aggregator.feed_frame, video_streamer.get_releaser())
+                video_consumer = ConsumingRFunc(aggregator.feed_frame, video_streamer.get_release())
                 video_streamer.connect(video_consumer)
 
                 annotations_streamer = VideoAnnotationsStreamer(annotations)
-                annotations_consumer = ConsumingRFunc(aggregator.feed_annotations, annotations_streamer.get_releaser())
+                annotations_consumer = ConsumingRFunc(aggregator.feed_annotations, annotations_streamer.get_release())
                 annotations_streamer.connect(annotations_consumer)
 
                 streamer = CompositeStreamer(

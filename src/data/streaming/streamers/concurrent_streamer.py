@@ -122,7 +122,7 @@ class ConcurrentStreamer(Streamer):
         with self._stop_lock:
             return self._requested_stop
 
-    def get_releaser(self) -> AtomicBool:
+    def get_release(self) -> AtomicBool:
         """
         Returns a releaser that can be used to release resources.
 
