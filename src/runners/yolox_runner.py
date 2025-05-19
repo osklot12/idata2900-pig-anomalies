@@ -21,7 +21,7 @@ def main():
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=train_pipeline)
 
     train_pipeline = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
-    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL, pipeline=train_pipeline)
+    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TEST, pipeline=train_pipeline)
 
     train_provider = ReusableStreamProvider(stream=train_factory.create_stream())
     val_provider = ClosingStreamProvider(stream_factory=val_factory)
@@ -50,7 +50,7 @@ def main():
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_outputs/streaming_yolox/epoch_43_ckpt.pth",
+        ckpt="YOLOX_outputs_old/streaming_yolox_2025_04_23/epoch_35_ckpt.pth",
         fp16=True,
         fuse=False,
         cache=False,
