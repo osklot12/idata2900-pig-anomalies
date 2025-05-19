@@ -13,7 +13,7 @@ def main():
 
     class_counts = defaultdict(int)
 
-    for group in data.get("0"):
+    for group in data.get(0):
         for video_annotations in group.values():
             for behavior_class, count in video_annotations.items():
                 class_counts[behavior_class] += count
