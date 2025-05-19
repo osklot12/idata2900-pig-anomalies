@@ -30,7 +30,8 @@ def main():
         stream_provider=val_provider,
         classes=["tail_biting", "ear_biting", "belly_nosing", "tail_down"],
         output_dir="YOLOX_outputs/streaming_yolox",
-        nms=False
+        nms=False,
+        iou_thresh=0.5
     )
 
     exp = StreamingExp(
@@ -38,7 +39,7 @@ def main():
         val_stream_provider=val_provider,
         evaluator=evaluator,
         freeze_backbone=True,
-        iou_thresh=0.3
+        iou_thresh=0.2
     )
 
     args = argparse.Namespace(
