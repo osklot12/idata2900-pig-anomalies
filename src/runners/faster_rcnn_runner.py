@@ -28,7 +28,7 @@ def main():
     train_pipe = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     val_pipe = Pipeline(Preprocessor(ZlibDecompressor())).then(Preprocessor(BBoxDenormalizerProcessor()))
     train_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TRAIN, pipeline=train_pipe)
-    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.VAL, pipeline=val_pipe)
+    val_factory = NetworkDatasetStreamFactory(server_ip=SERVER_IP, split=DatasetSplit.TEST, pipeline=val_pipe)
 
     train_provider = ReusableStreamProvider(train_factory.create_stream())
     val_provider = ClosingStreamProvider(val_factory)
