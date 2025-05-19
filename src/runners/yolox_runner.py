@@ -50,7 +50,7 @@ def main():
         machine_rank=0,
         dist_url="auto",
         experiment_name=exp.exp_name,
-        ckpt="YOLOX_outputs_old/streaming_yolox_curriculum/epoch_80_ckpt.pth",
+        ckpt="YOLOX_outputs_feature_extraction/streaming_yolox/epoch_43_ckpt.pth",
         fp16=True,
         fuse=False,
         cache=False,
