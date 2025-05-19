@@ -59,7 +59,7 @@ def main():
         class_shift=1,
         freeze_backbone=False
     )
-    trainer.train(ckpt_path="faster_rcnn_outputs_onlyanomaly_aug_balance_head/epoch32.pth")
+    trainer.train(ckpt_path="faster_rcnn_outputs_fine_tuning/epoch43.pth")
 
 
 if __name__ == "__main__":
